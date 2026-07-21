@@ -20,8 +20,15 @@ const tips = [
 ]
 
 function randomTipAfter(current: number) {
-  const random = crypto.getRandomValues(new Uint32Array(1))[0]
-  return (current + 1 + (random % (tips.length - 1))) % tips.length
+  const randomScores = crypto.getRandomValues(new Uint32Array(tips.length))
+  let selected: number | null = null
+
+  for (let index = 0; index < tips.length; index += 1) {
+    if (index === current) continue
+    if (selected === null || randomScores[index] > randomScores[selected]) selected = index
+  }
+
+  return selected ?? current
 }
 
 function PaperclipAssistant({ context }: DesktopPluginProps) {
