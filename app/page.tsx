@@ -289,7 +289,7 @@ export default function Game() {
     if (pollRef.current) clearInterval(pollRef.current)
     pollRef.current = setInterval(async () => {
       try {
-        const res = await fetch(`/api/room/${code}`)
+        const res = await fetch(`/api/room/${code}?pid=${encodeURIComponent(playerId)}`)
         if (!res.ok) return
         const { room } = await res.json()
         setRoomState(room.state as RoomState)
@@ -298,6 +298,21 @@ export default function Game() {
   }
 
   useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current) }, [])
+
+  // ─── Screen ↔ phase sync ────────────────────────────────────────────────────
+  // The poll only updates roomState; this keeps every client's visible screen in
+  // lock-step with the room phase so non-hosts leave the lobby when the game starts
+  // (and return to it on rematch). Guarded so the name/join screens are untouched.
+  useEffect(() => {
+    if (!roomState) return
+    if (screen !== 'lobby' && screen !== 'game') return
+    const shouldBe = roomState.phase === 'lobby' ? 'lobby' : 'game'
+    if (screen !== shouldBe) setScreen(shouldBe)
+    // Keep host flag in sync in case of reconnect
+    const amHost = roomState.hostId === playerId
+    if (amHost !== hostRef.current) { hostRef.current = amHost; setIsHost(amHost) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomState?.phase, screen, playerId])
 
   // ─── Timer countdown ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -358,7 +373,7 @@ export default function Game() {
     setGuess(getGaugeValue(e.nativeEvent as MouseEvent | TouchEvent))
   }
 
-  // ─── Toast ─────────────────────────────────────────────────────────────────
+  // ─── Toast ────────────────────────────────────────────────────��────────────
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(null), 2800) }
 
   // ─── Flow: name ────────────────────────────────────────────────────────────
@@ -405,7 +420,7 @@ export default function Game() {
     if (code.length !== 6) { setJoinError(lang === 'uk' ? 'Код має бути 6 символів' : 'Code must be 6 characters'); return }
     setJoinError('')
     try {
-      const res = await fetch(`/api/room/${code}`)
+      const res = await fetch(`/api/room/${code}?pid=${encodeURIComponent(playerId)}`)
       if (!res.ok) { setJoinError(lang === 'uk' ? 'Кімнату не знайдено' : 'Room not found'); return }
       const { room } = await res.json()
       const state = room.state as RoomState
