@@ -908,6 +908,17 @@ export function ConsensusRadarGame() {
                 <p className="muted" style={{ fontSize: 13, marginTop: 10 }}>
                   {lockedCount}/{teamPlayers.length} {t('waitGuesses')}
                 </p>
+                {isHost && (
+                  <button
+                    className={`btn${allLocked ? '' : ' ghost'}`}
+                    style={{ marginTop: 20 }}
+                    onClick={showResult}
+                  >
+                    {allLocked
+                      ? (lang === 'uk' ? 'Показати результат' : 'Show result')
+                      : (lang === 'uk' ? 'Показати результат зараз' : 'Show result now')}
+                  </button>
+                )}
               </div>
             </div>
             {toast && <div className="toast">{toast}</div>}

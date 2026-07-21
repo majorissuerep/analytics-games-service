@@ -8,7 +8,21 @@ const tips = [
   'Double-click a desktop icon to launch a game.',
   'External games can leave with the versioned bridge—or you can close their window.',
   'Game authors own gameplay. This desktop owns discovery, entry, and exit.',
+  'Four teammates and one room code are enough to test a full session.',
+  'A minimized game waits on the taskbar without losing its room.',
+  'The Start menu knows every registered game, including remote ones.',
+  'Private game data stays server-side until your role may see it.',
+  'Plugins decorate the desktop; games remain isolated from them.',
+  'Try the developer guide when a new game idea starts buzzing.',
+  'Window close means back to the desktop—no maze of back buttons.',
+  'A good clue sparks alignment without giving the answer away.',
+  'Tiny games can reveal surprisingly large differences in assumptions.',
 ]
+
+function randomTipAfter(current: number) {
+  const random = crypto.getRandomValues(new Uint32Array(1))[0]
+  return (current + 1 + (random % (tips.length - 1))) % tips.length
+}
 
 function PaperclipAssistant({ context }: DesktopPluginProps) {
   const [visible, setVisible] = useState(true)
@@ -41,7 +55,7 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
             <strong>Pip says:</strong>
             <p>{tips[tipIndex]}</p>
             <div>
-              <button onClick={() => setTipIndex((tipIndex + 1) % tips.length)}>Next tip</button>
+              <button onClick={() => setTipIndex((current) => randomTipAfter(current))}>Surprise me</button>
               <button onClick={context.openHelp}>Help</button>
             </div>
           </div>
