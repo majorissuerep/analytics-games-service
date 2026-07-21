@@ -21,9 +21,13 @@ if (!process.env.DATABASE_URL) {
   process.exit(1)
 }
 
+const databaseUrl = new URL(process.env.DATABASE_URL)
+const sslMode = databaseUrl.searchParams.get('sslmode') ?? process.env.PGSSLMODE
+const ssl = sslMode === 'disable' ? false : { rejectUnauthorized: false }
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
+  ssl,
   max: 1,
   connectionTimeoutMillis: 10_000,
 })
@@ -55,6 +59,51 @@ const migrations = [
   // v3 — auto-expire stale rooms after 24 h (requires pg_cron or manual cleanup;
   // this column is additive and safe to add even if cleanup isn't wired yet)
   `ALTER TABLE rooms ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ`,
+
+  // v4 — shared multi-game room engine
+  `CREATE TABLE IF NOT EXISTS game_rooms (
+    code       TEXT PRIMARY KEY,
+    game_id    TEXT NOT NULL,
+    host_id    TEXT NOT NULL,
+    state      TEXT NOT NULL,
+    revision   INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  )`,
+
+  `CREATE INDEX IF NOT EXISTS game_rooms_game_updated_idx
+    ON game_rooms (game_id, updated_at DESC)`,
+
+  // v5 — leaderboard entries are isolated by game and room
+  `CREATE TABLE IF NOT EXISTS game_leaderboard (
+    id         BIGSERIAL PRIMARY KEY,
+    game_id    TEXT NOT NULL,
+    room_code  TEXT NOT NULL,
+    player_id  TEXT NOT NULL,
+    name       TEXT NOT NULL,
+    score      INTEGER NOT NULL DEFAULT 0,
+    rounds     INTEGER NOT NULL DEFAULT 0,
+    metadata   TEXT NOT NULL DEFAULT '{}',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (game_id, room_code, player_id)
+  )`,
+
+  `CREATE INDEX IF NOT EXISTS game_leaderboard_rank_idx
+    ON game_leaderboard (game_id, score DESC, updated_at ASC)`,
+
+  // v6 — registry for games hosted and released by other repositories
+  `CREATE TABLE IF NOT EXISTS platform_games (
+    id         TEXT PRIMARY KEY,
+    title      TEXT NOT NULL,
+    manifest   TEXT NOT NULL,
+    enabled    BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  )`,
+
+  `CREATE INDEX IF NOT EXISTS platform_games_enabled_title_idx
+    ON platform_games (enabled, title)`,
 ]
 // ────────────────────────────────────────────────────────────────────────────
 

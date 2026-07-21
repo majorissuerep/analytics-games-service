@@ -1,9 +1,11 @@
-import { drizzle } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
-import * as schema from './schema'
 
-export const pool = new Pool({
+const globalForDatabase = globalThis as typeof globalThis & {
+  analyticsGamesPool?: Pool
+}
+
+export const pool = globalForDatabase.analyticsGamesPool ?? new Pool({
   connectionString: process.env.DATABASE_URL,
 })
 
-export const db = drizzle(pool, { schema })
+if (process.env.NODE_ENV !== 'production') globalForDatabase.analyticsGamesPool = pool

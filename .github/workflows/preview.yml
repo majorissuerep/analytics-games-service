@@ -7,17 +7,28 @@ on:
     branches: [master]
     types: [opened, synchronize, reopened, labeled]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   check-label:
+    name: Check deployment label
     runs-on: ubuntu-latest
     outputs:
       has-label: ${{ steps.check.outputs.has-label }}
     steps:
       - id: check
+        env:
+          HAS_DEPLOY_LABEL: ${{ contains(github.event.pull_request.labels.*.name, 'deploy') }}
         run: |
-          echo "has-label=${{ contains(github.event.pull_request.labels.*.name, 'deploy') }}" >> "$GITHUB_OUTPUT"
+          echo "has-label=$HAS_DEPLOY_LABEL" >> "$GITHUB_OUTPUT"
 
   deploy-preview:
+    name: Deploy preview
     needs: check-label
     if: needs.check-label.outputs.has-label == 'true'
     runs-on: ubuntu-latest
@@ -27,13 +38,17 @@ jobs:
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24
           cache: npm
@@ -49,27 +64,29 @@ jobs:
 
       # ── Build & deploy to Vercel preview ───────────────────────────────────
       - name: Install Vercel CLI
-        run: npm install --global vercel@latest
+        run: npm install --global vercel@56.4.1
 
       - name: Pull Vercel environment (preview)
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
 
       - name: Build project
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --token="$VERCEL_TOKEN"
 
       - name: Deploy to Vercel (preview)
         id: deploy
         run: |
-          URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          URL=$(vercel deploy --prebuilt --token="$VERCEL_TOKEN")
           echo "url=$URL" >> "$GITHUB_OUTPUT"
 
       # ── Health-check the preview before reporting success ──────────────────
       - name: Health check preview
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
         run: |
           for i in $(seq 1 10); do
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-              -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}" \
-              "${{ steps.deploy.outputs.url }}/api/health")
+              -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" \
+              "$DEPLOY_URL/api/health")
             if [ "$STATUS" = "200" ]; then
               echo "Preview healthy (HTTP $STATUS)"
               exit 0
@@ -81,15 +98,18 @@ jobs:
 
       # ── Post preview URL as PR comment ────────────────────────────────────
       - name: Comment preview URL on PR
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+          DEPLOY_SHA: ${{ github.sha }}
         with:
           script: |
             const body = [
               '### Vercel Preview Deployment',
               '',
-              `**URL:** ${{ steps.deploy.outputs.url }}`,
+              `**URL:** ${process.env.DEPLOY_URL}`,
               '',
-              '> Deployed from commit `${{ github.sha }}`',
+              `> Deployed from commit \`${process.env.DEPLOY_SHA}\``,
             ].join('\n');
 
             // Update existing bot comment if it exists, otherwise create a new one

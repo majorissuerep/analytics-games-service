@@ -1,22 +1,54 @@
 {
-  "name": "v0-project",
-  "version": "1.0.0",
-  "description": "",
+  "name": "analytics-games-service",
+  "version": "0.1.0",
+  "packageManager": "npm@11.12.1",
+  "private": true,
+  "description": "Shared web engine and catalog for analytics team games",
+  "workspaces": [
+    "games/*",
+    "packages/*",
+    "plugins/*"
+  ],
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "build": "next build --webpack",
+    "start": "next start",
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run test && npm run typecheck && npm run workspace:check && npm run build",
+    "workspace:check": "turbo run check",
+    "audit:dependencies": "npm audit --audit-level=high",
+    "scan:security": "bash scripts/security-scan.sh"
   },
   "dependencies": {
+    "motion": "^12.42.2",
+    "next": "^16.2.11",
+    "pg": "^8.22.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-rnd": "^10.5.3",
+    "xp.css": "^0.2.6",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
     "@types/node": "^26.1.1",
     "@types/pg": "^8.20.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "drizzle-orm": "^0.45.2",
-    "next": "^16.2.10",
-    "pg": "^8.22.0",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "typescript": "^5.8.3"
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.2.11",
+    "eslint-plugin-security": "^4.0.1",
+    "globals": "^17.7.0",
+    "turbo": "^2.10.5",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "postcss": "^8.5.10"
   }
 }

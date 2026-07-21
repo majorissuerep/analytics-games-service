@@ -1,0 +1,21 @@
+{
+  "name": "@analytics-games/game-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Versioned host bridge for externally hosted Analytics Games",
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit -p tsconfig.json"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "phaser": ">=4"
+  },
+  "peerDependenciesMeta": {
+    "phaser": {
+      "optional": true
+    }
+  }
+}

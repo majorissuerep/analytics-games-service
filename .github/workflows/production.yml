@@ -5,22 +5,33 @@ on:
   push:
     branches: [master]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: production
+  cancel-in-progress: false
+
 jobs:
   deploy-production:
+    name: Deploy production
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      deployments: write
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24
           cache: npm
@@ -40,20 +51,20 @@ jobs:
       # ── Build & deploy with blue/green so the old deployment keeps
       # serving traffic until we have verified the new one is healthy. ───────
       - name: Install Vercel CLI
-        run: npm install --global vercel@latest
+        run: npm install --global vercel@56.4.1
 
       - name: Pull Vercel environment (production)
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
 
       - name: Build project (production)
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --prod --token="$VERCEL_TOKEN"
 
       # Deploy WITHOUT assigning the domain yet (blue/green step 1).
       # The current production URL keeps serving the old deployment.
       - name: Deploy to Vercel (no domain assignment yet)
         id: deploy
         run: |
-          URL=$(vercel deploy --prebuilt --prod --skip-domain --token=${{ secrets.VERCEL_TOKEN }})
+          URL=$(vercel deploy --prebuilt --prod --skip-domain --token="$VERCEL_TOKEN")
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "Deployed (pending health check): $URL"
 
@@ -61,12 +72,14 @@ jobs:
       # Retry for up to 5 minutes (30 attempts × 10s). The old deployment
       # remains live during this entire window.
       - name: Health check new deployment
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
         run: |
           MAX=30
           for i in $(seq 1 $MAX); do
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-              -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}" \
-              "${{ steps.deploy.outputs.url }}/api/health")
+              -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" \
+              "$DEPLOY_URL/api/health")
             if [ "$STATUS" = "200" ]; then
               echo "New deployment is healthy (HTTP $STATUS) — promoting to production"
               exit 0
@@ -81,8 +94,10 @@ jobs:
       # Only runs if the health check passed. This is the only moment the
       # old deployment stops serving production traffic.
       - name: Promote to production
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
         run: |
-          vercel promote "${{ steps.deploy.outputs.url }}" \
-            --token=${{ secrets.VERCEL_TOKEN }} \
+          vercel promote "$DEPLOY_URL" \
+            --token="$VERCEL_TOKEN" \
             --yes
-          echo "Production promoted to: ${{ steps.deploy.outputs.url }}"
+          echo "Production promoted to: $DEPLOY_URL"
