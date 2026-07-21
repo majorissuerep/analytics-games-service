@@ -3,7 +3,6 @@
 import { useRouter } from 'next/navigation'
 import type { GameManifest } from '@/lib/engine/types'
 import { GameFrame } from './GameFrame'
-import 'xp.css/dist/XP.css'
 import './desktop.css'
 
 export function StandaloneGameFrame({ game }: { game: GameManifest }) {

@@ -7,6 +7,8 @@ __v0_jsx-dev-runtime.ts
 node_modules
 .next/
 .turbo/
+playwright-report/
+test-results/
 *.tsbuildinfo
 .env*.local
 .DS_Store

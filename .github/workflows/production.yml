@@ -90,6 +90,26 @@ jobs:
           echo "::error::New deployment never became healthy — aborting promote. Old deployment is still live."
           exit 1
 
+      # Exercise desktop entry/exit, Pip, and a complete four-player game on
+      # the candidate deployment before it receives the production domain.
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser acceptance suite
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ steps.deploy.outputs.url }}
+        run: npm run test:e2e
+
+      - name: Upload browser diagnostics
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: production-browser-e2e-diagnostics
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+
       # ── Promote: atomically swap the domain to the new deployment ─────────
       # Only runs if the health check passed. This is the only moment the
       # old deployment stops serving production traffic.
