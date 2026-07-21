@@ -52,7 +52,8 @@ jobs:
           --health-retries 10
     env:
       DATABASE_URL: postgresql://postgres:e2echeck@127.0.0.1:5432/analytics_games?sslmode=disable
-      PLAYWRIGHT_BASE_URL: http://127.0.0.1:3130
+      PLAYWRIGHT_BASE_URL: http://localhost:3130
+      PORT: 3130
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
