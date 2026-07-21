@@ -29,8 +29,8 @@ Local development also initializes missing tables on first API use. Canonical en
 `npm run check` runs ESLint (Next.js, TypeScript, React, and security rules), tests,
 workspace type checks, and a production build. `npm run scan:security` additionally
 runs npm audit, Gitleaks, Trivy, actionlint, and zizmor locally. CI also runs CodeQL
-and dependency review. Scanner versions and GitHub Actions are pinned; Dependabot
-opens weekly npm and Actions updates.
+while Dependabot opens weekly npm and Actions updates. Scanner versions, container
+images, and GitHub Actions are pinned.
 
 ```bash
 npm test

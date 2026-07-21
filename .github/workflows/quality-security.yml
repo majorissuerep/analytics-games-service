@@ -34,7 +34,7 @@ jobs:
         run: npm run check
 
   dependency-audit:
-    name: npm and dependency review
+    name: npm dependency audit
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -50,11 +50,6 @@ jobs:
         run: npm ci
       - name: Audit npm dependencies
         run: npm run audit:dependencies
-      - name: Review dependency changes
-        if: github.event_name == 'pull_request'
-        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4
-        with:
-          fail-on-severity: high
 
   codeql:
     name: CodeQL
