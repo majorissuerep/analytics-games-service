@@ -8,7 +8,6 @@ on:
 jobs:
   deploy-production:
     runs-on: ubuntu-latest
-    environment: production
     permissions:
       contents: read
       deployments: write
@@ -80,7 +79,7 @@ jobs:
       # old deployment stops serving production traffic.
       - name: Promote to production
         run: |
-          vercel promote ${{ steps.deploy.outputs.url }} \
-            --scope ${{ secrets.VERCEL_ORG_ID }} \
-            --token=${{ secrets.VERCEL_TOKEN }}
+          vercel promote "${{ steps.deploy.outputs.url }}" \
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            --yes
           echo "Production promoted to: ${{ steps.deploy.outputs.url }}"
