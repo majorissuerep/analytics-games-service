@@ -1,0 +1,125 @@
+.millennium-desktop {
+  --taskbar-height: 42px;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  color: #10294f;
+  font-family: Tahoma, Verdana, Arial, sans-serif;
+  font-size: 12px;
+  background: #69bce5;
+  user-select: none;
+}
+
+.standalone-game-shell { position: fixed; inset: 0; padding: 4px; background: #174d97; }
+.standalone-game-shell .desktop-window { width: 100%; height: 100%; }
+
+.millennium-desktop * { box-sizing: border-box; }
+
+.desktop-sky { position: absolute; inset: 0 0 var(--taskbar-height); overflow: hidden; background: linear-gradient(#69bce5 0%, #b9e8ff 67%, #e8f8ff 100%); }
+.desktop-cloud { position: absolute; width: 180px; height: 38px; border-radius: 50%; background: rgba(255,255,255,.82); filter: blur(.2px); }
+.desktop-cloud::before, .desktop-cloud::after { content: ''; position: absolute; background: inherit; border-radius: 50%; }
+.desktop-cloud::before { width: 78px; height: 78px; left: 24px; bottom: 0; }
+.desktop-cloud::after { width: 104px; height: 62px; right: 17px; bottom: 0; }
+.cloud-one { top: 10%; left: 8%; transform: scale(.8); opacity: .78; }
+.cloud-two { top: 18%; right: 14%; transform: scale(1.15); opacity: .6; }
+.desktop-hill { position: absolute; border-radius: 50% 50% 0 0; transform-origin: center bottom; }
+.hill-back { width: 120%; height: 42%; left: -24%; bottom: -16%; background: #79bd55; transform: rotate(7deg); box-shadow: inset 0 14px 30px rgba(255,255,255,.25); }
+.hill-front { width: 105%; height: 35%; right: -30%; bottom: -12%; background: linear-gradient(150deg, #4eaa40, #1f7c37); transform: rotate(-8deg); box-shadow: inset 0 18px 35px rgba(255,255,255,.18); }
+
+.desktop-icons { position: absolute; z-index: 2; top: 18px; left: 14px; bottom: 56px; display: flex; width: 102px; flex-direction: column; flex-wrap: wrap; align-content: flex-start; gap: 8px 12px; }
+.millennium-desktop .desktop-icon { width: 88px; min-width: 0; min-height: 82px; padding: 4px; border: 1px solid transparent; box-shadow: none; color: white; background: transparent; text-shadow: 1px 1px 2px #16375f; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 3px; cursor: default; }
+.millennium-desktop .desktop-icon:hover, .millennium-desktop .desktop-icon:focus { border: 1px dotted rgba(255,255,255,.9); background: rgba(24, 74, 154, .25); outline: none; }
+.desktop-icon-art { width: 46px; height: 46px; border-radius: 9px; border: 1px solid rgba(255,255,255,.62); display: grid; place-items: center; font-size: 28px; background: rgba(255,255,255,.2); box-shadow: 0 3px 7px rgba(0, 31, 89, .35), inset 0 1px rgba(255,255,255,.6); text-shadow: none; }
+.desktop-icon > span:nth-child(2) { max-width: 84px; line-height: 14px; }
+.desktop-icon small { padding: 0 4px; border-radius: 6px; color: #eaf7ff; background: rgba(0,40,100,.46); font-size: 9px; text-transform: uppercase; }
+.desktop-plugin-art { background: linear-gradient(135deg,#ffd65a,#ec8d2c); }
+.desktop-help-art { color: white; background: linear-gradient(135deg,#537ce0,#20398c); font-weight: 800; }
+
+.desktop-windows { position: absolute; z-index: 4; inset: 0 0 var(--taskbar-height); pointer-events: none; }
+.desktop-rnd-window { pointer-events: auto; }
+.desktop-window { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 3px; overflow: hidden; box-shadow: 4px 7px 22px rgba(0, 20, 60, .38); }
+.desktop-window .title-bar { flex: 0 0 auto; cursor: default; }
+.desktop-window .title-bar-text { display: flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.desktop-window-body { flex: 1 1 auto; min-height: 0; overflow: hidden; background: #f7f7f1; border: 1px solid #7f9db9; }
+.desktop-game-frame { display: block; width: 100%; height: 100%; border: 0; background: #070b12; }
+.redirect-game-panel { width: 100%; height: 100%; display: grid; place-content: center; justify-items: center; gap: 12px; padding: 30px; text-align: center; background: #f2f2e7; }
+.redirect-game-panel h2 { margin: 0; font-size: 24px; }
+.redirect-game-panel p { max-width: 440px; }
+.redirect-game-panel a { padding: 9px 22px; color: white; background: #1d56c5; border: 2px outset #dbe7ff; font-weight: 700; }
+
+.system-panel { height: 100%; overflow: auto; padding: 22px; color: #18212e; background: linear-gradient(135deg,#fff 0,#f2f2e7 100%); user-select: text; }
+.system-panel h1, .system-panel h2 { color: #173f8d; }
+.welcome-panel { display: grid; grid-template-columns: 118px 1fr; align-items: center; gap: 24px; }
+.welcome-logo { width: 110px; height: 110px; display: grid; place-items: center; border-radius: 30% 55% 44% 62%; color: white; background: linear-gradient(145deg,#276bd6,#1bad90); box-shadow: inset 0 3px rgba(255,255,255,.5), 0 7px 18px rgba(20,60,120,.3); transform: rotate(-6deg); }
+.welcome-logo span { font-size: 35px; font-weight: 900; transform: rotate(6deg); }
+.welcome-kicker { margin: 0; color: #198b71; font-size: 11px; font-weight: 800; letter-spacing: .14em; }
+.welcome-panel h1 { margin: 7px 0 10px; font-size: 34px; line-height: 1; }
+.welcome-panel p { font-size: 14px; line-height: 1.55; }
+.welcome-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.welcome-actions a { margin-left: 6px; font-weight: 700; }
+.help-panel { font-size: 14px; }
+.help-panel ol { padding-left: 24px; line-height: 1.8; }
+.help-panel code { padding: 2px 5px; background: #e5e6dc; }
+.plugin-manager header { margin-bottom: 16px; }
+.plugin-manager h2 { margin: 0 0 4px; font-size: 22px; }
+.plugin-row { display: grid; grid-template-columns: 20px 1fr auto; gap: 10px; align-items: center; padding: 12px; border: 1px solid #aeb9c8; background: white; }
+.plugin-row input { position: static; opacity: 1; appearance: auto; }
+.plugin-row span { display: flex; flex-direction: column; gap: 3px; }
+.plugin-row small { color: #596477; }
+.plugin-row code { color: #174c9b; }
+
+.paperclip-assistant { position: absolute; z-index: 10000; right: 24px; bottom: 58px; display: flex; align-items: flex-end; gap: 10px; filter: drop-shadow(0 5px 8px rgba(0, 30, 80, .28)); }
+.paperclip-dismiss { position: absolute; z-index: 2; top: -9px; right: -7px; width: 20px; min-width: 20px; height: 20px; min-height: 20px; padding: 0; border-radius: 50%; color: white; background: #ca342f; font: 700 13px/18px Arial; }
+.paperclip-character { position: relative; width: 66px; height: 100px; flex: 0 0 auto; }
+.paperclip-loop { position: absolute; border: 7px solid #b9c5d3; border-right-color: #748397; border-radius: 50px; transform: rotate(16deg); box-shadow: inset 2px 0 #fff, 2px 2px 0 #3e5069; }
+.paperclip-loop-outer { inset: 2px 7px 0 9px; }
+.paperclip-loop-inner { inset: 22px 20px 18px 22px; border-width: 5px; }
+.paperclip-eye { position: absolute; z-index: 2; top: 28px; width: 7px; height: 10px; border-radius: 50%; background: #17263c; box-shadow: 0 0 0 2px white; }
+.paperclip-eye-left { left: 26px; }
+.paperclip-eye-right { left: 43px; }
+.paperclip-bubble { position: relative; width: 255px; padding: 12px 14px; border: 1px solid #6a6d51; border-radius: 9px; background: #fffbd3; color: #202114; user-select: text; }
+.paperclip-bubble::after { content: ''; position: absolute; left: -9px; bottom: 19px; width: 16px; height: 16px; border-left: 1px solid #6a6d51; border-bottom: 1px solid #6a6d51; background: #fffbd3; transform: rotate(45deg); }
+.paperclip-bubble strong { color: #174c9b; }
+.paperclip-bubble p { min-height: 32px; margin: 6px 0 10px; line-height: 1.35; }
+.paperclip-bubble > div { display: flex; gap: 6px; }
+
+.start-menu { position: absolute; z-index: 11000; left: 0; bottom: var(--taskbar-height); width: 390px; min-height: 310px; display: grid; grid-template-columns: 42px 1fr; padding: 3px; box-shadow: 4px -5px 18px rgba(0,25,70,.38); }
+.start-menu-banner { display: flex; align-items: center; gap: 5px; padding: 8px 5px; color: white; background: linear-gradient(#174aa8,#1c68c6); writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: .04em; font-size: 15px; }
+.start-menu-banner strong { font-size: 20px; }
+.start-menu-items { padding: 8px; background: #f4f3e8; }
+.start-menu-items > button { width: 100%; min-height: 52px; display: flex; align-items: center; gap: 10px; padding: 6px; border: 0; box-shadow: none; text-align: left; background: transparent; }
+.start-menu-items > button:hover { color: white; background: #245edb; }
+.start-menu-items > button > span { width: 34px; font-size: 25px; text-align: center; }
+.start-menu-items > button > div { display: flex; min-width: 0; flex-direction: column; gap: 2px; }
+.start-menu-items small { overflow: hidden; color: #697080; white-space: nowrap; text-overflow: ellipsis; }
+.start-menu-items > button:hover small { color: #dbe8ff; }
+.start-menu-items hr { border: 0; border-top: 1px solid #aeb3bc; border-bottom: 1px solid white; }
+
+.desktop-taskbar { position: absolute; z-index: 12000; left: 0; right: 0; bottom: 0; height: var(--taskbar-height); display: flex; align-items: stretch; gap: 5px; padding: 3px 5px 3px 0; background: linear-gradient(#2c73df 0,#1757c8 12%,#1454c4 84%,#0f43a4 100%); box-shadow: inset 0 1px rgba(255,255,255,.62), 0 -2px 7px rgba(0,25,90,.3); }
+.millennium-desktop .start-button { width: 102px; min-width: 102px; height: 36px; min-height: 36px; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 0 12px 1px 6px; border: 0; border-radius: 0 16px 16px 0; color: white; background: linear-gradient(#5fbb5e,#2f9638 18%,#21862e 82%,#196d26); box-shadow: inset 0 1px 2px rgba(255,255,255,.8), inset -2px -2px 3px rgba(12,77,24,.7), 2px 0 4px rgba(0,30,90,.35); text-shadow: 1px 1px #155021; font-size: 15px; font-style: italic; }
+.millennium-desktop .start-button.active { filter: brightness(.86); box-shadow: inset 2px 2px 4px rgba(0,55,20,.65); }
+.start-mark { color: #ffdf3f; font-size: 17px; transform: rotate(12deg); }
+.taskbar-windows { display: flex; min-width: 0; flex: 1; gap: 3px; }
+.millennium-desktop .taskbar-windows button { width: min(190px, 24vw); min-width: 70px; min-height: 34px; overflow: hidden; padding: 0 9px; border: 1px solid #0f3c9c; border-radius: 3px; color: white; background: linear-gradient(#3f83e6,#2567d1); box-shadow: inset 1px 1px rgba(255,255,255,.28); text-align: left; white-space: nowrap; text-overflow: ellipsis; }
+.millennium-desktop .taskbar-windows button.active { background: #194da9; box-shadow: inset 2px 2px 3px rgba(0,24,88,.48); }
+.taskbar-tray { min-width: 112px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 0 10px; color: white; background: linear-gradient(#2e94e8,#1780d5); border-left: 1px solid #0e54b1; box-shadow: inset 1px 0 rgba(255,255,255,.25); }
+.taskbar-tray time { font-variant-numeric: tabular-nums; }
+
+@media (max-width: 760px) {
+  .desktop-icons { width: calc(100% - 20px); flex-direction: row; flex-wrap: wrap; }
+  .desktop-rnd-window { transform: none !important; inset: 0 !important; width: 100% !important; height: calc(100% - var(--taskbar-height)) !important; }
+  .desktop-window { border-radius: 0; }
+  .start-menu { width: min(390px, 100%); }
+  .paperclip-assistant { right: 8px; }
+  .paperclip-character { display: none; }
+  .paperclip-bubble { width: min(280px, calc(100vw - 16px)); }
+  .paperclip-bubble::after { display: none; }
+  .welcome-panel { grid-template-columns: 1fr; }
+  .welcome-logo { display: none; }
+  .taskbar-tray { min-width: 78px; }
+  .taskbar-tray span { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paperclip-character { transform: none !important; }
+}
