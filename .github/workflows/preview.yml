@@ -1,0 +1,113 @@
+name: Preview Deployment
+
+# Fires when a PR targeting master is opened/updated AND has the "deploy" label,
+# or when the "deploy" label is added to an already-open PR.
+on:
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened, labeled]
+
+jobs:
+  check-label:
+    runs-on: ubuntu-latest
+    outputs:
+      has-label: ${{ steps.check.outputs.has-label }}
+    steps:
+      - id: check
+        run: |
+          echo "has-label=${{ contains(github.event.pull_request.labels.*.name, 'deploy') }}" >> "$GITHUB_OUTPUT"
+
+  deploy-preview:
+    needs: check-label
+    if: needs.check-label.outputs.has-label == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write   # needed to post the comment
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # ── Run idempotent DB migrations before the build ──────────────────────
+      - name: Run DB migrations
+        run: node scripts/migrate.mjs
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      # ── Build & deploy to Vercel preview ───────────────────────────────────
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel environment (preview)
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build project
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy to Vercel (preview)
+        id: deploy
+        run: |
+          URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      # ── Health-check the preview before reporting success ──────────────────
+      - name: Health check preview
+        run: |
+          for i in $(seq 1 10); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ steps.deploy.outputs.url }}/api/health")
+            if [ "$STATUS" = "200" ]; then
+              echo "Preview healthy (HTTP $STATUS)"
+              exit 0
+            fi
+            echo "Attempt $i: got $STATUS, retrying in 10s…"
+            sleep 10
+          done
+          echo "Preview never became healthy" && exit 1
+
+      # ── Post preview URL as PR comment ────────────────────────────────────
+      - name: Comment preview URL on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = [
+              '### Vercel Preview Deployment',
+              '',
+              `**URL:** ${{ steps.deploy.outputs.url }}`,
+              '',
+              '> Deployed from commit `${{ github.sha }}`',
+            ].join('\n');
+
+            // Update existing bot comment if it exists, otherwise create a new one
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('Vercel Preview Deployment')
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
