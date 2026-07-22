@@ -1,6 +1,6 @@
 # Add a game
 
-Choose one lane.
+Choose one lane. A game does not need multiplayer or database state.
 
 ## External game — recommended default
 
@@ -37,7 +37,21 @@ Register strict manifest with `POST /api/platform/games` and admin bearer token.
 
 Use `openMode: "redirect"` when host forbids framing. Game receives `ag_return_url` and must provide a visible return action.
 
-## Internal engine game
+## Browser-local internal game
+
+Use this for single-player, canvas, puzzle, arcade, or creative apps. Create an isolated workspace:
+
+```text
+games/my-game/
+  package.json
+  manifest.ts
+  model.ts             # optional pure rules/physics
+  client/Game.tsx
+```
+
+Register only the manifest in `games/catalog.ts` and component in `games/client-registry.tsx`. Keep CSS selectors scoped under one game root. Add pure model tests plus a browser launch/interaction/close check. Minefield, Orbit Pinball, and Paintbox are examples.
+
+## Internal multiplayer engine game
 
 Create workspace:
 

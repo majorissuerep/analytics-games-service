@@ -1,0 +1,13 @@
+{
+  "name": "@analytics-games/game-shuffle",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Random game launcher for the desktop Start menu",
+  "type": "module",
+  "scripts": { "check": "tsc --noEmit -p tsconfig.json" },
+  "exports": { ".": "./src/index.tsx" },
+  "peerDependencies": {
+    "@analytics-games/plugin-sdk": "1.x",
+    "react": ">=19"
+  }
+}

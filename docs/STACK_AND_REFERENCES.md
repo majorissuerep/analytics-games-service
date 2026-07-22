@@ -23,9 +23,13 @@
 - [Puter](https://github.com/HeyPuter/puter), AGPL: strong remote-app ecosystem reference; too broad for this focused launcher and not embedded.
 - [React95](https://github.com/React95/React95), code MIT: evaluated for component/plugin coverage. Not used because repository explicitly excludes Microsoft-associated imagery from its license.
 - [Phaser](https://phaser.io/), MIT: recommended optional internal game engine and plugin ecosystem.
+- [OS.js](https://github.com/os-js/OS.js), BSD-2-Clause: mature application/package and web-desktop extension reference; not embedded because platform already has a smaller typed shell.
+- [JS Paint](https://github.com/1j01/jspaint), MIT: high-quality browser painting reference. Paintbox is original, smaller, browser-local code rather than copied JS Paint UI/assets.
+- [Webamp](https://github.com/captbaritone/webamp), MIT: proven embeddable nostalgic application reference; candidate future multimedia plugin, not currently bundled.
+- [SpaceCadetPinball](https://github.com/k4zmu2a/SpaceCadetPinball), MIT code with original resource files distributed separately: reviewed but not reused. Orbit Pinball uses original table art, names, and physics.
 
 ## Copyright/trademark boundary
 
-Product calls its UI **Millennium Desktop**. It uses no Microsoft names in UI, Windows logo, Bliss wallpaper, system icons, sounds, or Office Assistant sprites. Background, icons, assistant, and branding are original code/assets. Nostalgic layout and control behavior are inspiration; third-party code retains its license notices.
+Product calls its UI **Millennium Desktop**. It uses no Microsoft names in UI, Windows logo, Bliss wallpaper, system icons, sounds, game resources, or Office Assistant sprites. Background, icons, assistant, game art, and branding are original code/assets. Nostalgic layout and control behavior are inspiration; third-party code retains its license notices.
 
 This is an engineering risk reduction, not legal advice. Public commercial launch should still receive trademark/trade-dress review.

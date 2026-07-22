@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Rnd } from 'react-rnd'
-import type { DesktopPluginContext } from '@analytics-games/plugin-sdk'
+import type { DesktopPluginContext, DesktopPluginSlot } from '@analytics-games/plugin-sdk'
 import type { GameManifest } from '@/lib/engine/types'
 import { DESKTOP_PLUGINS } from '@/plugins/registry'
 import { GameFrame } from './GameFrame'
@@ -74,6 +74,7 @@ export function DesktopShell({ games }: DesktopShellProps) {
 
   const pluginContext: DesktopPluginContext = {
     gamesCount: games.length,
+    games: games.map(({ id, title, icon }) => ({ id, title, icon })),
     openGame: (gameId) => {
       const game = gamesById.get(gameId)
       if (game) openGame(game.id, game.title)
@@ -83,12 +84,7 @@ export function DesktopShell({ games }: DesktopShellProps) {
 
   return (
     <main className="millennium-desktop" onClick={() => startOpen && setStartOpen(false)}>
-      <div className="desktop-sky" aria-hidden>
-        <div className="desktop-cloud cloud-one" />
-        <div className="desktop-cloud cloud-two" />
-        <div className="desktop-hill hill-back" />
-        <div className="desktop-hill hill-front" />
-      </div>
+      <div className="desktop-sky" aria-hidden />
 
       <section className="desktop-icons" aria-label="Games and platform tools">
         {games.map((game) => (
@@ -159,9 +155,7 @@ export function DesktopShell({ games }: DesktopShellProps) {
         })}
       </section>
 
-      {DESKTOP_PLUGINS.filter((plugin) => enabledPlugins[plugin.manifest.id]).map((plugin) => (
-        <plugin.Component key={plugin.manifest.id} context={pluginContext} />
-      ))}
+      <PluginSlot slot="desktop-overlay" enabled={enabledPlugins} context={pluginContext} />
 
       {startOpen && (
         <nav className="start-menu window" onClick={(event) => event.stopPropagation()} aria-label="Start menu">
@@ -172,6 +166,7 @@ export function DesktopShell({ games }: DesktopShellProps) {
                 <span>{game.icon ?? '🎮'}</span><div><strong>{game.title}</strong><small>{game.description}</small></div>
               </button>
             ))}
+            <PluginSlot slot="start-menu" enabled={enabledPlugins} context={pluginContext} />
             <hr />
             <button onClick={() => openSystem('plugins', 'Plugin Manager')}><span>🧩</span><strong>Plugin Manager</strong></button>
             <button onClick={() => openSystem('help', 'Platform Help')}><span>📘</span><strong>Developer Guide</strong></button>
@@ -190,10 +185,27 @@ export function DesktopShell({ games }: DesktopShellProps) {
             </button>
           ))}
         </div>
-        <div className="taskbar-tray"><span aria-hidden>🔊</span><time>{clock}</time></div>
+        <div className="taskbar-tray">
+          <PluginSlot slot="tray" enabled={enabledPlugins} context={pluginContext} />
+          <span aria-hidden>🔊</span><time>{clock}</time>
+        </div>
       </footer>
     </main>
   )
+}
+
+function PluginSlot({
+  slot,
+  enabled,
+  context,
+}: {
+  slot: DesktopPluginSlot
+  enabled: Record<string, boolean>
+  context: DesktopPluginContext
+}) {
+  return DESKTOP_PLUGINS
+    .filter((plugin) => plugin.manifest.slot === slot && enabled[plugin.manifest.id])
+    .map((plugin) => <plugin.Component key={plugin.manifest.id} context={context} />)
 }
 
 function WindowContent({

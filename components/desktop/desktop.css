@@ -37,16 +37,15 @@
 
 .millennium-desktop * { box-sizing: border-box; }
 
-.desktop-sky { position: absolute; inset: 0 0 var(--taskbar-height); overflow: hidden; background: linear-gradient(#69bce5 0%, #b9e8ff 67%, #e8f8ff 100%); }
-.desktop-cloud { position: absolute; width: 180px; height: 38px; border-radius: 50%; background: rgba(255,255,255,.82); filter: blur(.2px); }
-.desktop-cloud::before, .desktop-cloud::after { content: ''; position: absolute; background: inherit; border-radius: 50%; }
-.desktop-cloud::before { width: 78px; height: 78px; left: 24px; bottom: 0; }
-.desktop-cloud::after { width: 104px; height: 62px; right: 17px; bottom: 0; }
-.cloud-one { top: 10%; left: 8%; transform: scale(.8); opacity: .78; }
-.cloud-two { top: 18%; right: 14%; transform: scale(1.15); opacity: .6; }
-.desktop-hill { position: absolute; border-radius: 50% 50% 0 0; transform-origin: center bottom; }
-.hill-back { width: 120%; height: 42%; left: -24%; bottom: -16%; background: #79bd55; transform: rotate(7deg); box-shadow: inset 0 14px 30px rgba(255,255,255,.25); }
-.hill-front { width: 105%; height: 35%; right: -30%; bottom: -12%; background: linear-gradient(150deg, #4eaa40, #1f7c37); transform: rotate(-8deg); box-shadow: inset 0 18px 35px rgba(255,255,255,.18); }
+.desktop-sky {
+  position: absolute;
+  inset: 0 0 var(--taskbar-height);
+  overflow: hidden;
+  background-color: #69bce5;
+  background-image: linear-gradient(rgba(20, 77, 132, .04), rgba(4, 41, 85, .1)), url('/wallpapers/green-horizon.png');
+  background-position: center;
+  background-size: cover;
+}
 
 .desktop-icons { position: absolute; z-index: 2; top: 18px; left: 14px; bottom: 56px; display: flex; width: 102px; flex-direction: column; flex-wrap: wrap; align-content: flex-start; gap: 8px 12px; }
 .millennium-desktop .desktop-icon { width: 88px; min-width: 0; min-height: 82px; padding: 4px; border: 1px solid transparent; box-shadow: none; color: white; background: transparent; text-shadow: 1px 1px 2px #16375f; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 3px; cursor: default; }
@@ -105,6 +104,13 @@
 .paperclip-bubble p { min-height: 32px; margin: 6px 0 10px; line-height: 1.35; }
 .paperclip-bubble > div { display: flex; gap: 6px; }
 
+.sticky-note-plugin { position: absolute; z-index: 3; top: 20px; right: 22px; width: 220px; padding: 10px; background: #fff29a; box-shadow: 3px 5px 12px rgba(42, 35, 0, .32); transform: rotate(1deg); user-select: text; }
+.sticky-note-plugin header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; color: #5e5000; font-weight: 700; }
+.sticky-note-plugin textarea { width: 100%; min-height: 92px; resize: vertical; border: 0; outline: 0; color: #3c360d; background: transparent; font: 13px/1.45 'Comic Sans MS', Tahoma, sans-serif; }
+.sticky-note-plugin button { min-width: 20px; min-height: 20px; padding: 0; border: 0; box-shadow: none; background: transparent; font-weight: 800; }
+.plugin-quick-launch { border-top: 1px solid #d4d1bd !important; }
+.session-meter-plugin { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; font-size: 11px; }
+
 .start-menu { position: absolute; z-index: 11000; left: 0; bottom: var(--taskbar-height); width: 390px; min-height: 310px; display: grid; grid-template-columns: 42px 1fr; padding: 3px; box-shadow: 4px -5px 18px rgba(0,25,70,.38); }
 .start-menu-banner { display: flex; align-items: center; gap: 5px; padding: 8px 5px; color: white; background: linear-gradient(#174aa8,#1c68c6); writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: .04em; font-size: 15px; }
 .start-menu-banner strong { font-size: 20px; }
@@ -124,7 +130,7 @@
 .taskbar-windows { display: flex; min-width: 0; flex: 1; gap: 3px; }
 .millennium-desktop .taskbar-windows button { width: min(190px, 24vw); min-width: 70px; min-height: 34px; overflow: hidden; padding: 0 9px; border: 1px solid #0f3c9c; border-radius: 3px; color: white; background: linear-gradient(#3f83e6,#2567d1); box-shadow: inset 1px 1px rgba(255,255,255,.28); text-align: left; white-space: nowrap; text-overflow: ellipsis; }
 .millennium-desktop .taskbar-windows button.active { background: #194da9; box-shadow: inset 2px 2px 3px rgba(0,24,88,.48); }
-.taskbar-tray { min-width: 112px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 0 10px; color: white; background: linear-gradient(#2e94e8,#1780d5); border-left: 1px solid #0e54b1; box-shadow: inset 1px 0 rgba(255,255,255,.25); }
+.taskbar-tray { min-width: 150px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 0 10px; color: white; background: linear-gradient(#2e94e8,#1780d5); border-left: 1px solid #0e54b1; box-shadow: inset 1px 0 rgba(255,255,255,.25); }
 .taskbar-tray time { font-variant-numeric: tabular-nums; }
 
 @media (max-width: 760px) {
@@ -136,6 +142,7 @@
   .paperclip-character { display: none; }
   .paperclip-bubble { width: min(280px, calc(100vw - 16px)); }
   .paperclip-bubble::after { display: none; }
+  .sticky-note-plugin { display: none; }
   .welcome-panel { grid-template-columns: 1fr; }
   .welcome-logo { display: none; }
   .taskbar-tray { min-width: 78px; }

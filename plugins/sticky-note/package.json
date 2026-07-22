@@ -1,0 +1,13 @@
+{
+  "name": "@analytics-games/sticky-note",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Persistent browser-local desktop note",
+  "type": "module",
+  "scripts": { "check": "tsc --noEmit -p tsconfig.json" },
+  "exports": { ".": "./src/index.tsx" },
+  "peerDependencies": {
+    "@analytics-games/plugin-sdk": "1.x",
+    "react": ">=19"
+  }
+}

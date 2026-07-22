@@ -11,8 +11,15 @@ export interface DesktopPluginManifest {
   defaultEnabled: boolean
 }
 
+export interface DesktopGameSummary {
+  id: string
+  title: string
+  icon?: string
+}
+
 export interface DesktopPluginContext {
   gamesCount: number
+  games: readonly DesktopGameSummary[]
   openGame(gameId: string): void
   openHelp(): void
 }

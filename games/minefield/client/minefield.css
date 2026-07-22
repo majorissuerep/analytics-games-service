@@ -1,0 +1,22 @@
+.minefield-app { width: 100%; min-height: 100svh; align-self: stretch; padding: 18px; overflow: auto; color: #111; background: linear-gradient(#dce8f6, #7d9ec6); font: 12px Tahoma, sans-serif; }
+.minefield-header { max-width: 980px; margin: 0 auto 14px; display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+.minefield-header a { color: #10366f; font-size: 20px; text-decoration: none; }
+.minefield-header label { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.minefield-header select { padding: 4px; font: inherit; }
+.minefield-machine { width: max-content; max-width: 100%; margin: 0 auto; padding: 9px; overflow: auto; border: 3px outset #eee; background: #c0c0c0; box-shadow: 8px 10px 24px rgba(17, 42, 75, .35); }
+.minefield-scoreboard { min-width: 250px; margin-bottom: 9px; padding: 7px; display: flex; justify-content: space-between; align-items: center; border: 3px inset #eee; }
+.minefield-scoreboard output { min-width: 58px; padding: 2px 5px; color: #ff1d19; background: #260000; font: 700 26px/1 'Courier New', monospace; text-align: center; }
+.minefield-scoreboard button { width: 38px; height: 38px; min-width: 38px; padding: 0; border: 3px outset #eee; background: #c0c0c0; font-size: 21px; }
+.minefield-scoreboard button:active { border-style: inset; }
+.minefield-grid { display: grid; width: max-content; border: 3px inset #eee; }
+.minefield-cell { width: 30px; min-width: 20px; height: 30px; min-height: 20px; padding: 0; border: 3px outset #eee; border-radius: 0; color: #111; background: #c0c0c0; box-shadow: none; font: 800 17px/1 Arial, sans-serif; }
+.minefield-cell:active:not(.revealed) { border-style: inset; }
+.minefield-cell.revealed { border: 1px solid #888; background: #c8c8c8; }
+.minefield-cell.flagged { color: #d41212; }
+.minefield-cell[data-adjacent='1'] { color: #0000c9; }
+.minefield-cell[data-adjacent='2'] { color: #08770b; }
+.minefield-cell[data-adjacent='3'] { color: #d00000; }
+.minefield-cell[data-adjacent='4'] { color: #000078; }
+.minefield-cell[data-adjacent='5'], .minefield-cell[data-adjacent='6'], .minefield-cell[data-adjacent='7'], .minefield-cell[data-adjacent='8'] { color: #741313; }
+.minefield-status { margin: 9px 2px 0; color: #262626; text-align: center; }
+@media (max-width: 640px) { .minefield-app { padding: 8px; } .minefield-cell { width: 25px; height: 25px; font-size: 14px; } }

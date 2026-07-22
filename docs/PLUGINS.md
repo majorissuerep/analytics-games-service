@@ -18,6 +18,15 @@ Current slots:
 
 Plugin manager exposes installed versions and browser-persisted enable/disable state. Add lifecycle hooks to SDK rather than importing desktop store internals.
 
+Bundled examples cover every slot:
+
+- `paperclip-assistant`: animated overlay and contextual help.
+- `sticky-note`: browser-local editable overlay state.
+- `game-shuffle`: Start-menu action using catalog summaries from plugin context.
+- `session-meter`: compact tray status.
+
+Slot placement belongs to shell. Plugin components render only their contribution; they must not use absolute positioning unless their slot is `desktop-overlay`.
+
 ## Assistant example
 
 `plugins/paperclip-assistant` uses Motion for spring/loop animation and an original CSS-drawn character named Pip. It deliberately does not use React95 Clippy or clippy.js assets: React95 license says Microsoft-associated images are outside its MIT grant.

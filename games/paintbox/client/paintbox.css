@@ -1,0 +1,23 @@
+.paintbox-app { width: 100%; min-height: 100svh; align-self: stretch; display: flex; flex-direction: column; overflow: hidden; color: #111; background: #c0c0c0; font: 12px Tahoma, sans-serif; }
+.paintbox-titlebar { min-height: 34px; display: flex; align-items: center; justify-content: space-between; padding: 5px 9px; color: white; background: linear-gradient(90deg, #064ea6, #2592e7); }
+.paintbox-titlebar a { color: inherit; text-decoration: none; font-size: 15px; }
+.paintbox-titlebar span { opacity: .9; }
+.paintbox-menu { display: flex; gap: 2px; padding: 4px 7px; border-bottom: 1px solid #777; background: #ece9d8; }
+.paintbox-menu button { padding: 3px 12px; border: 0; box-shadow: none; background: transparent; font: inherit; }
+.paintbox-menu button:hover { color: white; background: #2258b4; }
+.paintbox-workspace { min-height: 0; display: flex; flex: 1; }
+.paintbox-tools { width: 82px; flex: 0 0 auto; display: grid; align-content: start; grid-template-columns: 1fr 1fr; gap: 4px; padding: 7px; border-right: 2px groove white; background: #d4d0c8; }
+.paintbox-tools button { min-width: 0; height: 52px; padding: 4px; border: 2px outset white; border-radius: 0; background: #d4d0c8; font-size: 22px; }
+.paintbox-tools button.selected { border-style: inset; background: #fff; }
+.paintbox-tools small { display: block; font-size: 9px; }
+.paintbox-tools label { grid-column: 1 / -1; display: grid; gap: 4px; padding-top: 8px; text-align: center; }
+.paintbox-tools input { width: 100%; }
+.paintbox-canvas-scroll { min-width: 0; flex: 1; overflow: auto; padding: 14px; background: #8d8d8d; }
+.paintbox-canvas-scroll canvas { display: block; width: min(960px, 100%); height: auto; border: 2px inset white; background: white; box-shadow: 2px 2px #555; touch-action: none; cursor: crosshair; }
+.paintbox-footer { min-height: 54px; display: flex; align-items: center; gap: 10px; padding: 6px 9px; border-top: 2px groove white; background: #d4d0c8; }
+.paintbox-current-color { width: 38px; height: 38px; flex: 0 0 auto; border: 3px inset white; }
+.paintbox-palette { display: flex; flex-wrap: wrap; gap: 3px; max-width: 250px; }
+.paintbox-palette button { width: 22px; min-width: 22px; height: 22px; min-height: 22px; padding: 0; border: 2px outset white; border-radius: 0; box-shadow: none; }
+.paintbox-palette button.selected { outline: 2px dotted #111; outline-offset: 1px; }
+.paintbox-footer output { margin-left: auto; padding: 4px 8px; border: 2px inset white; background: #eee; }
+@media (max-width: 600px) { .paintbox-tools { width: 64px; } .paintbox-footer output { display: none; } }
