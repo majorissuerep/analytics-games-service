@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Millennium Horizon</title>
+  <desc id="desc">Original vector wallpaper of rolling green hills beneath a bright blue sky.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0878d1"/>
+      <stop offset="0.58" stop-color="#57baf0"/>
+      <stop offset="1" stop-color="#d7f2ff"/>
+    </linearGradient>
+    <linearGradient id="farHill" x1="0" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#84d24d"/>
+      <stop offset="1" stop-color="#2d8f31"/>
+    </linearGradient>
+    <linearGradient id="nearHill" x1="0" y1="0" x2="0.65" y2="1">
+      <stop offset="0" stop-color="#9de253"/>
+      <stop offset="0.55" stop-color="#54b537"/>
+      <stop offset="1" stop-color="#22792c"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-30%" width="140%" height="160%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <g fill="#fff" opacity="0.92" filter="url(#soft)">
+    <path d="M115 174c22-36 79-42 109-7 28-19 77-8 87 28 51-9 90 13 99 45H66c3-30 22-52 49-66z"/>
+    <path d="M887 112c24-36 78-43 111-10 42-28 104-6 112 43 53-12 106 15 117 58H827c4-45 25-76 60-91z"/>
+    <path d="M1265 293c18-29 62-36 91-12 34-19 77-2 85 34 41-8 83 11 93 46h-309c4-33 17-55 40-68z"/>
+  </g>
+  <g fill="#fff" opacity="0.72">
+    <ellipse cx="260" cy="338" rx="82" ry="19"/>
+    <ellipse cx="717" cy="270" rx="108" ry="22"/>
+    <ellipse cx="1050" cy="354" rx="75" ry="16"/>
+  </g>
+  <path d="M0 650C220 525 370 584 558 625c196 43 343-80 538-77 203 3 324 107 504 43v309H0z" fill="url(#farHill)"/>
+  <path d="M0 760c214-146 415-149 621-63 178 74 309 83 453-8 181-114 349-105 526 17v194H0z" fill="url(#nearHill)"/>
+  <path d="M0 819c235-85 411-84 586-14 177 71 338 72 516 4 175-67 332-57 498 24v67H0z" fill="#2f8f31" opacity="0.62"/>
+  <g fill="#d9f589" opacity="0.82">
+    <circle cx="147" cy="808" r="4"/><circle cx="188" cy="777" r="3"/><circle cx="331" cy="830" r="4"/>
+    <circle cx="486" cy="779" r="3"/><circle cx="662" cy="838" r="4"/><circle cx="805" cy="802" r="3"/>
+    <circle cx="1011" cy="831" r="4"/><circle cx="1194" cy="774" r="3"/><circle cx="1390" cy="825" r="4"/>
+  </g>
+</svg>

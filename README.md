@@ -1,6 +1,6 @@
 # Analytics Games
 
-Desktop-shaped web platform for games built across analytics teams. Consensus Radar is first internal engine game; independently hosted HTTPS games integrate through bridge v1.
+Desktop-shaped web platform for games built across analytics teams. Consensus Radar remains the multiplayer engine reference; three isolated browser-local classics demonstrate lightweight games without server state. Independently hosted HTTPS games integrate through bridge v1.
 
 ## Why this exists
 
@@ -19,6 +19,8 @@ cp .env.example .env.local
 npm install
 npm run dev
 ```
+
+Pip's optional repository-aware chat requires `OPENROUTER_API_KEY` as a server-side deployment secret. Without it, the desktop and games continue to work and Pip reports that chat is not configured. The key is never exposed to the browser.
 
 Production and preview workflows run the idempotent `scripts/migrate.mjs` before deployment.
 Local development also initializes missing tables on first API use. Canonical engine DDL:
@@ -53,6 +55,13 @@ Internal engine game:
 3. Register manifest in `games/catalog.ts`, server rules in `lib/engine/server/registry.ts`, client in `games/client-registry.tsx`.
 4. Use `useGameRoom()` in client; send semantic actions, never replacement room state.
 
+Browser-local game:
+
+1. Create `games/<game-id>/manifest.ts` and a client component.
+2. Keep gameplay/state/assets inside that workspace.
+3. Register manifest in `games/catalog.ts` and client in `games/client-registry.tsx`.
+4. No room API or database code required.
+
 See [docs/ADDING_A_GAME.md](docs/ADDING_A_GAME.md), [docs/EXTERNAL_GAMES.md](docs/EXTERNAL_GAMES.md), and in-app `/develop` page.
 
 ## Layout
@@ -68,3 +77,5 @@ lib/engine/server/           registry, room store, leaderboards
 db/migrations/               PostgreSQL schema
 docs/                        architecture + author guide
 ```
+
+Built-ins: Consensus Radar, Minefield, Orbit Pinball, and Paintbox. Desktop plugins: Pip Assistant, Sticky Note, Game Shuffle, and Game Counter.

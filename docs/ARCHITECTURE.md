@@ -6,7 +6,8 @@ Analytics Games is a desktop-shaped launcher and integration platform, not one l
 
 ```text
 Millennium Desktop
-  ├─ internal game window ── shared room engine ── PostgreSQL
+  ├─ local game window ───── isolated browser state/canvas
+  ├─ multiplayer window ──── shared room engine ── PostgreSQL
   ├─ external game window ── bridge v1/postMessage ── any HTTPS host
   └─ desktop plugins ─────── typed build-time plugin SDK
 ```
@@ -25,6 +26,10 @@ Use when a game benefits from shared multiplayer infrastructure:
 - per-game leaderboards.
 
 Internal modules live in isolated `games/*` workspaces. Consensus Radar is the reference.
+
+### Browser-local game
+
+Use for classics and experiments that do not need shared persistence. Game owns its React/canvas state and pure rule modules inside one workspace; portal only discovers, launches, and closes it. Minefield, Paintbox, and Orbit Pinball exercise DOM, canvas drawing, and animation/physics without adding server coupling.
 
 ### External URL game
 

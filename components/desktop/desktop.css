@@ -37,16 +37,15 @@
 
 .millennium-desktop * { box-sizing: border-box; }
 
-.desktop-sky { position: absolute; inset: 0 0 var(--taskbar-height); overflow: hidden; background: linear-gradient(#69bce5 0%, #b9e8ff 67%, #e8f8ff 100%); }
-.desktop-cloud { position: absolute; width: 180px; height: 38px; border-radius: 50%; background: rgba(255,255,255,.82); filter: blur(.2px); }
-.desktop-cloud::before, .desktop-cloud::after { content: ''; position: absolute; background: inherit; border-radius: 50%; }
-.desktop-cloud::before { width: 78px; height: 78px; left: 24px; bottom: 0; }
-.desktop-cloud::after { width: 104px; height: 62px; right: 17px; bottom: 0; }
-.cloud-one { top: 10%; left: 8%; transform: scale(.8); opacity: .78; }
-.cloud-two { top: 18%; right: 14%; transform: scale(1.15); opacity: .6; }
-.desktop-hill { position: absolute; border-radius: 50% 50% 0 0; transform-origin: center bottom; }
-.hill-back { width: 120%; height: 42%; left: -24%; bottom: -16%; background: #79bd55; transform: rotate(7deg); box-shadow: inset 0 14px 30px rgba(255,255,255,.25); }
-.hill-front { width: 105%; height: 35%; right: -30%; bottom: -12%; background: linear-gradient(150deg, #4eaa40, #1f7c37); transform: rotate(-8deg); box-shadow: inset 0 18px 35px rgba(255,255,255,.18); }
+.desktop-sky {
+  position: absolute;
+  inset: 0 0 var(--taskbar-height);
+  overflow: hidden;
+  background-color: #69bce5;
+  background-image: linear-gradient(rgba(20, 77, 132, .04), rgba(4, 41, 85, .1)), url('/wallpapers/millennium-horizon.svg');
+  background-position: center;
+  background-size: cover;
+}
 
 .desktop-icons { position: absolute; z-index: 2; top: 18px; left: 14px; bottom: 56px; display: flex; width: 102px; flex-direction: column; flex-wrap: wrap; align-content: flex-start; gap: 8px 12px; }
 .millennium-desktop .desktop-icon { width: 88px; min-width: 0; min-height: 82px; padding: 4px; border: 1px solid transparent; box-shadow: none; color: white; background: transparent; text-shadow: 1px 1px 2px #16375f; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 3px; cursor: default; }
@@ -103,7 +102,43 @@
 .paperclip-bubble::after { content: ''; position: absolute; left: -9px; bottom: 19px; width: 16px; height: 16px; border-left: 1px solid #6a6d51; border-bottom: 1px solid #6a6d51; background: #fffbd3; transform: rotate(45deg); }
 .paperclip-bubble strong { color: #174c9b; }
 .paperclip-bubble p { min-height: 32px; margin: 6px 0 10px; line-height: 1.35; }
-.paperclip-bubble > div { display: flex; gap: 6px; }
+.paperclip-bubble > div { display: flex; flex-wrap: wrap; gap: 6px; }
+.paperclip-bubble .pip-talk-button { color: white; background: linear-gradient(#3979e8, #174ca8); border-color: #8eb8ff #0b2864 #0b2864 #8eb8ff; font-weight: 700; }
+
+.pip-chat-window { position: fixed; z-index: 12001; right: 24px; bottom: 52px; width: min(410px, calc(100vw - 24px)); max-height: calc(100vh - 64px); overflow: hidden; border: 1px solid #244885; border-radius: 10px; color: #182238; background: #f4f7fc; box-shadow: 0 18px 50px rgba(2, 20, 60, .42); filter: none; user-select: text; }
+.pip-chat-window > header { min-height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 7px 8px 7px 12px; color: white; background: linear-gradient(135deg, #1164c7, #273b91); }
+.pip-chat-window > header div { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 7px; }
+.pip-chat-window > header div > span { grid-row: 1 / 3; font-size: 23px; }
+.pip-chat-window > header strong { font-size: 14px; }
+.pip-chat-window > header small { color: #c9e5ff; font-size: 10px; }
+.pip-chat-window > header button { width: 26px; min-width: 26px; height: 26px; min-height: 26px; padding: 0; border: 1px solid rgba(255,255,255,.8); border-radius: 5px; color: white; background: linear-gradient(#ef806b, #bd2d1a); font: 700 16px Arial; }
+.pip-chat-messages { height: min(260px, calc(100vh - 300px)); min-height: 120px; overflow-y: auto; padding: 12px; background: linear-gradient(#eef5ff, #fff); scroll-behavior: smooth; }
+.pip-chat-message { max-width: 86%; margin-bottom: 10px; }
+.pip-chat-message.user { margin-left: auto; }
+.pip-chat-message > span { display: block; margin: 0 5px 3px; color: #64718a; font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.pip-chat-message.user > span { text-align: right; }
+.pip-chat-message p { min-height: 0; margin: 0; padding: 9px 11px; border: 1px solid #ccd6e6; border-radius: 5px 14px 14px; color: #1e293b; background: white; box-shadow: 0 2px 5px rgba(24, 53, 94, .08); line-height: 1.45; white-space: pre-wrap; }
+.pip-chat-message.user p { border-color: #225ab7; border-radius: 14px 5px 14px 14px; color: white; background: linear-gradient(135deg, #2f75dc, #2052aa); }
+.pip-chat-thinking { display: flex; align-items: center; gap: 4px; color: #65718a; font-style: italic; }
+.pip-chat-thinking i { width: 5px; height: 5px; border-radius: 50%; background: #2a66bf; animation: pip-dot 1s ease-in-out infinite; }
+.pip-chat-thinking i:nth-child(2) { animation-delay: .15s; }
+.pip-chat-thinking i:nth-child(3) { margin-right: 4px; animation-delay: .3s; }
+.pip-chat-suggestions { display: flex; gap: 5px; overflow-x: auto; padding: 8px 10px 3px; background: white; }
+.pip-chat-suggestions button { flex: 0 0 auto; max-width: 190px; overflow: hidden; padding: 4px 8px; border: 1px solid #a9bcda; border-radius: 12px; color: #244f92; background: #eef5ff; box-shadow: none; font-size: 10px; white-space: nowrap; text-overflow: ellipsis; }
+.pip-chat-window form { display: flex; align-items: flex-end; gap: 7px; padding: 8px 10px; background: white; }
+.pip-chat-window textarea { min-width: 0; flex: 1; resize: none; padding: 8px 9px; border: 1px solid #8799b4; border-radius: 8px; color: #16233a; background: #fbfdff; font: 12px/1.35 Tahoma, sans-serif; }
+.pip-chat-window form button { width: 38px; min-width: 38px; height: 38px; min-height: 38px; padding: 0; border-radius: 50%; color: white; background: linear-gradient(#3c83e8, #174ba6); font-size: 17px; }
+.pip-chat-window form button:disabled { opacity: .45; }
+.pip-chat-error { min-height: 0; margin: 0; padding: 0 11px 7px; color: #a5261d; background: white; font-size: 11px; }
+.pip-chat-window > footer { padding: 5px 10px 7px; color: #758097; background: white; font-size: 9px; text-align: center; }
+@keyframes pip-dot { 0%, 80%, 100% { transform: translateY(0); opacity: .4; } 40% { transform: translateY(-4px); opacity: 1; } }
+
+.sticky-note-plugin { position: absolute; z-index: 3; top: 20px; right: 22px; width: 220px; padding: 10px; background: #fff29a; box-shadow: 3px 5px 12px rgba(42, 35, 0, .32); transform: rotate(1deg); user-select: text; }
+.sticky-note-plugin header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; color: #5e5000; font-weight: 700; }
+.sticky-note-plugin textarea { width: 100%; min-height: 92px; resize: vertical; border: 0; outline: 0; color: #3c360d; background: transparent; font: 13px/1.45 'Comic Sans MS', Tahoma, sans-serif; }
+.sticky-note-plugin button { min-width: 20px; min-height: 20px; padding: 0; border: 0; box-shadow: none; background: transparent; font-weight: 800; }
+.plugin-quick-launch { border-top: 1px solid #d4d1bd !important; }
+.session-meter-plugin { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; font-size: 11px; }
 
 .start-menu { position: absolute; z-index: 11000; left: 0; bottom: var(--taskbar-height); width: 390px; min-height: 310px; display: grid; grid-template-columns: 42px 1fr; padding: 3px; box-shadow: 4px -5px 18px rgba(0,25,70,.38); }
 .start-menu-banner { display: flex; align-items: center; gap: 5px; padding: 8px 5px; color: white; background: linear-gradient(#174aa8,#1c68c6); writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: .04em; font-size: 15px; }
@@ -124,7 +159,7 @@
 .taskbar-windows { display: flex; min-width: 0; flex: 1; gap: 3px; }
 .millennium-desktop .taskbar-windows button { width: min(190px, 24vw); min-width: 70px; min-height: 34px; overflow: hidden; padding: 0 9px; border: 1px solid #0f3c9c; border-radius: 3px; color: white; background: linear-gradient(#3f83e6,#2567d1); box-shadow: inset 1px 1px rgba(255,255,255,.28); text-align: left; white-space: nowrap; text-overflow: ellipsis; }
 .millennium-desktop .taskbar-windows button.active { background: #194da9; box-shadow: inset 2px 2px 3px rgba(0,24,88,.48); }
-.taskbar-tray { min-width: 112px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 0 10px; color: white; background: linear-gradient(#2e94e8,#1780d5); border-left: 1px solid #0e54b1; box-shadow: inset 1px 0 rgba(255,255,255,.25); }
+.taskbar-tray { min-width: 150px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 0 10px; color: white; background: linear-gradient(#2e94e8,#1780d5); border-left: 1px solid #0e54b1; box-shadow: inset 1px 0 rgba(255,255,255,.25); }
 .taskbar-tray time { font-variant-numeric: tabular-nums; }
 
 @media (max-width: 760px) {
@@ -136,6 +171,8 @@
   .paperclip-character { display: none; }
   .paperclip-bubble { width: min(280px, calc(100vw - 16px)); }
   .paperclip-bubble::after { display: none; }
+  .pip-chat-window { right: 8px; bottom: 48px; width: calc(100vw - 16px); }
+  .sticky-note-plugin { display: none; }
   .welcome-panel { grid-template-columns: 1fr; }
   .welcome-logo { display: none; }
   .taskbar-tray { min-width: 78px; }
