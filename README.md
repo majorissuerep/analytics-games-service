@@ -78,4 +78,4 @@ db/migrations/               PostgreSQL schema
 docs/                        architecture + author guide
 ```
 
-Built-ins: Consensus Radar, Minefield, Orbit Pinball, and Paintbox. Desktop plugins: Pip Assistant, Sticky Note, Game Shuffle, and Game Counter.
+Built-ins: Consensus Radar, Minefield, upstream Classic Pinball, and Paintbox. Desktop plugins: Pip Assistant, Sticky Note, Game Shuffle, and Game Counter.

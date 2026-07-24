@@ -15,7 +15,9 @@ interface GameFrameProps {
 }
 
 function externalLaunchUrl(game: GameManifest) {
-  if (game.integration.kind !== 'external') return `/games/${encodeURIComponent(game.id)}?embedded=1`
+  if (game.integration.kind !== 'external') {
+    return game.integration.launchPath ?? `/games/${encodeURIComponent(game.id)}?embedded=1`
+  }
   const url = new URL(game.integration.launchUrl)
   url.searchParams.set('ag_bridge', String(ANALYTICS_GAME_BRIDGE_VERSION))
   return url.toString()

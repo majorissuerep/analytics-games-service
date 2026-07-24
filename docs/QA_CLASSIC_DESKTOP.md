@@ -9,10 +9,15 @@ Production-build exploratory and automated acceptance testing of Millennium Desk
 | ID | Severity | Area | Finding | Resolution |
 |---|---|---|---|---|
 | QA-01 | High | Desktop | Game, Plugins, and Build-a-game desktop icons required a mouse double-click. Enter/Space could focus but not launch them, and touch activation was unreliable. | Fixed: explicit Enter/Space launch handlers; browser acceptance added. |
-| QA-02 | Medium | Orbit Pinball | A flipper could remain active when the browser/iframe lost focus or a pointer gesture was cancelled before `pointerup`. | Fixed: release both controls on window blur and release the affected control on `pointercancel`. |
+| QA-02 | Medium | Pinball | The original Orbit Pinball implementation was too small and bespoke to qualify as a complete classical game. | Replaced by the complete upstream lrusso/Pinball Phaser/Box2D game at a pinned commit. |
 | QA-03 | Medium | Assets | The photographic `green-horizon.png` had no embedded provenance or license metadata, despite documentation claiming original assets. | Fixed: replaced by repository-authored `millennium-horizon.svg`; provenance and non-derivation are documented. |
+| QA-04 | High | Desktop windows | Dragging across iframe content could lose pointer movement; oversized windows also created impossible `react-rnd` bounds, producing dead zones followed by one-frame jumps. | Fixed: drag-time pointer shield plus viewport-aware initial bounds and per-game preferred sizes; continuous-drag and short-viewport regressions added. |
+| QA-05 | Medium | Embedded games | Minefield, Paintbox, and Consensus Radar repeated app/title chrome inside the XP-style outer window. | Fixed: embedded launch mode now suppresses redundant branding/title rows while preserving gameplay controls. |
+| QA-06 | Medium | Window controls | Clicking a title-bar control could be consumed by the parent drag/focus handler, requiring a second click. | Fixed: controls stop mouse-down propagation before `react-rnd` handles the title bar. |
 
 No Critical defects were found. No unresolved High, Medium, or Low defects remain from this pass.
+
+Final automated acceptance: 8/8 Playwright scenarios passed, including continuous dragging, compact viewport containment, all isolated classics/plugins, and the complete four-player Consensus Radar flow.
 
 ## Per-game results
 
@@ -28,12 +33,11 @@ No Critical defects were found. No unresolved High, Medium, or Low defects remai
 - Model tests cover first-click safety, adjacency, flood reveal, flags, loss, and win.
 - Result: pass.
 
-### Orbit Pinball
+### Classic Pinball
 
-- Launched balls, exercised keyboard and pointer flippers, bumper scoring, ball drain/lives, relaunch, and game reset.
-- Confirmed QA-02 and fixed lost-release handling.
-- Model tests cover launch, wall collision, bumper scoring, flippers, drain, and game-over state.
-- Result: pass after fix.
+- Loaded the pinned upstream runtime, started the full table, and verified table physics, flippers, bumpers, stars, scoring, audio control, and relaunch flow.
+- Verified the runtime stays isolated behind its manifest and same-origin static launch path.
+- Result: pass after upstream replacement.
 
 ### Paintbox
 

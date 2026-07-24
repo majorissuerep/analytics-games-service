@@ -4,6 +4,7 @@ export const GAME_BRIDGE_VERSION = 1 as const
 
 export interface InternalGameIntegration {
   kind: 'internal'
+  launchPath?: string
 }
 
 export interface ExternalGameIntegration {
@@ -34,6 +35,7 @@ export interface GameManifest {
   estimatedMinutes: string
   tags: string[]
   instructions: GameInstruction[]
+  preferredWindow?: { width: number; height: number }
   status: GameStatus
   integration: GameIntegration
   icon?: string

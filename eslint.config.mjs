@@ -28,6 +28,7 @@ export default defineConfig([
     '.turbo/**',
     'coverage/**',
     'node_modules/**',
+    'public/vendor/**',
     'next-env.d.ts',
   ]),
 ])

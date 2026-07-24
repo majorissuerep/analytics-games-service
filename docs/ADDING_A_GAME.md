@@ -49,7 +49,7 @@ games/my-game/
   client/Game.tsx
 ```
 
-Register only the manifest in `games/catalog.ts` and component in `games/client-registry.tsx`. Keep CSS selectors scoped under one game root. Add pure model tests plus a browser launch/interaction/close check. Minefield, Orbit Pinball, and Paintbox are examples.
+Register only the manifest in `games/catalog.ts` and component in `games/client-registry.tsx`. Keep CSS selectors scoped under one game root. Add pure model tests plus a browser launch/interaction/close check. Minefield and Paintbox are examples. A pinned, same-origin upstream static game may instead use `integration.launchPath`, as Classic Pinball does; keep its provenance and upstream commit documented beside the vendored runtime.
 
 ## Internal multiplayer engine game
 

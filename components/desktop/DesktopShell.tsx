@@ -17,15 +17,36 @@ interface DesktopShellProps {
 
 const PLUGIN_STORAGE_KEY = 'analytics-games.desktop.plugins.v1'
 
-function windowDefaults(window: DesktopWindowState, index: number) {
-  if (window.kind === 'game') {
-    return { x: 72 + index * 18, y: 42 + index * 16, width: 1040, height: 700 }
+function windowDefaults(
+  window: DesktopWindowState,
+  index: number,
+  viewport: { width: number; height: number },
+  game?: GameManifest,
+) {
+  const margin = 16
+  const taskbarHeight = 42
+  const preferred = window.kind === 'game'
+    ? {
+        x: 72 + index * 18,
+        y: 42 + index * 16,
+        width: game?.preferredWindow?.width ?? 1040,
+        height: game?.preferredWindow?.height ?? 700,
+      }
+    : { x: 150 + index * 24, y: 90 + index * 18, width: 620, height: 430 }
+  const width = Math.min(preferred.width, Math.max(320, viewport.width - margin * 2))
+  const height = Math.min(preferred.height, Math.max(240, viewport.height - taskbarHeight - margin * 2))
+  return {
+    x: Math.max(margin, Math.min(preferred.x, viewport.width - width - margin)),
+    y: Math.max(margin, Math.min(preferred.y, viewport.height - taskbarHeight - height - margin)),
+    width,
+    height,
   }
-  return { x: 150 + index * 24, y: 90 + index * 18, width: 620, height: 430 }
 }
 
 export function DesktopShell({ games }: DesktopShellProps) {
   const [clock, setClock] = useState('')
+  const [draggingWindow, setDraggingWindow] = useState<string | null>(null)
+  const [viewport, setViewport] = useState({ width: 1024, height: 576 })
   const [enabledPlugins, setEnabledPlugins] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(DESKTOP_PLUGINS.map((plugin) => [plugin.manifest.id, plugin.manifest.defaultEnabled])),
   )
@@ -49,6 +70,13 @@ export function DesktopShell({ games }: DesktopShellProps) {
     update()
     const timer = window.setInterval(update, 1_000)
     return () => window.clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    const updateViewport = () => setViewport({ width: window.innerWidth, height: window.innerHeight })
+    updateViewport()
+    window.addEventListener('resize', updateViewport)
+    return () => window.removeEventListener('resize', updateViewport)
   }, [])
 
   useEffect(() => {
@@ -137,7 +165,12 @@ export function DesktopShell({ games }: DesktopShellProps) {
       <section className="desktop-windows" aria-live="polite">
         {windows.map((window, index) => {
           if (window.minimized) return null
-          const defaults = windowDefaults(window, index)
+          const defaults = windowDefaults(
+            window,
+            index,
+            viewport,
+            window.gameId ? gamesById.get(window.gameId) : undefined,
+          )
           return (
             <Rnd
               key={window.id}
@@ -146,18 +179,20 @@ export function DesktopShell({ games }: DesktopShellProps) {
               position={window.maximized ? { x: 0, y: 0 } : undefined}
               disableDragging={window.maximized}
               enableResizing={!window.maximized}
-              minWidth={window.kind === 'game' ? 560 : 360}
-              minHeight={window.kind === 'game' ? 400 : 260}
+              minWidth={Math.min(window.kind === 'game' ? 560 : 360, viewport.width)}
+              minHeight={Math.min(window.kind === 'game' ? 400 : 260, viewport.height - 42)}
               bounds="parent"
               dragHandleClassName="title-bar"
               style={{ zIndex: window.zIndex }}
               className="desktop-rnd-window"
               onMouseDown={() => focusWindow(window.id)}
+              onDragStart={() => setDraggingWindow(window.id)}
+              onDragStop={() => setDraggingWindow(null)}
             >
               <article className="window desktop-window">
                 <div className="title-bar" onDoubleClick={() => toggleMaximize(window.id)}>
                   <div className="title-bar-text"><span aria-hidden>{window.kind === 'game' ? '🎮' : '🖥️'}</span> {window.title}</div>
-                  <div className="title-bar-controls">
+                  <div className="title-bar-controls" onMouseDown={(event) => event.stopPropagation()}>
                     <button aria-label="Minimize" onClick={() => minimizeWindow(window.id)} />
                     <button aria-label={window.maximized ? 'Restore' : 'Maximize'} onClick={() => toggleMaximize(window.id)} />
                     <button aria-label="Close" onClick={() => closeWindow(window.id)} />
@@ -177,6 +212,7 @@ export function DesktopShell({ games }: DesktopShellProps) {
             </Rnd>
           )
         })}
+        {draggingWindow && <div className="desktop-drag-shield" aria-hidden data-dragging-window={draggingWindow} />}
       </section>
 
       <PluginSlot slot="desktop-overlay" enabled={enabledPlugins} context={pluginContext} />

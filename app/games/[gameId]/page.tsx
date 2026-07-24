@@ -6,6 +6,7 @@ import { GameClient } from '@/games/client-registry'
 
 interface GamePageProps {
   params: Promise<{ gameId: string }>
+  searchParams: Promise<{ embedded?: string }>
 }
 
 export async function generateMetadata({ params }: GamePageProps): Promise<Metadata> {
@@ -18,10 +19,12 @@ export async function generateMetadata({ params }: GamePageProps): Promise<Metad
   }
 }
 
-export default async function GamePage({ params }: GamePageProps) {
+export default async function GamePage({ params, searchParams }: GamePageProps) {
   const { gameId } = await params
+  const { embedded } = await searchParams
   const game = await getPlatformGame(gameId)
   if (!game || game.status === 'coming-soon') notFound()
-  if (game.integration.kind === 'external') return <StandaloneGameFrame game={game} />
-  return <GameClient gameId={game.id} />
+  if (game.integration.kind === 'external' || game.integration.launchPath) return <StandaloneGameFrame game={game} />
+  const client = <GameClient gameId={game.id} />
+  return embedded === '1' ? <div className="embedded-game-surface">{client}</div> : client
 }
