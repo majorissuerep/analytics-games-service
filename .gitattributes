@@ -1,0 +1,2 @@
+# Preserve pinned third-party runtime byte-for-byte; upstream minified bundle contains whitespace.
+public/vendor/pinball/PinballGame.js whitespace=-trailing-space

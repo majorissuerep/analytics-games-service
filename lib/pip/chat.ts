@@ -40,8 +40,8 @@ const KNOWLEDGE: readonly KnowledgeEntry[] = [
     content: `Minefield (games/minefield): reveal covered squares with left-click. A number is the count of mines touching that square. Right-click a covered square to flag it. The first reveal is always safe. Clear every non-mine square to win. Beginner is 9×9/10 mines, intermediate 16×16/40, expert 30×16/99. Rules are in games/minefield/model.ts and UI is in games/minefield/client/MinefieldGame.tsx.`,
   },
   {
-    keywords: ['pinball', 'orbit', 'flipper', 'ball', 'arcade'],
-    content: `Orbit Pinball (games/orbit-pinball): press Space or Launch, use Left/Right arrows or on-screen flipper buttons, hit glowing bumpers for points, and keep three balls out of the drain. Physics and scoring are in games/orbit-pinball/model.ts; canvas rendering and controls are in games/orbit-pinball/client/OrbitPinballGame.tsx. The table art and game code are original.`,
+    keywords: ['pinball', 'classic', 'flipper', 'ball', 'arcade'],
+    content: `Classic Pinball is the complete upstream lrusso/Pinball browser game, vendored under public/vendor/pinball at commit fcf63f97d24467248fe1eaa89adaf273209f3da2. Press the large play button, use the left and right sides of the table for flippers, hit bumpers, collect stars, and keep the ball above the drain. Its platform manifest is games/orbit-pinball/manifest.ts and provenance is documented in public/vendor/pinball/UPSTREAM.md.`,
   },
   {
     keywords: ['paintbox', 'paint', 'draw', 'canvas', 'brush', 'png', 'eraser'],

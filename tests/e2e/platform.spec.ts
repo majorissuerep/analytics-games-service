@@ -88,12 +88,13 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   await expect(paintbox.getByRole('button', { name: 'Eraser' })).toHaveAttribute('aria-pressed', 'true')
   await page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Paintbox"]') }).getByRole('button', { name: 'Close' }).click()
 
-  await page.locator('.desktop-icon[aria-label="Open Orbit Pinball"]').dblclick()
-  const pinball = page.frameLocator('iframe[title="Orbit Pinball"]')
-  await expect(pinball.getByRole('button', { name: 'Launch' })).toBeVisible()
-  await pinball.getByRole('button', { name: 'Launch' }).click()
-  await expect(pinball.getByText('Orbit active')).toBeVisible()
-  await page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Orbit Pinball"]') }).getByRole('button', { name: 'Close' }).click()
+  await page.locator('.desktop-icon[aria-label="Open Classic Pinball"]').dblclick()
+  const pinball = page.frameLocator('iframe[title="Classic Pinball"]')
+  const pinballCanvas = pinball.locator('canvas')
+  await expect(pinballCanvas).toBeVisible()
+  await expect(pinballCanvas).toHaveAttribute('width', '320')
+  await expect(pinballCanvas).toHaveAttribute('height', '608')
+  await page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Classic Pinball"]') }).getByRole('button', { name: 'Close' }).click()
 
   await expect(page.getByRole('heading', { name: 'Team games live here.' })).toBeVisible()
   expect(errors).toEqual([])
@@ -133,6 +134,56 @@ test('Pip opens a repo-aware chat and renders an answer', async ({ page }) => {
   await expect(chat.getByText('Right-click to flag mines, and clear every safe square!')).toBeVisible()
   await chat.getByRole('button', { name: 'Close Pip chat' }).click()
   await expect(chat).toHaveCount(0)
+})
+
+test('game window follows every drag step across iframe content', async ({ page }) => {
+  await page.setViewportSize({ width: 1600, height: 1000 })
+  await page.goto('/')
+  await page.locator('.desktop-icon[aria-label="Open Minefield"]').dblclick()
+  const gameWindow = page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Minefield"]') })
+  const titleBar = gameWindow.locator('.title-bar')
+  const box = await titleBar.boundingBox()
+  if (!box) throw new Error('Minefield title bar has no bounding box')
+
+  const startX = box.x + box.width / 2
+  const startY = box.y + box.height / 2
+  await page.mouse.move(startX, startY)
+  await page.mouse.down()
+  const positions: number[] = []
+  for (let step = 1; step <= 8; step += 1) {
+    await page.mouse.move(startX + step * 30, startY + step * 20)
+    positions.push((await gameWindow.boundingBox())?.x ?? Number.NaN)
+  }
+  await page.mouse.up()
+
+  expect(
+    positions.every((position, index) => index === 0 || position > positions[index - 1] + 15),
+    `Window x positions should advance continuously: ${positions.join(', ')}`,
+  ).toBe(true)
+})
+
+test('new windows fit inside a short desktop viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 576 })
+  await page.goto('/')
+  await page.locator('.desktop-icon[aria-label="Open Minefield"]').dblclick()
+  const gameWindow = page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Minefield"]') })
+  const box = await gameWindow.boundingBox()
+  if (!box) throw new Error('Minefield window has no bounding box')
+  expect(box.x).toBeGreaterThanOrEqual(0)
+  expect(box.y).toBeGreaterThanOrEqual(0)
+  expect(box.x + box.width).toBeLessThanOrEqual(1280)
+  expect(box.y + box.height).toBeLessThanOrEqual(576 - 42)
+})
+
+test('embedded games use only the desktop window chrome', async ({ page }) => {
+  await page.goto('/')
+  await page.locator('.desktop-icon[aria-label="Open Minefield"]').dblclick()
+  const minefield = page.frameLocator('iframe[title="Minefield"]')
+  await expect(minefield.getByRole('link', { name: 'Back to desktop' })).toHaveCount(0)
+
+  await page.locator('.desktop-icon[aria-label="Open Paintbox"]').dblclick()
+  const paintbox = page.frameLocator('iframe[title="Paintbox"]')
+  await expect(paintbox.getByRole('link', { name: 'Back to desktop' })).toHaveCount(0)
 })
 
 interface EmulatedPlayer {

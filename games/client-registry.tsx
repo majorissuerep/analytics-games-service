@@ -2,7 +2,6 @@
 
 import { ConsensusRadarGame } from './consensus-radar/client/ConsensusRadarGame'
 import { MinefieldGame } from './minefield/client/MinefieldGame'
-import { OrbitPinballGame } from './orbit-pinball/client/OrbitPinballGame'
 import { PaintboxGame } from './paintbox/client/PaintboxGame'
 
 interface GameClientProps {
@@ -11,7 +10,6 @@ interface GameClientProps {
 const CLIENT_GAMES: Record<string, React.ComponentType> = {
   'consensus-radar': ConsensusRadarGame,
   minefield: MinefieldGame,
-  'orbit-pinball': OrbitPinballGame,
   paintbox: PaintboxGame,
 }
 
