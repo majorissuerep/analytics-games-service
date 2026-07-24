@@ -30,6 +30,6 @@
 
 ## Copyright/trademark boundary
 
-Product calls its UI **Millennium Desktop**. It uses no Microsoft names in UI, Windows logo, Bliss wallpaper, system icons, sounds, game resources, or Office Assistant sprites. Background, icons, assistant, game art, and branding are original code/assets. Nostalgic layout and control behavior are inspiration; third-party code retains its license notices.
+Product calls its UI **Millennium Desktop**. It uses no Microsoft names in UI, Windows logo, Bliss wallpaper, system icons, sounds, game resources, or Office Assistant sprites. Background, icons, assistant, game art, and branding are original code/assets. `public/wallpapers/millennium-horizon.svg` is repository-authored vector artwork made only from SVG gradients and paths; it is not derived from a photograph or Microsoft asset. Nostalgic layout and control behavior are inspiration; third-party code retains its license notices.
 
 This is an engineering risk reduction, not legal advice. Public commercial launch should still receive trademark/trade-dress review.

@@ -116,9 +116,15 @@ export function OrbitPinballGame() {
     const up = key(false)
     window.addEventListener('keydown', down)
     window.addEventListener('keyup', up)
+    const releaseControls = () => {
+      controls.current.left = false
+      controls.current.right = false
+    }
+    window.addEventListener('blur', releaseControls)
     return () => {
       window.removeEventListener('keydown', down)
       window.removeEventListener('keyup', up)
+      window.removeEventListener('blur', releaseControls)
     }
   }, [])
 
@@ -150,6 +156,7 @@ export function OrbitPinballGame() {
             onPointerDown={() => setFlipper('left', true)}
             onPointerUp={() => setFlipper('left', false)}
             onPointerLeave={() => setFlipper('left', false)}
+            onPointerCancel={() => setFlipper('left', false)}
           >← Left flipper</button>
           {hud.status === 'over'
             ? <button className="pinball-launch" onClick={newGame}>New game</button>
@@ -158,6 +165,7 @@ export function OrbitPinballGame() {
             onPointerDown={() => setFlipper('right', true)}
             onPointerUp={() => setFlipper('right', false)}
             onPointerLeave={() => setFlipper('right', false)}
+            onPointerCancel={() => setFlipper('right', false)}
           >Right flipper →</button>
         </div>
         <p>Keyboard: ← → flippers · Space launch</p>

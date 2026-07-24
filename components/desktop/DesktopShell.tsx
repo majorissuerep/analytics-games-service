@@ -93,6 +93,12 @@ export function DesktopShell({ games }: DesktopShellProps) {
             key={game.id}
             onDoubleClick={() => openGame(game.id, game.title)}
             onClick={(event) => event.detail === 1 && focusWindow(`game:${game.id}`)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                openGame(game.id, game.title)
+              }
+            }}
             aria-label={`Open ${game.title}`}
           >
             <span className="desktop-icon-art" style={{ background: game.accentSoft }}>{game.icon ?? '🎮'}</span>
@@ -100,11 +106,29 @@ export function DesktopShell({ games }: DesktopShellProps) {
             {game.integration.kind === 'external' && <small>web link</small>}
           </button>
         ))}
-        <button className="desktop-icon" onDoubleClick={() => openSystem('plugins', 'Plugin Manager')}>
+        <button
+          className="desktop-icon"
+          onDoubleClick={() => openSystem('plugins', 'Plugin Manager')}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault()
+              openSystem('plugins', 'Plugin Manager')
+            }
+          }}
+        >
           <span className="desktop-icon-art desktop-plugin-art">🧩</span>
           <span>Plugins</span>
         </button>
-        <button className="desktop-icon" onDoubleClick={() => openSystem('help', 'Platform Help')}>
+        <button
+          className="desktop-icon"
+          onDoubleClick={() => openSystem('help', 'Platform Help')}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault()
+              openSystem('help', 'Platform Help')
+            }
+          }}
+        >
           <span className="desktop-icon-art desktop-help-art">?</span>
           <span>Build a game</span>
         </button>

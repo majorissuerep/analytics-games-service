@@ -39,7 +39,7 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   })
 
   await page.goto('/')
-  await expect(page.locator('.desktop-sky')).toHaveCSS('background-image', /green-horizon\.png/)
+  await expect(page.locator('.desktop-sky')).toHaveCSS('background-image', /millennium-horizon\.svg/)
   await expect(page.getByLabel('Desktop sticky note')).toBeVisible()
   await expect(page.getByLabel('4 games installed')).toBeVisible()
   await page.getByRole('button', { name: 'start' }).click()
@@ -97,6 +97,42 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
 
   await expect(page.getByRole('heading', { name: 'Team games live here.' })).toBeVisible()
   expect(errors).toEqual([])
+})
+
+test('desktop icons launch games and tools from the keyboard', async ({ page }) => {
+  await page.goto('/')
+
+  const minefieldIcon = page.locator('.desktop-icon[aria-label="Open Minefield"]')
+  await minefieldIcon.focus()
+  await minefieldIcon.press('Enter')
+  await expect(page.locator('iframe[title="Minefield"]')).toBeVisible()
+
+  const pluginIcon = page.locator('.desktop-icon').filter({ hasText: 'Plugins' })
+  await pluginIcon.focus()
+  await pluginIcon.press('Space')
+  await expect(page.getByRole('heading', { name: 'Installed desktop plugins' })).toBeVisible()
+})
+
+test('Pip opens a repo-aware chat and renders an answer', async ({ page }) => {
+  await page.route('**/api/pip/chat', async (route) => {
+    const body = route.request().postDataJSON() as { messages: Array<{ role: string; content: string }> }
+    expect(body.messages.at(-1)).toEqual({ role: 'user', content: 'How do I play Minefield?' })
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: 'Right-click to flag mines, and clear every safe square!', model: 'xiaomi/mimo-v2.5' }),
+    })
+  })
+  await page.goto('/')
+
+  await page.getByRole('button', { name: 'Talk to me' }).click()
+  const chat = page.getByRole('dialog', { name: 'Talk to Pip' })
+  await expect(chat).toBeVisible()
+  await chat.getByRole('button', { name: 'How do I play Minefield?' }).click()
+  await chat.getByRole('button', { name: 'Send message' }).click()
+  await expect(chat.getByText('Right-click to flag mines, and clear every safe square!')).toBeVisible()
+  await chat.getByRole('button', { name: 'Close Pip chat' }).click()
+  await expect(chat).toHaveCount(0)
 })
 
 interface EmulatedPlayer {

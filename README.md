@@ -20,6 +20,8 @@ npm install
 npm run dev
 ```
 
+Pip's optional repository-aware chat requires `OPENROUTER_API_KEY` as a server-side deployment secret. Without it, the desktop and games continue to work and Pip reports that chat is not configured. The key is never exposed to the browser.
+
 Production and preview workflows run the idempotent `scripts/migrate.mjs` before deployment.
 Local development also initializes missing tables on first API use. Canonical engine DDL:
 `db/migrations/0001_game_platform.sql`.
