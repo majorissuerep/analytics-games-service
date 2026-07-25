@@ -104,7 +104,7 @@ jobs:
         env:
           DEPLOY_URL: ${{ steps.deploy.outputs.url }}
         run: |
-          vercel curl --token "$VERCEL_TOKEN" /api/health \
+          vercel curl /api/health \
             --deployment "$DEPLOY_URL" \
             --yes \
             -- --fail --silent --show-error --output /tmp/health.json
@@ -114,7 +114,7 @@ jobs:
         env:
           DEPLOY_URL: ${{ steps.deploy.outputs.url }}
         run: |
-          vercel curl --token "$VERCEL_TOKEN" /api/rooms \
+          vercel curl /api/rooms \
             --deployment "$DEPLOY_URL" \
             --yes \
             -- --fail --silent --show-error --output /tmp/room-smoke.json \
@@ -126,7 +126,7 @@ jobs:
         env:
           DEPLOY_URL: ${{ steps.deploy.outputs.url }}
         run: |
-          vercel curl --token "$VERCEL_TOKEN" / \
+          vercel curl / \
             --deployment "$DEPLOY_URL" \
             --yes \
             -- --fail --silent --show-error --location --output /dev/null \
