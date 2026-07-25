@@ -98,39 +98,73 @@ jobs:
           echo "Deployed (pending health check): $URL"
 
       # ── Health-check the new deployment before promoting ──────────────────
-      # Retry for up to 5 minutes (30 attempts × 10s). The old deployment
-      # remains live during this entire window.
+      # Vercel CLI obtains a project-scoped protection token automatically.
+      # The old deployment remains live during this entire window.
       - name: Health check new deployment
         env:
           DEPLOY_URL: ${{ steps.deploy.outputs.url }}
         run: |
-          MAX=30
-          for i in $(seq 1 $MAX); do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-              -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" \
-              "$DEPLOY_URL/api/health")
-            if [ "$STATUS" = "200" ]; then
-              echo "New deployment is healthy (HTTP $STATUS) — promoting to production"
-              exit 0
-            fi
-            echo "Attempt $i/$MAX: got HTTP $STATUS, waiting 10s…"
-            sleep 10
-          done
-          echo "::error::New deployment never became healthy — aborting promote. Old deployment is still live."
-          exit 1
+          vercel curl /api/health \
+            --deployment "$DEPLOY_URL" \
+            --token "$VERCEL_TOKEN" \
+            --yes \
+            -- --fail --silent --show-error --output /tmp/health.json
+          jq -e '.status == "ok"' /tmp/health.json >/dev/null
 
       - name: Verify stateful room API
         env:
           DEPLOY_URL: ${{ steps.deploy.outputs.url }}
         run: |
-          STATUS=$(curl -s -o /tmp/room-smoke.json -w "%{http_code}" \
-            -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" \
-            -H "content-type: application/json" \
-            -X POST \
-            --data '{"gameId":"chess","host":{"id":"deployment-smoke","name":"Deployment smoke"}}' \
-            "$DEPLOY_URL/api/rooms")
-          test "$STATUS" = "201"
+          vercel curl /api/rooms \
+            --deployment "$DEPLOY_URL" \
+            --token "$VERCEL_TOKEN" \
+            --yes \
+            -- --fail --silent --show-error --output /tmp/room-smoke.json \
+            --request POST --header "content-type: application/json" \
+            --data '{"gameId":"chess","host":{"id":"deployment-smoke","name":"Deployment smoke"}}'
           jq -e '.room.gameId == "chess" and (.room.code | length == 6)' /tmp/room-smoke.json >/dev/null
+
+      - name: Authorize browser acceptance on protected candidate
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          vercel curl / \
+            --deployment "$DEPLOY_URL" \
+            --token "$VERCEL_TOKEN" \
+            --yes \
+            -- --fail --silent --show-error --location --output /dev/null \
+            --header "x-vercel-set-bypass-cookie: true" \
+            --cookie-jar /tmp/vercel-bypass.cookies
+          python3 - <<'PY'
+          import json
+
+          cookies = []
+          with open('/tmp/vercel-bypass.cookies', encoding='utf-8') as source:
+              for line in source:
+                  if not line.strip() or (line.startswith('#') and not line.startswith('#HttpOnly_')):
+                      continue
+                  fields = line.rstrip('\n').split('\t')
+                  if len(fields) != 7:
+                      continue
+                  domain, _, path, secure, expires, name, value = fields
+                  domain = domain.removeprefix('#HttpOnly_')
+                  cookie = {
+                      'name': name,
+                      'value': value,
+                      'domain': domain,
+                      'path': path,
+                      'secure': secure.upper() == 'TRUE',
+                      'httpOnly': line.startswith('#HttpOnly_'),
+                      'sameSite': 'Lax',
+                  }
+                  if expires != '0':
+                      cookie['expires'] = int(expires)
+                  cookies.append(cookie)
+          if not cookies:
+              raise SystemExit('Vercel did not issue a candidate bypass cookie')
+          with open('/tmp/playwright-storage-state.json', 'w', encoding='utf-8') as target:
+              json.dump({'cookies': cookies, 'origins': []}, target)
+          PY
 
       # Exercise desktop entry/exit, Pip, and a complete four-player game on
       # the candidate deployment before it receives the production domain.
@@ -140,6 +174,7 @@ jobs:
       - name: Run browser acceptance suite
         env:
           PLAYWRIGHT_BASE_URL: ${{ steps.deploy.outputs.url }}
+          PLAYWRIGHT_STORAGE_STATE: /tmp/playwright-storage-state.json
         run: npm run test:e2e
 
       - name: Upload browser diagnostics
