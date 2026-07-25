@@ -12,6 +12,7 @@ import {
   verifyPlayerCapability,
 } from './player-capability'
 import { getServerGame } from './registry'
+import { createRoomPasswordHash, verifyRoomPassword } from './room-password'
 
 const ROOM_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
 const ROOM_CODE_LENGTH = 6
@@ -95,6 +96,7 @@ async function selectRoom(client: PoolClient, code: string, lock = false) {
 export async function createRoom(
   gameId: string,
   hostInput: EnginePlayer,
+  password = '',
 ): Promise<RoomMembership> {
   await ensurePlatformSchema()
   const game = getServerGame(gameId)
@@ -107,6 +109,7 @@ export async function createRoom(
     const state: StoredRoomState<unknown> = {
       players: [host],
       playerTokens: { [host.id]: capability.hash },
+      passwordHash: createRoomPasswordHash(password),
       gameVersion: game.manifest.version,
       game: game.createState({ host, now, random }),
     }
@@ -180,6 +183,7 @@ export async function joinRoom(
   code: string,
   playerInput: EnginePlayer,
   currentToken: string,
+  password = '',
 ): Promise<RoomMembership> {
   const player = normalizePlayer(playerInput)
   await ensurePlatformSchema()
@@ -189,6 +193,9 @@ export async function joinRoom(
     const room = await selectRoom(client, code, true)
     const game = getServerGame(room.gameId)
     assertSupportedGameVersion(room, game.manifest.version)
+    if (!verifyRoomPassword(room.state.passwordHash ?? '', password)) {
+      throw new EngineError('FORBIDDEN', 'Incorrect room password', 403)
+    }
     const existing = room.state.players.find((candidate) => candidate.id === player.id)
     let playerToken = currentToken
 
