@@ -231,6 +231,24 @@ test('Chess exposes safe custom model submission without changing built-in play'
   await expect(page.getByRole('heading', { name: 'White to move' })).toBeVisible()
 })
 
+test('Chess model arena pauses and replays durable matches', async ({ page }) => {
+  await page.goto('/games/chess')
+  await page.getByRole('button', { name: /Model arena/ }).click()
+  await expect(page.getByRole('heading', { name: 'Model arena' })).toBeVisible()
+  await expect(page.getByLabel('White model')).toHaveValue('builtin-stockfish-18')
+  await expect(page.getByLabel('Black model')).toHaveValue('builtin-stockfish-18')
+  await page.getByRole('button', { name: 'Start model match' }).click()
+  await expect(page.getByRole('button', { name: 'Pause match' })).toBeVisible()
+  await expect(page.getByText(/active.*1 plies · 3s\/turn/)).toBeVisible({ timeout: 8000 })
+  await page.getByRole('button', { name: 'Pause match' }).click()
+  await expect(page.getByText(/paused.*\d+ plies · 3s\/turn/)).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Play replay' })).toBeVisible()
+  await page.reload()
+  await page.getByRole('button', { name: /Model arena/ }).click()
+  await expect(page.getByRole('heading', { name: 'Saved matches' })).toBeVisible()
+  await expect(page.getByRole('button', { name: /Stockfish 18 vs Stockfish 18/ }).first()).toBeVisible()
+})
+
 test('Chess password room synchronizes legal moves', async ({ browser }) => {
   const hostContext = await browser.newContext()
   const guestContext = await browser.newContext()

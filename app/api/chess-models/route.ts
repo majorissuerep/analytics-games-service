@@ -2,12 +2,13 @@ import { createHash } from 'node:crypto'
 import { NextResponse } from 'next/server'
 import { chessModelSubmissionSchema } from '@/lib/chess-models/contracts'
 import { inspectHuggingFaceRevision } from '@/lib/chess-models/huggingface'
-import { assertSubmissionAllowed, createSubmission, listPublicModels, recordAutomatedInspection } from '@/lib/chess-models/repository'
+import { assertSubmissionAllowed, createSubmission, listPublicModelRegistry, listPublicModels, recordAutomatedInspection } from '@/lib/chess-models/repository'
 import { createQuarantineUpload, modelStorageConfigured } from '@/lib/chess-models/storage'
 
 export async function GET() {
   try {
-    return NextResponse.json({ models: await listPublicModels(), capabilities: { directUpload: modelStorageConfigured(), huggingFaceImport: true } })
+    const [models, registry] = await Promise.all([listPublicModels(), listPublicModelRegistry()])
+    return NextResponse.json({ models, registry, capabilities: { directUpload: modelStorageConfigured(), huggingFaceImport: true } })
   } catch (error) {
     console.error('[chess-models] list failed', error)
     return NextResponse.json({ error: 'Model registry is unavailable' }, { status: 503 })

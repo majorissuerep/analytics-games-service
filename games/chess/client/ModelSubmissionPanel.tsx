@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 
 type Source = 'huggingface' | 'direct'
+type RegistryModel = { slug: string; displayName: string; state: string; runtimeId: string }
 
 export function ModelSubmissionPanel() {
   const [open, setOpen] = useState(false)
@@ -18,10 +19,12 @@ export function ModelSubmissionPanel() {
   const [pending, setPending] = useState(false)
   const [message, setMessage] = useState('')
   const [directUpload, setDirectUpload] = useState(false)
+  const [registry, setRegistry] = useState<RegistryModel[]>([])
 
   useEffect(() => {
-    fetch('/api/chess-models').then(response => response.json()).then((body: { capabilities?: { directUpload?: boolean } }) => {
+    fetch('/api/chess-models').then(response => response.json()).then((body: { capabilities?: { directUpload?: boolean }; registry?: RegistryModel[] }) => {
       setDirectUpload(Boolean(body.capabilities?.directUpload))
+      setRegistry(body.registry ?? [])
     }).catch(() => undefined)
   }, [])
 
@@ -49,6 +52,8 @@ export function ModelSubmissionPanel() {
         if (!upload.ok) throw new Error('The submission was registered, but artifact upload failed')
       }
       setMessage(`Submitted for scanning and admin review. Save receipt: ${result.submission.receipt}`)
+      const catalog = await fetch('/api/chess-models').then(value => value.json()) as { registry?: RegistryModel[] }
+      setRegistry(catalog.registry ?? [])
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Submission failed')
     } finally {
@@ -60,6 +65,7 @@ export function ModelSubmissionPanel() {
     <button className="chess-model-toggle" onClick={() => setOpen(value => !value)} aria-expanded={open}>
       <span>◇</span><b>Bring your own Chess model</b><small>Safe ONNX or Hugging Face submission</small>
     </button>
+    {registry.length > 0 && <div className="chess-model-registry"><b>Community model registry</b>{registry.map(model => <div key={`${model.slug}-${model.state}`}><span>{model.displayName}<small>{model.runtimeId}</small></span><em>{model.state.replaceAll('_', ' ')}</em></div>)}</div>}
     {open && <form onSubmit={(event) => void submit(event)}>
       <p>Submissions are quarantined, scanned, and require administrator approval before deployment or play.</p>
       <div className="chess-online-tabs">

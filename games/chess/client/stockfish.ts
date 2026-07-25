@@ -40,6 +40,10 @@ export function buildStockfishSearchCommands(fen: string, levelId: StockfishLeve
   ]
 }
 
+export function buildStockfishTimedSearchCommands(fen: string, moveTimeMs: number) {
+  return ['stop', 'setoption name Skill Level value 20', `position fen ${fen}`, `go movetime ${moveTimeMs}`]
+}
+
 export function parseBestMove(line: string): EngineMove | null {
   const match = /^bestmove\s+([a-h][1-8])([a-h][1-8])([qrbn])?/.exec(line.trim())
   if (!match) return null
@@ -99,6 +103,17 @@ export class StockfishBrowserEngine {
       this.pendingReject = reject
     })
     for (const command of buildStockfishSearchCommands(fen, level)) this.worker.postMessage(command)
+    return result
+  }
+
+  async findBestMoveTimed(fen: string, moveTimeMs = 3000) {
+    await this.readyPromise
+    if (this.pendingReject) this.pendingReject(new Error('Stockfish search was replaced by a newer position.'))
+    const result = new Promise<EngineMove>((resolve, reject) => {
+      this.pendingMove = resolve
+      this.pendingReject = reject
+    })
+    for (const command of buildStockfishTimedSearchCommands(fen, moveTimeMs)) this.worker.postMessage(command)
     return result
   }
 

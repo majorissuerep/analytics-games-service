@@ -181,6 +181,30 @@ const migrations = [
 
   `CREATE INDEX IF NOT EXISTS chess_model_audit_target_idx
     ON chess_model_audit (model_id, revision_id, created_at DESC)`,
+
+  // v8 — durable model-vs-model Chess matches and replay snapshots
+  `CREATE TABLE IF NOT EXISTS chess_model_matches (
+    id                   TEXT PRIMARY KEY,
+    white_revision_id    TEXT NOT NULL,
+    black_revision_id    TEXT NOT NULL,
+    white_model_name     TEXT NOT NULL,
+    black_model_name     TEXT NOT NULL,
+    control_token_hash   TEXT NOT NULL,
+    source_ip_hash       TEXT,
+    state                JSONB NOT NULL,
+    status               TEXT NOT NULL,
+    result               TEXT NOT NULL DEFAULT '',
+    ply_count            INTEGER NOT NULL DEFAULT 0,
+    version              INTEGER NOT NULL DEFAULT 0,
+    created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    completed_at         TIMESTAMPTZ
+  )`,
+
+  `CREATE INDEX IF NOT EXISTS chess_model_matches_recent_idx
+    ON chess_model_matches (created_at DESC)`,
+
+  `ALTER TABLE chess_model_matches ADD COLUMN IF NOT EXISTS source_ip_hash TEXT`,
 ]
 // ────────────────────────────────────────────────────────────────────────────
 

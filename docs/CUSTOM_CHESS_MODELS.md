@@ -9,6 +9,7 @@ Canonical product/security contract: [`../specs/chess-custom-model-runtime.md`](
 - Ready-model inference proxy: `POST /api/chess-models/{revisionId}/move`
 - Admin metadata changes: `PATCH /api/admin/chess-models/{modelId}`
 - Admin review: `POST /api/admin/chess-models/{modelId}/revisions/{revisionId}/decision`
+- Durable model matches: `GET/POST /api/chess-model-matches` plus move and pause endpoints
 - Package schema: `/schemas/chess-model-v1.json`
 - KServe runtime/security definitions: `deploy/kserve/`
 - Immutable public Hugging Face import with executable/remote-code rejection
@@ -36,6 +37,16 @@ When object storage is absent, the UI clearly disables direct package upload whi
 
 ## Admin examples
 
+The supported operator workflow is the checked-in CLI. Keep the bearer token in the process environment; never paste it into browser JavaScript:
+
+```bash
+export CHESS_MODEL_ADMIN_TOKEN='<value from the encrypted operator secret store>'
+npm run chess-models:admin -- list
+npm run chess-models:admin -- approve MODEL_ID REVISION_ID
+npm run chess-models:admin -- reject MODEL_ID REVISION_ID 'Reason'
+npm run chess-models:admin -- rename MODEL_ID 'New display name'
+```
+
 ```bash
 curl -X PATCH "$BASE/api/admin/chess-models/$MODEL_ID" \
   -H "Authorization: Bearer $CHESS_MODEL_ADMIN_TOKEN" \
@@ -49,6 +60,14 @@ curl -X POST "$BASE/api/admin/chess-models/$MODEL_ID/revisions/$REVISION_ID/deci
 ```
 
 Approval is accepted only from `pending_review`; it does not make a model playable. A deployment controller must create the `InferenceService`, run the `chess-move-v1` canary, and atomically mark the deployment/revision ready.
+
+## Model arena and replay
+
+- Any two `ready` revisions may be selected; Stockfish 18 is always available.
+- Each model receives at most 3,000 ms per turn. Browser Stockfish searches for 2,800 ms, reserving time to persist the move. Remote KServe inference receives the same 2,800 ms compute budget.
+- A random control token authorizes move and pause mutations. Only its SHA-256 digest is stored; the browser keeps the token in local storage so the creator can resume after reload.
+- Every accepted move stores UCI, SAN, resulting FEN, duration, timestamp, full PGN, and an optimistic-concurrency version in PostgreSQL.
+- Match records and replay snapshots are public and immutable through replay APIs. Controls support first, previous, play/pause replay, next, and last position.
 
 ## Apply runtime policy
 
