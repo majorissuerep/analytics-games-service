@@ -21,8 +21,8 @@ jobs:
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
       VERCEL_TARGET_PROJECT: analytics-games-service
+      PRODUCTION_URL: https://analytics-games-service.vercel.app
 
     steps:
       - name: Checkout
@@ -48,8 +48,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      # ── Build & deploy with blue/green so the old deployment keeps
-      # serving traffic until we have verified the new one is healthy. ───────
+      # Build and deploy the named analytics-games-service project directly.
       - name: Install Vercel CLI
         run: npm install --global vercel@56.4.1
 
@@ -88,90 +87,34 @@ jobs:
       - name: Build project (production)
         run: vercel build --prod --token="$VERCEL_TOKEN"
 
-      # Deploy WITHOUT assigning the domain yet (blue/green step 1).
-      # The current production URL keeps serving the old deployment.
-      - name: Deploy to Vercel (no domain assignment yet)
-        id: deploy
+      - name: Deploy analytics-games-service to production
         run: |
-          URL=$(vercel deploy --prebuilt --prod --skip-domain --token="$VERCEL_TOKEN")
+          URL=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")
           echo "url=$URL" >> "$GITHUB_OUTPUT"
-          echo "Deployed (pending health check): $URL"
+          echo "Production deployed: $URL"
 
-      # ── Health-check the new deployment before promoting ──────────────────
-      # Vercel CLI obtains a project-scoped protection token automatically.
-      # The old deployment remains live during this entire window.
-      - name: Health check new deployment
-        env:
-          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+      - name: Health check production deployment
         run: |
-          vercel curl /api/health \
-            --deployment "$DEPLOY_URL" \
-            --yes \
-            -- --fail --silent --show-error --output /tmp/health.json
+          curl --fail --silent --show-error \
+            --output /tmp/health.json \
+            "$PRODUCTION_URL/api/health"
           jq -e '.status == "ok"' /tmp/health.json >/dev/null
 
       - name: Verify stateful room API
-        env:
-          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
         run: |
-          vercel curl /api/rooms \
-            --deployment "$DEPLOY_URL" \
-            --yes \
-            -- --fail --silent --show-error --output /tmp/room-smoke.json \
+          curl --fail --silent --show-error --output /tmp/room-smoke.json \
             --request POST --header "content-type: application/json" \
-            --data '{"gameId":"chess","host":{"id":"deployment-smoke","name":"Deployment smoke"}}'
+            --data '{"gameId":"chess","host":{"id":"deployment-smoke","name":"Deployment smoke"}}' \
+            "$PRODUCTION_URL/api/rooms"
           jq -e '.room.gameId == "chess" and (.room.code | length == 6)' /tmp/room-smoke.json >/dev/null
 
-      - name: Authorize browser acceptance on protected candidate
-        env:
-          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
-        run: |
-          vercel curl / \
-            --deployment "$DEPLOY_URL" \
-            --yes \
-            -- --fail --silent --show-error --location --output /dev/null \
-            --header "x-vercel-set-bypass-cookie: true" \
-            --cookie-jar /tmp/vercel-bypass.cookies
-          python3 - <<'PY'
-          import json
-
-          cookies = []
-          with open('/tmp/vercel-bypass.cookies', encoding='utf-8') as source:
-              for line in source:
-                  if not line.strip() or (line.startswith('#') and not line.startswith('#HttpOnly_')):
-                      continue
-                  fields = line.rstrip('\n').split('\t')
-                  if len(fields) != 7:
-                      continue
-                  domain, _, path, secure, expires, name, value = fields
-                  domain = domain.removeprefix('#HttpOnly_')
-                  cookie = {
-                      'name': name,
-                      'value': value,
-                      'domain': domain,
-                      'path': path,
-                      'secure': secure.upper() == 'TRUE',
-                      'httpOnly': line.startswith('#HttpOnly_'),
-                      'sameSite': 'Lax',
-                  }
-                  if expires != '0':
-                      cookie['expires'] = int(expires)
-                  cookies.append(cookie)
-          if not cookies:
-              raise SystemExit('Vercel did not issue a candidate bypass cookie')
-          with open('/tmp/playwright-storage-state.json', 'w', encoding='utf-8') as target:
-              json.dump({'cookies': cookies, 'origins': []}, target)
-          PY
-
-      # Exercise desktop entry/exit, Pip, and a complete four-player game on
-      # the candidate deployment before it receives the production domain.
+      # Exercise desktop entry/exit, Pip, Chess, and a complete four-player game.
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
       - name: Run browser acceptance suite
         env:
-          PLAYWRIGHT_BASE_URL: ${{ steps.deploy.outputs.url }}
-          PLAYWRIGHT_STORAGE_STATE: /tmp/playwright-storage-state.json
+          PLAYWRIGHT_BASE_URL: ${{ env.PRODUCTION_URL }}
         run: npm run test:e2e
 
       - name: Upload browser diagnostics
@@ -183,15 +126,3 @@ jobs:
             playwright-report/
             test-results/
           if-no-files-found: ignore
-
-      # ── Promote: atomically swap the domain to the new deployment ─────────
-      # Only runs if the health check passed. This is the only moment the
-      # old deployment stops serving production traffic.
-      - name: Promote to production
-        env:
-          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
-        run: |
-          vercel promote "$DEPLOY_URL" \
-            --token="$VERCEL_TOKEN" \
-            --yes
-          echo "Production promoted to: $DEPLOY_URL"
