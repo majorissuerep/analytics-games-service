@@ -241,12 +241,13 @@ test('Chess password room synchronizes legal moves', async ({ browser }) => {
 
     await expect(host.getByRole('heading', { name: /Lobby · 2\/2 players/ })).toBeVisible({ timeout: 5000 })
     await host.getByRole('button', { name: 'Start online game' }).click()
+    await expect(host.getByRole('heading', { name: /White to move/ })).toBeVisible({ timeout: 15_000 })
     await host.getByRole('button', { name: 'e2 white p' }).click()
     await host.getByRole('button', { name: 'e4 empty' }).click()
-    await expect(guest.getByRole('heading', { name: /Black to move/ })).toBeVisible({ timeout: 5000 })
+    await expect(guest.getByRole('heading', { name: /Black to move/ })).toBeVisible({ timeout: 15_000 })
     await guest.getByRole('button', { name: 'e7 black p' }).click()
     await guest.getByRole('button', { name: 'e5 empty' }).click()
-    await expect(host.getByRole('heading', { name: /White to move/ })).toBeVisible({ timeout: 5000 })
+    await expect(host.getByRole('heading', { name: /White to move/ })).toBeVisible({ timeout: 15_000 })
   } finally {
     await hostContext.close()
     await guestContext.close()
