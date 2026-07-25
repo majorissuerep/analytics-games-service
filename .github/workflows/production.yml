@@ -104,9 +104,8 @@ jobs:
         env:
           DEPLOY_URL: ${{ steps.deploy.outputs.url }}
         run: |
-          vercel curl /api/health \
+          vercel curl --token "$VERCEL_TOKEN" /api/health \
             --deployment "$DEPLOY_URL" \
-            --token "$VERCEL_TOKEN" \
             --yes \
             -- --fail --silent --show-error --output /tmp/health.json
           jq -e '.status == "ok"' /tmp/health.json >/dev/null
@@ -115,9 +114,8 @@ jobs:
         env:
           DEPLOY_URL: ${{ steps.deploy.outputs.url }}
         run: |
-          vercel curl /api/rooms \
+          vercel curl --token "$VERCEL_TOKEN" /api/rooms \
             --deployment "$DEPLOY_URL" \
-            --token "$VERCEL_TOKEN" \
             --yes \
             -- --fail --silent --show-error --output /tmp/room-smoke.json \
             --request POST --header "content-type: application/json" \
@@ -128,9 +126,8 @@ jobs:
         env:
           DEPLOY_URL: ${{ steps.deploy.outputs.url }}
         run: |
-          vercel curl / \
+          vercel curl --token "$VERCEL_TOKEN" / \
             --deployment "$DEPLOY_URL" \
-            --token "$VERCEL_TOKEN" \
             --yes \
             -- --fail --silent --show-error --location --output /dev/null \
             --header "x-vercel-set-bypass-cookie: true" \
