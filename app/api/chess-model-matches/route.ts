@@ -13,7 +13,8 @@ export async function POST(request: Request) {
   try {
     const forwarded = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? ''
     const salt = process.env.CHESS_MODEL_ABUSE_SALT
-    const sourceIpHash = forwarded && salt ? createHash('sha256').update(`${salt}:${forwarded}`).digest('hex') : undefined
+    const isLoopback = ['localhost', '127.0.0.1', '::1'].includes(new URL(request.url).hostname)
+    const sourceIpHash = forwarded && salt ? createHash('sha256').update(`${salt}:${forwarded}`).digest('hex') : isLoopback ? 'local-loopback' : undefined
     const match = await createPersistedModelMatch(parsed.data.whiteRevisionId, parsed.data.blackRevisionId, sourceIpHash)
     return NextResponse.json({ match }, { status: 201 })
   } catch (error) {
