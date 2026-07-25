@@ -58,7 +58,7 @@ jobs:
       - name: Select analytics-games-service project
         run: |
           PROJECT_JSON=$(curl --fail --silent --show-error \
-            -H "Authorization: Bearer $VERCEL_TOKEN" \
+              -H "Authorization: Bearer $VERCEL_TOKEN" \
             "https://api.vercel.com/v9/projects/$VERCEL_TARGET_PROJECT?teamId=$VERCEL_ORG_ID")
           PROJECT_ID=$(printf '%s' "$PROJECT_JSON" | jq -r '.id')
           test -n "$PROJECT_ID" && test "$PROJECT_ID" != "null"
@@ -67,19 +67,24 @@ jobs:
       - name: Configure production database on target project
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          CHESS_MODEL_ABUSE_SALT: ${{ secrets.CHESS_MODEL_ABUSE_SALT }}
+          CHESS_MODEL_ADMIN_TOKEN: ${{ secrets.CHESS_MODEL_ADMIN_TOKEN }}
         run: |
-          jq -n \
-            --arg value "$DATABASE_URL" \
-            '{key:"DATABASE_URL",value:$value,type:"encrypted",target:["production","preview"]}' \
-            > /tmp/vercel-database-env.json
-          curl --fail --silent --show-error \
-            -X POST \
-            -H "Authorization: Bearer $VERCEL_TOKEN" \
-            -H "Content-Type: application/json" \
-            --data-binary @/tmp/vercel-database-env.json \
-            "https://api.vercel.com/v10/projects/$VERCEL_PROJECT_ID/env?upsert=true&teamId=$VERCEL_ORG_ID" \
-            >/dev/null
-          rm -f /tmp/vercel-database-env.json
+          for key in DATABASE_URL CHESS_MODEL_ABUSE_SALT CHESS_MODEL_ADMIN_TOKEN; do
+            jq -n \
+              --arg key "$key" \
+              --arg value "${!key}" \
+              '{key:$key,value:$value,type:"encrypted",target:["production","preview"]}' \
+              > /tmp/vercel-env.json
+            curl --fail --silent --show-error \
+              -X POST \
+              -H "Authorization: Bearer $VERCEL_TOKEN" \
+              -H "Content-Type: application/json" \
+              --data-binary @/tmp/vercel-env.json \
+              "https://api.vercel.com/v10/projects/$VERCEL_PROJECT_ID/env?upsert=true&teamId=$VERCEL_ORG_ID" \
+              >/dev/null
+          done
+          rm -f /tmp/vercel-env.json
 
       - name: Pull Vercel environment (production)
         run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"

@@ -220,6 +220,17 @@ test('Chess remains usable on a narrow viewport', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Black to move' })).toBeVisible()
 })
 
+test('Chess exposes safe custom model submission without changing built-in play', async ({ page }) => {
+  await page.goto('/games/chess')
+  await page.getByRole('button', { name: /Bring your own Chess model/ }).click()
+  await expect(page.getByText(/quarantined, scanned, and require administrator approval/)).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Upload package (unavailable)' })).toBeDisabled()
+  await expect(page.getByLabel('Repository')).toBeVisible()
+  await expect(page.getByLabel('Immutable commit SHA')).toBeVisible()
+  await page.getByRole('button', { name: 'Play Stockfish' }).click()
+  await expect(page.getByRole('heading', { name: 'White to move' })).toBeVisible()
+})
+
 test('Chess password room synchronizes legal moves', async ({ browser }) => {
   const hostContext = await browser.newContext()
   const guestContext = await browser.newContext()

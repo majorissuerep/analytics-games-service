@@ -104,6 +104,83 @@ const migrations = [
 
   `CREATE INDEX IF NOT EXISTS platform_games_enabled_title_idx
     ON platform_games (enabled, title)`,
+
+  // v7 — safe, revisioned registry for custom Chess models
+  `CREATE TABLE IF NOT EXISTS chess_models (
+    id                     TEXT PRIMARY KEY,
+    slug                   TEXT NOT NULL UNIQUE,
+    display_name           TEXT NOT NULL,
+    description            TEXT NOT NULL DEFAULT '',
+    visibility             TEXT NOT NULL DEFAULT 'public',
+    disabled               BOOLEAN NOT NULL DEFAULT FALSE,
+    archived               BOOLEAN NOT NULL DEFAULT FALSE,
+    current_ready_revision TEXT,
+    created_at             TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at             TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  )`,
+
+  `CREATE TABLE IF NOT EXISTS chess_model_revisions (
+    id                 TEXT PRIMARY KEY,
+    model_id           TEXT NOT NULL REFERENCES chess_models(id),
+    revision_number    INTEGER NOT NULL,
+    source_type        TEXT NOT NULL,
+    source_ref         TEXT NOT NULL,
+    runtime_id         TEXT NOT NULL,
+    input_contract     TEXT NOT NULL DEFAULT 'chess-move-v1',
+    output_contract    TEXT NOT NULL DEFAULT 'chess-move-v1',
+    sha256             TEXT,
+    size_bytes         BIGINT,
+    license            TEXT NOT NULL,
+    state              TEXT NOT NULL DEFAULT 'pending_scan',
+    scan_report        TEXT,
+    scan_policy        TEXT,
+    approved_by        TEXT,
+    approved_at        TIMESTAMPTZ,
+    rejection_reason   TEXT,
+    created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (model_id, revision_number)
+  )`,
+
+  `CREATE INDEX IF NOT EXISTS chess_model_revisions_model_state_idx
+    ON chess_model_revisions (model_id, state, created_at DESC)`,
+
+  `CREATE TABLE IF NOT EXISTS chess_model_submissions (
+    id                  TEXT PRIMARY KEY,
+    model_id            TEXT NOT NULL REFERENCES chess_models(id),
+    revision_id         TEXT NOT NULL REFERENCES chess_model_revisions(id),
+    receipt_hash        TEXT NOT NULL UNIQUE,
+    submitter_contact   TEXT,
+    source_ip_hash      TEXT,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  )`,
+
+  `CREATE TABLE IF NOT EXISTS chess_model_deployments (
+    id                  TEXT PRIMARY KEY,
+    revision_id         TEXT NOT NULL REFERENCES chess_model_revisions(id),
+    kserve_name         TEXT NOT NULL,
+    kserve_namespace    TEXT NOT NULL,
+    endpoint            TEXT,
+    state               TEXT NOT NULL DEFAULT 'deploying',
+    observed_generation BIGINT,
+    last_error          TEXT,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  )`,
+
+  `CREATE TABLE IF NOT EXISTS chess_model_audit (
+    id          BIGSERIAL PRIMARY KEY,
+    actor       TEXT NOT NULL,
+    action      TEXT NOT NULL,
+    model_id    TEXT,
+    revision_id TEXT,
+    metadata    TEXT NOT NULL DEFAULT '{}',
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  )`,
+
+  `CREATE INDEX IF NOT EXISTS chess_model_audit_target_idx
+    ON chess_model_audit (model_id, revision_id, created_at DESC)`,
 ]
 // ────────────────────────────────────────────────────────────────────────────
 

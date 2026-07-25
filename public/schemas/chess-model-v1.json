@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://analytics-games-service.vercel.app/schemas/chess-model-v1.json",
+  "title": "Chess model package v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": {"const": "chess.analytics-games/v1"},
+    "kind": {"const": "ChessModel"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "displayName", "version"],
+      "properties": {
+        "name": {"type": "string", "pattern": "^[a-z][a-z0-9-]{2,39}$"},
+        "displayName": {"type": "string", "minLength": 3, "maxLength": 80},
+        "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtime", "format", "artifact", "sha256", "license", "inputContract", "outputContract", "resources"],
+      "properties": {
+        "runtime": {"enum": ["onnx-policy-v1", "hf-transformers-chess-v1"]},
+        "format": {"enum": ["onnx", "safetensors"]},
+        "artifact": {"type": "string", "pattern": "^(model\\.onnx|model\\.safetensors)$"},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "license": {"type": "string", "minLength": 2, "maxLength": 80},
+        "inputContract": {"const": "chess-move-v1"},
+        "outputContract": {"const": "chess-move-v1"},
+        "resources": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["accelerator"],
+          "properties": {"accelerator": {"enum": ["cpu", "gpu-reviewed"]}}
+        }
+      }
+    }
+  }
+}

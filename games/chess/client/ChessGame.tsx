@@ -12,12 +12,14 @@ import {
   stockfishLevel,
   type StockfishLevelId,
 } from './stockfish'
+import { ModelSubmissionPanel } from './ModelSubmissionPanel'
 import './chess.css'
 
 type Mode = 'setup' | 'bot' | 'local' | 'online'
 type SetupMode = 'bot' | 'online' | 'local'
 type OnlineAction = 'create' | 'join'
 type PendingPromotion = { from: Square; to: Square } | null
+type ModelOption = { revisionId: string; displayName: string; runtimeId: string }
 
 function resultFor(chess: Chess) {
   if (chess.isCheckmate()) return chess.turn() === 'w' ? 'Black wins by checkmate' : 'White wins by checkmate'
@@ -40,6 +42,8 @@ export function ChessGame() {
   const [colorChoice, setColorChoice] = useState<ChessColorChoice>('white')
   const [humanColor, setHumanColor] = useState<Color>('w')
   const [levelId, setLevelId] = useState<StockfishLevelId>('club')
+  const [modelRevision, setModelRevision] = useState('builtin-stockfish-18')
+  const [modelOptions, setModelOptions] = useState<ModelOption[]>([{ revisionId: 'builtin-stockfish-18', displayName: 'Stockfish 18', runtimeId: 'builtin-stockfish-18' }])
   const [localFen, setLocalFen] = useState(() => new Chess().fen())
   const [localPgn, setLocalPgn] = useState('')
   const [localResult, setLocalResult] = useState('')
@@ -59,6 +63,12 @@ export function ChessGame() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setPlayerId(getOrCreatePlayerId())
     setName(getPlayerName() || '')
+  }, [])
+
+  useEffect(() => {
+    fetch('/api/chess-models').then(response => response.json()).then((body: { models?: ModelOption[] }) => {
+      if (body.models?.length) setModelOptions(body.models)
+    }).catch(() => undefined)
   }, [])
 
   useEffect(() => () => engineRef.current?.destroy(), [])
@@ -82,8 +92,20 @@ export function ChessGame() {
       setEngineThinking(true)
       setEngineError('')
       try {
-        engineRef.current ??= new StockfishBrowserEngine()
-        const move = await engineRef.current.findBestMove(localFen, levelId)
+        let move: { from: Square; to: Square; promotion?: 'q' | 'r' | 'b' | 'n' }
+        if (modelRevision === 'builtin-stockfish-18') {
+          engineRef.current ??= new StockfishBrowserEngine()
+          move = await engineRef.current.findBestMove(localFen, levelId)
+        } else {
+          const legalMoves = chess.moves({ verbose: true }).map(item => `${item.from}${item.to}${item.promotion ?? ''}`)
+          const response = await fetch(`/api/chess-models/${encodeURIComponent(modelRevision)}/move`, {
+            method: 'POST', headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ fen: localFen, legalMoves, moveTimeMs: 500 }),
+          })
+          const result = await response.json() as { move?: string; error?: string }
+          if (!response.ok || !result.move) throw new Error(result.error || 'Custom model failed to move')
+          move = { from: result.move.slice(0, 2) as Square, to: result.move.slice(2, 4) as Square, promotion: result.move[4] as 'q' | 'r' | 'b' | 'n' | undefined }
+        }
         if (cancelled) return
         const next = new Chess(localFen)
         next.move(move)
@@ -91,14 +113,14 @@ export function ChessGame() {
         setLocalPgn(next.pgn())
         setLocalResult(resultFor(next))
       } catch (error) {
-        if (!cancelled) setEngineError(error instanceof Error ? error.message : 'Stockfish failed to move.')
+        if (!cancelled) setEngineError(error instanceof Error ? error.message : 'Chess model failed to move.')
       } finally {
         if (!cancelled) setEngineThinking(false)
       }
     }
     void run()
     return () => { cancelled = true }
-  }, [chess, humanColor, levelId, localFen, localResult, mode])
+  }, [chess, humanColor, levelId, localFen, localResult, mode, modelRevision])
 
   function resetToSetup() {
     engineRef.current?.destroy()
@@ -224,8 +246,9 @@ export function ChessGame() {
             <div className="chess-choice-row"><span>Play as</span><div className="chess-segmented">{(['white', 'random', 'black'] as const).map((color) => <button key={color} className={colorChoice === color ? 'selected' : ''} onClick={() => setColorChoice(color)}>{color === 'white' ? '○ White' : color === 'black' ? '● Black' : '◐ Random'}</button>)}</div></div>
 
             {setupMode === 'bot' && <>
-              <div className="chess-field"><label htmlFor="stockfish-level">Stockfish difficulty</label><select id="stockfish-level" value={levelId} onChange={(event) => setLevelId(event.target.value as StockfishLevelId)}>{STOCKFISH_LEVELS.map((item) => <option key={item.id} value={item.id}>{item.label} · Skill {item.skill}/20</option>)}</select><small>{level.description}. Stockfish 18 WASM, {level.moveTimeMs} ms search per move.</small></div>
-              <button className="chess-primary" onClick={() => startLocal('bot')}>Play Stockfish</button>
+              <div className="chess-field"><label htmlFor="opponent-model">Opponent model</label><select id="opponent-model" value={modelRevision} onChange={(event) => setModelRevision(event.target.value)}>{modelOptions.map((model) => <option key={model.revisionId} value={model.revisionId}>{model.displayName}</option>)}</select><small>Only scanned, approved, deployed, and healthy models appear here.</small></div>
+              <div className="chess-field"><label htmlFor="stockfish-level">Stockfish difficulty</label><select id="stockfish-level" disabled={modelRevision !== 'builtin-stockfish-18'} value={levelId} onChange={(event) => setLevelId(event.target.value as StockfishLevelId)}>{STOCKFISH_LEVELS.map((item) => <option key={item.id} value={item.id}>{item.label} · Skill {item.skill}/20</option>)}</select><small>{modelRevision === 'builtin-stockfish-18' ? `${level.description}. Stockfish 18 WASM, ${level.moveTimeMs} ms search per move.` : 'Custom model strength and move budget are controlled by its approved runtime profile.'}</small></div>
+              <button className="chess-primary" onClick={() => startLocal('bot')}>Play {modelOptions.find((model) => model.revisionId === modelRevision)?.displayName ?? 'Chess model'}</button>
             </>}
 
             {setupMode === 'local' && <><p className="chess-explainer">Take turns on this device. The board stays oriented to your selected side and all legal chess rules apply.</p><button className="chess-primary" onClick={() => startLocal('local')}>Start pass-and-play</button></>}
@@ -239,6 +262,7 @@ export function ChessGame() {
             </>}
             {(notice || roomClient.error) && <p className="chess-notice" role="alert">{notice || roomClient.error?.message}</p>}
           </div>
+          <ModelSubmissionPanel />
           <footer className="chess-attribution">Rules: chess.js · Engine: Stockfish 18 lite WASM · Board: react-chessboard</footer>
         </section>
       ) : (

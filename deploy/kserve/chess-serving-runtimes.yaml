@@ -1,0 +1,74 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  name: chess-onnx-policy-v1
+  namespace: chess-models
+  labels:
+    app.kubernetes.io/part-of: analytics-games-chess-models
+spec:
+  supportedModelFormats:
+    - name: onnx
+      version: "1"
+      autoSelect: false
+      priority: 1
+  protocolVersions: [v2]
+  multiModel: false
+  containers:
+    - name: kserve-container
+      image: nvcr.io/nvidia/tritonserver:25.06-py3
+      args: ["tritonserver", "--model-repository=/mnt/models", "--strict-model-config=true", "--exit-on-error=true"]
+      ports:
+        - {name: h2c, containerPort: 8080, protocol: TCP}
+      resources:
+        requests: {cpu: "250m", memory: "512Mi"}
+        limits: {cpu: "2", memory: "2Gi", ephemeral-storage: "1Gi"}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities: {drop: ["ALL"]}
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile: {type: RuntimeDefault}
+      volumeMounts:
+        - {name: tmp, mountPath: /tmp}
+  volumes:
+    - name: tmp
+      emptyDir: {sizeLimit: 256Mi}
+---
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  name: chess-hf-transformers-v1
+  namespace: chess-models
+  labels:
+    app.kubernetes.io/part-of: analytics-games-chess-models
+spec:
+  supportedModelFormats:
+    - name: huggingface
+      version: "1"
+      autoSelect: false
+      priority: 1
+  protocolVersions: [v2]
+  multiModel: false
+  containers:
+    - name: kserve-container
+      image: kserve/huggingfaceserver:v0.16.0
+      args: ["--model_dir=/mnt/models", "--disable_lower_case", "--trust_remote_code=false"]
+      resources:
+        requests: {cpu: "500m", memory: "1Gi"}
+        limits: {cpu: "2", memory: "4Gi", ephemeral-storage: "1Gi"}
+      env:
+        - {name: HF_HUB_OFFLINE, value: "1"}
+        - {name: TRANSFORMERS_OFFLINE, value: "1"}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities: {drop: ["ALL"]}
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile: {type: RuntimeDefault}
+      volumeMounts:
+        - {name: tmp, mountPath: /tmp}
+  volumes:
+    - name: tmp
+      emptyDir: {sizeLimit: 256Mi}
