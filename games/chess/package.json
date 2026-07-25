@@ -4,5 +4,5 @@
   "private": true,
   "description": "Room, local pass-and-play, and bot chess",
   "scripts": { "check": "tsc --noEmit -p tsconfig.json" },
-  "peerDependencies": { "react": ">=19", "chess.js": ">=1.4.0" }
+  "peerDependencies": { "react": ">=19", "chess.js": ">=1.4.0", "react-chessboard": ">=5.10.0" }
 }

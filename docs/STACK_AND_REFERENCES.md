@@ -17,6 +17,8 @@
 ## Reviewed references
 
 - [chess.js](https://github.com/jhlywa/chess.js), BSD-2-Clause: reused for legal move generation, FEN/PGN, checkmate, stalemate, and draw detection.
+- [Stockfish.js 18](https://github.com/nmrugg/stockfish.js), GPL-3.0: vendored lite single-threaded WASM build for five real computer difficulty profiles. Full provenance and corresponding-source links are in `public/vendor/stockfish/UPSTREAM.md`.
+- [react-chessboard](https://github.com/Clariity/react-chessboard), MIT: responsive board, standard piece set, drag-and-drop, animation, and mobile interactions.
 - [XP.css](https://github.com/botoxparty/XP.css), MIT: reused dependency for semantic nostalgic controls.
 - [98.css](https://github.com/jdan/98.css), MIT: XP.css ancestor and design-system reference.
 - [web3point1](https://mythronaut.neocities.org/), public-domain claim: useful Windows 3.1 interaction reference, but source repository is gone; not vendored.

@@ -33,7 +33,7 @@ const PLATFORM_OVERVIEW = `Platform overview (repository source of truth):
 const KNOWLEDGE: readonly KnowledgeEntry[] = [
   {
     keywords: ['chess', 'checkmate', 'bot', 'castle', 'room', 'pass'],
-    content: `Chess (games/chess) supports pass-and-play, Easy and Medium bots, and two-player online rooms with optional passwords. Players can choose White, Black, or Random. Select a piece and then a highlighted legal square; pawn promotion defaults to queen. Rules and check/checkmate/draw validation use chess.js. Online room moves are server-authoritative.`,
+    content: `Chess (games/chess) supports pass-and-play, Stockfish 18 WASM opponents at five difficulties, and two-player online rooms with optional passwords. Players can choose White, Black, or Random. The polished board supports click or drag moves, legal-square highlights, explicit promotion choice, move history, and responsive layouts. Rules use chess.js and online moves are server-authoritative.`,
   },
   {
     keywords: ['consensus', 'radar', 'clue', 'team', 'room', 'multiplayer'],
