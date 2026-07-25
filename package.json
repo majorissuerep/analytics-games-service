@@ -23,7 +23,8 @@
     "check": "npm run lint && npm run test && npm run typecheck && npm run workspace:check && npm run build",
     "workspace:check": "turbo run check",
     "audit:dependencies": "npm audit --omit=dev --audit-level=high",
-    "scan:security": "bash scripts/security-scan.sh"
+    "scan:security": "bash scripts/security-scan.sh",
+    "chess-models:admin": "node scripts/chess-model-admin.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1095.0",

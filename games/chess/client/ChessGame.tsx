@@ -13,10 +13,11 @@ import {
   type StockfishLevelId,
 } from './stockfish'
 import { ModelSubmissionPanel } from './ModelSubmissionPanel'
+import { ModelArena } from './ModelArena'
 import './chess.css'
 
 type Mode = 'setup' | 'bot' | 'local' | 'online'
-type SetupMode = 'bot' | 'online' | 'local'
+type SetupMode = 'bot' | 'online' | 'local' | 'arena'
 type OnlineAction = 'create' | 'join'
 type PendingPromotion = { from: Square; to: Square } | null
 type ModelOption = { revisionId: string; displayName: string; runtimeId: string }
@@ -240,9 +241,10 @@ export function ChessGame() {
             <button className={setupMode === 'bot' ? 'active' : ''} onClick={() => setSetupMode('bot')}><b>♟</b><span>Computer<small>Stockfish 18</small></span></button>
             <button className={setupMode === 'online' ? 'active' : ''} onClick={() => setSetupMode('online')}><b>♜</b><span>Online<small>Private room</small></span></button>
             <button className={setupMode === 'local' ? 'active' : ''} onClick={() => setSetupMode('local')}><b>♚</b><span>Local<small>Same device</small></span></button>
+            <button className={setupMode === 'arena' ? 'active' : ''} onClick={() => setSetupMode('arena')}><b>⚔</b><span>Model arena<small>3s turns + replay</small></span></button>
           </nav>
 
-          <div className="chess-setup-panel">
+          {setupMode === 'arena' ? <ModelArena models={modelOptions} /> : <div className="chess-setup-panel">
             <div className="chess-choice-row"><span>Play as</span><div className="chess-segmented">{(['white', 'random', 'black'] as const).map((color) => <button key={color} className={colorChoice === color ? 'selected' : ''} onClick={() => setColorChoice(color)}>{color === 'white' ? '○ White' : color === 'black' ? '● Black' : '◐ Random'}</button>)}</div></div>
 
             {setupMode === 'bot' && <>
@@ -261,7 +263,7 @@ export function ChessGame() {
               <button className="chess-primary" onClick={() => void (onlineAction === 'create' ? createOnline() : joinOnline())} disabled={roomClient.pending || !playerId}>{roomClient.pending ? 'Connecting…' : onlineAction === 'create' ? 'Create private room' : 'Join room'}</button>
             </>}
             {(notice || roomClient.error) && <p className="chess-notice" role="alert">{notice || roomClient.error?.message}</p>}
-          </div>
+          </div>}
           <ModelSubmissionPanel />
           <footer className="chess-attribution">Rules: chess.js · Engine: Stockfish 18 lite WASM · Board: react-chessboard</footer>
         </section>

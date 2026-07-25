@@ -38,6 +38,23 @@ export async function listPublicModels(): Promise<PublicChessModel[]> {
   }))]
 }
 
+export async function listAdminModels() {
+  const result = await pool.query(`SELECT m.id, m.slug, m.display_name, m.description, m.disabled, m.archived,
+    r.id AS revision_id, r.revision_number, r.runtime_id, r.source_type, r.source_ref, r.license, r.state,
+    r.scan_report, r.rejection_reason, r.created_at, r.updated_at
+    FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+    ORDER BY r.created_at DESC LIMIT 100`)
+  return result.rows
+}
+
+export async function listPublicModelRegistry() {
+  const result = await pool.query(`SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100`)
+  return result.rows.map(row => ({ slug: row.slug, displayName: row.display_name, description: row.description,
+    runtimeId: row.runtime_id, sourceType: row.source_type, license: row.license, state: row.state, updatedAt: row.updated_at }))
+}
+
 export async function assertSubmissionAllowed(sourceIpHash?: string) {
   if (process.env.NODE_ENV === 'production' && !sourceIpHash) throw new Error('Public submission abuse protection is not configured')
   if (!sourceIpHash) return

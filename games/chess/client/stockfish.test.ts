@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { STOCKFISH_LEVELS, buildStockfishSearchCommands, parseBestMove } from './stockfish'
+import { STOCKFISH_LEVELS, buildStockfishSearchCommands, buildStockfishTimedSearchCommands, parseBestMove } from './stockfish'
 
 describe('Stockfish 18 browser engine', () => {
   it('offers five real difficulty profiles with increasing strength and think time', () => {
@@ -14,6 +14,15 @@ describe('Stockfish 18 browser engine', () => {
       'setoption name Skill Level value 10',
       'position fen test-fen',
       'go movetime 350',
+    ])
+  })
+
+  it('builds a full-strength three-second arena search', () => {
+    expect(buildStockfishTimedSearchCommands('test-fen', 3000)).toEqual([
+      'stop',
+      'setoption name Skill Level value 20',
+      'position fen test-fen',
+      'go movetime 3000',
     ])
   })
 

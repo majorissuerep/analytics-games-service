@@ -55,6 +55,19 @@ export const chessModelMoveRequestSchema = z.object({
   moveTimeMs: z.number().int().min(50).max(5000),
 }).strict()
 
+export const createModelMatchSchema = z.object({
+  whiteRevisionId: z.string().min(3).max(100),
+  blackRevisionId: z.string().min(3).max(100),
+}).strict()
+
+export const modelMatchMoveSchema = z.object({
+  uci: z.string().regex(/^[a-h][1-8][a-h][1-8][qrbn]?$/),
+  durationMs: z.number().int().min(0).max(3000),
+  expectedPly: z.number().int().min(0).max(1000),
+}).strict()
+
+export const modelMatchPauseSchema = z.object({ paused: z.boolean() }).strict()
+
 export type ChessModelSubmission = z.infer<typeof chessModelSubmissionSchema>
 
 export type PublicChessModel = {
