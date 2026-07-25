@@ -10,11 +10,12 @@ export async function POST(
 ) {
   try {
     const { code } = await params
-    const body = (await request.json()) as { player?: EnginePlayer }
+    const body = (await request.json()) as { player?: EnginePlayer; password?: unknown }
     const membership = await joinRoom(
       code,
       body.player as EnginePlayer,
       readBearerToken(request.headers),
+      typeof body.password === 'string' ? body.password : '',
     )
     return NextResponse.json(membership)
   } catch (error) {

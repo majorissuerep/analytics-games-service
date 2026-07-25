@@ -8,6 +8,7 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as {
       gameId?: unknown
       host?: EnginePlayer
+      password?: unknown
     }
     if (typeof body.gameId !== 'string') {
       return NextResponse.json(
@@ -15,7 +16,11 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       )
     }
-    const membership = await createRoom(body.gameId, body.host as EnginePlayer)
+    const membership = await createRoom(
+      body.gameId,
+      body.host as EnginePlayer,
+      typeof body.password === 'string' ? body.password : '',
+    )
     return NextResponse.json(membership, { status: 201 })
   } catch (error) {
     const mapped = engineErrorResponse(error)

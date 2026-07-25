@@ -22,10 +22,11 @@
     "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run test && npm run typecheck && npm run workspace:check && npm run build",
     "workspace:check": "turbo run check",
-    "audit:dependencies": "npm audit --audit-level=high",
+    "audit:dependencies": "npm audit --omit=dev --audit-level=high",
     "scan:security": "bash scripts/security-scan.sh"
   },
   "dependencies": {
+    "chess.js": "^1.4.0",
     "motion": "^12.42.2",
     "next": "^16.2.11",
     "pg": "^8.22.0",

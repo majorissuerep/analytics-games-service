@@ -41,7 +41,7 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   await page.goto('/')
   await expect(page.locator('.desktop-sky')).toHaveCSS('background-image', /millennium-horizon\.svg/)
   await expect(page.getByLabel('Desktop sticky note')).toBeVisible()
-  await expect(page.getByLabel('4 games installed')).toBeVisible()
+  await expect(page.getByLabel('5 games installed')).toBeVisible()
   await page.getByRole('button', { name: 'start' }).click()
   await expect(page.getByRole('button', { name: /Open a random installed game/ })).toBeVisible()
   await page.getByRole('button', { name: 'start' }).click()
@@ -51,9 +51,9 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   await expect(pluginWindow.locator('.plugin-row')).toHaveCount(4)
   const counterToggle = pluginWindow.locator('.plugin-row').filter({ hasText: 'Game Counter' }).getByRole('checkbox')
   await counterToggle.uncheck()
-  await expect(page.getByLabel('4 games installed')).toHaveCount(0)
+  await expect(page.getByLabel('5 games installed')).toHaveCount(0)
   await counterToggle.check()
-  await expect(page.getByLabel('4 games installed')).toBeVisible()
+  await expect(page.getByLabel('5 games installed')).toBeVisible()
   await pluginWindow.getByRole('button', { name: 'Close' }).click()
 
   await page.locator('.desktop-icon[aria-label="Open Minefield"]').dblclick()
@@ -184,6 +184,73 @@ test('embedded games use only the desktop window chrome', async ({ page }) => {
   await page.locator('.desktop-icon[aria-label="Open Paintbox"]').dblclick()
   const paintbox = page.frameLocator('iframe[title="Paintbox"]')
   await expect(paintbox.getByRole('link', { name: 'Back to desktop' })).toHaveCount(0)
+})
+
+test('Chess supports bot color selection and pass-and-play moves', async ({ page }) => {
+  await page.goto('/games/chess')
+  await page.getByRole('button', { name: 'black', exact: true }).click()
+  await page.getByRole('button', { name: 'Start bot game' }).click()
+  await expect(page.getByRole('heading', { name: /Black to move/ })).toBeVisible()
+  await page.getByRole('button', { name: 'e7 black p' }).click()
+  await page.getByRole('button', { name: 'e5 empty' }).click()
+  await expect(page.locator('.chess-moves')).not.toContainText('No moves yet.')
+
+  await page.getByRole('button', { name: 'New setup' }).click()
+  await page.getByRole('button', { name: 'Start local game' }).click()
+  await page.getByRole('button', { name: 'e2 white p' }).click()
+  await page.getByRole('button', { name: 'e4 empty' }).click()
+  await expect(page.getByRole('heading', { name: 'Black to move' })).toBeVisible()
+})
+
+test('Chess remains usable on a narrow viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/games/chess')
+  await expect(page.getByRole('button', { name: 'Start bot game' })).toBeVisible()
+  await page.getByRole('button', { name: 'Start local game' }).click()
+  const board = page.getByLabel('Chess board')
+  const box = await board.boundingBox()
+  if (!box) throw new Error('Chess board has no bounding box')
+  expect(box.x).toBeGreaterThanOrEqual(0)
+  expect(box.x + box.width).toBeLessThanOrEqual(390)
+  await page.getByRole('button', { name: 'e2 white p' }).click()
+  await page.getByRole('button', { name: 'e4 empty' }).click()
+  await expect(page.getByRole('heading', { name: 'Black to move' })).toBeVisible()
+})
+
+test('Chess password room synchronizes legal moves', async ({ browser }) => {
+  const hostContext = await browser.newContext()
+  const guestContext = await browser.newContext()
+  const host = await hostContext.newPage()
+  const guest = await guestContext.newPage()
+  try {
+    await host.goto('/games/chess')
+    await host.getByPlaceholder('Player name').fill('White Host')
+    await host.getByPlaceholder('Room password (optional)').fill('knights')
+    await host.getByRole('button', { name: 'Create room' }).click()
+    const code = (await host.locator('.chess-room-code strong').textContent())?.trim() ?? ''
+    expect(code).toMatch(/^[A-Z2-9]{6}$/)
+
+    await guest.goto('/games/chess')
+    await guest.getByPlaceholder('Player name').fill('Black Guest')
+    await guest.getByPlaceholder('ROOM CODE').fill(code)
+    await guest.getByPlaceholder('Room password (optional)').fill('wrong')
+    await guest.getByRole('button', { name: 'Join' }).click()
+    await expect(guest.locator('.chess-notice')).toContainText('Incorrect room password')
+    await guest.getByPlaceholder('Room password (optional)').fill('knights')
+    await guest.getByRole('button', { name: 'Join' }).click()
+
+    await expect(host.getByRole('heading', { name: /Lobby · 2\/2 players/ })).toBeVisible({ timeout: 5000 })
+    await host.getByRole('button', { name: 'Start online game' }).click()
+    await host.getByRole('button', { name: 'e2 white p' }).click()
+    await host.getByRole('button', { name: 'e4 empty' }).click()
+    await expect(guest.getByRole('heading', { name: /Black to move/ })).toBeVisible({ timeout: 5000 })
+    await guest.getByRole('button', { name: 'e7 black p' }).click()
+    await guest.getByRole('button', { name: 'e5 empty' }).click()
+    await expect(host.getByRole('heading', { name: /White to move/ })).toBeVisible({ timeout: 5000 })
+  } finally {
+    await hostContext.close()
+    await guestContext.close()
+  }
 })
 
 interface EmulatedPlayer {

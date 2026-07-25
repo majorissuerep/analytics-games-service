@@ -97,13 +97,13 @@ export function useGameRoom<TGameView>({
     return nextRoom
   }, [gameId])
 
-  const create = useCallback(async (host: EnginePlayer) => {
+  const create = useCallback(async (host: EnginePlayer, password = '') => {
     setPending(true)
     try {
       const response = await fetch('/api/rooms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ gameId, host }),
+        body: JSON.stringify({ gameId, host, password }),
       })
       const body = await readResponse<{
         room: RoomSnapshot<TGameView>
@@ -123,14 +123,14 @@ export function useGameRoom<TGameView>({
     }
   }, [acceptRoom, gameId])
 
-  const join = useCallback(async (code: string, player: EnginePlayer) => {
+  const join = useCallback(async (code: string, player: EnginePlayer, password = '') => {
     setPending(true)
     try {
       const currentToken = readCapability(code, player.id)
       const response = await fetch(`/api/rooms/${encodeURIComponent(code)}/join`, {
         method: 'POST',
         headers: requestHeaders(currentToken, true),
-        body: JSON.stringify({ player }),
+        body: JSON.stringify({ player, password }),
       })
       const body = await readResponse<{
         room: RoomSnapshot<TGameView>

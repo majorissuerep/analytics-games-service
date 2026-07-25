@@ -3,6 +3,7 @@ import type { EnginePlayer, GameManifest, RoomSnapshot } from '@/lib/engine/type
 export interface StoredRoomState<TGameState = unknown> {
   players: EnginePlayer[]
   playerTokens: Record<string, string>
+  passwordHash?: string
   gameVersion: number
   game: TGameState
 }

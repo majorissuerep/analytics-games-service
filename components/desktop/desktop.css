@@ -67,6 +67,7 @@
 .embedded-game-surface { width: 100%; min-height: 100svh; }
 .embedded-game-surface .minefield-header > a,
 .embedded-game-surface .paintbox-titlebar,
+.embedded-game-surface .chess-toolbar,
 .embedded-game-surface .topbar > .brand { display: none; }
 .embedded-game-surface .minefield-header { justify-content: flex-end; }
 .embedded-game-surface .topbar { justify-content: flex-end; }

@@ -32,6 +32,10 @@ const PLATFORM_OVERVIEW = `Platform overview (repository source of truth):
 
 const KNOWLEDGE: readonly KnowledgeEntry[] = [
   {
+    keywords: ['chess', 'checkmate', 'bot', 'castle', 'room', 'pass'],
+    content: `Chess (games/chess) supports pass-and-play, Easy and Medium bots, and two-player online rooms with optional passwords. Players can choose White, Black, or Random. Select a piece and then a highlighted legal square; pawn promotion defaults to queen. Rules and check/checkmate/draw validation use chess.js. Online room moves are server-authoritative.`,
+  },
+  {
     keywords: ['consensus', 'radar', 'clue', 'team', 'room', 'multiplayer'],
     content: `Consensus Radar (games/consensus-radar): 4–20 players, about 15–25 minutes. A clue-giver sees a secret target on a two-sided spectrum and gives one clue without numbers or directions. Teammates place markers; closeness to the target earns points. Create or join a six-character room, split into two teams, assign exactly one clue-giver per team, then alternate turns. Server rules are in games/consensus-radar/server.ts and client UI is in games/consensus-radar/client/ConsensusRadarGame.tsx.`,
   },
