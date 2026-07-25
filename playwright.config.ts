@@ -2,7 +2,6 @@ import { defineConfig, devices } from '@playwright/test'
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3130'
 const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
-const storageState = process.env.PLAYWRIGHT_STORAGE_STATE
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -14,7 +13,6 @@ export default defineConfig({
     ...devices['Desktop Chrome'],
     baseURL,
     extraHTTPHeaders: bypass ? { 'x-vercel-protection-bypass': bypass } : undefined,
-    storageState,
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
