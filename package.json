@@ -42,17 +42,17 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
-    "@playwright/test": "^1.61.1",
-    "@types/node": "^26.1.1",
+    "@playwright/test": "^1.62.0",
+    "@types/node": "^26.1.2",
     "@types/pg": "^8.20.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "eslint": "^9.39.5",
-    "eslint-config-next": "^16.2.11",
+    "eslint": "^10.8.0",
+    "eslint-config-next": "^16.2.12",
     "eslint-plugin-security": "^4.0.1",
-    "globals": "^17.7.0",
-    "turbo": "^2.10.5",
-    "typescript": "^5.9.3",
+    "globals": "^17.8.0",
+    "turbo": "^2.10.7",
+    "typescript": "^7.0.2",
     "vitest": "^4.1.10"
   },
   "overrides": {
