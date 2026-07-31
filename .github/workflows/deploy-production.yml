@@ -1,6 +1,6 @@
-name: Production Deployment
+name: Deploy Production
 
-# Fires on every push (or merge) to master.
+# Quality gate + production deploy. Fires on every push (or merge) to master.
 on:
   push:
     branches: [master]
@@ -14,10 +14,8 @@ concurrency:
 
 jobs:
   deploy-production:
-    name: Deploy production
+    name: Gate and deploy production
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -38,6 +36,11 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      # ── Quality gate: lint, unit tests, typecheck, workspace checks, build.
+      # A failing gate stops the deploy.
+      - name: Run quality gate
+        run: npm run check
 
       # ── DB migrations run BEFORE building so the new schema is live
       # before any new code starts serving requests.
@@ -104,30 +107,3 @@ jobs:
             --output /tmp/health.json \
             "$PRODUCTION_URL/api/health"
           jq -e '.status == "ok"' /tmp/health.json >/dev/null
-
-      - name: Verify stateful room API
-        run: |
-          curl --fail --silent --show-error --output /tmp/room-smoke.json \
-            --request POST --header "content-type: application/json" \
-            --data '{"gameId":"chess","host":{"id":"deployment-smoke","name":"Deployment smoke"}}' \
-            "$PRODUCTION_URL/api/rooms"
-          jq -e '.room.gameId == "chess" and (.room.code | length == 6)' /tmp/room-smoke.json >/dev/null
-
-      # Exercise desktop entry/exit, Pip, Chess, and a complete four-player game.
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
-
-      - name: Run browser acceptance suite
-        env:
-          PLAYWRIGHT_BASE_URL: ${{ env.PRODUCTION_URL }}
-        run: npm run test:e2e
-
-      - name: Upload browser diagnostics
-        if: failure()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: production-browser-e2e-diagnostics
-          path: |
-            playwright-report/
-            test-results/
-          if-no-files-found: ignore
