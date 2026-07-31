@@ -1,5 +1,0 @@
-rules:
-  # Vercel's current CLI dependency graph contains known audit findings when
-  # lockfile-installed. CI installs one verified, pinned CLI version instead.
-  adhoc-packages:
-    disable: true
