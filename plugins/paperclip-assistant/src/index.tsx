@@ -46,6 +46,54 @@ function getOrCreateUserKey() {
   }
 }
 
+interface ChatMessage {
+  role: 'user' | 'assistant'
+  content: string
+  reasoning?: string
+  blocked?: boolean
+}
+
+interface ToolCard {
+  id: string
+  name: string
+  state: 'open' | 'done' | 'error'
+  excerpt: string
+}
+
+/** Minimal SSE reader: emits (event, parsedData) for each `event:`/`data:` pair. */
+async function readSseStream(
+  body: ReadableStream<Uint8Array>,
+  onEvent: (event: string, data: Record<string, unknown>) => void,
+) {
+  const reader = body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+      let boundary = buffer.indexOf('\n\n')
+      while (boundary !== -1) {
+        const raw = buffer.slice(0, boundary)
+        buffer = buffer.slice(boundary + 2)
+        const event = raw.match(/^event: (.+)$/m)?.[1]
+        const dataLine = raw.match(/^data: (.*)$/m)?.[1]
+        if (event && dataLine) {
+          try {
+            onEvent(event, JSON.parse(dataLine) as Record<string, unknown>)
+          } catch {
+            // Ignore malformed event payloads; the stream continues.
+          }
+        }
+        boundary = buffer.indexOf('\n\n')
+      }
+    }
+  } finally {
+    reader.releaseLock()
+  }
+}
+
 function PaperclipAssistant({ context }: DesktopPluginProps) {
   const [visible, setVisible] = useState(true)
   const [tipIndex, setTipIndex] = useState(0)
@@ -54,9 +102,15 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
   const [userKey, setUserKey] = useState('')
-  const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([
+  const [messages, setMessages] = useState<ChatMessage[]>([
     { role: 'assistant', content: "Hi! I'm Pip. Ask me how to play, where code lives, or what this desktop can do." },
   ])
+  // Live turn state (reset on every send)
+  const [streamingText, setStreamingText] = useState<string | null>(null)
+  const [statusLine, setStatusLine] = useState('')
+  const [toolCards, setToolCards] = useState<ToolCard[]>([])
+  const [modelChip, setModelChip] = useState('')
+  const reasoningRef = useRef('')
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const messagesRef = useRef<HTMLDivElement>(null)
 
@@ -73,31 +127,86 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
 
   useEffect(() => {
     messagesRef.current?.scrollTo({ top: messagesRef.current.scrollHeight, behavior: 'smooth' })
-  }, [messages])
+  }, [messages, streamingText, statusLine])
 
   const sendMessage = async (event?: FormEvent) => {
     event?.preventDefault()
     const content = draft.trim()
     if (!content || sending) return
-    const nextMessages = [...messages, { role: 'user' as const, content }].slice(-12)
-    setMessages(nextMessages)
+    setMessages((current) => [...current, { role: 'user' as const, content }].slice(-12))
     setDraft('')
     setError('')
     setSending(true)
+    setStreamingText(null)
+    reasoningRef.current = ''
+    setToolCards([])
+    setStatusLine('Pip is rummaging through the repo…')
     try {
       const response = await fetch('/api/pip/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userKey: resolveUserKey(), message: content }),
       })
-      const result = await response.json() as { message?: string; error?: string }
-      const answer = result.message
-      if (!response.ok || !answer) throw new Error(result.error || 'Pip could not answer')
-      setMessages((current) => [...current, { role: 'assistant' as const, content: answer }].slice(-12))
+      if (!response.ok || !response.body || !response.headers.get('content-type')?.includes('text/event-stream')) {
+        const result = await response.json().catch(() => ({})) as { error?: string }
+        throw new Error(result.error || 'Pip could not answer')
+      }
+
+      let finished = false
+      await readSseStream(response.body, (event, data) => {
+        if (event === 'meta') {
+          setModelChip(String(data.model ?? ''))
+        } else if (event === 'status') {
+          const text = String(data.text ?? '')
+          if (text) setStatusLine(text)
+        } else if (event === 'delta') {
+          const chunk = String(data.text ?? '')
+          if (chunk) setStreamingText((current) => (current ?? '') + chunk)
+        } else if (event === 'reasoning') {
+          reasoningRef.current += String(data.text ?? '')
+        } else if (event === 'tool_start') {
+          setToolCards((current) => [...current.slice(-2), {
+            id: String(data.id ?? ''),
+            name: String(data.name ?? 'tool'),
+            state: 'open',
+            excerpt: String(data.args ?? ''),
+          }])
+        } else if (event === 'tool_end') {
+          setToolCards((current) => current.map((card) => card.id === String(data.id ?? '')
+            ? { ...card, state: 'done', excerpt: String(data.result ?? '').slice(0, 120) }
+            : card))
+        } else if (event === 'blocked') {
+          setMessages((current) => [...current, {
+            role: 'assistant' as const,
+            content: String(data.message ?? 'That one tripped my safety filter.'),
+            blocked: true,
+          }].slice(-12))
+          finished = true
+        } else if (event === 'done') {
+          const text = String(data.text ?? '')
+          const reasoning = reasoningRef.current.trim() ? reasoningRef.current.slice(0, 4_000) : undefined
+          setStreamingText(null)
+          setMessages((current) => [...current, {
+            role: 'assistant' as const,
+            content: text,
+            ...(reasoning ? { reasoning } : {}),
+          }].slice(-12))
+          finished = true
+        } else if (event === 'error') {
+          const kind = String(data.kind ?? 'provider')
+          throw new Error(kind === 'timeout'
+            ? 'Pip took too long rummaging. Try again!'
+            : 'Pip lost the line to the model office. Try again!')
+        }
+      })
+      if (!finished) throw new Error('Pip lost the line to the model office. Try again!')
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : 'Pip could not answer')
     } finally {
       setSending(false)
+      setStreamingText(null)
+      setStatusLine('')
+      reasoningRef.current = ''
     }
   }
 
@@ -152,17 +261,43 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
                 exit={{ opacity: 0, y: 12, scale: 0.97 }}
               >
                 <header>
-                  <div><span aria-hidden>📎</span><strong>Talk to Pip</strong><small>Repo-aware · ZDR</small></div>
+                  <div>
+                    <span aria-hidden>📎</span>
+                    <strong>Talk to Pip</strong>
+                    <small>{modelChip ? `${modelChip} · ZDR` : 'Repo-aware · ZDR'}</small>
+                  </div>
                   <button onClick={() => setChatOpen(false)} aria-label="Close Pip chat">×</button>
                 </header>
                 <div className="pip-chat-messages" ref={messagesRef} aria-live="polite">
                   {messages.map((message, index) => (
-                    <div className={`pip-chat-message ${message.role}`} key={`${message.role}-${index}`}>
-                      <span>{message.role === 'assistant' ? 'Pip' : 'You'}</span>
+                    <div className={`pip-chat-message ${message.role}${message.blocked ? ' blocked' : ''}`} key={`${message.role}-${index}`}>
+                      <span>{message.role === 'assistant' ? 'Pip' : 'You'}{message.blocked ? ' · 🛡' : ''}</span>
                       <p>{message.content}</p>
+                      {message.reasoning && (
+                        <details className="pip-chat-reasoning">
+                          <summary>Pip&apos;s notes</summary>
+                          <p>{message.reasoning}</p>
+                        </details>
+                      )}
                     </div>
                   ))}
-                  {sending && <div className="pip-chat-thinking" role="status"><i /><i /><i /> Pip is rummaging through the repo…</div>}
+                  {toolCards.map((card) => (
+                    <div className={`pip-tool-card ${card.state}`} key={card.id} role="status">
+                      <strong>
+                        {card.state === 'open' ? '⏳' : card.state === 'done' ? '✓' : '✕'} {card.name}
+                      </strong>
+                      {card.excerpt && <small>{card.excerpt}</small>}
+                    </div>
+                  ))}
+                  {streamingText !== null && (
+                    <div className="pip-chat-message assistant streaming">
+                      <span>Pip</span>
+                      <p>{streamingText}<b className="pip-cursor" aria-hidden>▌</b></p>
+                    </div>
+                  )}
+                  {sending && streamingText === null && (
+                    <div className="pip-chat-thinking" role="status"><i /><i /><i /> {statusLine || 'Pip is rummaging through the repo…'}</div>
+                  )}
                 </div>
                 <div className="pip-chat-suggestions" aria-label="Suggested questions">
                   {['How do I play Minefield?', 'Explain Consensus Radar', 'Where do games live in the repo?'].map((question) => (
@@ -196,7 +331,7 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
 export const paperclipAssistantPlugin: DesktopPluginDefinition = {
   manifest: {
     id: 'paperclip-assistant',
-    version: 2,
+    version: 3,
     title: 'Pip Assistant',
     description: 'Original repo-aware AI desktop guide with a private ZDR chat.',
     slot: 'desktop-overlay',

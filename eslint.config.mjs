@@ -29,6 +29,7 @@ export default defineConfig([
     'coverage/**',
     'node_modules/**',
     'public/vendor/**',
+    'vendor/**',
     'next-env.d.ts',
   ]),
 ])
