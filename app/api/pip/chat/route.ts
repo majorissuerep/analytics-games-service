@@ -1,11 +1,15 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { z } from 'zod'
-import { buildOpenRouterRequest, parsePipChatRequest, PIP_MODEL } from '@/lib/pip/chat'
+import { buildOpenRouterRequest, parsePipChatRequest, PIP_MODEL, type PipChatMessage } from '@/lib/pip/chat'
+import { checkContentSafety } from '@/lib/pip/guardrail'
+import { hashUserKey, loadPipSession, pipMemoryEnabled, savePipSession } from '@/lib/pip/session-store'
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
 const WINDOW_MS = 60_000
 const MAX_REQUESTS_PER_WINDOW = 12
 const REQUEST_TIMEOUT_MS = 20_000
+
+const BLOCKED_REPLY = 'Whoops — that one tripped my office-safety filter, so I have to file it away. Ask me about the games on the desktop instead!'
 
 const openRouterResponseSchema = z.object({
   choices: z.array(z.object({
@@ -37,6 +41,13 @@ function consumeRateLimit(key: string, now = Date.now()) {
   return true
 }
 
+function blockedResponse() {
+  return NextResponse.json(
+    { message: BLOCKED_REPLY, model: PIP_MODEL, blocked: true },
+    { headers: { 'Cache-Control': 'no-store' } },
+  )
+}
+
 export async function POST(request: NextRequest) {
   const apiKey = process.env.OPENROUTER_API_KEY
   if (!apiKey) {
@@ -47,7 +58,26 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { messages } = parsePipChatRequest(await request.json())
+    const { userKey, message } = parsePipChatRequest(await request.json())
+
+    // ── Guardrail 1: scan user input (fail-closed) ─────────────────────────
+    if (await checkContentSafety(message, apiKey) === 'unsafe') {
+      return blockedResponse()
+    }
+
+    // ── Assemble conversation from per-user server-side memory ─────────────
+    const memory = pipMemoryEnabled()
+    const keyHash = hashUserKey(userKey)
+    let history: PipChatMessage[] = []
+    if (memory) {
+      try {
+        history = await loadPipSession(keyHash)
+      } catch {
+        history = [] // memory outage must not take the chat down
+      }
+    }
+    const conversation: PipChatMessage[] = [...history, { role: 'user', content: message }]
+
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
     let response: Response
@@ -60,7 +90,7 @@ export async function POST(request: NextRequest) {
           'HTTP-Referer': request.nextUrl.origin,
           'X-Title': 'Analytics Games Pip',
         },
-        body: JSON.stringify(buildOpenRouterRequest(messages, request.nextUrl.origin)),
+        body: JSON.stringify(buildOpenRouterRequest(conversation, request.nextUrl.origin)),
         cache: 'no-store',
         signal: controller.signal,
       })
@@ -74,8 +104,24 @@ export async function POST(request: NextRequest) {
     }
 
     const result = openRouterResponseSchema.parse(await response.json())
+    const answer = result.choices[0].message.content.slice(0, 4_000)
+
+    // ── Guardrail 2: scan model output before serving (fail-closed) ────────
+    if (await checkContentSafety(answer, apiKey) === 'unsafe') {
+      return blockedResponse()
+    }
+
+    // ── Persist the turn to the user session (best effort) ─────────────────
+    if (memory) {
+      try {
+        await savePipSession(keyHash, [...conversation, { role: 'assistant', content: answer }])
+      } catch {
+        // memory outage must not take the chat down
+      }
+    }
+
     return NextResponse.json(
-      { message: result.choices[0].message.content.slice(0, 4_000), model: PIP_MODEL },
+      { message: answer, model: PIP_MODEL },
       { headers: { 'Cache-Control': 'no-store' } },
     )
   } catch (error) {

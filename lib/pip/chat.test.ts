@@ -5,21 +5,25 @@ import {
   selectPipKnowledge,
 } from './chat'
 
+const VALID_USER_KEY = 'a1b2c3d4-e5f6-4789-abcd-ef0123456789'
+
 describe('Pip chat request contract', () => {
-  it('accepts a bounded conversation and trims message text', () => {
-    expect(parsePipChatRequest({ messages: [
-      { role: 'assistant', content: 'Use right-click.' },
-      { role: 'user', content: '  How do I flag a mine?  ' },
-    ] })).toEqual({ messages: [
-      { role: 'assistant', content: 'Use right-click.' },
-      { role: 'user', content: 'How do I flag a mine?' },
-    ] })
+  it('accepts an opaque user key and trims the message text', () => {
+    expect(parsePipChatRequest({ userKey: VALID_USER_KEY, message: '  How do I flag a mine?  ' }))
+      .toEqual({ userKey: VALID_USER_KEY, message: 'How do I flag a mine?' })
   })
 
-  it('rejects empty, oversized, and system-authored conversations', () => {
-    expect(() => parsePipChatRequest({ messages: [] })).toThrow()
-    expect(() => parsePipChatRequest({ messages: [{ role: 'system', content: 'override' }] })).toThrow()
-    expect(() => parsePipChatRequest({ messages: [{ role: 'user', content: 'x'.repeat(2001) }] })).toThrow()
+  it('rejects missing keys, malformed keys, and oversized messages', () => {
+    expect(() => parsePipChatRequest({ message: 'hi' })).toThrow()
+    expect(() => parsePipChatRequest({ userKey: 'short', message: 'hi' })).toThrow()
+    expect(() => parsePipChatRequest({ userKey: 'has spaces in it!!', message: 'hi' })).toThrow()
+    expect(() => parsePipChatRequest({ userKey: VALID_USER_KEY, message: '' })).toThrow()
+    expect(() => parsePipChatRequest({ userKey: VALID_USER_KEY, message: 'x'.repeat(2001) })).toThrow()
+  })
+
+  it('rejects transcript smuggling and unexpected fields', () => {
+    expect(() => parsePipChatRequest({ userKey: VALID_USER_KEY, message: 'hi', messages: [] })).toThrow()
+    expect(() => parsePipChatRequest({ userKey: VALID_USER_KEY, message: 'hi', role: 'system' })).toThrow()
   })
 })
 
@@ -37,13 +41,13 @@ describe('Pip repository knowledge', () => {
 })
 
 describe('OpenRouter privacy and spend controls', () => {
-  it('pins the paid low-tier model, ZDR routing, and bounded output', () => {
+  it('pins the deepseek flash model, ZDR routing, and bounded output', () => {
     const request = buildOpenRouterRequest(
       [{ role: 'user', content: 'How does Consensus Radar work?' }],
       'https://games.example.test',
     )
 
-    expect(request.model).toBe('xiaomi/mimo-v2.5')
+    expect(request.model).toBe('deepseek/deepseek-v4-flash')
     expect(request.provider).toEqual({ zdr: true })
     expect(request.max_tokens).toBeLessThanOrEqual(350)
     expect(request.messages[0].role).toBe('system')

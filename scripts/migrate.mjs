@@ -205,6 +205,18 @@ const migrations = [
     ON chess_model_matches (created_at DESC)`,
 
   `ALTER TABLE chess_model_matches ADD COLUMN IF NOT EXISTS source_ip_hash TEXT`,
+
+  // v9 — per-user Pip chat session memory (rolling transcript, sliding TTL)
+  `CREATE TABLE IF NOT EXISTS pip_sessions (
+    user_key_hash TEXT PRIMARY KEY,
+    messages      JSONB NOT NULL DEFAULT '[]',
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    expires_at    TIMESTAMPTZ NOT NULL
+  )`,
+
+  `CREATE INDEX IF NOT EXISTS pip_sessions_expires_idx
+    ON pip_sessions (expires_at)`,
 ]
 // ────────────────────────────────────────────────────────────────────────────
 
