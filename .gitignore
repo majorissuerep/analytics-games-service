@@ -13,3 +13,5 @@ test-results/
 .env*.local
 .DS_Store
 research/sources/
+.venv-pip-agent/
+__pycache__/

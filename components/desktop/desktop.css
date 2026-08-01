@@ -131,6 +131,19 @@
 .pip-chat-thinking i { width: 5px; height: 5px; border-radius: 50%; background: #2a66bf; animation: pip-dot 1s ease-in-out infinite; }
 .pip-chat-thinking i:nth-child(2) { animation-delay: .15s; }
 .pip-chat-thinking i:nth-child(3) { margin-right: 4px; animation-delay: .3s; }
+.pip-cursor { display: inline-block; margin-left: 1px; color: #2a66bf; font-weight: 400; animation: pip-cursor-blink .8s steps(1) infinite; }
+@keyframes pip-cursor-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.pip-chat-message.streaming p { border-color: #9db9e2; box-shadow: 0 0 0 2px rgba(42, 102, 191, .12); }
+.pip-chat-message.blocked p { border-color: #d9b45c; background: #fdf6e3; }
+.pip-chat-reasoning { margin: 4px 5px 0; font-size: 10px; }
+.pip-chat-reasoning summary { cursor: pointer; color: #7c8aa5; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.pip-chat-reasoning summary:hover { color: #244f92; }
+.pip-chat-reasoning p { margin: 4px 0 0; padding: 8px 10px; border: 1px inset #b8c4d9; border-radius: 4px; color: #54627d; background: #f2f5fa; font-size: 11px; line-height: 1.4; max-height: 120px; overflow-y: auto; white-space: pre-wrap; }
+.pip-tool-card { margin: 0 0 8px; padding: 6px 9px; border: 1px solid #b8c4d9; border-radius: 6px; background: linear-gradient(#f7fafe, #eaf1fb); box-shadow: inset 0 1px 0 #fff; font-size: 11px; }
+.pip-tool-card strong { display: block; color: #244f92; font-size: 11px; }
+.pip-tool-card small { display: block; margin-top: 2px; overflow: hidden; color: #6b7a94; white-space: nowrap; text-overflow: ellipsis; }
+.pip-tool-card.done strong { color: #1d7a35; }
+.pip-tool-card.error strong { color: #b3261e; }
 .pip-chat-suggestions { display: flex; gap: 5px; overflow-x: auto; padding: 8px 10px 3px; background: white; }
 .pip-chat-suggestions button { flex: 0 0 auto; max-width: 190px; overflow: hidden; padding: 4px 8px; border: 1px solid #a9bcda; border-radius: 12px; color: #244f92; background: #eef5ff; box-shadow: none; font-size: 10px; white-space: nowrap; text-overflow: ellipsis; }
 .pip-chat-window form { display: flex; align-items: flex-end; gap: 7px; padding: 8px 10px; background: white; }

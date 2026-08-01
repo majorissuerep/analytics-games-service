@@ -59,11 +59,18 @@ export async function checkContentSafety(
       cache: 'no-store',
       signal: controller.signal,
     })
-    if (!response.ok) return 'unsafe'
+    if (!response.ok) {
+      console.warn('[pip-guard] classifier HTTP', response.status)
+      return 'unsafe'
+    }
     const parsed = guardResponseSchema.safeParse(await response.json())
-    if (!parsed.success) return 'unsafe'
+    if (!parsed.success) {
+      console.warn('[pip-guard] classifier schema mismatch')
+      return 'unsafe'
+    }
     return parseGuardVerdict(parsed.data.choices[0].message.content)
-  } catch {
+  } catch (error) {
+    console.warn('[pip-guard] classifier exception:', error instanceof Error ? error.message : error)
     return 'unsafe'
   } finally {
     clearTimeout(timeout)
