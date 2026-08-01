@@ -12,3 +12,4 @@ test-results/
 *.tsbuildinfo
 .env*.local
 .DS_Store
+research/sources/

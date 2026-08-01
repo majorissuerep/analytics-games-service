@@ -31,6 +31,21 @@ function randomTipAfter(current: number) {
   return selected ?? current
 }
 
+const PIP_USER_KEY_STORAGE = 'pip-user-key'
+
+function getOrCreateUserKey() {
+  try {
+    const existing = window.localStorage.getItem(PIP_USER_KEY_STORAGE)
+    if (existing && /^[A-Za-z0-9-]{8,100}$/.test(existing)) return existing
+    const created = crypto.randomUUID()
+    window.localStorage.setItem(PIP_USER_KEY_STORAGE, created)
+    return created
+  } catch {
+    // Storage unavailable (private mode): fall back to a per-tab key.
+    return crypto.randomUUID()
+  }
+}
+
 function PaperclipAssistant({ context }: DesktopPluginProps) {
   const [visible, setVisible] = useState(true)
   const [tipIndex, setTipIndex] = useState(0)
@@ -38,11 +53,19 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
+  const [userKey, setUserKey] = useState('')
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([
     { role: 'assistant', content: "Hi! I'm Pip. Ask me how to play, where code lives, or what this desktop can do." },
   ])
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const messagesRef = useRef<HTMLDivElement>(null)
+
+  const resolveUserKey = () => {
+    if (userKey) return userKey
+    const created = getOrCreateUserKey()
+    setUserKey(created)
+    return created
+  }
 
   useEffect(() => {
     if (chatOpen) inputRef.current?.focus()
@@ -65,7 +88,7 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
       const response = await fetch('/api/pip/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: nextMessages }),
+        body: JSON.stringify({ userKey: resolveUserKey(), message: content }),
       })
       const result = await response.json() as { message?: string; error?: string }
       const answer = result.message
@@ -160,7 +183,7 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
                   <button type="submit" disabled={sending || !draft.trim()} aria-label="Send message">➤</button>
                 </form>
                 {error && <p className="pip-chat-error" role="alert">{error}</p>}
-                <footer>AI can make mistakes · conversation is not retained by this app</footer>
+                <footer>AI can make mistakes · Pip remembers this conversation for up to 14 days</footer>
               </motion.section>
             )}
           </AnimatePresence>

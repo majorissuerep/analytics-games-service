@@ -1,22 +1,26 @@
 import { z } from 'zod'
+import { buildPipSystemPrompt } from './persona'
 
-export const PIP_MODEL = 'xiaomi/mimo-v2.5'
+export const PIP_MODEL = 'deepseek/deepseek-v4-flash'
 export const PIP_MAX_OUTPUT_TOKENS = 320
 
-const messageSchema = z.object({
-  role: z.enum(['user', 'assistant']),
-  content: z.string().trim().min(1).max(2_000),
+const requestSchema = z.object({
+  userKey: z.string().trim().min(8).max(100).regex(
+    /^[A-Za-z0-9-]+$/,
+    'userKey must be an opaque alphanumeric token',
+  ),
+  message: z.string().trim().min(1).max(2_000),
 }).strict()
 
-const requestSchema = z.object({
-  messages: z.array(messageSchema).min(1).max(12),
-}).strict().superRefine(({ messages }, context) => {
-  if (messages.at(-1)?.role !== 'user') {
-    context.addIssue({ code: 'custom', path: ['messages'], message: 'Last message must be from the user' })
-  }
-})
+export interface PipChatMessage {
+  role: 'user' | 'assistant'
+  content: string
+}
 
-export type PipChatMessage = z.infer<typeof messageSchema>
+export interface PipChatRequest {
+  userKey: string
+  message: string
+}
 
 interface KnowledgeEntry {
   keywords: readonly string[]
@@ -61,7 +65,7 @@ const KNOWLEDGE: readonly KnowledgeEntry[] = [
   },
 ]
 
-export function parsePipChatRequest(value: unknown): { messages: PipChatMessage[] } {
+export function parsePipChatRequest(value: unknown): PipChatRequest {
   return requestSchema.parse(value)
 }
 
@@ -82,10 +86,7 @@ export function buildOpenRouterRequest(messages: PipChatMessage[], siteUrl: stri
     max_tokens: PIP_MAX_OUTPUT_TOKENS,
     temperature: 0.65,
     messages: [
-      {
-        role: 'system' as const,
-        content: `You are Pip, the cheerful paperclip guide inside Analytics Games. Be concise, playful, and genuinely useful. Answer game rules and repository questions from the supplied knowledge. Never invent files, features, scores, or rules. If the knowledge does not support an answer, say so and point the user to the Developer Guide. Do not claim to be Microsoft Clippy. Keep responses under 140 words.\n\nKNOWLEDGE BASE:\n${knowledge}`,
-      },
+      { role: 'system' as const, content: buildPipSystemPrompt(knowledge) },
       ...messages,
     ],
     user: 'pip-desktop-chat',
