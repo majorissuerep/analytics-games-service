@@ -17,7 +17,7 @@ export function StandaloneGameFrame({ game }: { game: GameManifest }) {
           </div>
         </div>
         <div className="desktop-window-body">
-          <GameFrame game={game} onExit={() => router.push('/')} />
+          <GameFrame game={game} launchContext="standalone" onExit={() => router.push('/')} />
         </div>
       </div>
     </main>

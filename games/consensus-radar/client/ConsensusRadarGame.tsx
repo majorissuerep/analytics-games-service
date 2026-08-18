@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import type { LeaderboardRow } from '@/lib/engine/types'
 import { useGameRoom } from '@/lib/engine/client/use-game-room'
+import { emitGameSessionCompleted } from '@/lib/analytics/game-events'
 import {
   getOrCreatePlayerId,
   getPlayerName,
@@ -232,6 +233,10 @@ export function ConsensusRadarGame() {
   useEffect(() => {
     if (!roomState) return
     setScreen(roomState.phase === 'lobby' ? 'lobby' : 'game')
+  }, [roomState?.phase])
+
+  useEffect(() => {
+    if (roomState?.phase === 'final') emitGameSessionCompleted('completed')
   }, [roomState?.phase])
 
   useEffect(() => {

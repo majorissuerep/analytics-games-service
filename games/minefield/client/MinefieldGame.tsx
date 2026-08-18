@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { emitGameSessionCompleted } from '@/lib/analytics/game-events'
 import {
   armMinefield,
   createMinefield,
@@ -44,6 +45,12 @@ export function MinefieldGame() {
     const timer = window.setInterval(() => setElapsed((current) => Math.min(999, current + 1)), 1_000)
     return () => window.clearInterval(timer)
   }, [board.armed, board.status])
+
+  useEffect(() => {
+    if (board.status === 'won' || board.status === 'lost') {
+      emitGameSessionCompleted(board.status)
+    }
+  }, [board.status])
 
   const reset = (nextDifficulty = difficulty) => {
     setElapsed(0)

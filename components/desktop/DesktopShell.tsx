@@ -6,6 +6,8 @@ import { Rnd } from 'react-rnd'
 import type { DesktopPluginContext, DesktopPluginSlot } from '@analytics-games/plugin-sdk'
 import type { GameManifest } from '@/lib/engine/types'
 import { DESKTOP_PLUGINS } from '@/plugins/registry'
+import { useAnalytics } from '@/components/analytics/AnalyticsProvider'
+import { trackAnalyticsEventOnce } from '@/lib/analytics/client'
 import { GameFrame } from './GameFrame'
 import { useDesktopStore, type DesktopWindowState } from './store'
 import 'xp.css/dist/XP.css'
@@ -44,6 +46,7 @@ function windowDefaults(
 }
 
 export function DesktopShell({ games }: DesktopShellProps) {
+  const { consent } = useAnalytics()
   const [clock, setClock] = useState('')
   const [draggingWindow, setDraggingWindow] = useState<string | null>(null)
   const [viewport, setViewport] = useState({ width: 1024, height: 576 })
@@ -62,6 +65,14 @@ export function DesktopShell({ games }: DesktopShellProps) {
     setStartOpen,
   } = useDesktopStore()
   const gamesById = useMemo(() => new Map(games.map((game) => [game.id, game])), [games])
+
+  useEffect(() => {
+    if (consent !== 'granted') return
+    trackAnalyticsEventOnce('platform_viewed', 'platform_viewed', {
+      games_available: games.length,
+      path: '/',
+    })
+  }, [consent, games.length])
 
   useEffect(() => {
     const update = () => setClock(new Intl.DateTimeFormat(undefined, {

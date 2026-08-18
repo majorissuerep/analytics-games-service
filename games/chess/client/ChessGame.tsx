@@ -5,6 +5,7 @@ import { Chess, type Color, type Square } from 'chess.js'
 import { Chessboard, type PieceDropHandlerArgs, type SquareHandlerArgs } from 'react-chessboard'
 import { getOrCreatePlayerId, getPlayerName, setPlayerName } from '@/lib/cookies'
 import { useGameRoom } from '@/lib/engine/client/use-game-room'
+import { emitGameSessionCompleted } from '@/lib/analytics/game-events'
 import type { ChessColorChoice, ChessGameView } from '../model'
 import {
   STOCKFISH_LEVELS,
@@ -29,6 +30,16 @@ function resultFor(chess: Chess) {
   if (chess.isInsufficientMaterial()) return 'Draw by insufficient material'
   if (chess.isDraw()) return 'Draw'
   return ''
+}
+
+function completionResult(result: string) {
+  const normalized = result.toLowerCase()
+  if (normalized.includes('checkmate')) return 'checkmate'
+  if (normalized.includes('stalemate')) return 'stalemate'
+  if (normalized.includes('repetition')) return 'repetition'
+  if (normalized.includes('insufficient')) return 'insufficient_material'
+  if (normalized.includes('resign')) return 'resigned'
+  return 'draw'
 }
 
 function chosenColor(choice: ChessColorChoice): Color {
@@ -85,6 +96,13 @@ export function ChessGame() {
     () => selected ? chess.moves({ square: selected, verbose: true }).map((move) => move.to) : [],
     [chess, selected],
   )
+
+  useEffect(() => {
+    const result = mode === 'online' && online?.phase === 'finished'
+      ? online.result
+      : localResult
+    if (result) emitGameSessionCompleted(completionResult(result))
+  }, [localResult, mode, online?.phase, online?.result])
 
   useEffect(() => {
     if (mode !== 'bot' || localResult || chess.turn() === humanColor) return

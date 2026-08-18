@@ -8,10 +8,21 @@ import {
   type HostInitMessage,
 } from '@analytics-games/game-bridge'
 import type { GameManifest } from '@/lib/engine/types'
+import {
+  gameCompletionFromMessage,
+  gameExitReasonFromMessage,
+} from '@/lib/analytics/game-events'
+import { readInternalAnalyticsRelay } from '@/lib/analytics/internal-relay'
+import { trackAnalyticsEvent } from '@/lib/analytics/client'
+import {
+  useTrackedGameSession,
+  type GameLaunchContext,
+} from '@/components/analytics/useTrackedGameSession'
 
 interface GameFrameProps {
   game: GameManifest
   onExit(): void
+  launchContext?: GameLaunchContext
 }
 
 function externalLaunchUrl(game: GameManifest) {
@@ -23,16 +34,19 @@ function externalLaunchUrl(game: GameManifest) {
   return url.toString()
 }
 
-export function GameFrame({ game, onExit }: GameFrameProps) {
+export function GameFrame({ game, onExit, launchContext = 'desktop' }: GameFrameProps) {
   const frameRef = useRef<HTMLIFrameElement>(null)
   const sessionId = useMemo(() => crypto.randomUUID(), [])
+  const { completeSession, markExit } = useTrackedGameSession(game, launchContext)
   const src = externalLaunchUrl(game)
 
   useEffect(() => {
-    if (game.integration.kind !== 'external') return
-    const targetOrigin = game.integration.origin
+    const targetOrigin = game.integration.kind === 'external'
+      ? game.integration.origin
+      : window.location.origin
 
     const sendInit = () => {
+      if (game.integration.kind !== 'external') return
       const message: HostInitMessage = {
         protocol: ANALYTICS_GAME_BRIDGE,
         version: ANALYTICS_GAME_BRIDGE_VERSION,
@@ -51,18 +65,33 @@ export function GameFrame({ game, onExit }: GameFrameProps) {
 
     const receive = (event: MessageEvent) => {
       if (event.origin !== targetOrigin || event.source !== frameRef.current?.contentWindow) return
+      if (game.integration.kind === 'internal') {
+        const relay = readInternalAnalyticsRelay(event.data, game.id)
+        if (relay) {
+          trackAnalyticsEvent(relay.event, relay.properties)
+          return
+        }
+      }
       if (!isGameToHostMessage(event.data)) return
       if (event.data.type === 'game.ready') sendInit()
-      if (event.data.type === 'game.exit') onExit()
+      const completion = gameCompletionFromMessage(event.data)
+      if (completion) completeSession(completion)
+      if (event.data.type === 'game.exit') {
+        const reason = gameExitReasonFromMessage(event.data) ?? 'error'
+        markExit(reason)
+        if (reason === 'complete') completeSession('completed')
+        onExit()
+      }
     }
 
     window.addEventListener('message', receive)
     return () => window.removeEventListener('message', receive)
-  }, [game, onExit, sessionId])
+  }, [completeSession, game, markExit, onExit, sessionId])
 
   if (game.integration.kind === 'external' && game.integration.openMode === 'redirect') {
     const integration = game.integration
     const redirect = () => {
+      markExit('redirected')
       const url = new URL(integration.launchUrl)
       url.searchParams.set('ag_bridge', String(ANALYTICS_GAME_BRIDGE_VERSION))
       url.searchParams.set('ag_host_origin', window.location.origin)
