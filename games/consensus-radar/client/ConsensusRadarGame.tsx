@@ -11,17 +11,21 @@ import {
   setPlayerName as savePlayerName,
 } from '@/lib/cookies'
 import {
+  betIsCorrect,
+  GOAL_OPTIONS,
+  MAX_TEAMS,
+  MIN_TEAMS,
+  TEAM_COLORS,
+  type BetSide,
+  type Category,
   type ConsensusAction,
   type ConsensusGameView,
   type Lang,
-  scoreFor,
+  type Scale,
   toConsensusRoomView,
 } from '../model'
-import type { Scale } from '../scales'
 
-// ─── Constants ───────────────────────────────────────────────────────────────
-const TEAM_COLORS = ['#00f5a0', '#ffc53d', '#ff4f6b', '#4da6ff']
-
+// ─── Strings ───────────────────────────────────────────────────────────────
 const T: Record<Lang, Record<string, string>> = {
   uk: {
     tagline:         'калібруй чуйку команди',
@@ -33,69 +37,93 @@ const T: Record<Lang, Record<string, string>> = {
     joinRoom:        'Приєднатись',
     roomPlaceholder: 'Код кімнати (6 символів)',
     orSeparator:     'або',
-    lobbyTitle:      'Зал очікування',
-    lobbyWaiting:    'Очікуємо гравців…',
-    playersIn:       'У кімнаті',
+    lobbyTitle:      'Лобі',
+    shareHint:       'Продиктуй код або кинь посилання — всі заходять зі своїх телефонів.',
+    playersIn:       'Гравці у кімнаті',
     teamLabel:       'Команда',
-    assignTeam:      'Обрати команду',
-    hostLabel:       'Хост',
-    assignCluegiver: 'Ведучий команди',
-    becomeCluegiver: 'Стати ведучим',
-    cluegiverSet:    'Ведучий призначений',
-    needCluegiver:   'Кожна команда повинна мати ведучого',
+    pickTeam:        'Твоя команда',
+    hostLabel:       'хост',
     startBtn:        'Почати гру',
-    waitForHost:     'Чекаємо поки ведучий розпочне…',
+    needTwoTeams:    'Потрібно щонайменше по одному гравцю у двох командах.',
+    soloTeamWarn:    'Команди з одним гравцем не зможуть відгадувати: той, хто дає clue, не ставить маркер.',
+    waitForHost:     'Чекаємо, поки хост почне гру…',
     configTeams:     'Команди',
-    configRounds:    'Раундів на команду',
     addTeam:         '+ Команда',
     removeTeam:      '− Команда',
-    cluegiverPhase:  'Ведучий думає…',
-    cluegiverYou:    'Ти ведучий цього раунду!',
+    catLabel:        'Категорії шкал',
+    catGeneral:      'Загальні та смішні',
+    catAnalytics:    'Для аналітиків',
+    goalLabel:       'Грати до (очок)',
+    endless:         'Без ліміту',
+    betsLabel:       'Ставки для інших команд (+1 за вгаданий бік)',
+    betsOn:          'Увімк',
+    betsOff:         'Вимк',
+    round:           'Раунд',
+    firstTo:         'до {goal} очок',
+    endlessMode:     'без ліміту',
+    cluePhase:       'Ведучий думає…',
+    cluegiverYou:    'Ти даєш clue цього раунду!',
     secretTarget:    'Таємна позиція:',
     secretPill:      'тільки для тебе',
-    clueLabel:       'Твоя підказка',
+    clueLabel:       'Твій clue',
     cluePlaceholder: 'одна асоціація, не число',
-    clueHint:        "Запам'ятай позицію. Дай підказку, яка веде туди без слів-напрямків.",
-    clueBtn:         'Відправити підказку',
-    guessingPhase:   'Команда відгадує',
-    clueWas:         'Підказка:',
+    clueHint:        "Дай clue, що наведе команду на цю точку. Цифри заборонені!",
+    clueBtn:         'Надіслати clue',
+    noNumbers:       'Без цифр у clue — у цьому вся гра!',
+    thinksClue:      'придумує clue…',
+    guessPhase:      'Команда відгадує',
+    clueWas:         'Clue:',
+    guessTitle:      'Де ця точка?',
+    guessSub:        'Постав свій маркер. Позиція команди — середнє всіх маркерів.',
     dragHint:        'Перетягни маркер',
     lockBtn:         'Зафіксувати',
+    changeBtn:       'Змінити маркер',
+    lockedAt:        'Маркер зафіксовано: {value}',
     lockedWaiting:   'Відповідь зафіксована. Чекаємо на інших…',
-    resultPhase:     'Результат',
-    targetWas:       'Ціль:',
-    guessWas:        'відповідь',
+    lockedCount:     'Зафіксували: {done} з {total}',
+    betTitle:        'Твоя ставка',
+    betSub:          'З якого боку від таємної точки стане їхній маркер?',
+    betLeft:         '◀ Лівіше',
+    betRight:        'Правіше ▶',
+    betPlaced:       'Ставка зроблена: {side}',
+    sideLeft:        'лівіше',
+    sideRight:       'правіше',
+    betCount:        'Поставили: {done} з {total}',
+    revealNow:       'Відкрити зараз',
+    noGuessers:      'У цій команді нікому відгадувати — хост або ведучий може відкрити раунд і йти далі.',
+    revealTitle:     'Розкриття',
+    targetWas:       'Точка:',
+    markerWas:       'маркер',
     off:             'відхилення',
-    supermark:       'SUPERSHOT!',
-    bullseye:        'В яблучко!',
-    close:           'Близько!',
-    far:             'Далеко…',
-    opposite:        'Не той бік!',
-    points:          'б',
-    nextTurnBtn:     'Наступний хід',
+    bullseye:        'В яблучко! Ідеальна калібровка 🎯',
+    close:           'Близько! Гарне відчуття одне одного.',
+    far:             'Мимо — нуль за цей раунд.',
+    opposite:        'Зовсім протилежний бік. −2.',
+    individualGuesses: 'Хто куди ставив',
+    betResults:      'Ставки',
+    betWon:          'вгадав бік',
+    betLost:         'мимо',
+    nextBtn:         'Наступний раунд',
+    waitNext:        'Чекаємо наступний раунд…',
+    endGame:         'Завершити гру',
     finalTitle:      'Гру завершено',
     finalScores:     'Фінальний рахунок',
-    winnerPrefix:    'Переможець:',
+    winnerPrefix:    'Перемогла команда',
     tie:             'Нічия!',
-    againBtn:        'Нова гра',
+    playAgain:       'Зіграти ще',
     leaderboardBtn:  'Рекорди',
     submitScore:     'Записати рекорд',
     submitDone:      'Рекорд збережено!',
     roomCode:        'Код кімнати',
     copyCode:        'Копіювати',
     copied:          'Скопійовано!',
-    turn:            'Хід',
-    of:              'з',
     lbTitle:         'Таблиця рекордів',
     lbEmpty:         'Ще немає записів — станьте першими!',
     unassigned:      'Без команди',
     you:             '(ти)',
     rounds:          'раундів',
-    pt:              'б',
-    waitGuesses:     'гравців відповіли',
-    configTimer:     'Таймер на відповідь',
-    timerOff:        'Вимк',
-    timerExpired:    'Час вийшов!',
+    points:          'очок',
+    watchingTeam:    'відгадує',
   },
   en: {
     tagline:         "calibrate your team's instincts",
@@ -108,73 +136,103 @@ const T: Record<Lang, Record<string, string>> = {
     roomPlaceholder: 'Room code (6 chars)',
     orSeparator:     'or',
     lobbyTitle:      'Lobby',
-    lobbyWaiting:    'Waiting for players…',
+    shareHint:       'Read out the code or share the link — everyone joins from their own phone.',
     playersIn:       'Players in room',
     teamLabel:       'Team',
-    assignTeam:      'Pick a team',
-    hostLabel:       'Host',
-    assignCluegiver: 'Team clue-giver',
-    becomeCluegiver: 'Be clue-giver',
-    cluegiverSet:    'Clue-giver assigned',
-    needCluegiver:   'Each team needs exactly one clue-giver',
+    pickTeam:        'Your team',
+    hostLabel:       'host',
     startBtn:        'Start game',
-    waitForHost:     'Waiting for the host to start…',
+    needTwoTeams:    'At least two teams need one player each.',
+    soloTeamWarn:    "Teams with a single player can't guess: the clue-giver doesn't place a marker.",
+    waitForHost:     'Waiting for the host to start the game…',
     configTeams:     'Teams',
-    configRounds:    'Rounds per team',
     addTeam:         '+ Team',
     removeTeam:      '− Team',
-    cluegiverPhase:  'Clue-giver is thinking…',
+    catLabel:        'Scale categories',
+    catGeneral:      'General & fun',
+    catAnalytics:    'Analytics team',
+    goalLabel:       'Play to (points)',
+    endless:         'Endless',
+    betsLabel:       'Side bets for other teams (+1 for the right side)',
+    betsOn:          'On',
+    betsOff:         'Off',
+    round:           'Round',
+    firstTo:         'first to {goal}',
+    endlessMode:     'endless',
+    cluePhase:       'Clue-giver is thinking…',
     cluegiverYou:    "You're the clue-giver this round!",
     secretTarget:    'Secret position:',
     secretPill:      'only you see this',
     clueLabel:       'Your clue',
     cluePlaceholder: 'one word or phrase — no numbers',
-    clueHint:        'Memorise the position. Give a clue that points there without directions.',
+    clueHint:        'Give a clue that points your team to this spot. No digits allowed!',
     clueBtn:         'Send clue',
-    guessingPhase:   'Team is guessing',
+    noNumbers:       "No numbers in the clue — that's the whole game!",
+    thinksClue:      'is thinking of a clue…',
+    guessPhase:      'Team is guessing',
     clueWas:         'Clue:',
+    guessTitle:      "Where's the spot?",
+    guessSub:        "Place your own marker. The team's position is the average of all markers.",
     dragHint:        'Drag the marker',
     lockBtn:         'Lock in',
+    changeBtn:       'Change my marker',
+    lockedAt:        'Marker locked at {value}',
     lockedWaiting:   'Answer locked. Waiting for others…',
-    resultPhase:     'Result',
-    targetWas:       'Target:',
-    guessWas:        'placed',
+    lockedCount:     'Locked in: {done} of {total}',
+    betTitle:        'Your side bet',
+    betSub:          'Which side of the secret spot will their marker land on?',
+    betLeft:         '◀ To the left',
+    betRight:        'To the right ▶',
+    betPlaced:       'Bet placed: {side}',
+    sideLeft:        'left',
+    sideRight:       'right',
+    betCount:        'Bets in: {done} of {total}',
+    revealNow:       'Reveal now',
+    noGuessers:      'Nobody on this team can guess — the host or clue-giver can reveal and move on.',
+    revealTitle:     'The reveal',
+    targetWas:       'Spot:',
+    markerWas:       'marker',
     off:             'off',
-    supermark:       'SUPERSHOT!',
-    bullseye:        'Bullseye!',
-    close:           'So close!',
-    far:             'Way off…',
-    opposite:        'Wrong side!',
-    points:          'pts',
-    nextTurnBtn:     'Next turn',
+    bullseye:        'Bullseye! Perfect calibration 🎯',
+    close:           'Close! Nicely tuned in.',
+    far:             'Missed it — zero this round.',
+    opposite:        'Totally opposite side. −2.',
+    individualGuesses: 'Who placed what',
+    betResults:      'Side bets',
+    betWon:          'called it',
+    betLost:         'missed',
+    nextBtn:         'Next round',
+    waitNext:        'Waiting for the next round…',
+    endGame:         'End the game',
     finalTitle:      'Game over',
     finalScores:     'Final scores',
-    winnerPrefix:    'Winner:',
+    winnerPrefix:    'Team',
     tie:             "It's a tie!",
-    againBtn:        'New game',
+    playAgain:       'Play again',
     leaderboardBtn:  'Leaderboard',
     submitScore:     'Submit score',
     submitDone:      'Score saved!',
     roomCode:        'Room code',
     copyCode:        'Copy',
     copied:          'Copied!',
-    turn:            'Turn',
-    of:              'of',
     lbTitle:         'Leaderboard',
     lbEmpty:         'No scores yet — be the first!',
     unassigned:      'No team',
     you:             '(you)',
     rounds:          'rounds',
-    pt:              'pt',
-    waitGuesses:     'players answered',
-    configTimer:     'Guess timer',
-    timerOff:        'Off',
-    timerExpired:    "Time's up!",
+    points:          'pts',
+    watchingTeam:    'is guessing',
   },
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function pct(x: number) { return Math.max(0, Math.min(100, x)) }
+
+function fmt(template: string, vars: Record<string, string | number>): string {
+  let out = template
+  for (const [key, value] of Object.entries(vars)) out = out.replaceAll(`{${key}}`, String(value))
+  return out
+}
 
 // ─── Component ───────────────────────────────────────────────────────────────
 export function ConsensusRadarGame() {
@@ -198,6 +256,7 @@ export function ConsensusRadarGame() {
 
   // Local game UI
   const [guess, setGuess]          = useState(50)
+  const [editing, setEditing]      = useState(false)
   const [clueInput, setClueInput]  = useState('')
   const [copied, setCopied]        = useState(false)
   const [toast, setToast]          = useState<string | null>(null)
@@ -210,15 +269,11 @@ export function ConsensusRadarGame() {
   const [submitting, setSubmitting] = useState(false)
 
   // Lobby config (host only)
-  const [teamNames, setTeamNames]  = useState<string[]>(['', ''])
-  const [numTeams, setNumTeams]    = useState(2)
-  const [roundsPerTeam, setRoundsPerTeam] = useState(3)
-  const [timerSecs, setTimerSecs]  = useState(0) // 0 = off
-
-  // Timer countdown (local, derived from round.timerStart)
-  const [timeLeft, setTimeLeft]    = useState<number | null>(null)
-
-  const timerRef   = useRef<ReturnType<typeof setInterval> | null>(null)
+  const [teamNames, setTeamNames]  = useState<string[]>(['Team 1', 'Team 2'])
+  const [numTeams, setNumTeams]    = useState(MIN_TEAMS)
+  const [categories, setCategories] = useState<Category[]>(['general', 'analytics'])
+  const [goal, setGoal]            = useState<number>(20)
+  const [betsEnabled, setBetsEnabled] = useState(true)
 
   const t = useCallback((k: string) => T[lang][k] ?? k, [lang])
 
@@ -236,42 +291,25 @@ export function ConsensusRadarGame() {
   }, [roomState?.phase])
 
   useEffect(() => {
-    if (roomState?.phase === 'final') emitGameSessionCompleted('completed')
+    if (roomState?.phase === 'finished') emitGameSessionCompleted('completed')
   }, [roomState?.phase])
 
+  // Sync host config from room state while in lobby
   useEffect(() => {
     if (!roomState || roomState.phase !== 'lobby') return
-    setTeamNames(roomState.teams)
+    setTeamNames(roomState.teams.map((team) => team.name))
     setNumTeams(roomState.teams.length)
-    setRoundsPerTeam(roomState.roundsPerTeam)
-    setTimerSecs(roomState.timerSecs)
+    setCategories(roomState.categories)
+    setGoal(roomState.goal)
+    setBetsEnabled(roomState.betsEnabled)
   }, [roomClient.room?.revision, roomState?.phase])
 
-  // ─── Timer countdown ───────────────────────────────────────────────────────
+  // Reset the local marker editor whenever a fresh round begins
   useEffect(() => {
-    if (timerRef.current) clearInterval(timerRef.current)
-    const round = roomState?.round
-    if (!round?.timerStart || roomState?.phase !== 'guessing') {
-      setTimeLeft(null)
-      return
-    }
-    const totalMs = (roomState.timerSecs ?? 0) * 1000
-    if (totalMs <= 0) { setTimeLeft(null); return }
-
-    function tick() {
-      const elapsed = Date.now() - (round!.timerStart as number)
-      const left = Math.max(0, Math.ceil((totalMs - elapsed) / 1000))
-      setTimeLeft(left)
-      if (left <= 0) {
-        if (timerRef.current) clearInterval(timerRef.current)
-        // Host auto-reveals result when time is up
-        if (isHost) void showResult()
-      }
-    }
-    tick()
-    timerRef.current = setInterval(tick, 250)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [isHost, roomState?.phase, roomState?.round?.timerStart])
+    setEditing(false)
+    setGuess(50)
+    setClueInput('')
+  }, [roomState?.round?.roundNo])
 
   // ─── Gauge drag ────────────────────────────────────────────────────────────
   const gaugeRef = useRef<HTMLDivElement>(null)
@@ -325,106 +363,120 @@ export function ConsensusRadarGame() {
     setScreen('join')
   }
 
-  // ─── Flow: create room ─────────────────────────────────────────────────────
+  // ─── Flow: create / join room ──────────────────────────────────────────────
   async function createRoom() {
     try {
       await roomClient.create({ id: playerId, name: playerName })
-      setTeamNames(['', ''])
-      setNumTeams(2)
-      setRoundsPerTeam(3)
-      setTimerSecs(0)
+      setScoreSubmitted(false)
       setScreen('lobby')
     } catch (error) {
       showToast(error instanceof Error ? error.message : String(error))
     }
   }
 
-  // ─── Flow: join room ───────────────────────────────────────────────────────
   async function joinRoom() {
     const code = joinInput.trim().toUpperCase()
     if (code.length !== 6) { setJoinError(lang === 'uk' ? 'Код має бути 6 символів' : 'Code must be 6 characters'); return }
     setJoinError('')
     try {
       const joined = await roomClient.join(code, { id: playerId, name: playerName })
+      setScoreSubmitted(false)
       setScreen(joined.game.phase === 'lobby' ? 'lobby' : 'game')
     } catch (error) {
       setJoinError(error instanceof Error ? error.message : (lang === 'uk' ? 'Помилка з\'єднання' : 'Connection error'))
     }
   }
 
-  // ─── Lobby: team assignment ────────────────────────────────────────────────
+  // ─── Lobby actions ─────────────────────────────────────────────────────────
   async function assignTeam(teamIdx: number) {
     await runAction({ type: 'consensus.team.assign', teamIndex: teamIdx })
   }
 
-  // ─── Lobby: volunteer as cluegiver for your team ───────────────────────────
-  async function assignCluegiver(teamIdx: number) {
-    await runAction({ type: 'consensus.cluegiver.assign', teamIndex: teamIdx })
-  }
-
-  // ─── Lobby: host config ────────────────────────────────────────────────────
-  async function updateLobbyConfig(newTeamNames: string[], newNumTeams: number, newRounds: number, newTimer?: number) {
+  async function saveConfig(patch: {
+    teamNames?: string[]
+    numTeams?: number
+    categories?: string[]
+    goal?: number
+    betsEnabled?: boolean
+  }) {
     if (!roomState || !isHost) return
-    await runAction({
-      type: 'consensus.lobby.configure',
-      teamNames: newTeamNames.slice(0, newNumTeams),
-      numTeams: newNumTeams,
-      roundsPerTeam: newRounds,
-      timerSecs: newTimer ?? timerSecs,
-    })
+    await runAction({ type: 'consensus.lobby.configure', ...patch })
   }
 
-  // ─── Host: start game ──────────────────────────────────────────────────────
+  function pushTeamNames(next: string[], nextNumTeams = numTeams) {
+    setTeamNames(next)
+    void saveConfig({ teamNames: next.slice(0, nextNumTeams), numTeams: nextNumTeams })
+  }
+
+  function toggleCategory(category: Category) {
+    const next = categories.includes(category)
+      ? categories.filter((item) => item !== category)
+      : [...categories, category]
+    if (next.length === 0) return
+    setCategories(next)
+    void saveConfig({ categories: next })
+  }
+
+  function pickGoal(next: number) {
+    setGoal(next)
+    void saveConfig({ goal: next })
+  }
+
+  function toggleBets() {
+    const next = !betsEnabled
+    setBetsEnabled(next)
+    void saveConfig({ betsEnabled: next })
+  }
+
   async function startGame() {
     if (!roomState || !isHost) return
-    // Validate: every team must have exactly one designated cluegiver
-    const cgs = roomState.cluegivers ?? {}
-    for (let i = 0; i < numTeams; i++) {
-      if (!cgs[i]) {
-        showToast(t('needCluegiver'))
-        return
-      }
+    const staffed = new Set(Object.values(roomState.playerTeams).filter((team) => team >= 0))
+    if (staffed.size < 2) {
+      showToast(t('needTwoTeams'))
+      return
     }
-    const finalTeams = teamNames.slice(0, numTeams).map((n, i) =>
-      n.trim() || `${T[lang].teamLabel} ${i + 1}`
-    )
     const started = await runAction({
       type: 'consensus.game.start',
-      teamNames: finalTeams,
+      teamNames: teamNames.slice(0, numTeams),
       numTeams,
-      roundsPerTeam,
-      timerSecs,
+      categories,
+      goal,
+      betsEnabled,
     })
     if (started) setScreen('game')
   }
 
-  // ─── Cluegiver: submit clue ────────────────────────────────────────────────
+  // ─── Round actions ─────────────────────────────────────────────────────────
   async function submitClue() {
-    if (!roomState?.round || !clueInput.trim()) return
-    const submitted = await runAction({ type: 'consensus.clue.submit', clue: clueInput.trim() })
+    const clue = clueInput.trim()
+    if (!roomState?.round || !clue) return
+    if (/\d/.test(clue)) { showToast(t('noNumbers')); return }
+    const submitted = await runAction({ type: 'consensus.clue.submit', clue })
     if (submitted) setClueInput('')
   }
 
-  // ─── Guesser: lock answer ──────────────────────────────────────────────────
-  async function lockGuess() {
-    await runAction({ type: 'consensus.guess.lock', guess })
+  async function submitGuess() {
+    const submitted = await runAction({ type: 'consensus.guess.submit', value: guess })
+    if (submitted) setEditing(false)
   }
 
-  // ─── Host: advance to result ───────────────────────────────────────────────
-  async function showResult() {
-    if (!roomState?.round || !isHost) return
+  async function submitBet(side: BetSide) {
+    await runAction({ type: 'consensus.bet.submit', side })
+  }
+
+  async function forceReveal() {
     await runAction({ type: 'consensus.round.reveal' })
   }
 
-  // ─── Host: next turn ────────────────────────────────────────────────────────
-  async function nextTurn() {
-    if (!roomState || !isHost) return
+  async function nextRound() {
     await runAction({ type: 'consensus.round.next' })
   }
 
-  // ─── Host: reset game ───────────────────────────────────────────────────────
+  async function endGame() {
+    await runAction({ type: 'consensus.game.end' })
+  }
+
   async function resetGame() {
-    if (!roomState || !isHost) return
     const reset = await runAction({ type: 'consensus.game.reset' })
     if (reset) {
       setScoreSubmitted(false)
@@ -449,10 +501,7 @@ export function ConsensusRadarGame() {
       const res = await roomClient.authorizedFetch('/api/games/consensus-radar/leaderboard', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          roomCode,
-          playerId,
-        }),
+        body: JSON.stringify({ roomCode, playerId }),
       })
       if (res.ok) { setScoreSubmitted(true); showToast(t('submitDone')) }
     } catch { /* ignore */ }
@@ -477,9 +526,9 @@ export function ConsensusRadarGame() {
   }
 
   function TargetBand({ target }: { target: number }) {
-    const z5 = 4, z3 = 12
-    const l3 = pct(target - z3), w3 = pct(Math.min(100, target + z3) - Math.max(0, target - z3))
-    const l5 = pct(target - z5), w5 = pct(Math.min(100, target + z5) - Math.max(0, target - z5))
+    const bull = 5, close = 12
+    const l3 = pct(target - close), w3 = pct(Math.min(100, target + close) - Math.max(0, target - close))
+    const l5 = pct(target - bull), w5 = pct(Math.min(100, target + bull) - Math.max(0, target - bull))
     return (
       <div className="target-band band-reveal">
         <div className="zone-3" style={{ left: `${l3}%`, width: `${w3}%` }} />
@@ -512,64 +561,32 @@ export function ConsensusRadarGame() {
     )
   }
 
-  function TimerRing({ secs, total }: { secs: number | null; total: number }) {
-    if (secs === null || total <= 0) return null
-    const r = 22
-    const circ = 2 * Math.PI * r
-    const frac = Math.max(0, secs / total)
-    const urgent = secs <= 10
-    const color  = urgent ? 'var(--hot)' : secs <= Math.floor(total * 0.4) ? 'var(--warm)' : 'var(--sweep)'
-    return (
-      <div className="timer-ring-wrap" aria-live="polite" aria-label={`${secs}s`}>
-        <svg width="56" height="56" viewBox="0 0 56 56" aria-hidden>
-          <circle cx="28" cy="28" r={r} fill="none" stroke="var(--line)" strokeWidth="3" />
-          <circle
-            cx="28" cy="28" r={r} fill="none"
-            stroke={color} strokeWidth="3"
-            strokeDasharray={circ}
-            strokeDashoffset={circ * (1 - frac)}
-            strokeLinecap="round"
-            transform="rotate(-90 28 28)"
-            style={{ transition: 'stroke-dashoffset .22s linear, stroke .4s' }}
-          />
-        </svg>
-        <div className="timer-num" style={{ color, fontWeight: 700, fontSize: urgent ? 18 : 16 }}>
-          {secs >= 60 ? `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}` : secs}
-        </div>
-      </div>
-    )
-  }
-
   function ScoreBar({ activeIdx }: { activeIdx?: number }) {
     if (!roomState) return null
     return (
       <div className="scorebar">
-        {roomState.teams.map((name, i) => (
+        {roomState.teams.map((team, i) => (
           <div key={i} className={`score-card${i === activeIdx ? ' active' : ''}`}>
             <div className="s-name">
               <span className="swatch" style={{ background: TEAM_COLORS[i] }} />
-              {name || `${t('teamLabel')} ${i + 1}`}
+              {team.name}
             </div>
-            <div className="s-num">{roomState.scores[i] ?? 0}</div>
+            <div className="s-num">{team.score}</div>
           </div>
         ))}
       </div>
     )
   }
 
-  function ProgressBar() {
-    if (!roomState) return null
-    const total = roomState.roundsPerTeam * roomState.teams.length
-    const done  = roomState.turnPtr
-    const pctDone = Math.round((done / total) * 100)
+  function RoundMeta() {
+    if (!roomState || roomState.phase === 'lobby') return null
     return (
       <div className="progress-wrap">
         <div className="progress-label">
-          <span>{t('turn')} {done + 1} {t('of')} {total}</span>
-          <span>{pctDone}%</span>
-        </div>
-        <div className="progress-bar">
-          <div className="progress-fill" style={{ width: `${pctDone}%` }} />
+          <span>{t('round')} {roomState.roundNo}</span>
+          <span className="muted" style={{ fontSize: 12 }}>
+            {roomState.goal > 0 ? fmt(t('firstTo'), { goal: roomState.goal }) : t('endlessMode')}
+          </span>
         </div>
       </div>
     )
@@ -649,23 +666,27 @@ export function ConsensusRadarGame() {
 
   // ─────────────────────────────────────────────────────────────────────────
   // SCREEN: Lobby
-  // ��───────────────────────────────────────────────────────────────────────���
+  // ─────────────────────────────────────────────────────────────────────────
   if (screen === 'lobby' && roomState) {
     const myPlayer = roomState.players.find(p => p.id === playerId)
+    const soloTeams = roomState.teams
+      .map((_, i) => i)
+      .filter(i => roomState.players.filter(p => p.team === i).length === 1)
+
     return (
       <div className="wrap screen-enter">
         <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
         <div className="card">
           <div className="eyebrow">{t('lobbyTitle')}</div>
           <RoomCodePill />
+          <p className="hint" style={{ marginTop: 10 }}>{t('shareHint')}</p>
 
           {/* Players list */}
-          <div className="field" style={{ marginTop: 18 }}>
+          <div className="field" style={{ marginTop: 14 }}>
             <label className="lbl">{t('playersIn')} ({roomState.players.length})</label>
             <div className="player-list">
               {roomState.players.map(p => {
-                const tm = p.team >= 0 && p.team < (isHost ? numTeams : roomState.teams.length) ? p.team : -1
-                const isCgForTeam = tm >= 0 && (roomState.cluegivers ?? {})[tm] === p.id
+                const tm = p.team >= 0 && p.team < roomState.teams.length ? p.team : -1
                 const isMe = p.id === playerId
                 return (
                   <div key={p.id} className={`player-row${isMe ? ' me' : ''}`}>
@@ -673,17 +694,11 @@ export function ConsensusRadarGame() {
                       {p.name}
                       {isMe && <span className="you-tag">{t('you')}</span>}
                       {p.id === roomState.hostId && <span className="host-tag">{t('hostLabel')}</span>}
-                      {isCgForTeam && (
-                        <span className="cg-tag" style={{ background: `${TEAM_COLORS[tm]}22`, borderColor: TEAM_COLORS[tm], color: TEAM_COLORS[tm] }}>
-                          {lang === 'uk' ? 'ведучий' : 'clue-giver'}
-                        </span>
-                      )}
                     </span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      {/* Team picker — only own row */}
                       {isMe && (
                         <div className="team-picker">
-                          {Array.from({ length: isHost ? numTeams : roomState.teams.length }, (_, i) => (
+                          {roomState.teams.map((team, i) => (
                             <button
                               key={i}
                               className={`team-dot-btn${myPlayer?.team === i ? ' active' : ''}`}
@@ -694,20 +709,9 @@ export function ConsensusRadarGame() {
                           ))}
                         </div>
                       )}
-                      {/* "Be clue-giver" button — own row, already on a team */}
-                      {isMe && tm >= 0 && !isCgForTeam && (
-                        <button
-                          className="btn ghost small cg-btn"
-                          onClick={() => assignCluegiver(tm)}
-                          title={t('becomeCluegiver')}
-                        >
-                          {lang === 'uk' ? 'Ведучий' : 'Clue-giver'}
-                        </button>
-                      )}
-                      {/* Other players: show team badge */}
                       {!isMe && tm >= 0 && (
                         <span className="pill" style={{ borderColor: TEAM_COLORS[tm], color: TEAM_COLORS[tm], fontSize: 11 }}>
-                          {roomState.teams[tm] || `${t('teamLabel')} ${tm + 1}`}
+                          {roomState.teams[tm].name}
                         </span>
                       )}
                       {!isMe && tm < 0 && (
@@ -720,23 +724,9 @@ export function ConsensusRadarGame() {
             </div>
           </div>
 
-          {/* Validation notice */}
-          {(() => {
-            const cgs = roomState.cluegivers ?? {}
-            const nTeams = isHost ? numTeams : roomState.teams.length
-            const missing = Array.from({ length: nTeams }, (_, i) => i).filter(i => !cgs[i])
-            if (missing.length === 0) return null
-            return (
-              <div className="validation-notice">
-                {t('needCluegiver')}:&nbsp;
-                {missing.map(i => (
-                  <span key={i} className="pill" style={{ borderColor: TEAM_COLORS[i], color: TEAM_COLORS[i], fontSize: 11 }}>
-                    {(isHost ? teamNames[i] : roomState.teams[i]) || `${t('teamLabel')} ${i + 1}`}
-                  </span>
-                ))}
-              </div>
-            )
-          })()}
+          {soloTeams.length > 0 && (
+            <div className="validation-notice">{t('soloTeamWarn')}</div>
+          )}
 
           {/* Host config */}
           {isHost && (
@@ -749,51 +739,62 @@ export function ConsensusRadarGame() {
                       <span className="dot" style={{ background: TEAM_COLORS[i] }} />
                       <input
                         type="text"
-                        value={teamNames[i] || ''}
-                        placeholder={`${T[lang].teamLabel} ${i + 1}`}
+                        value={teamNames[i] ?? ''}
+                        placeholder={`${t('teamLabel')} ${i + 1}`}
                         onChange={e => {
-                          const n = [...teamNames]; n[i] = e.target.value
-                          setTeamNames(n)
+                          const next = [...teamNames]; next[i] = e.target.value
+                          setTeamNames(next)
                         }}
-                        onBlur={() => updateLobbyConfig(teamNames, numTeams, roundsPerTeam)}
+                        onBlur={() => pushTeamNames(teamNames)}
                         maxLength={24}
                       />
                     </div>
                   ))}
                 </div>
                 <div className="btn-row" style={{ marginTop: 8 }}>
-                  <button className="btn ghost small" disabled={numTeams <= 2}
-                    onClick={() => { const n = numTeams - 1; setNumTeams(n); updateLobbyConfig(teamNames, n, roundsPerTeam) }}>
+                  <button className="btn ghost small" disabled={numTeams <= MIN_TEAMS}
+                    onClick={() => { const n = numTeams - 1; setNumTeams(n); pushTeamNames(teamNames, n) }}>
                     {t('removeTeam')}
                   </button>
-                  <button className="btn ghost small" disabled={numTeams >= 4}
-                    onClick={() => { const n = numTeams + 1; setNumTeams(n); if (!teamNames[n - 1]) { const t2 = [...teamNames]; t2[n - 1] = ''; setTeamNames(t2) }; updateLobbyConfig(teamNames, n, roundsPerTeam) }}>
+                  <button className="btn ghost small" disabled={numTeams >= MAX_TEAMS}
+                    onClick={() => { const n = numTeams + 1; setNumTeams(n); pushTeamNames(teamNames, n) }}>
                     {t('addTeam')}
                   </button>
                 </div>
               </div>
+
               <div className="field">
-                <label className="lbl">{t('configRounds')}</label>
+                <label className="lbl">{t('catLabel')}</label>
                 <div className="round-pick">
-                  {[2, 3, 4, 5].map(n => (
-                    <button key={n} className={`btn${roundsPerTeam === n ? '' : ' ghost'}`}
-                      onClick={() => { setRoundsPerTeam(n); updateLobbyConfig(teamNames, numTeams, n) }}>
-                      {n}
+                  <button className={`btn${categories.includes('general') ? '' : ' ghost'}`} onClick={() => toggleCategory('general')}>
+                    {t('catGeneral')}
+                  </button>
+                  <button className={`btn${categories.includes('analytics') ? '' : ' ghost'}`} onClick={() => toggleCategory('analytics')}>
+                    {t('catAnalytics')}
+                  </button>
+                </div>
+              </div>
+
+              <div className="field">
+                <label className="lbl">{t('goalLabel')}</label>
+                <div className="round-pick">
+                  {GOAL_OPTIONS.map(option => (
+                    <button key={option} className={`btn${goal === option ? '' : ' ghost'}`} onClick={() => pickGoal(option)}>
+                      {option === 0 ? t('endless') : option}
                     </button>
                   ))}
                 </div>
               </div>
+
               <div className="field">
-                <label className="lbl">{t('configTimer')}</label>
+                <label className="lbl">{t('betsLabel')}</label>
                 <div className="round-pick">
-                  {([0, 30, 60, 120, 300] as const).map(s => (
-                    <button key={s} className={`btn${timerSecs === s ? '' : ' ghost'}`}
-                      onClick={() => { setTimerSecs(s); updateLobbyConfig(teamNames, numTeams, roundsPerTeam, s) }}>
-                      {s === 0 ? t('timerOff') : s < 60 ? `${s}s` : `${s / 60}m`}
-                    </button>
-                  ))}
+                  <button className={`btn${betsEnabled ? '' : ' ghost'}`} onClick={toggleBets}>
+                    {betsEnabled ? t('betsOn') : t('betsOff')}
+                  </button>
                 </div>
               </div>
+
               <button className="btn" style={{ marginTop: 8 }} onClick={startGame}>{t('startBtn')}</button>
             </div>
           )}
@@ -815,20 +816,22 @@ export function ConsensusRadarGame() {
   if (screen === 'game' && roomState) {
     const rs     = roomState
     const round  = rs.round
+    const myPlayer = rs.players.find(p => p.id === playerId)
     const isCluegiver = round?.cluegiver === playerId
-    const isMyTeamTurn = round ? rs.players.find(p => p.id === playerId)?.team === round.teamIdx : false
+    const myTeam = myPlayer?.team ?? -1
+    const isMyTeamTurn = round ? myTeam === round.teamIdx : false
     const teamColor = round ? TEAM_COLORS[round.teamIdx] : 'var(--sweep)'
-    const teamName  = round ? (rs.teams[round.teamIdx] || `${t('teamLabel')} ${round.teamIdx + 1}`) : ''
+    const teamName  = round ? rs.teams[round.teamIdx]?.name ?? '' : ''
+    const canDrive  = isHost || isCluegiver // reveal / next-round privileges
 
-    // ── Phase: cluegiver ───────────────────────────────────────────────────
-    if (rs.phase === 'cluegiver' && round) {
+    // ── Phase: clue ────────────────────────────────────────────────────────
+    if (rs.phase === 'clue' && round) {
       if (isCluegiver) {
-        // This player IS the cluegiver
         return (
           <div className="wrap screen-enter">
             <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
             <div className="card">
-              <ProgressBar />
+              <RoundMeta />
               <div className="stage-meta">
                 <span className="pill" style={{ borderColor: teamColor, color: teamColor }}>
                   <span className="swatch" style={{ background: teamColor }} />{teamName}
@@ -855,7 +858,7 @@ export function ConsensusRadarGame() {
                   onChange={e => setClueInput(e.target.value)}
                   placeholder={t('cluePlaceholder')}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.nativeEvent.isComposing) submitClue() }}
-                  maxLength={100} autoFocus />
+                  maxLength={120} autoFocus />
               </div>
               <button className="btn warn" onClick={submitClue} disabled={!clueInput.trim()}>{t('clueBtn')}</button>
               <p className="hint" style={{ marginTop: 10 }}>{t('clueHint')}</p>
@@ -864,21 +867,20 @@ export function ConsensusRadarGame() {
           </div>
         )
       }
-      // Others wait
+      // Everyone else waits for the clue
       return (
         <div className="wrap screen-enter">
           <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
           <div className="card center">
-            <ProgressBar />
+            <RoundMeta />
             <ScoreBar activeIdx={round.teamIdx} />
             <div style={{ marginTop: 24, marginBottom: 8 }}>
-              <div className="eyebrow">{t('cluegiverPhase')}</div>
+              <div className="eyebrow">{t('cluePhase')}</div>
               <div className="team-turn-badge" style={{ background: teamColor }}>
                 {teamName}
               </div>
               <p className="muted" style={{ marginTop: 12, fontSize: 14 }}>
-                {rs.players.find(p => p.id === round.cluegiver)?.name ?? '—'}
-                {lang === 'uk' ? ' думає над підказкою…' : ' is thinking of a clue…'}
+                {rs.players.find(p => p.id === round.cluegiver)?.name ?? '—'} {t('thinksClue')}
               </p>
               <div className="waiting-dots"><span /><span /><span /></div>
             </div>
@@ -888,228 +890,270 @@ export function ConsensusRadarGame() {
       )
     }
 
-    // ── Phase: guessing ────────────────────────────────────────────────────
-    if (rs.phase === 'guessing' && round) {
-      const myLocked    = round.locked[playerId]
-      const teamPlayers = rs.players.filter(p => p.team === round.teamIdx && p.id !== round.cluegiver)
-      const lockedCount = teamPlayers.filter(p => round.locked[p.id]).length
-      const allLocked   = teamPlayers.length > 0 && lockedCount === teamPlayers.length
+    // ── Phase: guess ───────────────────────────────────────────────────────
+    if (rs.phase === 'guess' && round) {
+      const guessers   = rs.players.filter(p => p.team === round.teamIdx && p.id !== round.cluegiver)
+      const bettors    = rs.players.filter(p => p.team >= 0 && p.team !== round.teamIdx)
+      const bettedCount = bettors.filter(p => p.id in round.bets).length
+      const myGuessIn  = round.guessed.includes(playerId)
+      const myBetIn    = playerId in round.bets
+      const canGuess   = isMyTeamTurn && !isCluegiver
+      const canBet     = rs.betsEnabled && myTeam >= 0 && !isMyTeamTurn
 
-      // Non-team players just watch
-      if (!isMyTeamTurn) {
+      const guessCounter = (
+        <p className="muted" style={{ fontSize: 13, marginTop: 10 }}>
+          {fmt(t('lockedCount'), { done: round.guessed.length, total: guessers.length })}
+          {rs.betsEnabled && bettors.length > 0 && (
+            <> · {fmt(t('betCount'), { done: bettedCount, total: bettors.length })}</>
+          )}
+        </p>
+      )
+
+      const revealButton = canDrive && (
+        <button className="btn ghost" style={{ marginTop: 16 }} onClick={forceReveal}>
+          {t('revealNow')}
+        </button>
+      )
+
+      // Active-team guesser view
+      if (canGuess) {
+        const showEditor = editing || !myGuessIn
         return (
           <div className="wrap screen-enter">
             <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
-            <div className="card center">
-              <ProgressBar />
-              <ScoreBar activeIdx={round.teamIdx} />
-              <div style={{ marginTop: 20 }}>
-                <div className="eyebrow">{t('guessingPhase')}</div>
-                <div className="team-turn-badge" style={{ background: teamColor }}>{teamName}</div>
-                <div className={`cluebox solid`} style={{ marginTop: 16 }}>
-                  {round.clue ? `"${round.clue}"` : '…'}
-                </div>
-                <Poles scale={round.scale} />
-                <p className="muted" style={{ fontSize: 13, marginTop: 10 }}>
-                  {lockedCount}/{teamPlayers.length} {t('waitGuesses')}
-                </p>
-                {isHost && (
-                  <button
-                    className={`btn${allLocked ? '' : ' ghost'}`}
-                    style={{ marginTop: 20 }}
-                    onClick={showResult}
-                  >
-                    {allLocked
-                      ? (lang === 'uk' ? 'Показати результат' : 'Show result')
-                      : (lang === 'uk' ? 'Показати результат зараз' : 'Show result now')}
-                  </button>
-                )}
-              </div>
-            </div>
-            {toast && <div className="toast">{toast}</div>}
-          </div>
-        )
-      }
-
-      // Cluegiver of THIS team watches too
-      if (isCluegiver) {
-        return (
-          <div className="wrap screen-enter">
-            <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
-            <div className="card center">
-              <ProgressBar />
+            <div className="card">
+              <RoundMeta />
               <div className="stage-meta">
                 <span className="pill" style={{ borderColor: teamColor, color: teamColor }}>
                   <span className="swatch" style={{ background: teamColor }} />{teamName}
                 </span>
-                <span className="pill secret-pill">{t('secretPill')}</span>
-                {rs.timerSecs > 0 && <TimerRing secs={timeLeft} total={rs.timerSecs} />}
+                <span className="pill green">{t('guessTitle')}</span>
               </div>
-              <div className={`cluebox solid`} style={{ marginTop: 12 }}>
-                {round.clue ? `"${round.clue}"` : ''}
+              <div className="cluebox solid">
+                {round.clue ? `"${round.clue}"` : '…'}
               </div>
+              <p className="muted" style={{ fontSize: 13, marginTop: 8 }}>{t('guessSub')}</p>
               <Poles scale={round.scale} />
-              <p className="muted" style={{ fontSize: 13, marginTop: 12 }}>
-                {lockedCount}/{teamPlayers.length} {t('waitGuesses')}
-              </p>
-              {isHost && allLocked && (
-                <button className="btn" style={{ marginTop: 20 }} onClick={showResult}>
-                  {lang === 'uk' ? 'Показати результат' : 'Show result'}
-                </button>
+              {showEditor ? (
+                <div className="scalewrap">
+                  <div
+                    className="gauge interactive"
+                    ref={gaugeRef}
+                    onMouseDown={startDrag}
+                    onTouchStart={startDrag}
+                    role="slider"
+                    aria-valuemin={0} aria-valuemax={100} aria-valuenow={guess}
+                    aria-label={lang === 'uk' ? 'Маркер позиції' : 'Position marker'}
+                  >
+                    <div className="gauge-fill" />
+                    <Ticks />
+                    <div className="marker marker-drop" style={{ left: `${guess}%` }}>
+                      <div className="knob" />
+                    </div>
+                  </div>
+                  <div className="readout">
+                    <span>{t('dragHint')}</span>
+                    <span><b>{guess}</b> / 100</span>
+                  </div>
+                  <button className="btn" style={{ marginTop: 12 }} onClick={submitGuess}>{t('lockBtn')}</button>
+                </div>
+              ) : (
+                <div className="locked-state">
+                  <div className="locked-icon">✓</div>
+                  <p>{fmt(t('lockedAt'), { value: round.guesses[playerId] ?? guess })}</p>
+                  <p className="muted" style={{ fontSize: 13 }}>{t('lockedWaiting')}</p>
+                  <button className="btn ghost small" style={{ marginTop: 10 }} onClick={() => setEditing(true)}>
+                    {t('changeBtn')}
+                  </button>
+                </div>
               )}
-              {isHost && !allLocked && (
-                <button className="btn ghost" style={{ marginTop: 20 }} onClick={showResult}>
-                  {lang === 'uk' ? 'Показати результат зараз' : 'Show result now'}
-                </button>
-              )}
+              {guessCounter}
             </div>
             {toast && <div className="toast">{toast}</div>}
           </div>
         )
       }
 
-      // Active guesser
+      // Everyone else: clue-giver, betting rivals, spectators
       return (
         <div className="wrap screen-enter">
           <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
-          <div className="card">
-            <ProgressBar />
-            <div className="stage-meta">
-              <span className="pill" style={{ borderColor: teamColor, color: teamColor }}>
-                <span className="swatch" style={{ background: teamColor }} />{teamName}
-              </span>
-              <span className="pill green">{lang === 'uk' ? 'твоя відповідь' : 'your turn'}</span>
-              {rs.timerSecs > 0 && <TimerRing secs={timeLeft} total={rs.timerSecs} />}
-            </div>
-            {timeLeft === 0 && !myLocked && (
-              <div className="timer-expired">{t('timerExpired')}</div>
-            )}
-            <div className="cluebox solid">
-              {round.clue ? `"${round.clue}"` : (lang === 'uk' ? '(підказка усна)' : '(clue spoken)')}
-            </div>
-            <Poles scale={round.scale} />
-            {myLocked ? (
-              <div className="locked-state">
-                <div className="locked-icon">✓</div>
-                <p>{t('lockedWaiting')}</p>
-                <p className="muted" style={{ fontSize: 13 }}>{lockedCount}/{teamPlayers.length} {t('waitGuesses')}</p>
-              </div>
-            ) : (
-              <div className="scalewrap">
-                <div
-                  className="gauge interactive"
-                  ref={gaugeRef}
-                  onMouseDown={startDrag}
-                  onTouchStart={startDrag}
-                  role="slider"
-                  aria-valuemin={0} aria-valuemax={100} aria-valuenow={guess}
-                  aria-label={lang === 'uk' ? 'Маркер позиції' : 'Position marker'}
-                >
-                  <div className="gauge-fill" />
-                  <Ticks />
-                  <div className="marker marker-drop" style={{ left: `${guess}%` }}>
-                    <div className="knob" />
-                  </div>
-                </div>
-                <div className="readout">
-                  <span>{t('dragHint')}</span>
-                  <span><b>{guess}</b> / 100</span>
-                </div>
-                <button className="btn" style={{ marginTop: 12 }} onClick={lockGuess}>{t('lockBtn')}</button>
-              </div>
-            )}
-          </div>
-          {toast && <div className="toast">{toast}</div>}
-        </div>
-      )
-    }
-
-    // ── Phase: result ──────────────────────────────────────────────────────
-    if (rs.phase === 'result' && round) {
-      const avgGuess  = round.guesses.__avg ?? 50
-      const target    = round.target ?? 50
-      const res       = scoreFor(avgGuess, target)
-      const off       = Math.abs(avgGuess - target)
-      const isSupermark = res.key === 'supermark'
-      const verdictColor = isSupermark ? '#ffd166' : res.pts === 5 ? 'var(--sweep)' : res.pts === 3 ? 'var(--warm)' : res.pts < 0 ? 'var(--hot)' : 'var(--ink-dim)'
-      const deltaBg    = isSupermark ? 'linear-gradient(135deg,#ffd166,#ff9a3c)' : res.pts > 0 ? (res.pts === 5 ? 'var(--sweep)' : 'var(--warm)') : res.pts < 0 ? 'var(--hot)' : 'var(--panel-3)'
-      const deltaColor = isSupermark ? '#1a0a00' : res.pts > 0 ? '#001a0f' : res.pts < 0 ? '#fff' : 'var(--ink)'
-      const total      = rs.roundsPerTeam * rs.teams.length
-      const isLast     = rs.turnPtr >= total - 1
-
-      return (
-        <div className="wrap screen-enter">
-          <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
-          <div className="card">
-            <ProgressBar />
-            <div className="stage-meta">
-              <span className="pill" style={{ borderColor: teamColor, color: teamColor }}>
-                <span className="swatch" style={{ background: teamColor }} />{teamName}
-              </span>
-              <span className={`delta-pill score-bounce${isSupermark ? ' supermark-pill' : ''}`} style={{ background: deltaBg, color: deltaColor }}>
-                {isSupermark ? '★ ' : ''}{res.pts > 0 ? '+' : ''}{res.pts} {t('points')}
-              </span>
-            </div>
-
-            <Poles scale={round.scale} />
-            <div className="scalewrap">
-              <div className="gauge">
-                <div className="gauge-fill" />
-                <Ticks />
-                <TargetBand target={target} />
-                <div className="marker team-marker" style={{ left: `${avgGuess}%`, '--cold': teamColor } as React.CSSProperties}>
-                  <div className="knob" />
-                </div>
-              </div>
-            </div>
-
-            <div className="cluebox solid" style={{ fontSize: 15 }}>
-              {round.clue ? `${t('clueWas')} "${round.clue}"` : (lang === 'uk' ? '(підказка усна)' : '(spoken clue)')}
-            </div>
-
-            <div className="verdict-wrap">
-              <div className={`verdict-label score-bounce${isSupermark ? ' supermark-verdict' : ''}`} style={{ color: verdictColor }}>
-                {isSupermark && <span className="supermark-star" aria-hidden>★</span>}
-                {t(res.key)}
-                {isSupermark && <span className="supermark-star" aria-hidden>★</span>}
-              </div>
-              <div className="verdict-detail">
-                {t('targetWas')} <b>{target}</b> · {t('guessWas')} <b>{avgGuess}</b> · {off} {t('off')}
-              </div>
-            </div>
-
-            {/* Per-player guesses */}
-            <div className="guess-breakdown">
-              {rs.players.filter(p => p.team === round.teamIdx && p.id !== round.cluegiver).map(p => (
-                <div key={p.id} className="guess-row">
-                  <span>{p.name}{p.id === playerId ? ` ${t('you')}` : ''}</span>
-                  <span style={{ fontWeight: 700 }}>{round.guesses[p.id] ?? '—'}</span>
-                </div>
-              ))}
-            </div>
-
+          <div className="card center">
+            <RoundMeta />
             <ScoreBar activeIdx={round.teamIdx} />
+            <div style={{ marginTop: 20 }}>
+              <div className="eyebrow">{t('guessPhase')}</div>
+              <div className="team-turn-badge" style={{ background: teamColor }}>{teamName}</div>
+              <div className="cluebox solid" style={{ marginTop: 16 }}>
+                {round.clue ? `"${round.clue}"` : '…'}
+              </div>
+              <Poles scale={round.scale} />
+              {guessCounter}
 
-            {isHost && (
-              <button className="btn" style={{ marginTop: 16 }} onClick={nextTurn}>
-                {isLast ? t('finalTitle') : t('nextTurnBtn')}
-              </button>
-            )}
-            {!isHost && (
-              <p className="hint" style={{ marginTop: 16, textAlign: 'center' }}>{t('waitForHost')}</p>
-            )}
+              {guessers.length === 0 && (
+                <div className="validation-notice" style={{ marginTop: 12 }}>{t('noGuessers')}</div>
+              )}
+
+              {canBet && (
+                <div className="bet-panel" style={{ marginTop: 16 }}>
+                  <div className="eyebrow">{t('betTitle')}</div>
+                  <p className="muted" style={{ fontSize: 13, margin: '6px 0 10px' }}>{t('betSub')}</p>
+                  {myBetIn ? (
+                    <p className="pill green" style={{ display: 'inline-block' }}>
+                      {round.bets[playerId]
+                        ? fmt(t('betPlaced'), { side: t(round.bets[playerId] === 'left' ? 'sideLeft' : 'sideRight') })
+                        : t('betPlaced').replace('{side}', '✓')}
+                    </p>
+                  ) : (
+                    <div className="btn-row" style={{ justifyContent: 'center' }}>
+                      <button className="btn ghost" onClick={() => submitBet('left')}>{t('betLeft')}</button>
+                      <button className="btn ghost" onClick={() => submitBet('right')}>{t('betRight')}</button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {revealButton}
+            </div>
           </div>
           {toast && <div className="toast">{toast}</div>}
         </div>
       )
     }
 
-    // ── Phase: final ───────────────────────────────────────────────────────
-    if (rs.phase === 'final') {
-      const sorted  = rs.teams.map((name, i) => ({ name: name || `${t('teamLabel')} ${i + 1}`, score: rs.scores[i] ?? 0, color: TEAM_COLORS[i] }))
+    // ── Phase: reveal ──────────────────────────────────────────────────────
+    if ((rs.phase === 'reveal' || rs.phase === 'finished') && round) {
+      const target   = round.target ?? 50
+      const marker   = round.marker ?? 50
+      const pts      = round.points ?? 0
+      const distance = round.distance ?? Math.round(Math.abs(target - marker) * 10) / 10
+      const verdictKey = pts >= 5 ? 'bullseye' : pts >= 3 ? 'close' : pts <= -2 ? 'opposite' : 'far'
+      const verdictColor = pts >= 5 ? 'var(--sweep)' : pts >= 3 ? 'var(--warm)' : pts < 0 ? 'var(--hot)' : 'var(--ink-dim)'
+      const deltaBg    = pts >= 5 ? 'var(--sweep)' : pts >= 3 ? 'var(--warm)' : pts < 0 ? 'var(--hot)' : 'var(--panel-3)'
+      const deltaColor = pts > 0 ? '#001a0f' : pts < 0 ? '#fff' : 'var(--ink)'
+
+      const guessRows = Object.entries(round.guesses)
+        .map(([pid, value]) => ({
+          pid,
+          value,
+          distance: Math.round(Math.abs(target - value) * 10) / 10,
+          name: rs.players.find(p => p.id === pid)?.name ?? pid,
+        }))
+        .sort((a, b) => a.distance - b.distance)
+
+      const betRows = Object.entries(round.bets)
+        .filter(([, side]) => side !== null)
+        .map(([pid, side]) => ({
+          pid,
+          side: side as BetSide,
+          correct: betIsCorrect(target, marker, side as BetSide),
+          name: rs.players.find(p => p.id === pid)?.name ?? pid,
+          team: rs.players.find(p => p.id === pid)?.team ?? -1,
+        }))
+
+      const nextAdvance = canDrive && rs.phase === 'reveal' && (
+        <button className="btn" style={{ marginTop: 16 }} onClick={nextRound}>{t('nextBtn')}</button>
+      )
+
+      const revealBody = (
+        <div className="card">
+          <RoundMeta />
+          <div className="eyebrow">{t('revealTitle')}</div>
+          <div className="stage-meta">
+            <span className="pill" style={{ borderColor: teamColor, color: teamColor }}>
+              <span className="swatch" style={{ background: teamColor }} />{teamName}
+            </span>
+            <span className="delta-pill score-bounce" style={{ background: deltaBg, color: deltaColor }}>
+              {pts > 0 ? '+' : ''}{pts} {t('points')}
+            </span>
+          </div>
+
+          <Poles scale={round.scale} />
+          <div className="scalewrap">
+            <div className="gauge">
+              <div className="gauge-fill" />
+              <Ticks />
+              <TargetBand target={target} />
+              <div className="marker team-marker" style={{ left: `${marker}%`, '--cold': teamColor } as React.CSSProperties}>
+                <div className="knob" />
+              </div>
+            </div>
+          </div>
+
+          <div className="cluebox solid" style={{ fontSize: 15 }}>
+            {round.clue ? `${t('clueWas')} "${round.clue}"` : ''}
+          </div>
+
+          <div className="verdict-wrap">
+            <div className="verdict-label score-bounce" style={{ color: verdictColor }}>
+              {t(verdictKey)}
+            </div>
+            <div className="verdict-detail">
+              {t('targetWas')} <b>{target}</b> · {t('markerWas')} <b>{marker}</b> · {distance} {t('off')}
+            </div>
+          </div>
+
+          {guessRows.length > 0 && (
+            <>
+              <div className="eyebrow" style={{ marginTop: 14 }}>{t('individualGuesses')}</div>
+              <div className="guess-breakdown">
+                {guessRows.map(row => (
+                  <div key={row.pid} className="guess-row">
+                    <span>{row.name}{row.pid === playerId ? ` ${t('you')}` : ''}</span>
+                    <span style={{ fontWeight: 700 }}>{row.value} <span className="muted" style={{ fontWeight: 400 }}>({row.distance})</span></span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {betRows.length > 0 && (
+            <>
+              <div className="eyebrow" style={{ marginTop: 14 }}>{t('betResults')}</div>
+              <div className="guess-breakdown">
+                {betRows.map(row => (
+                  <div key={row.pid} className="guess-row">
+                    <span>
+                      <span className="swatch" style={{ background: TEAM_COLORS[row.team] ?? 'var(--line)' }} />
+                      {row.name}{row.pid === playerId ? ` ${t('you')}` : ''}
+                    </span>
+                    <span style={{ fontWeight: 700, color: row.correct ? 'var(--sweep)' : 'var(--hot)' }}>
+                      {t(row.side === 'left' ? 'sideLeft' : 'sideRight')} · {row.correct ? t('betWon') : t('betLost')}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          <ScoreBar activeIdx={round.teamIdx} />
+          {nextAdvance}
+          {!canDrive && rs.phase === 'reveal' && (
+            <p className="hint" style={{ marginTop: 16, textAlign: 'center' }}>{t('waitNext')}</p>
+          )}
+          {isHost && rs.phase === 'reveal' && (
+            <button className="btn ghost small" style={{ marginTop: 10 }} onClick={endGame}>{t('endGame')}</button>
+          )}
+        </div>
+      )
+
+      if (rs.phase === 'reveal') {
+        return (
+          <div className="wrap screen-enter">
+            <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
+            {revealBody}
+            {toast && <div className="toast">{toast}</div>}
+          </div>
+        )
+      }
+    }
+
+    // ── Phase: finished ────────────────────────────────────────────────────
+    if (rs.phase === 'finished') {
+      const sorted  = rs.teams.map((team, i) => ({ ...team, color: TEAM_COLORS[i], idx: i }))
         .sort((a, b) => b.score - a.score)
-      const top     = sorted[0].score
-      const winners = sorted.filter(tm => tm.score === top)
+      const top     = sorted[0]?.score ?? 0
+      const winners = sorted.filter(team => team.score === top)
 
       return (
         <div className="wrap screen-enter">
@@ -1119,7 +1163,7 @@ export function ConsensusRadarGame() {
             <h2>{t('finalScores')}</h2>
             <div className="final-scores">
               {sorted.map((team, i) => (
-                <div key={i} className={`table-row${i === 0 ? ' gold-row' : ''}`}>
+                <div key={team.idx} className={`table-row${i === 0 ? ' gold-row' : ''}`}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <span className="rank">{i + 1}.</span>
                     <span className="swatch" style={{ background: team.color, width: 12, height: 12, borderRadius: '50%' }} />
@@ -1130,13 +1174,13 @@ export function ConsensusRadarGame() {
               ))}
             </div>
             <div className={`big winner score-bounce${winners.length === 1 ? ' winner-glow' : ''}`} style={{ margin: '16px 0 6px' }}>
-              {winners.length > 1 ? t('tie') : winners[0].name}
+              {winners.length > 1 ? t('tie') : `${t('winnerPrefix')} «${winners[0].name}»!`}
             </div>
             <div style={{ fontSize: 13, color: 'var(--ink-dim)', marginBottom: 24 }}>
-              {rs.roundsPerTeam * rs.teams.length} {t('rounds')} · {top} {t('points')}
+              {rs.roundNo} {t('rounds')} · {top} {t('points')}
             </div>
             <div className="btn-row">
-              {isHost && <button className="btn ghost" onClick={resetGame}>{t('againBtn')}</button>}
+              {isHost && <button className="btn ghost" onClick={resetGame}>{t('playAgain')}</button>}
               <button
                 className={`btn${scoreSubmitted ? ' ghost' : ''}`}
                 onClick={scoreSubmitted ? undefined : submitScore}
@@ -1154,7 +1198,18 @@ export function ConsensusRadarGame() {
       )
     }
 
-    return null
+    // ── Playing but between rounds (clue/guess with no round yet) ──────────
+    return (
+      <div className="wrap screen-enter">
+        <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
+        <div className="card center">
+          <RoundMeta />
+          <ScoreBar />
+          <div className="waiting-dots" style={{ marginTop: 24 }}><span /><span /><span /></div>
+        </div>
+        {toast && <div className="toast">{toast}</div>}
+      </div>
+    )
   }
 
   return null

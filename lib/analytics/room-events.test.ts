@@ -7,14 +7,15 @@ describe('multiplayer room analytics', () => {
       type: 'consensus.game.start',
       teamNames: ['Alpha', 'Beta'],
       numTeams: 2,
-      roundsPerTeam: 3,
-      timerSecs: 60,
+      categories: ['general', 'analytics'],
+      goal: 20,
+      betsEnabled: true,
     })).toEqual({
       game_id: 'consensus-radar',
       player_count: 4,
       team_count: 2,
-      rounds_per_team: 3,
-      timer_seconds: 60,
+      goal: 20,
+      bets_enabled: true,
     })
 
     expect(multiplayerRoomStartedProperties('chess', 2, {
