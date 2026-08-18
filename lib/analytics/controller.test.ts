@@ -28,6 +28,7 @@ describe('analytics consent', () => {
     analytics.track('platform_viewed', { games_available: 5 })
 
     expect(client.init).toHaveBeenCalledWith('project-token', expect.objectContaining({
+      api_host: 'https://api-eu.mixpanel.com',
       opt_out_tracking_by_default: true,
       persistence: 'localStorage',
     }))

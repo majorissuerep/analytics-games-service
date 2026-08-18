@@ -2,7 +2,7 @@ import { expect, test, type Browser, type BrowserContext, type Page } from '@pla
 
 test('Mixpanel remains silent until consent and tracks the game launch journey', async ({ page }) => {
   const mixpanelEvents: string[] = []
-  await page.route('https://api-js.mixpanel.com/**', async (route) => {
+  await page.route('https://api-eu.mixpanel.com/**', async (route) => {
     const encoded = new URLSearchParams(route.request().postData() ?? '').get('data')
     if (encoded) {
       const payload = JSON.parse(encoded) as { event?: string }
