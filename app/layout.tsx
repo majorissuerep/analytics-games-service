@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Analytics } from '@vercel/analytics/next'
 import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider'
 import './globals.css'
 
@@ -22,6 +23,7 @@ export default function RootLayout({
         <AnalyticsProvider token={process.env.MIXPANEL_PROJECT_TOKEN}>
           {children}
         </AnalyticsProvider>
+        <Analytics />
       </body>
     </html>
   )
