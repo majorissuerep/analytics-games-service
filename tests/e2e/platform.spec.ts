@@ -363,46 +363,70 @@ test('four isolated players complete a full Consensus Radar game', async ({ brow
     }
     await expect(host.page.getByText('Players in room (4)', { exact: true })).toBeVisible({ timeout: 15_000 })
 
+    // Host starts on Team 1 automatically; Ben joins them, Cy and Dee form Team 2.
     await teamOneGuesser.page.getByTitle('Team 1').click()
     await teamTwoCluegiver.page.getByTitle('Team 2').click()
     await teamTwoGuesser.page.getByTitle('Team 2').click()
 
-    await host.page.getByRole('button', { name: 'Clue-giver', exact: true }).click()
-    await expect(teamTwoCluegiver.page.getByRole('button', { name: 'Clue-giver', exact: true })).toBeVisible()
-    await teamTwoCluegiver.page.getByRole('button', { name: 'Clue-giver', exact: true }).click()
-
-    const rounds = host.page.locator('.round-pick').first()
-    await rounds.getByRole('button', { name: '2', exact: true }).click()
-    await expect(host.page.getByText('Each team needs exactly one clue-giver')).toHaveCount(0, { timeout: 15_000 })
-    await host.page.getByRole('button', { name: 'Start game' }).click()
-
-    for (let round = 0; round < 4; round += 1) {
-      const cluegiver = round % 2 === 0 ? host : teamTwoCluegiver
-      const guesser = round % 2 === 0 ? teamOneGuesser : teamTwoGuesser
-
-      await expect(cluegiver.page.getByText("You're the clue-giver this round!", { exact: true })).toBeVisible({
-        timeout: 15_000,
-      })
-      await cluegiver.page.getByPlaceholder('one word or phrase — no numbers').fill(`signal-${round + 1}`)
-      await cluegiver.page.getByRole('button', { name: 'Send clue' }).click()
-
-      const slider = guesser.page.getByRole('slider', { name: 'Position marker' })
-      await expect(slider).toBeVisible({ timeout: 15_000 })
-      const box = await slider.boundingBox()
-      if (!box) throw new Error('Position marker has no bounding box')
-      await guesser.page.mouse.click(box.x + box.width * (0.25 + round * 0.15), box.y + box.height / 2)
-      await guesser.page.getByRole('button', { name: 'Lock in' }).click()
-
-      const reveal = host.page.getByRole('button', { name: /Show result/ })
-      await expect(reveal).toBeVisible({ timeout: 15_000 })
-      await reveal.click()
-
-      const advanceName = round === 3 ? 'Game over' : 'Next turn'
-      const advance = host.page.getByRole('button', { name: advanceName, exact: true })
-      await expect(advance).toBeVisible({ timeout: 15_000 })
-      await advance.click()
+    // The host learns about assignments via polling — wait until every roster
+    // pill is visible before starting, otherwise the lobby validation races.
+    for (const [name, team] of [['Ben', 'Team 1'], ['Cy', 'Team 2'], ['Dee', 'Team 2']] as const) {
+      await expect(
+        host.page.locator('.player-row').filter({ hasText: name }).getByText(team, { exact: true }),
+      ).toBeVisible({ timeout: 15_000 })
     }
 
+    await host.page.getByRole('button', { name: 'Start game' }).click()
+
+    // ── Round 1: Team 1 plays, host is the clue-giver (join-order rotation) ──
+    await expect(host.page.getByText("You're the clue-giver this round!", { exact: true })).toBeVisible({
+      timeout: 15_000,
+    })
+    await host.page.getByPlaceholder('one word or phrase — no numbers').fill('signal one')
+    await host.page.getByRole('button', { name: 'Send clue' }).click()
+
+    const slider = teamOneGuesser.page.getByRole('slider', { name: 'Position marker' })
+    await expect(slider).toBeVisible({ timeout: 15_000 })
+    const box = await slider.boundingBox()
+    if (!box) throw new Error('Position marker has no bounding box')
+    await teamOneGuesser.page.mouse.click(box.x + box.width * 0.3, box.y + box.height / 2)
+    await teamOneGuesser.page.getByRole('button', { name: 'Lock in' }).click()
+
+    // Rival team places side bets; the last bet auto-reveals the round.
+    await teamTwoCluegiver.page.getByRole('button', { name: /To the right/ }).click()
+    await expect(teamTwoCluegiver.page.getByText(/Bet placed/)).toBeVisible({ timeout: 15_000 })
+    await teamTwoGuesser.page.getByRole('button', { name: /To the right/ }).click()
+
+    for (const player of players) {
+      await expect(player.page.getByText('The reveal', { exact: true })).toBeVisible({ timeout: 15_000 })
+    }
+    await expect(host.page.getByText('Who placed what', { exact: true })).toBeVisible()
+    await expect(host.page.getByText('Side bets', { exact: true })).toBeVisible()
+
+    // ── Round 2: turn rotates to Team 2, its clue-giver is Cy ────────────────
+    await host.page.getByRole('button', { name: 'Next round', exact: true }).click()
+    await expect(teamTwoCluegiver.page.getByText("You're the clue-giver this round!", { exact: true })).toBeVisible({
+      timeout: 15_000,
+    })
+    await teamTwoCluegiver.page.getByPlaceholder('one word or phrase — no numbers').fill('signal two')
+    await teamTwoCluegiver.page.getByRole('button', { name: 'Send clue' }).click()
+
+    const sliderTwo = teamTwoGuesser.page.getByRole('slider', { name: 'Position marker' })
+    await expect(sliderTwo).toBeVisible({ timeout: 15_000 })
+    const boxTwo = await sliderTwo.boundingBox()
+    if (!boxTwo) throw new Error('Position marker has no bounding box')
+    await teamTwoGuesser.page.mouse.click(boxTwo.x + boxTwo.width * 0.7, boxTwo.y + boxTwo.height / 2)
+    await teamTwoGuesser.page.getByRole('button', { name: 'Lock in' }).click()
+
+    await host.page.getByRole('button', { name: /To the left/ }).click()
+    await teamOneGuesser.page.getByRole('button', { name: /To the left/ }).click()
+
+    for (const player of players) {
+      await expect(player.page.getByText('The reveal', { exact: true })).toBeVisible({ timeout: 15_000 })
+    }
+
+    // ── Host ends the game; everyone lands on the final scoreboard ───────────
+    await host.page.getByRole('button', { name: 'End the game', exact: true }).click()
     for (const player of players) {
       await expect(player.page.getByText('Game over', { exact: true })).toBeVisible({ timeout: 15_000 })
       await expect(player.page.getByRole('heading', { name: 'Final scores' })).toBeVisible()

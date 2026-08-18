@@ -4,8 +4,8 @@ type RoomStartedProperties = {
   game_id: string
   player_count: number
   team_count?: number
-  rounds_per_team?: number
-  timer_seconds?: number
+  goal?: number
+  bets_enabled?: boolean
   host_color?: string
 }
 
@@ -26,8 +26,8 @@ export function multiplayerRoomStartedProperties(
       game_id: gameId,
       player_count: playerCount,
       team_count: integerProperty(candidate.numTeams),
-      rounds_per_team: integerProperty(candidate.roundsPerTeam),
-      timer_seconds: integerProperty(candidate.timerSecs),
+      goal: integerProperty(candidate.goal),
+      ...(typeof candidate.betsEnabled === 'boolean' ? { bets_enabled: candidate.betsEnabled } : {}),
     }
   }
 
