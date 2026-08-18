@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import Link from 'next/link'
+import { emitGameSessionCompleted } from '@/lib/analytics/game-events'
 import './paintbox.css'
 
 const COLORS = ['#111111', '#ffffff', '#d72b2b', '#ff8a1f', '#ffd629', '#2aa13b', '#168cc9', '#2444b8', '#7735a8', '#ed77a8']
@@ -101,8 +102,9 @@ export function PaintboxGame() {
     const link = document.createElement('a')
     link.download = 'paintbox-drawing.png'
     link.href = canvas.toDataURL('image/png')
-    link.click()
     setStatus('Saved PNG')
+    emitGameSessionCompleted('drawing_saved')
+    link.click()
   }
 
   return (

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { EnginePlayer, RoomSnapshot } from '@/lib/engine/types'
+import { trackAnalyticsEvent } from '@/lib/analytics/client'
+import { multiplayerRoomStartedProperties } from '@/lib/analytics/room-events'
 
 interface ApiErrorBody {
   error?: {
@@ -111,7 +113,13 @@ export function useGameRoom<TGameView>({
       }>(response)
       tokenRef.current = body.playerToken
       storeCapability(body.room.code, host.id, body.playerToken)
-      return acceptRoom(body.room)
+      const accepted = acceptRoom(body.room)
+      trackAnalyticsEvent('multiplayer_room_created', {
+        game_id: gameId,
+        player_count: accepted.players.length,
+        is_password_protected: Boolean(password),
+      })
+      return accepted
     } catch (caught) {
       const nextError = caught instanceof GameRoomClientError
         ? caught
@@ -138,7 +146,12 @@ export function useGameRoom<TGameView>({
       }>(response)
       tokenRef.current = body.playerToken
       storeCapability(body.room.code, player.id, body.playerToken)
-      return acceptRoom(body.room)
+      const accepted = acceptRoom(body.room)
+      trackAnalyticsEvent('multiplayer_room_joined', {
+        game_id: gameId,
+        player_count: accepted.players.length,
+      })
+      return accepted
     } catch (caught) {
       const nextError = caught instanceof GameRoomClientError
         ? caught
@@ -148,7 +161,7 @@ export function useGameRoom<TGameView>({
     } finally {
       setPending(false)
     }
-  }, [acceptRoom])
+  }, [acceptRoom, gameId])
 
   const refresh = useCallback(async (code = roomRef.current?.code) => {
     if (!code || !playerId || pollingRef.current) return roomRef.current
@@ -189,7 +202,14 @@ export function useGameRoom<TGameView>({
         },
       )
       const body = await readResponse<{ room: RoomSnapshot<TGameView> }>(response)
-      return acceptRoom(body.room)
+      const accepted = acceptRoom(body.room)
+      const startedProperties = multiplayerRoomStartedProperties(
+        gameId,
+        accepted.players.length,
+        action,
+      )
+      if (startedProperties) trackAnalyticsEvent('multiplayer_room_started', startedProperties)
+      return accepted
     } catch (caught) {
       const nextError = caught instanceof GameRoomClientError
         ? caught
@@ -199,7 +219,7 @@ export function useGameRoom<TGameView>({
     } finally {
       setPending(false)
     }
-  }, [acceptRoom, playerId])
+  }, [acceptRoom, gameId, playerId])
 
   useEffect(() => {
     if (!room?.code || !playerId) return

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -17,7 +18,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AnalyticsProvider token={process.env.MIXPANEL_PROJECT_TOKEN}>
+          {children}
+        </AnalyticsProvider>
+      </body>
     </html>
   )
 }

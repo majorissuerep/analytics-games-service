@@ -1,5 +1,43 @@
 import { expect, test, type Browser, type BrowserContext, type Page } from '@playwright/test'
 
+test('Mixpanel remains silent until consent and tracks the game launch journey', async ({ page }) => {
+  const mixpanelEvents: string[] = []
+  await page.route('https://api-js.mixpanel.com/**', async (route) => {
+    const encoded = new URLSearchParams(route.request().postData() ?? '').get('data')
+    if (encoded) {
+      const payload = JSON.parse(encoded) as { event?: string }
+      if (payload.event) mixpanelEvents.push(payload.event)
+    }
+    await route.fulfill({ status: 200, contentType: 'application/json', body: '1' })
+  })
+
+  await page.goto('/')
+  await expect(page.getByRole('dialog', { name: 'Analytics privacy settings' })).toBeVisible()
+  expect(mixpanelEvents).toEqual([])
+
+  await page.getByRole('button', { name: 'Accept analytics' }).click()
+  await expect.poll(() => mixpanelEvents).toContain('platform_viewed')
+
+  await page.locator('.desktop-icon[aria-label="Open Paintbox"]').dblclick()
+  const paintbox = page.frameLocator('iframe[title="Paintbox"]')
+  await expect(paintbox.getByRole('button', { name: 'Save PNG' })).toBeVisible()
+  await expect.poll(() => paintbox.getByLabel('Drawing canvas').evaluate((canvas) => (
+    (canvas as HTMLCanvasElement).getContext('2d')?.getImageData(0, 0, 1, 1).data[3]
+  ))).toBe(255)
+  await expect.poll(() => mixpanelEvents).toContain('game_session_started')
+  expect(mixpanelEvents).not.toContain('game_session_ended')
+
+  await paintbox.getByRole('button', { name: 'Save PNG' }).click()
+  await expect.poll(() => mixpanelEvents).toContain('game_session_completed')
+  expect(mixpanelEvents.filter((event) => event === '$opt_in')).toHaveLength(1)
+
+  const gameWindow = page.locator('.desktop-rnd-window').filter({
+    has: page.locator('iframe[title="Paintbox"]'),
+  })
+  await gameWindow.getByRole('button', { name: 'Close' }).click()
+  await expect.poll(() => mixpanelEvents).toContain('game_session_ended')
+})
+
 test('desktop opens and closes a readable game while Pip responds', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))

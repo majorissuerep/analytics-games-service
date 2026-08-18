@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { StandaloneGameFrame } from '@/components/desktop/StandaloneGameFrame'
+import { TrackedStandaloneGame } from '@/components/analytics/TrackedStandaloneGame'
 import { getPlatformGame } from '@/lib/platform/catalog'
 import { GameClient } from '@/games/client-registry'
 
@@ -26,5 +27,7 @@ export default async function GamePage({ params, searchParams }: GamePageProps) 
   if (!game || game.status === 'coming-soon') notFound()
   if (game.integration.kind === 'external' || game.integration.launchPath) return <StandaloneGameFrame game={game} />
   const client = <GameClient gameId={game.id} />
-  return embedded === '1' ? <div className="embedded-game-surface">{client}</div> : client
+  return embedded === '1'
+    ? <div className="embedded-game-surface">{client}</div>
+    : <TrackedStandaloneGame game={game}>{client}</TrackedStandaloneGame>
 }

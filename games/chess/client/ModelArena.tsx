@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Chess } from 'chess.js'
 import { Chessboard } from 'react-chessboard'
 import type { ModelMatchState } from '@/lib/chess-models/model-match'
+import { emitGameSessionCompleted } from '@/lib/analytics/game-events'
 import { StockfishBrowserEngine } from './stockfish'
 
 type ModelOption = { revisionId: string; displayName: string }
@@ -92,7 +93,10 @@ export function ModelArena({ models }: { models: ModelOption[] }) {
         if (!response.ok || !body.match) throw new Error(body.error || 'Could not save move')
         setMatch(body.match)
         setReplayPly(body.match.state.moves.length)
-        if (body.match.state.status === 'completed') void refreshArchive()
+        if (body.match.state.status === 'completed') {
+          emitGameSessionCompleted('model_match_completed')
+          void refreshArchive()
+        }
       } catch (cause) {
         if (!cancelled) setError(cause instanceof Error ? cause.message : 'Model match failed')
       } finally {
