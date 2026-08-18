@@ -48,8 +48,8 @@ const KNOWLEDGE: readonly KnowledgeEntry[] = [
     content: `Minefield (games/minefield): reveal covered squares with left-click. A number is the count of mines touching that square. Right-click a covered square to flag it. The first reveal is always safe. Clear every non-mine square to win. Beginner is 9×9/10 mines, intermediate 16×16/40, expert 30×16/99. Rules are in games/minefield/model.ts and UI is in games/minefield/client/MinefieldGame.tsx.`,
   },
   {
-    keywords: ['pinball', 'classic', 'flipper', 'ball', 'arcade'],
-    content: `Classic Pinball is the complete upstream lrusso/Pinball browser game, vendored under public/vendor/pinball at commit fcf63f97d24467248fe1eaa89adaf273209f3da2. Press the large play button, use the left and right sides of the table for flippers, hit bumpers, collect stars, and keep the ball above the drain. Its platform manifest is games/orbit-pinball/manifest.ts and provenance is documented in public/vendor/pinball/UPSTREAM.md.`,
+    keywords: ['pinball', 'flipper', 'ball', 'arcade'],
+    content: `Pinball (games/orbit-pinball) is an original pinball table with a custom 2D physics engine written from scratch in TypeScript. Hold Space to charge the plunger and release to launch the ball. Use arrow keys or A/D for left and right flippers, or tap the left/right side of the table. Hit pop bumpers, slingshots, and drop targets; spin the spinner; chain hits for combo multipliers (up to 5x). Knock down all 4 drop targets for a bank-clear bonus. The physics engine is in games/orbit-pinball/lib/physics.ts, table layout in games/orbit-pinball/lib/table.ts, game state in games/orbit-pinball/lib/model.ts, and the canvas renderer + React component in games/orbit-pinball/client/.`,
   },
   {
     keywords: ['paintbox', 'paint', 'draw', 'canvas', 'brush', 'png', 'eraser'],

@@ -9,7 +9,7 @@ Production-build exploratory and automated acceptance testing of Millennium Desk
 | ID | Severity | Area | Finding | Resolution |
 |---|---|---|---|---|
 | QA-01 | High | Desktop | Game, Plugins, and Build-a-game desktop icons required a mouse double-click. Enter/Space could focus but not launch them, and touch activation was unreliable. | Fixed: explicit Enter/Space launch handlers; browser acceptance added. |
-| QA-02 | Medium | Pinball | The original Orbit Pinball implementation was too small and bespoke to qualify as a complete classical game. | Replaced by the complete upstream lrusso/Pinball Phaser/Box2D game at a pinned commit. |
+| QA-02 | Medium | Pinball | The original Orbit Pinball implementation was too small and bespoke to qualify as a complete classical game. | Replaced by an original pinball game with a custom 2D physics engine, featuring flippers, pop bumpers, slingshots, drop targets, spinner, rollover lanes, combo multipliers, and multiball. |
 | QA-03 | Medium | Assets | The photographic `green-horizon.png` had no embedded provenance or license metadata, despite documentation claiming original assets. | Fixed: replaced by repository-authored `millennium-horizon.svg`; provenance and non-derivation are documented. |
 | QA-04 | High | Desktop windows | Dragging across iframe content could lose pointer movement; oversized windows also created impossible `react-rnd` bounds, producing dead zones followed by one-frame jumps. | Fixed: drag-time pointer shield plus viewport-aware initial bounds and per-game preferred sizes; continuous-drag and short-viewport regressions added. |
 | QA-05 | Medium | Embedded games | Minefield, Paintbox, and Consensus Radar repeated app/title chrome inside the XP-style outer window. | Fixed: embedded launch mode now suppresses redundant branding/title rows while preserving gameplay controls. |
@@ -33,11 +33,11 @@ Final automated acceptance: 8/8 Playwright scenarios passed, including continuou
 - Model tests cover first-click safety, adjacency, flood reveal, flags, loss, and win.
 - Result: pass.
 
-### Classic Pinball
+### Pinball
 
-- Loaded the pinned upstream runtime, started the full table, and verified table physics, flippers, bumpers, stars, scoring, audio control, and relaunch flow.
-- Verified the runtime stays isolated behind its manifest and same-origin static launch path.
-- Result: pass after upstream replacement.
+- Original pinball table with custom 2D physics engine (no external physics library). Verified plunger charge/launch, flipper controls (keyboard + touch), ball-wall/flipper/bumper/slingshot collision, drop target knockdown and bank reset, spinner, rollover lanes, combo multipliers, and drain/ball-count/game-over flow.
+- Physics engine, table layout, and game model are unit-tested.
+- Result: pass after original rewrite.
 
 ### Paintbox
 

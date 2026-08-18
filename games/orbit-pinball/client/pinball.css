@@ -1,0 +1,188 @@
+/* Pinball — original implementation, scoped under .pinball-app */
+
+.pinball-app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  font-family: 'Tahoma', 'Segoe UI', sans-serif;
+  color: #c8d4e0;
+  background: #0a0a14;
+  min-height: 100%;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.pinball-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 340px;
+  gap: 12px;
+}
+
+.pinball-header a {
+  color: #7ec8ff;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.pinball-header a:hover {
+  text-decoration: underline;
+}
+
+.pinball-hud {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #11111e;
+  border: 1px solid #222240;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  width: 100%;
+  max-width: 340px;
+  box-sizing: border-box;
+}
+
+.pinball-hud-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.pinball-hud-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #6a7080;
+}
+
+.pinball-hud-value {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffd629;
+  font-variant-numeric: tabular-nums;
+}
+
+.pinball-hud-value.multiball-active {
+  color: #ff4a6a;
+  animation: pinball-pulse 0.8s ease-in-out infinite;
+}
+
+.pinball-canvas-wrap {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 24px rgba(40, 80, 160, 0.3), inset 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+.pinball-canvas {
+  display: block;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.pinball-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 22px;
+  font-weight: bold;
+  color: #ffd629;
+  text-shadow: 0 0 12px rgba(255, 214, 41, 0.8), 0 2px 4px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  text-align: center;
+  white-space: nowrap;
+  letter-spacing: 2px;
+}
+
+.pinball-message.gameover {
+  color: #ff4a6a;
+  font-size: 28px;
+  text-shadow: 0 0 16px rgba(255, 74, 106, 0.8);
+}
+
+.pinball-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pinball-btn {
+  background: #1a1a2e;
+  border: 1px solid #2a2a48;
+  color: #c8d4e0;
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.pinball-btn:hover {
+  background: #222244;
+  border-color: #3a3a60;
+  color: #fff;
+}
+
+.pinball-btn:active {
+  transform: translateY(1px);
+}
+
+.pinball-btn-primary {
+  background: #1a3a5e;
+  border-color: #2a5a8e;
+  color: #7ec8ff;
+}
+
+.pinball-btn-primary:hover {
+  background: #2a4a6e;
+  color: #aee4ff;
+}
+
+.pinball-plunger-bar {
+  width: 100%;
+  max-width: 340px;
+  height: 10px;
+  background: #11111e;
+  border: 1px solid #222240;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.pinball-plunger-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2aa13b, #ffd629, #d72b2b);
+  transition: width 0.05s linear;
+  border-radius: 5px;
+}
+
+.pinball-instructions {
+  font-size: 11px;
+  color: #6a7080;
+  text-align: center;
+  max-width: 340px;
+  line-height: 1.5;
+}
+
+.pinball-instructions kbd {
+  background: #1a1a2e;
+  border: 1px solid #2a2a48;
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 10px;
+  color: #a0a8b8;
+  font-family: inherit;
+}
+
+@keyframes pinball-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

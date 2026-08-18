@@ -29,7 +29,7 @@
 - [OS.js](https://github.com/os-js/OS.js), BSD-2-Clause: mature application/package and web-desktop extension reference; not embedded because platform already has a smaller typed shell.
 - [JS Paint](https://github.com/1j01/jspaint), MIT: high-quality browser painting reference. Paintbox is original, smaller, browser-local code rather than copied JS Paint UI/assets.
 - [Webamp](https://github.com/captbaritone/webamp), MIT: proven embeddable nostalgic application reference; candidate future multimedia plugin, not currently bundled.
-- [lrusso/Pinball](https://github.com/lrusso/Pinball), complete Phaser/Box2D browser pinball: runtime vendored at commit `fcf63f97d24467248fe1eaa89adaf273209f3da2`. Upstream declares no license; provenance and separation are documented in `public/vendor/pinball/UPSTREAM.md`.
+- Pinball: original implementation with a custom 2D physics engine in TypeScript (no external physics library). The table features flippers, pop bumpers, slingshots, drop targets, spinner, rollover lanes, score zones, combo multipliers, and multiball. Source is in `games/orbit-pinball/`.
 
 ## Copyright/trademark boundary
 

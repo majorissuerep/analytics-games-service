@@ -126,13 +126,13 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   await expect(paintbox.getByRole('button', { name: 'Eraser' })).toHaveAttribute('aria-pressed', 'true')
   await page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Paintbox"]') }).getByRole('button', { name: 'Close' }).click()
 
-  await page.locator('.desktop-icon[aria-label="Open Classic Pinball"]').dblclick()
-  const pinball = page.frameLocator('iframe[title="Classic Pinball"]')
+  await page.locator('.desktop-icon[aria-label="Open Pinball"]').dblclick()
+  const pinball = page.frameLocator('iframe[title="Pinball"]')
   const pinballCanvas = pinball.locator('canvas')
   await expect(pinballCanvas).toBeVisible()
   await expect(pinballCanvas).toHaveAttribute('width', '320')
   await expect(pinballCanvas).toHaveAttribute('height', '608')
-  await page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Classic Pinball"]') }).getByRole('button', { name: 'Close' }).click()
+  await page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Pinball"]') }).getByRole('button', { name: 'Close' }).click()
 
   await expect(page.getByRole('heading', { name: 'Team games live here.' })).toBeVisible()
   expect(errors).toEqual([])
