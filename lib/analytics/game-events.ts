@@ -19,6 +19,7 @@ const COMPLETION_RESULTS = new Set([
   'repetition',
   'insufficient_material',
   'resigned',
+  'timeout',
   'draw',
   'model_match_completed',
 ])

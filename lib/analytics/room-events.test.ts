@@ -21,10 +21,12 @@ describe('multiplayer room analytics', () => {
     expect(multiplayerRoomStartedProperties('chess', 2, {
       type: 'chess.start',
       hostColor: 'random',
+      timeControlId: 'blitz-5',
     })).toEqual({
       game_id: 'chess',
       player_count: 2,
       host_color: 'random',
+      time_control: 'blitz-5',
     })
   })
 

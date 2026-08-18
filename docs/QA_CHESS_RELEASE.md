@@ -40,7 +40,8 @@ No unresolved Critical, High, or Medium functional defects remain in this pass.
 - Stockfish modes: Beginner, Casual, Club, Advanced, and Expert using genuine Stockfish 18 search at increasing skill/time bounds.
 - Local pass-and-play: alternating legal turns on one device.
 - Online rooms: create/join, optional password rejection/success, two-player seating, host-selected color, synchronized legal moves, resignation/rematch server rules.
-- Rules: illegal move rejection, turn ownership, checkmate/draw detection through chess.js.
+- Online time controls: host picks bullet/blitz/rapid/long (base + optional increment) before starting; live countdown clocks for both sides; loss-on-time when a clock expires (unless the opponent lacks mating material); a timeout claim is reflected to all players.
+- Rules: illegal move rejection, turn ownership, checkmate/draw detection through chess.js, flag-fall priority over a late move.
 - UI: setup, board, move history, legal target highlighting, desktop embedding without duplicate title chrome, narrow viewport.
 
 ## Service evidence

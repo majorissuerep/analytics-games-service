@@ -36,6 +36,7 @@ export function multiplayerRoomStartedProperties(
       game_id: gameId,
       player_count: playerCount,
       ...(typeof candidate.hostColor === 'string' ? { host_color: candidate.hostColor } : {}),
+      ...(typeof candidate.timeControlId === 'string' ? { time_control: candidate.timeControlId } : {}),
     }
   }
 

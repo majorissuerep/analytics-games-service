@@ -17,6 +17,12 @@ import { ModelSubmissionPanel } from './ModelSubmissionPanel'
 import { ModelArena } from './ModelArena'
 import { playMoveSound, playUndoSound, setSoundEnabled } from './sound'
 import { descriptorFromDiff, kingSquare, outcomeInfo, pinnedSquares, resultFor, type GameOverInfo } from './chess-logic'
+import {
+  CHESS_TIME_CONTROLS,
+  DEFAULT_CHESS_TIME_ID,
+  chessTimeLabel,
+  formatClock,
+} from '../time-control'
 import './chess.css'
 
 type Mode = 'setup' | 'bot' | 'local' | 'online'
@@ -32,6 +38,7 @@ function completionResult(result: string) {
   if (normalized.includes('repetition')) return 'repetition'
   if (normalized.includes('insufficient')) return 'insufficient_material'
   if (normalized.includes('resign')) return 'resigned'
+  if (normalized.includes('on time')) return 'timeout'
   return 'draw'
 }
 
@@ -77,6 +84,8 @@ export function ChessGame() {
   const [roomCode, setRoomCode] = useState('')
   const [password, setPassword] = useState('')
   const [notice, setNotice] = useState('')
+  const [timeControlId, setTimeControlId] = useState(DEFAULT_CHESS_TIME_ID)
+  const [clockNow, setClockNow] = useState(() => Date.now())
   const roomClient = useGameRoom<ChessGameView>({ gameId: 'chess', playerId, pollMs: 1000 })
   const [undoStack, setUndoStack] = useState<Array<{ fen: string; pgn: string }>>([])
 
@@ -111,6 +120,38 @@ export function ChessGame() {
   const inCheck = chess.inCheck()
   const checkSquare = inCheck ? kingSquare(chess, chess.turn()) : null
   const displayLastMove = mode === 'online' ? online?.lastMove ?? null : lastMove
+
+  // Live clock ticker — re-renders the countdown while an online game is active.
+  useEffect(() => {
+    if (mode !== 'online' || online?.phase !== 'active') return
+    const timer = window.setInterval(() => setClockNow(Date.now()), 250)
+    return () => window.clearInterval(timer)
+  }, [mode, online?.clockStartedAtMs, online?.phase])
+
+  // Compute each side's live remaining ms. The active side's clock counts down
+  // from clockStartedAtMs; the opponent's clock is frozen at its stored value.
+  const remainingMs = useMemo(() => {
+    if (!online || !online.timeControlId) return { w: 0, b: 0 }
+    const side = chess.turn()
+    const elapsed = Math.max(0, clockNow - online.clockStartedAtMs)
+    const w = side === 'w' ? Math.max(0, online.whiteClockMs - elapsed) : online.whiteClockMs
+    const b = side === 'b' ? Math.max(0, online.blackClockMs - elapsed) : online.blackClockMs
+    return { w, b }
+  }, [chess, clockNow, online])
+
+  // Claim a timeout for the active side whose clock has run out. Re-dispatches
+  // on a 3s cooldown until the server confirms the game is finished, so an
+  // occasional clock-skew rejection retries instead of leaving the game stuck.
+  const lastTimeoutClaimRef = useRef(0)
+  useEffect(() => {
+    if (mode !== 'online' || online?.phase !== 'active' || !online.timeControlId) return
+    const side = chess.turn()
+    const elapsed = Math.max(0, clockNow - online.clockStartedAtMs)
+    const remaining = side === 'w' ? online.whiteClockMs - elapsed : online.blackClockMs - elapsed
+    if (remaining > 0 || clockNow - lastTimeoutClaimRef.current < 3000) return
+    lastTimeoutClaimRef.current = clockNow
+    void roomClient.dispatch({ type: 'chess.timeout' })
+  }, [chess, clockNow, mode, online, roomClient])
 
   /** Commit a real move onto the local board, keeping an undo snapshot first. */
   const applyMove = useCallback((move: { from: Square; to: Square; promotion?: 'q' | 'r' | 'b' | 'n' }, painter = 'q') => {
@@ -355,6 +396,20 @@ export function ChessGame() {
               <div className="chess-online-tabs"><button className={onlineAction === 'create' ? 'active' : ''} onClick={() => setOnlineAction('create')}>Create room</button><button className={onlineAction === 'join' ? 'active' : ''} onClick={() => setOnlineAction('join')}>Join room</button></div>
               <div className="chess-field"><label htmlFor="chess-name">Display name</label><input id="chess-name" value={name} maxLength={40} onChange={(event) => setName(event.target.value)} placeholder="Your name" autoComplete="nickname" /></div>
               {onlineAction === 'join' && <div className="chess-field"><label htmlFor="chess-code">Room code</label><input id="chess-code" className="code-input" value={roomCode} maxLength={6} onChange={(event) => setRoomCode(event.target.value.toUpperCase().replace(/[^A-Z2-9]/g, ''))} placeholder="ABC234" autoComplete="off" /></div>}
+              {onlineAction === 'create' && (
+                <div className="chess-field">
+                  <span className="chess-control-label">Time control</span>
+                  <div className="chess-time-grid">
+                    {CHESS_TIME_CONTROLS.map((control) => (
+                      <button key={control.id} type="button" className={timeControlId === control.id ? 'selected' : ''} onClick={() => setTimeControlId(control.id)} title={control.incrementSeconds ? `Base ${control.baseSeconds}s + ${control.incrementSeconds}s per move` : `${control.baseSeconds}s total`}>
+                        <b>{control.category}</b>
+                        <span>{control.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <small>Clock starts when the match begins. If your time runs out before you move, you lose on time.</small>
+                </div>
+              )}
               <div className="chess-field"><label htmlFor="chess-password">Room password <span>optional</span></label><input id="chess-password" value={password} maxLength={100} onChange={(event) => setPassword(event.target.value)} type="password" placeholder={onlineAction === 'create' ? 'Protect this room' : 'Enter room password'} /></div>
               <button className="chess-primary" onClick={() => void (onlineAction === 'create' ? createOnline() : joinOnline())} disabled={roomClient.pending || !playerId}>{roomClient.pending ? 'Connecting…' : onlineAction === 'create' ? 'Create private room' : 'Join room'}</button>
             </>}
@@ -385,7 +440,14 @@ export function ChessGame() {
             <div className="chess-status"><span className={`turn-dot ${chess.turn() === 'w' ? 'white' : 'black'}`} /><div><small>{mode === 'bot' ? `You are ${humanColor === 'w' ? 'White' : 'Black'}` : mode === 'local' ? 'Pass and play' : onlineColor ? `You are ${onlineColor === 'w' ? 'White' : 'Black'}` : 'Online game'}</small><h2>{status}</h2></div></div>
             {mode === 'bot' && <div className="chess-opponent"><span>♞</span><div><b>{opponentName}</b><small>{modelRevision === 'builtin-stockfish-18' ? `${level.label} · Skill ${level.skill}/20` : 'Custom model'}</small></div></div>}
             {engineError && <p className="chess-notice" role="alert">{engineError}</p>}
-            {mode === 'online' && roomClient.room && <div className="chess-room-panel"><small>ROOM CODE</small><div><strong>{roomClient.room.code}</strong><button onClick={() => void navigator.clipboard.writeText(roomClient.room?.code ?? '')}>Copy</button></div><p>{roomClient.room.players.map((player) => player.name).join('  vs  ')}</p>{online?.phase === 'lobby' && roomClient.room.hostId === playerId && <button className="chess-primary" disabled={roomClient.room.players.length !== 2 || roomClient.pending} onClick={() => void roomClient.dispatch({ type: 'chess.start', hostColor: colorChoice })}>{roomClient.room.players.length === 2 ? 'Start match' : 'Waiting for opponent…'}</button>}</div>}
+            {mode === 'online' && roomClient.room && <div className="chess-room-panel"><small>ROOM CODE</small><div><strong>{roomClient.room.code}</strong><button onClick={() => void navigator.clipboard.writeText(roomClient.room?.code ?? '')}>Copy</button></div><p>{roomClient.room.players.map((player) => player.name).join('  vs  ')}</p>{online?.phase === 'lobby' && roomClient.room.hostId === playerId && <button className="chess-primary" disabled={roomClient.room.players.length !== 2 || roomClient.pending} onClick={() => void roomClient.dispatch({ type: 'chess.start', hostColor: colorChoice, timeControlId })}>{roomClient.room.players.length === 2 ? 'Start match' : 'Waiting for opponent…'}</button>}</div>}
+            {mode === 'online' && online?.timeControlId && (
+              <div className="chess-clocks" aria-label="Game clock">
+                <div className={`chess-clock ${chess.turn() === 'w' && online.phase === 'active' ? 'active' : ''}`}><span>White</span><b>{formatClock(remainingMs.w)}</b></div>
+                <div className={`chess-clock ${chess.turn() === 'b' && online.phase === 'active' ? 'active' : ''}`}><span>Black</span><b>{formatClock(remainingMs.b)}</b></div>
+                <small>{chessTimeLabel(online.timeControlId)}</small>
+              </div>
+            )}
             <div className="chess-moves"><h3>Move history</h3><div>{mode === 'online' ? online?.pgn || 'Moves will appear here.' : localPgn || 'Moves will appear here.'}</div></div>
             <div className="chess-actions">
               {canUndo && <button className="chess-undo" onClick={undoMove} title="Undo last move">↶ Undo</button>}

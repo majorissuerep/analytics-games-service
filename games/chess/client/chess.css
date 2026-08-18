@@ -15,3 +15,17 @@
 .chess-end-actions .chess-primary{margin:0}
 @keyframes chess-fade{from{opacity:0}to{opacity:1}}
 @keyframes chess-pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.chess-control-label{font-size:12px;font-weight:750;display:block;margin-bottom:6px}
+.chess-time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.chess-time-grid button{display:grid;gap:2px;place-items:center;border:1px solid #c8d2ca;border-radius:7px;background:#f6f8f5;padding:7px 4px;color:var(--ink);font-size:11px;cursor:pointer}
+.chess-time-grid button:hover{border-color:#9fb4a6}
+.chess-time-grid button.selected{border-color:var(--green);background:linear-gradient(#47755d,#315b46);color:#fff;box-shadow:0 2px 8px rgba(35,69,52,.18)}
+.chess-time-grid b{font-weight:800;letter-spacing:.3px}
+.chess-time-grid span{opacity:.9;font-variant-numeric:tabular-nums}
+.chess-clocks{display:grid;gap:6px;padding:10px;border:1px solid #d5ddd7;border-radius:8px;background:#f6f8f5}
+.chess-clock{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:6px;background:#e6ebe6;color:#2c3a30;transition:background .15s,box-shadow .15s}
+.chess-clock.active{background:linear-gradient(#47755d,#315b46);color:#fff;box-shadow:0 0 0 2px #d7a93d}
+.chess-clock span{font-size:11px;text-transform:uppercase;letter-spacing:.6px;opacity:.85}
+.chess-clock b{font-size:17px;font-variant-numeric:tabular-nums;font-family:Consolas,monospace}
+.chess-clocks>small{color:var(--muted);text-align:center;font-size:10px;letter-spacing:.5px;text-transform:uppercase}
+@media(max-width:560px){.chess-time-grid{grid-template-columns:repeat(2,1fr)}}
