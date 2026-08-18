@@ -13,6 +13,7 @@
 - SDK: `mixpanel-browser`.
 - Project token source: server-only environment lookup of `MIXPANEL_PROJECT_TOKEN` in `app/layout.tsx`; the public project token is passed to `AnalyticsProvider` at runtime. Never hard-code the token in source.
 - Initialization: `lib/analytics/client.ts`, mounted only in the top-level browsing context by `components/analytics/AnalyticsProvider.tsx`.
+- Data residency: the Mixpanel project is hosted in the EU; SDK requests must use `https://api-eu.mixpanel.com`.
 - Initialization settings: local-storage persistence, no automatic page-view tracking, no batching, and opt-out by default.
 - Consent: explicit opt-in. No custom events are sent before `granted` consent. The top-level app owns the consent UI; embedded game frames do not show duplicate prompts.
 - Identity: anonymous Mixpanel device identity only. This project has no authenticated user identity, so do not call `identify`, `alias`, or set People profiles unless authentication is introduced and the identity plan is reviewed.

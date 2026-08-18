@@ -13,6 +13,7 @@ export type AnalyticsEventName =
 
 export interface AnalyticsClient {
   init(token: string, options: {
+    api_host: 'https://api-eu.mixpanel.com'
     debug: boolean
     persistence: 'localStorage'
     opt_out_tracking_by_default: true
@@ -36,6 +37,7 @@ export function createAnalyticsController(client: AnalyticsClient, storage: Anal
     initialize(token: string, debug: boolean) {
       if (initialized || !token) return
       client.init(token, {
+        api_host: 'https://api-eu.mixpanel.com',
         debug,
         persistence: 'localStorage',
         opt_out_tracking_by_default: true,
