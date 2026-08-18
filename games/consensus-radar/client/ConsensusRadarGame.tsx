@@ -108,7 +108,7 @@ const T: Record<Lang, Record<string, string>> = {
     endGame:         'Завершити гру',
     finalTitle:      'Гру завершено',
     finalScores:     'Фінальний рахунок',
-    winnerPrefix:    'Перемогла команда',
+    winnerPrefix:    '«{name}» перемагає!',
     tie:             'Нічия!',
     playAgain:       'Зіграти ще',
     leaderboardBtn:  'Рекорди',
@@ -206,7 +206,7 @@ const T: Record<Lang, Record<string, string>> = {
     endGame:         'End the game',
     finalTitle:      'Game over',
     finalScores:     'Final scores',
-    winnerPrefix:    'Team',
+    winnerPrefix:    '«{name}» wins!',
     tie:             "It's a tie!",
     playAgain:       'Play again',
     leaderboardBtn:  'Leaderboard',
@@ -521,6 +521,9 @@ export function ConsensusRadarGame() {
         {Array.from({ length: 11 }, (_, i) => (
           <div key={i} className={`tick${i === 5 ? ' mid' : ''}`} style={{ left: `${i * 10}%` }} />
         ))}
+        <span className="tick-num" style={{ left: 0 }}>0</span>
+        <span className="tick-num" style={{ left: '50%', transform: 'translateX(-50%)' }}>50</span>
+        <span className="tick-num" style={{ right: 0 }}>100</span>
       </div>
     )
   }
@@ -566,7 +569,11 @@ export function ConsensusRadarGame() {
     return (
       <div className="scorebar">
         {roomState.teams.map((team, i) => (
-          <div key={i} className={`score-card${i === activeIdx ? ' active' : ''}`}>
+          <div
+            key={i}
+            className={`score-card${i === activeIdx ? ' active' : ''}`}
+            style={{ '--tc': TEAM_COLORS[i] } as React.CSSProperties}
+          >
             <div className="s-name">
               <span className="swatch" style={{ background: TEAM_COLORS[i] }} />
               {team.name}
@@ -580,10 +587,19 @@ export function ConsensusRadarGame() {
 
   function RoundMeta() {
     if (!roomState || roomState.phase === 'lobby') return null
+    const PHASES = ['clue', 'guess', 'reveal'] as const
+    const activeIdx = roomState.phase === 'finished'
+      ? PHASES.length
+      : PHASES.indexOf(roomState.phase as (typeof PHASES)[number])
     return (
       <div className="progress-wrap">
         <div className="progress-label">
           <span>{t('round')} {roomState.roundNo}</span>
+          <span className="phase-dots" aria-hidden>
+            {PHASES.map((phase, i) => (
+              <span key={phase} className={`phase-dot${i <= activeIdx ? ' on' : ''}`} />
+            ))}
+          </span>
           <span className="muted" style={{ fontSize: 12 }}>
             {roomState.goal > 0 ? fmt(t('firstTo'), { goal: roomState.goal }) : t('endlessMode')}
           </span>
@@ -1174,7 +1190,7 @@ export function ConsensusRadarGame() {
               ))}
             </div>
             <div className={`big winner score-bounce${winners.length === 1 ? ' winner-glow' : ''}`} style={{ margin: '16px 0 6px' }}>
-              {winners.length > 1 ? t('tie') : `${t('winnerPrefix')} «${winners[0].name}»!`}
+              {winners.length > 1 ? t('tie') : fmt(t('winnerPrefix'), { name: winners[0].name })}
             </div>
             <div style={{ fontSize: 13, color: 'var(--ink-dim)', marginBottom: 24 }}>
               {rs.roundNo} {t('rounds')} · {top} {t('points')}
@@ -1222,6 +1238,7 @@ function Topbar({ lang, toggleLang, t, onLeaderboard, playerName }: {
 }) {
   return (
     <header className="topbar">
+      <span className="cr-backdrop" aria-hidden />
       <Link className="brand" href="/" aria-label="Back to Analytics Games">
         <div className="logo" aria-hidden />
         <div>
