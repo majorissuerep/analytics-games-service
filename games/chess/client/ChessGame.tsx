@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { Chess, type Color, type Square } from 'chess.js'
-import { Chessboard, type PieceDropHandlerArgs, type SquareHandlerArgs } from 'react-chessboard'
+import { Chessboard, type PieceDropHandlerArgs, type PieceHandlerArgs, type SquareHandlerArgs } from 'react-chessboard'
 import { getOrCreatePlayerId, getPlayerName, setPlayerName } from '@/lib/cookies'
 import { useGameRoom } from '@/lib/engine/client/use-game-room'
 import { emitGameSessionCompleted } from '@/lib/analytics/game-events'
@@ -15,6 +15,8 @@ import {
 } from './stockfish'
 import { ModelSubmissionPanel } from './ModelSubmissionPanel'
 import { ModelArena } from './ModelArena'
+import { playMoveSound, playUndoSound, setSoundEnabled } from './sound'
+import { descriptorFromDiff, kingSquare, outcomeInfo, pinnedSquares, resultFor, type GameOverInfo } from './chess-logic'
 import './chess.css'
 
 type Mode = 'setup' | 'bot' | 'local' | 'online'
@@ -22,15 +24,6 @@ type SetupMode = 'bot' | 'online' | 'local' | 'arena'
 type OnlineAction = 'create' | 'join'
 type PendingPromotion = { from: Square; to: Square } | null
 type ModelOption = { revisionId: string; displayName: string; runtimeId: string }
-
-function resultFor(chess: Chess) {
-  if (chess.isCheckmate()) return chess.turn() === 'w' ? 'Black wins by checkmate' : 'White wins by checkmate'
-  if (chess.isStalemate()) return 'Draw by stalemate'
-  if (chess.isThreefoldRepetition()) return 'Draw by repetition'
-  if (chess.isInsufficientMaterial()) return 'Draw by insufficient material'
-  if (chess.isDraw()) return 'Draw'
-  return ''
-}
 
 function completionResult(result: string) {
   const normalized = result.toLowerCase()
@@ -47,6 +40,19 @@ function chosenColor(choice: ChessColorChoice): Color {
   return choice === 'white' ? 'w' : 'b'
 }
 
+const selectedStyle: CSSProperties = { boxShadow: 'inset 0 0 0 4px #f6c344' }
+const lastMoveStyle: CSSProperties = { background: 'rgba(246,195,68,.48)' }
+const checkStyle: CSSProperties = {
+  boxShadow: 'inset 0 0 0 4px rgba(197,47,47,.9)',
+  background: 'radial-gradient(circle, rgba(197,47,47,.28) 0 32%, transparent 42%)',
+}
+const pinStyle: CSSProperties = { boxShadow: 'inset 0 -7px 0 0 rgba(214,102,26,.9)' }
+const moveStyle: CSSProperties = { background: 'radial-gradient(circle, rgba(20,90,50,.52) 0 17%, transparent 19%)' }
+const captureStyle: CSSProperties = {
+  boxShadow: 'inset 0 0 0 4px rgba(197,47,47,.95)',
+  background: 'radial-gradient(circle, rgba(20,90,50,.4) 0 11%, transparent 14%)',
+}
+
 export function ChessGame() {
   const [mode, setMode] = useState<Mode>('setup')
   const [setupMode, setSetupMode] = useState<SetupMode>('bot')
@@ -60,9 +66,11 @@ export function ChessGame() {
   const [localPgn, setLocalPgn] = useState('')
   const [localResult, setLocalResult] = useState('')
   const [selected, setSelected] = useState<Square | null>(null)
+  const [lastMove, setLastMove] = useState<{ from: Square; to: Square } | null>(null)
   const [promotion, setPromotion] = useState<PendingPromotion>(null)
   const [engineThinking, setEngineThinking] = useState(false)
   const [engineError, setEngineError] = useState('')
+  const [soundOn, setSoundOn] = useState(true)
   const engineRef = useRef<StockfishBrowserEngine | null>(null)
   const [playerId, setPlayerId] = useState('')
   const [name, setName] = useState('')
@@ -70,6 +78,7 @@ export function ChessGame() {
   const [password, setPassword] = useState('')
   const [notice, setNotice] = useState('')
   const roomClient = useGameRoom<ChessGameView>({ gameId: 'chess', playerId, pollMs: 1000 })
+  const [undoStack, setUndoStack] = useState<Array<{ fen: string; pgn: string }>>([])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -92,10 +101,42 @@ export function ChessGame() {
   const orientation: Color = mode === 'online'
     ? onlineColor ?? (colorChoice === 'black' ? 'b' : 'w')
     : mode === 'bot' ? humanColor : colorChoice === 'black' ? 'b' : 'w'
-  const legalTargets = useMemo(
-    () => selected ? chess.moves({ square: selected, verbose: true }).map((move) => move.to) : [],
+  const legalMoves = useMemo(
+    () => selected ? chess.moves({ square: selected, verbose: true }) : [],
     [chess, selected],
   )
+  const legalTargets = useMemo(() => legalMoves.map((move) => move.to), [legalMoves])
+  const captureTargets = useMemo(() => new Set(legalMoves.filter((move) => move.captured).map((move) => move.to)), [legalMoves])
+  const pinned = useMemo(() => pinnedSquares(chess), [chess])
+  const inCheck = chess.inCheck()
+  const checkSquare = inCheck ? kingSquare(chess, chess.turn()) : null
+  const displayLastMove = mode === 'online' ? online?.lastMove ?? null : lastMove
+
+  /** Commit a real move onto the local board, keeping an undo snapshot first. */
+  const applyMove = useCallback((move: { from: Square; to: Square; promotion?: 'q' | 'r' | 'b' | 'n' }, painter = 'q') => {
+    const next = new Chess(localFen)
+    try { next.move({ from: move.from, to: move.to, promotion: move.promotion ?? painter }) } catch { return false }
+    setUndoStack((stack) => [...stack, { fen: localFen, pgn: localPgn }])
+    setLocalFen(next.fen())
+    setLocalPgn(next.pgn())
+    setLocalResult(resultFor(next))
+    setLastMove({ from: move.from, to: move.to })
+    setSelected(null)
+    setPromotion(null)
+    return true
+  }, [localFen, localPgn])
+
+  // Fire the correct sound whenever the effective board position advances by
+  // exactly one move. The display last-move is null after a reset/undo, which
+  // naturally suppresses the sound on those paths.
+  const prevFenRef = useRef(fen)
+  useEffect(() => {
+    const prev = prevFenRef.current
+    prevFenRef.current = fen
+    if (prev === fen || !displayLastMove) return
+    playMoveSound(descriptorFromDiff(prev, fen))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fen])
 
   useEffect(() => {
     const result = mode === 'online' && online?.phase === 'finished'
@@ -126,11 +167,7 @@ export function ChessGame() {
           move = { from: result.move.slice(0, 2) as Square, to: result.move.slice(2, 4) as Square, promotion: result.move[4] as 'q' | 'r' | 'b' | 'n' | undefined }
         }
         if (cancelled) return
-        const next = new Chess(localFen)
-        next.move(move)
-        setLocalFen(next.fen())
-        setLocalPgn(next.pgn())
-        setLocalResult(resultFor(next))
+        applyMove({ from: move.from, to: move.to, promotion: move.promotion })
       } catch (error) {
         if (!cancelled) setEngineError(error instanceof Error ? error.message : 'Chess model failed to move.')
       } finally {
@@ -139,14 +176,16 @@ export function ChessGame() {
     }
     void run()
     return () => { cancelled = true }
-  }, [chess, humanColor, levelId, localFen, localResult, mode, modelRevision])
+  }, [applyMove, chess, humanColor, levelId, localFen, localResult, mode, modelRevision])
 
   function resetToSetup() {
     engineRef.current?.destroy()
     engineRef.current = null
     roomClient.clear()
+    setUndoStack([])
     setMode('setup')
     setSelected(null)
+    setLastMove(null)
     setPromotion(null)
     setNotice('')
     setEngineError('')
@@ -155,12 +194,15 @@ export function ChessGame() {
 
   function startLocal(nextMode: 'bot' | 'local') {
     setHumanColor(nextMode === 'bot' ? chosenColor(colorChoice) : colorChoice === 'black' ? 'b' : 'w')
+    setUndoStack([])
     setLocalFen(new Chess().fen())
     setLocalPgn('')
     setLocalResult('')
     setSelected(null)
+    setLastMove(null)
     setPromotion(null)
     setEngineError('')
+    setEngineThinking(false)
     setMode(nextMode)
   }
 
@@ -172,13 +214,7 @@ export function ChessGame() {
       return true
     }
     if (localResult || engineThinking || (mode === 'bot' && chess.turn() !== humanColor)) return false
-    const next = new Chess(localFen)
-    try { next.move({ from, to, promotion: piece }) } catch { return false }
-    setLocalFen(next.fen())
-    setLocalPgn(next.pgn())
-    setLocalResult(resultFor(next))
-    setSelected(null)
-    return true
+    return applyMove({ from, to }, piece)
   }
 
   function requestMove(from: Square, to: Square) {
@@ -205,6 +241,10 @@ export function ChessGame() {
     setSelected(canControl(target) ? target : null)
   }
 
+  function onDragStart({ square }: PieceHandlerArgs) {
+    if (square && canControl(square as Square)) setSelected(square as Square)
+  }
+
   function onPieceDrop({ sourceSquare, targetSquare }: PieceDropHandlerArgs) {
     if (!targetSquare || !canControl(sourceSquare as Square)) return false
     const legal = chess.moves({ square: sourceSquare as Square, verbose: true })
@@ -212,6 +252,25 @@ export function ChessGame() {
     if (!legal) return false
     return requestMove(sourceSquare as Square, targetSquare as Square)
   }
+
+  function undoMove() {
+    const stack = undoStack
+    const required = mode === 'bot' ? 2 : 1
+    if (mode === 'online' || engineThinking || stack.length < required) return
+    const rest = stack.slice(0, stack.length - required)
+    const restore = rest.length ? rest[rest.length - 1] : { fen: new Chess().fen(), pgn: '' }
+    setUndoStack(rest)
+    setLocalFen(restore.fen)
+    setLocalPgn(restore.pgn)
+    setLocalResult('')
+    setSelected(null)
+    setLastMove(null)
+    setPromotion(null)
+    setEngineError('')
+    playUndoSound()
+  }
+
+  const canUndo = mode !== 'online' && !engineThinking && undoStack.length >= (mode === 'bot' ? 2 : 1)
 
   async function createOnline() {
     setNotice('')
@@ -235,28 +294,47 @@ export function ChessGame() {
     } catch (error) { setNotice(error instanceof Error ? error.message : 'Could not join the room.') }
   }
 
-  const status = mode === 'online' && online
+  const isMultiplayer = mode === 'online'
+  const finishedResult = isMultiplayer && online?.phase === 'finished' ? online.result : localResult
+  const perspective: Color | null = isMultiplayer ? onlineColor : mode === 'bot' ? humanColor : null
+  const outcome: GameOverInfo | null = finishedResult ? outcomeInfo(finishedResult, perspective) : null
+  const opponentName = modelOptions.find((model) => model.revisionId === modelRevision)?.displayName ?? 'Stockfish 18'
+
+  const status = isMultiplayer && online
     ? online.phase === 'lobby' ? `Waiting for opponent · ${roomClient.room?.players.length ?? 0}/2` : online.result || `${chess.turn() === 'w' ? 'White' : 'Black'} to move`
-    : localResult || (engineThinking ? 'Stockfish is thinking…' : `${chess.turn() === 'w' ? 'White' : 'Black'} to move${chess.inCheck() ? ' · Check' : ''}`)
+    : localResult || (engineThinking ? `${opponentName} is thinking…` : `${chess.turn() === 'w' ? 'White' : 'Black'} to move${chess.inCheck() ? ' · Check' : ''}`)
   const level = stockfishLevel(levelId)
-  const squareStyles = Object.fromEntries([
-    ...(selected ? [[selected, { boxShadow: 'inset 0 0 0 4px #f6c344' }]] : []),
-    ...legalTargets.map((square) => [square, { background: 'radial-gradient(circle, rgba(20,90,50,.52) 0 17%, transparent 19%)' }]),
-    ...(online?.lastMove ? [online.lastMove.from, online.lastMove.to].map((square) => [square, { background: 'rgba(246,195,68,.48)' }]) : []),
-  ])
+
+  const squareStyles: Record<string, CSSProperties> = Object.fromEntries([
+    ...(displayLastMove ? [[displayLastMove.from, lastMoveStyle], [displayLastMove.to, lastMoveStyle]] : []),
+    ...(checkSquare ? [[checkSquare, checkStyle]] : []),
+    ...[...pinned].map((square) => [square, pinStyle] as const),
+    ...legalTargets.map((square) => [square, captureTargets.has(square) ? captureStyle : moveStyle] as const),
+    ...(selected ? [[selected, selectedStyle]] : []),
+  ]) as Record<string, CSSProperties>
 
   return (
     <main className="chess-app">
       <header className="chess-toolbar">
-        <div><span className="chess-mark">♞</span><strong>Chess</strong><span className="chess-engine-name">Stockfish 18</span></div>
-        {mode !== 'setup' && <button onClick={resetToSetup}>New game</button>}
+        <div><span className="chess-mark">♞</span><strong>Chess</strong><span className="chess-engine-name">{mode === 'bot' ? opponentName : 'Stockfish 18'}</span></div>
+        <div>
+          <button
+            type="button"
+            className="chess-sound-toggle"
+            aria-pressed={soundOn}
+            aria-label={soundOn ? 'Mute sounds' : 'Unmute sounds'}
+            title={soundOn ? 'Mute sounds' : 'Unmute sounds'}
+            onClick={() => { const next = !soundOn; setSoundOn(next); setSoundEnabled(next) }}
+          >{soundOn ? '🔊' : '🔇'}</button>
+          {mode !== 'setup' && <button onClick={resetToSetup}>New game</button>}
+        </div>
       </header>
 
       {mode === 'setup' ? (
         <section className="chess-setup" aria-label="Chess setup">
           <div className="chess-intro"><span>♞</span><div><p className="chess-kicker">CLASSIC BOARD GAME</p><h1>Play chess your way</h1><p>Stockfish 18 opponents, local pass-and-play, or a protected online room.</p></div></div>
           <nav className="chess-mode-tabs" aria-label="Game mode">
-            <button className={setupMode === 'bot' ? 'active' : ''} onClick={() => setSetupMode('bot')}><b>♟</b><span>Computer<small>Stockfish 18</small></span></button>
+            <button className={setupMode === 'bot' ? 'active' : ''} onClick={() => setSetupMode('bot')}><b>♟</b><span>Computer<small>Bot modes support undo</small></span></button>
             <button className={setupMode === 'online' ? 'active' : ''} onClick={() => setSetupMode('online')}><b>♜</b><span>Online<small>Private room</small></span></button>
             <button className={setupMode === 'local' ? 'active' : ''} onClick={() => setSetupMode('local')}><b>♚</b><span>Local<small>Same device</small></span></button>
             <button className={setupMode === 'arena' ? 'active' : ''} onClick={() => setSetupMode('arena')}><b>⚔</b><span>Model arena<small>3s turns + replay</small></span></button>
@@ -268,10 +346,10 @@ export function ChessGame() {
             {setupMode === 'bot' && <>
               <div className="chess-field"><label htmlFor="opponent-model">Opponent model</label><select id="opponent-model" value={modelRevision} onChange={(event) => setModelRevision(event.target.value)}>{modelOptions.map((model) => <option key={model.revisionId} value={model.revisionId}>{model.displayName}</option>)}</select><small>Only scanned, approved, deployed, and healthy models appear here.</small></div>
               <div className="chess-field"><label htmlFor="stockfish-level">Stockfish difficulty</label><select id="stockfish-level" disabled={modelRevision !== 'builtin-stockfish-18'} value={levelId} onChange={(event) => setLevelId(event.target.value as StockfishLevelId)}>{STOCKFISH_LEVELS.map((item) => <option key={item.id} value={item.id}>{item.label} · Skill {item.skill}/20</option>)}</select><small>{modelRevision === 'builtin-stockfish-18' ? `${level.description}. Stockfish 18 WASM, ${level.moveTimeMs} ms search per move.` : 'Custom model strength and move budget are controlled by its approved runtime profile.'}</small></div>
-              <button className="chess-primary" onClick={() => startLocal('bot')}>Play {modelOptions.find((model) => model.revisionId === modelRevision)?.displayName ?? 'Chess model'}</button>
+              <button className="chess-primary" onClick={() => startLocal('bot')}>Play {opponentName}</button>
             </>}
 
-            {setupMode === 'local' && <><p className="chess-explainer">Take turns on this device. The board stays oriented to your selected side and all legal chess rules apply.</p><button className="chess-primary" onClick={() => startLocal('local')}>Start pass-and-play</button></>}
+            {setupMode === 'local' && <><p className="chess-explainer">Take turns on this device. The board stays oriented to your selected side and all legal chess rules apply. You can undo any number of moves.</p><button className="chess-primary" onClick={() => startLocal('local')}>Start pass-and-play</button></>}
 
             {setupMode === 'online' && <>
               <div className="chess-online-tabs"><button className={onlineAction === 'create' ? 'active' : ''} onClick={() => setOnlineAction('create')}>Create room</button><button className={onlineAction === 'join' ? 'active' : ''} onClick={() => setOnlineAction('join')}>Join room</button></div>
@@ -294,6 +372,7 @@ export function ChessGame() {
               boardOrientation: orientation === 'w' ? 'white' : 'black',
               onSquareClick,
               onPieceDrop,
+              onPieceDrag: onDragStart,
               canDragPiece: ({ square }) => Boolean(square && canControl(square as Square)),
               squareStyles,
               lightSquareStyle: { backgroundColor: '#e8d7b7' },
@@ -304,16 +383,37 @@ export function ChessGame() {
           </div>
           <aside className="chess-sidebar">
             <div className="chess-status"><span className={`turn-dot ${chess.turn() === 'w' ? 'white' : 'black'}`} /><div><small>{mode === 'bot' ? `You are ${humanColor === 'w' ? 'White' : 'Black'}` : mode === 'local' ? 'Pass and play' : onlineColor ? `You are ${onlineColor === 'w' ? 'White' : 'Black'}` : 'Online game'}</small><h2>{status}</h2></div></div>
-            {mode === 'bot' && <div className="chess-opponent"><span>♞</span><div><b>Stockfish 18</b><small>{level.label} · Skill {level.skill}/20</small></div></div>}
+            {mode === 'bot' && <div className="chess-opponent"><span>♞</span><div><b>{opponentName}</b><small>{modelRevision === 'builtin-stockfish-18' ? `${level.label} · Skill ${level.skill}/20` : 'Custom model'}</small></div></div>}
             {engineError && <p className="chess-notice" role="alert">{engineError}</p>}
             {mode === 'online' && roomClient.room && <div className="chess-room-panel"><small>ROOM CODE</small><div><strong>{roomClient.room.code}</strong><button onClick={() => void navigator.clipboard.writeText(roomClient.room?.code ?? '')}>Copy</button></div><p>{roomClient.room.players.map((player) => player.name).join('  vs  ')}</p>{online?.phase === 'lobby' && roomClient.room.hostId === playerId && <button className="chess-primary" disabled={roomClient.room.players.length !== 2 || roomClient.pending} onClick={() => void roomClient.dispatch({ type: 'chess.start', hostColor: colorChoice })}>{roomClient.room.players.length === 2 ? 'Start match' : 'Waiting for opponent…'}</button>}</div>}
             <div className="chess-moves"><h3>Move history</h3><div>{mode === 'online' ? online?.pgn || 'Moves will appear here.' : localPgn || 'Moves will appear here.'}</div></div>
-            <div className="chess-actions"><button onClick={resetToSetup}>Leave game</button>{mode === 'online' && online?.phase === 'active' && <button className="danger" onClick={() => void roomClient.dispatch({ type: 'chess.resign' })}>Resign</button>}</div>
+            <div className="chess-actions">
+              {canUndo && <button className="chess-undo" onClick={undoMove} title="Undo last move">↶ Undo</button>}
+              <button onClick={resetToSetup}>Leave game</button>
+              {mode === 'online' && online?.phase === 'active' && <button className="danger" onClick={() => void roomClient.dispatch({ type: 'chess.resign' })}>Resign</button>}
+            </div>
           </aside>
         </section>
       )}
 
       {promotion && <div className="promotion-backdrop" role="dialog" aria-modal="true" aria-label="Choose promotion piece"><div className="promotion-card"><h2>Promote pawn</h2><p>Choose a piece.</p><div>{(['q', 'r', 'b', 'n'] as const).map((piece) => <button key={piece} onClick={() => { void commitMove(promotion.from, promotion.to, piece); setPromotion(null) }}>{piece === 'q' ? '♛ Queen' : piece === 'r' ? '♜ Rook' : piece === 'b' ? '♝ Bishop' : '♞ Knight'}</button>)}</div><button onClick={() => setPromotion(null)}>Cancel</button></div></div>}
+
+      {outcome && (
+        <div className="chess-end-backdrop" role="dialog" aria-modal="true" aria-label="Game over">
+          <div className={`chess-end-card ${outcome.kind}`}>
+            <p className="chess-end-kicker">GAME OVER</p>
+            <h2>{outcome.headline}</h2>
+            <p className="chess-end-reason">{outcome.reason}</p>
+            <div className="chess-end-actions">
+              {!isMultiplayer && <button className="chess-primary" onClick={() => startLocal(mode as 'bot' | 'local')}>{mode === 'local' ? 'Rematch' : 'Play again'}</button>}
+              {isMultiplayer && online?.phase === 'finished' && roomClient.room?.hostId === playerId && (
+                <button className="chess-primary" onClick={() => void roomClient.dispatch({ type: 'chess.rematch' })}>Rematch</button>
+              )}
+              <button onClick={resetToSetup}>New game</button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
