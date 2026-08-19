@@ -245,7 +245,7 @@ export function handleDrain(current: PinballState, now: number, ballsStillInPlay
     }
   }
 
-  const bonusPoints = current.bonus * current.multiplier
+  const bonusPoints = current.tilted ? 0 : current.bonus * current.multiplier
   const ballsRemaining = current.ballsRemaining - 1
   if (ballsRemaining <= 0) {
     return {
@@ -275,7 +275,7 @@ export function handleDrain(current: PinballState, now: number, ballsStillInPlay
       nudgeTimes: [],
       combo: 0,
       ballSaveUntil: 0,
-    }, `BONUS ${bonusPoints.toLocaleString()}`, now, 2_000),
+    }, current.tilted ? 'TILT · BONUS FORFEIT' : `BONUS ${bonusPoints.toLocaleString()}`, now, 2_000),
     effects: [],
     points: bonusPoints,
   }

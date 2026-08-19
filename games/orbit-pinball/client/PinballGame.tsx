@@ -22,6 +22,7 @@ import { TABLE_HEIGHT, TABLE_WIDTH } from '../lib/table'
 import './pinball.css'
 
 const HIGH_SCORE_KEY = 'neon-forge-pinball.high-score.v1'
+const INTERACTIVE_SELECTOR = 'button, a, input, select, textarea, [role="button"], [contenteditable="true"]'
 
 function loadHighScore(): number {
   if (typeof window === 'undefined') return 0
@@ -138,6 +139,7 @@ export function PinballGame() {
 
   useEffect(() => {
     const keyDown = (event: KeyboardEvent) => {
+      if (event.target instanceof HTMLElement && event.target.closest(INTERACTIVE_SELECTOR)) return
       if (event.code === 'ArrowLeft' || event.code === 'KeyZ') keysRef.current.left = true
       if (event.code === 'ArrowRight' || event.code === 'Slash') keysRef.current.right = true
       if (event.code === 'Space') {
@@ -150,6 +152,7 @@ export function PinballGame() {
       }
     }
     const keyUp = (event: KeyboardEvent) => {
+      if (event.target instanceof HTMLElement && event.target.closest(INTERACTIVE_SELECTOR)) return
       if (event.code === 'ArrowLeft' || event.code === 'KeyZ') keysRef.current.left = false
       if (event.code === 'ArrowRight' || event.code === 'Slash') keysRef.current.right = false
       if (event.code === 'Space') releasePlunger()
@@ -352,6 +355,18 @@ export function PinballGame() {
             onPointerDown={(event) => { event.currentTarget.setPointerCapture(event.pointerId); beginPlungerCharge() }}
             onPointerUp={releasePlunger}
             onPointerCancel={releasePlunger}
+            onKeyDown={(event) => {
+              if ((event.code === 'Space' || event.code === 'Enter') && !event.repeat) {
+                event.preventDefault()
+                beginPlungerCharge()
+              }
+            }}
+            onKeyUp={(event) => {
+              if (event.code === 'Space' || event.code === 'Enter') {
+                event.preventDefault()
+                releasePlunger()
+              }
+            }}
           ><span>HOLD</span><b>LAUNCH</b></button>
           <button
             type="button"

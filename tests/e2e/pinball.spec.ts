@@ -47,3 +47,24 @@ test('Neon Forge remains playable when browser storage is unavailable', async ({
   await page.getByRole('button', { name: 'START GAME' }).click()
   await expect(page.getByRole('button', { name: 'HOLD LAUNCH' })).toBeEnabled()
 })
+
+test('focused controls retain native Space-key activation', async ({ page }) => {
+  await page.goto('/games/orbit-pinball')
+
+  const start = page.getByRole('button', { name: 'START GAME' })
+  await start.focus()
+  await page.keyboard.press('Space')
+  await expect(page.getByRole('button', { name: 'HOLD LAUNCH' })).toBeEnabled()
+
+  const sound = page.getByRole('button', { name: 'Enable pinball sounds' })
+  await sound.focus()
+  await page.keyboard.press('Space')
+  await expect(page.getByRole('button', { name: 'Mute pinball sounds' })).toBeVisible()
+
+  const launch = page.getByRole('button', { name: 'HOLD LAUNCH' })
+  await launch.focus()
+  await page.keyboard.down('Space')
+  await page.waitForTimeout(200)
+  await page.keyboard.up('Space')
+  await expect(launch).toBeDisabled()
+})

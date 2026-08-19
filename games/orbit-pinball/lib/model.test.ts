@@ -168,6 +168,13 @@ describe('Neon Forge rules', () => {
     expect(handlePhysicsEvent(state, event('bumper', 'bumper-a'), 3_600).points).toBe(0)
   })
 
+  it('forfeits the end-of-ball bonus after a tilt', () => {
+    const state = { ...playing(), score: 500, bonus: 2_000, multiplier: 3, tilted: true, ballSaveUntil: 0 }
+    const update = handleDrain(state, 5_000, 0)
+    expect(update.points).toBe(0)
+    expect(update.state.score).toBe(500)
+  })
+
   it('expires combos and timed modes deterministically', () => {
     const state = { ...playing(), combo: 4, comboExpiresAt: 2_000, mode: 'reactor-rush' as const, modeEndsAt: 2_500 }
     const next = tickState(state, 3_000)
