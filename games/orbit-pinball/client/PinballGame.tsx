@@ -1,454 +1,368 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { emitGameSessionCompleted } from '@/lib/analytics/game-events'
+import { PinballAudio } from './audio'
+import { renderTable, type TrailPoint, type VisualEffect } from './renderer'
+import { PinballPhysics, type PhysicsEvent } from '../lib/physics'
 import {
-  type Ball,
-  type Collider,
-  type PhysicsWorld,
-  vec,
-  stepWorld,
-  createWorld,
-} from '../lib/physics'
-import {
-  buildTableColliders,
-  getFlippers,
-  isBallDrained,
-  TABLE_WIDTH,
-  TABLE_HEIGHT,
-} from '../lib/table'
-import {
-  type PinballState,
   createInitialState,
-  createBall,
-  launchBall,
-  handleCollision,
-  checkDropTargets,
-  checkRolloverLanes,
-  checkScoreZones,
-  updateSpinner,
-  handleBallDrain,
+  handleDrain,
+  handlePhysicsEvent,
+  launchBall as markBallLaunched,
+  registerNudge,
+  serveNextBall,
   startGame,
-  getDynamicColliders,
-  maybeResetDropTargets,
+  tickState,
+  type PinballState,
+  type RuleEffect,
 } from '../lib/model'
-import {
-  drawBackground,
-  drawCollider,
-  drawDropTarget,
-  drawRolloverLane,
-  drawSpinner,
-  drawScoreZone,
-  drawBall,
-  drawPlunger,
-  drawMessage,
-} from './renderer'
+import { TABLE_HEIGHT, TABLE_WIDTH } from '../lib/table'
 import './pinball.css'
 
-const HS_KEY = 'pinball-highscore-v3'
-const GRAVITY = 1100 // px/s²
+const HIGH_SCORE_KEY = 'neon-forge-pinball.high-score.v1'
+
+function loadHighScore(): number {
+  if (typeof window === 'undefined') return 0
+  try {
+    const value = Number(window.localStorage.getItem(HIGH_SCORE_KEY))
+    return Number.isFinite(value) ? Math.max(0, value) : 0
+  } catch {
+    return 0
+  }
+}
+
+function effectColor(event: PhysicsEvent): string {
+  if (event.kind === 'bumper') return '#ffc857'
+  if (event.kind === 'target' || event.kind === 'lock') return '#52f29b'
+  if (event.kind === 'jackpot' || event.kind === 'scoop') return '#ff4fa3'
+  if (event.kind === 'ramp' || event.kind === 'spinner') return '#a65cff'
+  return '#24e7ff'
+}
 
 export function PinballGame() {
+  const [physics] = useState(() => new PinballPhysics())
+  const [audio] = useState(() => new PinballAudio())
+  const [state, setState] = useState<PinballState>(() => createInitialState())
+  const [highScore, setHighScore] = useState(loadHighScore)
+  const [audioEnabled, setAudioEnabled] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const rafRef = useRef<number>(0)
-  const lastTimeRef = useRef<number>(0)
-
-  // Physics world (mutable, in refs — not React state)
-  const worldRef = useRef<PhysicsWorld>(createWorld(vec(0, GRAVITY), 0.15))
-  const staticCollidersRef = useRef<Collider[]>(buildTableColliders())
-
-  // Game state — React state for HUD rendering
-  const [hudState, setHudState] = useState<PinballState>(() => {
-    let hs = 0
-    try { hs = parseInt(localStorage.getItem(HS_KEY) ?? '0', 10) || 0 } catch { /* ignore */ }
-    return createInitialState(hs)
-  })
-
-  // Plunger power (0..1)
-  const [plungerPower, setPlungerPower] = useState(0)
-
-  // Refs for game loop access — updated in effects, never during render
-  const stateRef = useRef<PinballState>(hudState)
+  const stateRef = useRef(state)
+  const animationRef = useRef<number | null>(null)
+  const previousFrameRef = useRef(0)
+  const ballSequenceRef = useRef(0)
+  const shooterBallRef = useRef<string | null>(null)
+  const chargeStartedRef = useRef<number | null>(null)
   const plungerPowerRef = useRef(0)
-  const plungerChargingRef = useRef(false)
-  const keysRef = useRef<Set<string>>(new Set())
+  const keysRef = useRef({ left: false, right: false })
+  const effectsRef = useRef<VisualEffect[]>([])
+  const effectSequenceRef = useRef(0)
+  const trailsRef = useRef<Record<string, TrailPoint[]>>({})
+  const completedRef = useRef(false)
 
-  // Sync refs in effects (not during render)
-  useEffect(() => { stateRef.current = hudState }, [hudState])
-  useEffect(() => { plungerPowerRef.current = plungerPower }, [plungerPower])
-
-  // ---------------------------------------------------------------------------
-  // Initialize / reset game
-  // ---------------------------------------------------------------------------
-
-  const beginNewGame = useCallback(() => {
-    const fresh = startGame(stateRef.current)
-    const world = worldRef.current
-    world.balls = []
-    world.colliders = [...staticCollidersRef.current]
-
-    const ball = createBall()
-    world.balls = [ball]
-
-    setHudState(fresh)
-    setPlungerPower(0)
-    plungerChargingRef.current = false
+  const commitState = useCallback((next: PinballState) => {
+    stateRef.current = next
+    setState(next)
   }, [])
 
-  // ---------------------------------------------------------------------------
-  // Launch ball from plunger
-  // ---------------------------------------------------------------------------
+  const spawnShooterBall = useCallback(() => {
+    const id = `ball-${++ballSequenceRef.current}`
+    physics.spawnBall(id)
+    shooterBallRef.current = id
+    return id
+  }, [physics])
 
-  const launchBallFromPlunger = useCallback(() => {
-    const power = plungerPowerRef.current
-    if (power < 0.05) return
-    const world = worldRef.current
-    const ball = world.balls[0]
-    if (!ball || !ball.alive) return
-    const launchVel = launchBall(power)
-    ball.vel = launchVel
-    const state = stateRef.current
-    if (state.phase === 'plunger') {
-      setHudState({ ...state, phase: 'playing' })
+  const applyEffects = useCallback((effects: RuleEffect[]) => {
+    for (const effect of effects) {
+      if (effect.type === 'target-down') physics.setTargetDown(effect.id, true)
+      if (effect.type === 'reset-targets') physics.resetTargets()
+      if (effect.type === 'capture-ball') physics.removeBall(effect.ballId)
+      if (effect.type === 'serve-ball') spawnShooterBall()
+      if (effect.type === 'spawn-multiball') {
+        shooterBallRef.current = null
+        const launches = [
+          { at: { x: 88, y: 176 }, velocity: { x: 360, y: -260 } },
+          { at: { x: 94, y: 158 }, velocity: { x: 520, y: 10 } },
+          { at: { x: 81, y: 193 }, velocity: { x: 290, y: 300 } },
+        ]
+        launches.slice(0, effect.count).forEach(({ at, velocity }) => {
+          physics.spawnBall(`ball-${++ballSequenceRef.current}`, at, velocity)
+        })
+        audio.play('multiball')
+      }
     }
-    setPlungerPower(0)
-    plungerChargingRef.current = false
+  }, [audio, physics, spawnShooterBall])
+
+  const beginGame = useCallback(() => {
+    const now = performance.now()
+    physics.clearBalls()
+    physics.resetTargets()
+    keysRef.current = { left: false, right: false }
+    effectsRef.current = []
+    trailsRef.current = {}
+    completedRef.current = false
+    const next = startGame(now)
+    commitState(next)
+    spawnShooterBall()
+  }, [commitState, physics, spawnShooterBall])
+
+  const releasePlunger = useCallback(() => {
+    const started = chargeStartedRef.current
+    if (started === null || stateRef.current.phase !== 'plunger') return
+    const power = Math.max(0.18, Math.min(1, (performance.now() - started) / 1_150))
+    chargeStartedRef.current = null
+    plungerPowerRef.current = 0
+    const ballId = shooterBallRef.current
+    if (ballId && physics.launchBall(ballId, power)) {
+      commitState(markBallLaunched(stateRef.current, performance.now()))
+      shooterBallRef.current = null
+      audio.play('launch')
+    }
+  }, [audio, commitState, physics])
+
+  const beginPlungerCharge = useCallback(() => {
+    if (stateRef.current.phase === 'plunger' && chargeStartedRef.current === null) {
+      chargeStartedRef.current = performance.now()
+    }
   }, [])
 
-  // ---------------------------------------------------------------------------
-  // Keyboard input
-  // ---------------------------------------------------------------------------
+  const nudge = useCallback((direction: -1 | 1) => {
+    const before = stateRef.current
+    const next = registerNudge(before, performance.now())
+    if (next === before) return
+    physics.nudge(direction)
+    commitState(next)
+    if (next.tilted && !before.tilted) audio.play('tilt')
+  }, [audio, commitState, physics])
 
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      const key = e.key.toLowerCase()
-      keysRef.current.add(key)
-
-      if (key === ' ' || key === 'spacebar') {
-        e.preventDefault()
-        const state = stateRef.current
-        if (state.phase === 'ready') {
-          beginNewGame()
-        } else if (state.phase === 'plunger') {
-          if (!plungerChargingRef.current) {
-            plungerChargingRef.current = true
-            setPlungerPower(0)
-          }
-        } else if (state.phase === 'game_over') {
-          beginNewGame()
-        }
+    const keyDown = (event: KeyboardEvent) => {
+      if (event.code === 'ArrowLeft' || event.code === 'KeyZ') keysRef.current.left = true
+      if (event.code === 'ArrowRight' || event.code === 'Slash') keysRef.current.right = true
+      if (event.code === 'Space') {
+        event.preventDefault()
+        if (!event.repeat) beginPlungerCharge()
       }
-
-      if (key === 'r' && stateRef.current.phase === 'game_over') {
-        beginNewGame()
+      if ((event.code === 'ArrowUp' || event.code === 'KeyN') && !event.repeat) {
+        event.preventDefault()
+        nudge(event.code === 'KeyN' ? -1 : 1)
       }
     }
-
-    const onKeyUp = (e: KeyboardEvent) => {
-      const key = e.key.toLowerCase()
-      keysRef.current.delete(key)
-
-      if (key === ' ' || key === 'spacebar') {
-        if (plungerChargingRef.current) {
-          launchBallFromPlunger()
-        }
-      }
+    const keyUp = (event: KeyboardEvent) => {
+      if (event.code === 'ArrowLeft' || event.code === 'KeyZ') keysRef.current.left = false
+      if (event.code === 'ArrowRight' || event.code === 'Slash') keysRef.current.right = false
+      if (event.code === 'Space') releasePlunger()
     }
-
-    window.addEventListener('keydown', onKeyDown)
-    window.addEventListener('keyup', onKeyUp)
+    const clearKeys = () => {
+      keysRef.current = { left: false, right: false }
+      chargeStartedRef.current = null
+    }
+    window.addEventListener('keydown', keyDown)
+    window.addEventListener('keyup', keyUp)
+    window.addEventListener('blur', clearKeys)
     return () => {
-      window.removeEventListener('keydown', onKeyDown)
-      window.removeEventListener('keyup', onKeyUp)
+      window.removeEventListener('keydown', keyDown)
+      window.removeEventListener('keyup', keyUp)
+      window.removeEventListener('blur', clearKeys)
     }
-  }, [beginNewGame, launchBallFromPlunger])
-
-  // ---------------------------------------------------------------------------
-  // Mouse / touch input for flippers
-  // ---------------------------------------------------------------------------
+  }, [beginPlungerCharge, nudge, releasePlunger])
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
+    const ratio = Math.min(2, window.devicePixelRatio || 1)
+    canvas.width = TABLE_WIDTH * ratio
+    canvas.height = TABLE_HEIGHT * ratio
+    const context = canvas.getContext('2d')
+    if (!context) return
+    context.setTransform(ratio, 0, 0, ratio, 0, 0)
 
-    const onPointerDown = (e: PointerEvent) => {
-      const rect = canvas.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const flippers = getFlippers(worldRef.current.colliders)
-      for (const f of flippers) {
-        if (f.side === 'left' && x < rect.width / 2) f.active = true
-        if (f.side === 'right' && x >= rect.width / 2) f.active = true
+    const addVisuals = (event: PhysicsEvent, points: number, now: number) => {
+      const color = effectColor(event)
+      effectsRef.current.push({ id: ++effectSequenceRef.current, x: event.x, y: event.y, startedAt: now, duration: 520, color, kind: 'pulse' })
+      if (points > 0) {
+        effectsRef.current.push({
+          id: ++effectSequenceRef.current,
+          x: event.x,
+          y: event.y,
+          startedAt: now,
+          duration: 850,
+          color,
+          kind: 'score',
+          text: `+${points.toLocaleString()}`,
+        })
       }
-      if (stateRef.current.phase === 'plunger' && x > rect.width * 0.7) {
-        plungerChargingRef.current = true
+      if (event.kind === 'bumper' || event.kind === 'target' || event.kind === 'jackpot') {
+        effectsRef.current.push({ id: ++effectSequenceRef.current, x: event.x, y: event.y, startedAt: now, duration: 600, color, kind: 'burst' })
       }
     }
 
-    const onPointerUp = () => {
-      const flippers = getFlippers(worldRef.current.colliders)
-      for (const f of flippers) f.active = false
-      if (plungerChargingRef.current && stateRef.current.phase === 'plunger') {
-        launchBallFromPlunger()
-      }
+    const processDrain = (event: PhysicsEvent, now: number, current: PinballState): PinballState => {
+      if (!physics.removeBall(event.ballId)) return current
+      audio.play('drain')
+      const update = handleDrain(current, now, physics.ballIds().length)
+      applyEffects(update.effects)
+      return update.state
     }
 
-    canvas.addEventListener('pointerdown', onPointerDown)
-    window.addEventListener('pointerup', onPointerUp)
+    const frame = (now: number) => {
+      const elapsed = previousFrameRef.current === 0 ? 0 : Math.min(0.04, (now - previousFrameRef.current) / 1_000)
+      previousFrameRef.current = now
+      const current = stateRef.current
+      physics.setFlippers(keysRef.current.left && !current.tilted, keysRef.current.right && !current.tilted)
+      physics.advance(elapsed)
+
+      let next = tickState(current, now)
+      const events = physics.drainEvents()
+      for (const event of events) {
+        if (event.kind === 'drain') {
+          next = processDrain(event, now, next)
+          continue
+        }
+        const update = handlePhysicsEvent(next, event, now)
+        next = update.state
+        applyEffects(update.effects)
+        addVisuals(event, update.points, now)
+        if (update.points > 0) audio.play(event.kind)
+      }
+
+      for (const ballId of physics.ballIds()) {
+        if (!physics.isOutOfBounds(ballId)) continue
+        next = processDrain({ kind: 'drain', elementId: 'bounds', ballId, speed: 0, x: 210, y: 720 }, now, next)
+      }
+
+      if (next.phase === 'ball-over' && now >= next.messageUntil) {
+        const update = serveNextBall(next, now)
+        next = update.state
+        applyEffects(update.effects)
+      }
+
+      if (next !== stateRef.current) commitState(next)
+
+      if (next.phase === 'game-over' && !completedRef.current) {
+        completedRef.current = true
+        emitGameSessionCompleted('completed')
+        if (next.score > highScore) {
+          setHighScore(next.score)
+          try {
+            window.localStorage.setItem(HIGH_SCORE_KEY, String(next.score))
+          } catch {
+            // High scores are a best-effort local enhancement.
+          }
+        }
+      }
+
+      const balls = physics.getBallSnapshots()
+      const activeIds = new Set(balls.map((ball) => ball.id))
+      for (const ball of balls) {
+        const trail = trailsRef.current[ball.id] ?? []
+        trailsRef.current[ball.id] = [...trail.slice(-12), { x: ball.x, y: ball.y, alpha: Math.min(1, ball.speed / 500) }]
+      }
+      for (const id of Object.keys(trailsRef.current)) if (!activeIds.has(id)) delete trailsRef.current[id]
+      effectsRef.current = effectsRef.current.filter((effect) => now - effect.startedAt < effect.duration)
+      plungerPowerRef.current = chargeStartedRef.current === null ? 0 : Math.min(1, (now - chargeStartedRef.current) / 1_150)
+
+      renderTable(context, {
+        balls,
+        flippers: physics.getFlipperSnapshots(),
+        state: next,
+        effects: effectsRef.current,
+        trails: trailsRef.current,
+        now,
+        plungerPower: plungerPowerRef.current,
+      })
+      animationRef.current = requestAnimationFrame(frame)
+    }
+
+    animationRef.current = requestAnimationFrame(frame)
     return () => {
-      canvas.removeEventListener('pointerdown', onPointerDown)
-      window.removeEventListener('pointerup', onPointerUp)
+      if (animationRef.current !== null) cancelAnimationFrame(animationRef.current)
+      previousFrameRef.current = 0
     }
-  }, [launchBallFromPlunger])
+  }, [applyEffects, audio, commitState, highScore, physics])
 
-  // ---------------------------------------------------------------------------
-  // Game loop
-  // ---------------------------------------------------------------------------
+  useEffect(() => () => audio.dispose(), [audio])
 
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    const loop = (now: number) => {
-      const last = lastTimeRef.current || now
-      let dt = (now - last) / 1000
-      lastTimeRef.current = now
-      dt = Math.min(dt, 1 / 30)
-
-      const state = stateRef.current
-
-      // --- Update flipper states from keyboard ---
-      if (state.phase === 'playing' || state.phase === 'plunger') {
-        const flippers = getFlippers(worldRef.current.colliders)
-        const keys = keysRef.current
-        for (const f of flippers) {
-          if (f.side === 'left') {
-            f.active = keys.has('arrowleft') || keys.has('a') || f.active
-          }
-          if (f.side === 'right') {
-            f.active = keys.has('arrowright') || keys.has('d') || f.active
-          }
-        }
-      }
-
-      // --- Update plunger charge ---
-      if (plungerChargingRef.current && state.phase === 'plunger') {
-        setPlungerPower((p) => Math.min(1, p + dt * 1.5))
-      }
-
-      // --- Step physics ---
-      if (state.phase === 'playing' || state.phase === 'plunger') {
-        const world = worldRef.current
-
-        // Update dynamic colliders (drop targets)
-        const dynamicColliders = getDynamicColliders(state)
-        world.colliders = [...staticCollidersRef.current, ...dynamicColliders]
-
-        // Collision callback for scoring
-        let stateChanged = false
-        let newState = state
-
-        const onCollision = (e: { collider: Collider; ball: Ball; contact: { x: number; y: number }; normal: { x: number; y: number } }) => {
-          const before = newState
-          newState = handleCollision(newState, e.collider, now)
-          if (newState !== before) stateChanged = true
-
-          const dropResult = checkDropTargets(newState, e.ball, now)
-          if (dropResult.newColliders.length > 0 || dropResult.state !== newState) {
-            newState = dropResult.state
-            stateChanged = true
-          }
-
-          const afterRollover = checkRolloverLanes(newState, e.ball, now)
-          if (afterRollover !== newState) {
-            newState = afterRollover
-            stateChanged = true
-          }
-
-          const afterZones = checkScoreZones(newState, e.ball, now)
-          if (afterZones !== newState) {
-            newState = afterZones
-            stateChanged = true
-          }
-        }
-
-        stepWorld(world, dt, onCollision)
-
-        // Spinner update
-        for (const ball of world.balls) {
-          if (!ball.alive) continue
-          const afterSpinner = updateSpinner(newState, ball, dt)
-          if (afterSpinner !== newState) {
-            newState = afterSpinner
-            stateChanged = true
-          }
-        }
-
-        // Check for drained balls
-        let drainedCount = 0
-        let aliveCount = 0
-        for (const ball of world.balls) {
-          if (ball.alive && isBallDrained(ball)) {
-            ball.alive = false
-            drainedCount += 1
-          }
-          if (ball.alive) aliveCount += 1
-        }
-
-        if (drainedCount > 0 && aliveCount === 0) {
-          newState = handleBallDrain(newState, now)
-          stateChanged = true
-
-          if (newState.phase === 'plunger') {
-            const newBall = createBall()
-            world.balls = [newBall]
-            setPlungerPower(0)
-          } else if (newState.phase === 'game_over') {
-            try {
-              if (newState.highScore > 0) {
-                localStorage.setItem(HS_KEY, String(newState.highScore))
-              }
-            } catch { /* ignore */ }
-            emitGameSessionCompleted('lost')
-          }
-        }
-
-        newState = maybeResetDropTargets(newState, now)
-
-        if (newState.message && now > newState.messageUntil) {
-          newState = { ...newState, message: '' }
-          stateChanged = true
-        }
-
-        if (stateChanged) {
-          setHudState(newState)
-        }
-      }
-
-      // --- Render ---
-      const renderState = stateRef.current
-      const world = worldRef.current
-
-      drawBackground(ctx)
-
-      for (const z of renderState.scoreZones) {
-        drawScoreZone(ctx, z)
-      }
-
-      for (const lane of renderState.rolloverLanes) {
-        drawRolloverLane(ctx, lane)
-      }
-
-      drawSpinner(ctx, renderState.spinner)
-
-      for (const c of staticCollidersRef.current) {
-        drawCollider(ctx, c)
-      }
-
-      for (const t of renderState.dropTargets) {
-        drawDropTarget(ctx, t)
-      }
-
-      for (const ball of world.balls) {
-        drawBall(ctx, ball)
-      }
-
-      if (renderState.phase === 'plunger' || renderState.phase === 'playing') {
-        drawPlunger(ctx, 297, 595, plungerPowerRef.current)
-      }
-
-      const isGameOver = renderState.phase === 'game_over'
-      drawMessage(ctx, renderState.message, isGameOver)
-
-      if (renderState.phase === 'ready') {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'
-        ctx.fillRect(0, 0, TABLE_WIDTH, TABLE_HEIGHT)
-        ctx.font = "bold 24px 'Tahoma', sans-serif"
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
-        ctx.fillStyle = '#ffd629'
-        ctx.fillText('PINBALL', TABLE_WIDTH / 2, TABLE_HEIGHT / 2 - 30)
-        ctx.font = "14px 'Tahoma', sans-serif"
-        ctx.fillStyle = '#c8d4e0'
-        ctx.fillText('Press SPACE or click START', TABLE_WIDTH / 2, TABLE_HEIGHT / 2)
-        ctx.font = "11px 'Tahoma', sans-serif"
-        ctx.fillStyle = '#6a7080'
-        ctx.fillText('← / A : left flipper', TABLE_WIDTH / 2, TABLE_HEIGHT / 2 + 25)
-        ctx.fillText('→ / D : right flipper', TABLE_WIDTH / 2, TABLE_HEIGHT / 2 + 42)
-        ctx.fillText('SPACE : plunger', TABLE_WIDTH / 2, TABLE_HEIGHT / 2 + 59)
-      }
-
-      rafRef.current = requestAnimationFrame(loop)
-    }
-
-    rafRef.current = requestAnimationFrame(loop)
-    return () => cancelAnimationFrame(rafRef.current)
-  }, [beginNewGame])
-
-  // ---------------------------------------------------------------------------
-  // Render JSX
-  // ---------------------------------------------------------------------------
-
-  const phase = hudState.phase
+  const setFlipper = (side: 'left' | 'right', active: boolean) => {
+    keysRef.current[side] = active
+  }
+  const showOverlay = state.phase === 'attract' || state.phase === 'game-over'
 
   return (
     <main className="pinball-app">
-      <header className="pinball-header">
-        <Link href="/" aria-label="Back to desktop">🪐 <strong>Pinball</strong></Link>
-        <button
-          className="pinball-btn pinball-btn-primary"
-          onClick={() => beginNewGame()}
-        >
-          {phase === 'game_over' ? 'Play Again' : 'Start'}
-        </button>
+      <header className="forge-header">
+        <div className="forge-brand"><span>NF</span><div><b>NEON FORGE</b><small>REACTOR PINBALL</small></div></div>
+        <div className="forge-actions">
+          <button
+            type="button"
+            className="forge-icon-button"
+            aria-pressed={audioEnabled}
+            aria-label={audioEnabled ? 'Mute pinball sounds' : 'Enable pinball sounds'}
+            onClick={() => {
+              const enabled = !audioEnabled
+              setAudioEnabled(enabled)
+              audio.setEnabled(enabled)
+            }}
+          >{audioEnabled ? 'SOUND ON' : 'SOUND OFF'}</button>
+          <Link href="/" className="forge-exit">Exit</Link>
+        </div>
       </header>
 
-      <div className="pinball-hud" role="status">
-        <div className="pinball-hud-cell">
-          <span className="pinball-hud-label">Score</span>
-          <span className="pinball-hud-value">{hudState.score.toLocaleString()}</span>
+      <section className="forge-machine" aria-label="Neon Forge pinball machine">
+        <div className="forge-dmd" aria-live="polite">
+          <div><small>SCORE</small><strong>{state.score.toLocaleString().padStart(7, '0')}</strong></div>
+          <p>{state.message}</p>
+          <div className="forge-dmd-right"><small>HIGH</small><strong>{Math.max(highScore, state.score).toLocaleString()}</strong></div>
         </div>
-        <div className="pinball-hud-cell">
-          <span className="pinball-hud-label">Ball</span>
-          <span className="pinball-hud-value">{Math.max(1, hudState.balls)}/{hudState.maxBalls}</span>
+        <div className="forge-status-strip">
+          <span>BALL <b>{Math.min(state.ballNumber, 3)}</b></span>
+          <span>PLAYFIELD <b>{state.multiplier}×</b></span>
+          <span>LOCK <b>{state.lockedBalls}/2</b></span>
+          <span>{state.multiball ? 'MULTIBALL' : state.mode ? 'REACTOR RUSH' : `TURBINE ${state.spinnerCharge}/12`}</span>
         </div>
-        <div className="pinball-hud-cell">
-          <span className="pinball-hud-label">Mult</span>
-          <span className="pinball-hud-value">×{hudState.multiplier}</span>
+        <div className="forge-canvas-wrap">
+          <canvas ref={canvasRef} aria-label="Neon Forge pinball playfield" />
+          {showOverlay && (
+            <div className="forge-overlay">
+              <span className="forge-overlay-kicker">ORIGINAL REACTOR TABLE</span>
+              <h1>{state.phase === 'game-over' ? 'SHIFT COMPLETE' : 'LIGHT THE FORGE'}</h1>
+              {state.phase === 'game-over'
+                ? <p>Final score <strong>{state.score.toLocaleString()}</strong><br />Jackpots collected {state.jackpots}</p>
+                : <p>Complete F·O·R·G·E, lock two balls,<br />then shoot the core for jackpots.</p>}
+              <button type="button" onClick={beginGame}>{state.phase === 'game-over' ? 'PLAY AGAIN' : 'START GAME'}</button>
+              <small>← / Z left flipper · → / / right flipper · Space launch · N nudge</small>
+            </div>
+          )}
         </div>
-        <div className="pinball-hud-cell">
-          <span className="pinball-hud-label">Best</span>
-          <span className="pinball-hud-value" style={{ fontSize: '13px' }}>{hudState.highScore.toLocaleString()}</span>
-        </div>
-      </div>
 
-      <div className="pinball-canvas-wrap">
-        <canvas
-          ref={canvasRef}
-          className="pinball-canvas"
-          width={TABLE_WIDTH}
-          height={TABLE_HEIGHT}
-          aria-label="Pinball playfield"
-        />
-        {hudState.message && phase !== 'ready' && (
-          <div className={`pinball-message${phase === 'game_over' ? ' gameover' : ''}`}>
-            {hudState.message}
-          </div>
-        )}
-      </div>
-
-      {phase === 'plunger' && (
-        <div className="pinball-plunger-bar" aria-label="Plunger power">
-          <div className="pinball-plunger-fill" style={{ width: `${plungerPower * 100}%` }} />
+        <div className="forge-controls" aria-label="Pinball touch controls">
+          <button
+            type="button"
+            className="forge-flip left"
+            onPointerDown={(event) => { event.currentTarget.setPointerCapture(event.pointerId); setFlipper('left', true) }}
+            onPointerUp={() => setFlipper('left', false)}
+            onPointerCancel={() => setFlipper('left', false)}
+          ><span>LEFT</span><b>FLIP</b></button>
+          <button type="button" className="forge-nudge" onClick={() => nudge(-1)}>NUDGE</button>
+          <button
+            type="button"
+            className="forge-launch"
+            disabled={state.phase !== 'plunger'}
+            onPointerDown={(event) => { event.currentTarget.setPointerCapture(event.pointerId); beginPlungerCharge() }}
+            onPointerUp={releasePlunger}
+            onPointerCancel={releasePlunger}
+          ><span>HOLD</span><b>LAUNCH</b></button>
+          <button
+            type="button"
+            className="forge-flip right"
+            onPointerDown={(event) => { event.currentTarget.setPointerCapture(event.pointerId); setFlipper('right', true) }}
+            onPointerUp={() => setFlipper('right', false)}
+            onPointerCancel={() => setFlipper('right', false)}
+          ><span>RIGHT</span><b>FLIP</b></button>
         </div>
-      )}
-
-      <div className="pinball-instructions">
-        <kbd>←</kbd>/<kbd>A</kbd> left flipper · <kbd>→</kbd>/<kbd>D</kbd> right flipper · <kbd>Space</kbd> plunger · <kbd>R</kbd> restart
-        <br />or tap left/right side of the table
-      </div>
+      </section>
+      <p className="forge-rules">FORGE bank → lock · 2 locks → multiball · turbine → ramp cashout · scoop → 2× Reactor Rush · three nudges → tilt</p>
     </main>
   )
 }

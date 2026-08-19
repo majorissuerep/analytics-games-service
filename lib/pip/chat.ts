@@ -49,7 +49,7 @@ const KNOWLEDGE: readonly KnowledgeEntry[] = [
   },
   {
     keywords: ['pinball', 'flipper', 'ball', 'arcade'],
-    content: `Pinball (games/orbit-pinball) is an original pinball table with a custom 2D physics engine written from scratch in TypeScript. Hold Space to charge the plunger and release to launch the ball. Use arrow keys or A/D for left and right flippers, or tap the left/right side of the table. Hit pop bumpers, slingshots, and drop targets; spin the spinner; chain hits for combo multipliers (up to 5x). Knock down all 4 drop targets for a bank-clear bonus. The physics engine is in games/orbit-pinball/lib/physics.ts, table layout in games/orbit-pinball/lib/table.ts, game state in games/orbit-pinball/lib/model.ts, and the canvas renderer + React component in games/orbit-pinball/client/.`,
+    content: `Neon Forge Pinball (games/orbit-pinball) is an original reactor-themed table. Planck.js provides fixed-step collision detection, CCD, and flipper joints; the table geometry, rules, rendering, synthesized opt-in audio, and visual design are repository-authored. Hold Space to charge and release the plunger. Use Left/Z and Right/Slash for flippers. Complete F·O·R·G·E to light lock, lock two balls for three-ball multiball, and shoot the core for escalating jackpots. N·E·O·N lanes raise the playfield multiplier, the turbine builds a ramp cashout, and the scoop starts Reactor Rush. Nudge with N, but three quick nudges tilt. Physics integration is in games/orbit-pinball/lib/physics.ts, table geometry in table.ts, rules in model.ts, and rendering/UI in client/.`,
   },
   {
     keywords: ['paintbox', 'paint', 'draw', 'canvas', 'brush', 'png', 'eraser'],

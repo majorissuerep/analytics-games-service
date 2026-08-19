@@ -15,7 +15,7 @@ import {
 } from './stockfish'
 import { ModelSubmissionPanel } from './ModelSubmissionPanel'
 import { ModelArena } from './ModelArena'
-import { playMoveSound, playUndoSound, setSoundEnabled } from './sound'
+import { disposeChessSound, isSoundEnabled, playMoveSound, playUndoSound, setSoundEnabled } from './sound'
 import { descriptorFromDiff, kingSquare, outcomeInfo, pinnedSquares, resultFor, type GameOverInfo } from './chess-logic'
 import {
   CHESS_TIME_CONTROLS,
@@ -77,7 +77,7 @@ export function ChessGame() {
   const [promotion, setPromotion] = useState<PendingPromotion>(null)
   const [engineThinking, setEngineThinking] = useState(false)
   const [engineError, setEngineError] = useState('')
-  const [soundOn, setSoundOn] = useState(true)
+  const [soundOn, setSoundOn] = useState(() => isSoundEnabled())
   const engineRef = useRef<StockfishBrowserEngine | null>(null)
   const [playerId, setPlayerId] = useState('')
   const [name, setName] = useState('')
@@ -101,7 +101,10 @@ export function ChessGame() {
     }).catch(() => undefined)
   }, [])
 
-  useEffect(() => () => engineRef.current?.destroy(), [])
+  useEffect(() => () => {
+    engineRef.current?.destroy()
+    disposeChessSound()
+  }, [])
 
   const online = roomClient.room?.game ?? null
   const fen = mode === 'online' && online ? online.fen : localFen

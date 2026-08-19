@@ -49,7 +49,7 @@ games/my-game/
   client/Game.tsx
 ```
 
-Register only the manifest in `games/catalog.ts` and component in `games/client-registry.tsx`. Keep CSS selectors scoped under one game root. Add pure model tests plus a browser launch/interaction/close check. Minefield and Paintbox are examples. Pinball demonstrates a fully original canvas-based game with its own physics engine in `games/orbit-pinball/`.
+Register only the manifest in `games/catalog.ts` and component in `games/client-registry.tsx`. Keep CSS selectors scoped under one game root. Add pure model tests plus a browser launch/interaction/close check. Minefield and Paintbox are examples. Neon Forge demonstrates an original canvas game whose repository-authored rules/rendering wrap a declared, MIT-licensed Planck.js physics dependency in `games/orbit-pinball/`.
 
 ## Internal multiplayer engine game
 

@@ -1,566 +1,381 @@
-/**
- * Original 2D pinball physics engine — written from scratch for this platform.
- *
- * No external physics library is used. The engine implements:
- *  - A lightweight Vector2 type with the math we need.
- *  - Circle-vs-segment, circle-vs-circle, circle-vs-arc, and
- *    circle-vs-rotating-flipper collision detection with impulse-based
- *    response and configurable restitution.
- *  - Gravity, sub-stepped integration for tunneling prevention.
- *  - A small set of collider "shapes" that compose a pinball table.
- *
- * Everything here is original code. The collision formulas are standard
- * analytic geometry (point-to-segment distance, reflection about a normal)
- * reimplemented from first principles.
- */
+import {
+  Body,
+  Box,
+  Circle,
+  Edge,
+  Fixture,
+  Polygon,
+  RevoluteJoint,
+  Vec2,
+  World,
+  type Contact,
+} from 'planck'
+import {
+  BALL_RADIUS,
+  BUMPERS,
+  DROP_TARGETS,
+  FLIPPERS,
+  PLAYFIELD_RAILS,
+  POSTS,
+  SENSORS,
+  SHOOTER_SPAWN,
+  SLINGSHOTS,
+  TABLE_HEIGHT,
+  TABLE_WIDTH,
+  type Point,
+  type SensorKind,
+} from './table'
 
-// ---------------------------------------------------------------------------
-// Vector math
-// ---------------------------------------------------------------------------
+const SCALE = 40
+const FIXED_STEP = 1 / 120
+const MAX_ACCUMULATED = FIXED_STEP * 8
+const MAX_BALL_SPEED = 52
 
-export interface Vec2 {
+export interface BallSnapshot {
+  id: string
+  x: number
+  y: number
+  angle: number
+  speed: number
+  radius: number
+}
+
+export interface FlipperSnapshot {
+  side: 'left' | 'right'
+  pivot: Point
+  tip: Point
+  radius: number
+  active: boolean
+}
+
+export type PhysicsEventKind = 'bumper' | 'sling' | 'target' | SensorKind
+
+export interface PhysicsEvent {
+  kind: PhysicsEventKind
+  elementId: string
+  ballId: string
+  speed: number
   x: number
   y: number
 }
 
-export const vec = (x: number, y: number): Vec2 => ({ x, y })
+interface BallData { type: 'ball'; id: string }
+interface ElementData { type: 'element'; id: string; kind: PhysicsEventKind | 'surface'; x: number; y: number }
+type FixtureData = BallData | ElementData
 
-export const vadd = (a: Vec2, b: Vec2): Vec2 => ({ x: a.x + b.x, y: a.y + b.y })
-export const vsub = (a: Vec2, b: Vec2): Vec2 => ({ x: a.x - b.x, y: a.y - b.y })
-export const vscale = (a: Vec2, s: number): Vec2 => ({ x: a.x * s, y: a.y * s })
-export const vlen = (a: Vec2): number => Math.hypot(a.x, a.y)
-export const vlenSq = (a: Vec2): number => a.x * a.x + a.y * a.y
-export const vdist = (a: Vec2, b: Vec2): number => Math.hypot(a.x - b.x, a.y - b.y)
-export const vdistSq = (a: Vec2, b: Vec2): number => {
-  const dx = a.x - b.x
-  const dy = a.y - b.y
-  return dx * dx + dy * dy
-}
-export const vnorm = (a: Vec2): Vec2 => {
-  const l = vlen(a)
-  return l < 1e-9 ? { x: 0, y: 0 } : { x: a.x / l, y: a.y / l }
-}
-export const vdot = (a: Vec2, b: Vec2): number => a.x * b.x + a.y * b.y
-export const vperp = (a: Vec2): Vec2 => ({ x: -a.y, y: a.x })
-export const vlerp = (a: Vec2, b: Vec2, t: number): Vec2 => ({
-  x: a.x + (b.x - a.x) * t,
-  y: a.y + (b.y - a.y) * t,
-})
-export const vangle = (a: Vec2): number => Math.atan2(a.y, a.x)
-export const vfromAngle = (angle: number, len = 1): Vec2 => ({ x: Math.cos(angle) * len, y: Math.sin(angle) * len })
-
-/** Reflect velocity `v` about surface normal `n` with restitution `e`. */
-export const reflect = (v: Vec2, n: Vec2, e: number): Vec2 => {
-  const d = vdot(v, n)
-  return { x: v.x - (1 + e) * d * n.x, y: v.y - (1 + e) * d * n.y }
-}
-
-/** Clamp a value to [lo, hi]. */
-export const clamp = (v: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, v))
-
-/** Linear interpolation. */
-export const lerp = (a: number, b: number, t: number): number => a + (b - a) * t
-
-// ---------------------------------------------------------------------------
-// Collider shapes
-// ---------------------------------------------------------------------------
-
-/** A static line-segment wall. */
-export interface SegmentWall {
-  kind: 'segment'
-  a: Vec2
-  b: Vec2
-  /** Normal pointing into the playable area. */
-  normal: Vec2
-  restitution: number
-}
-
-/** A static circular bumper (also used for posts / pegs). */
-export interface CircleWall {
-  kind: 'circle'
-  center: Vec2
-  radius: number
-  restitution: number
-  /** If true, this is a scoring bumper, not just a wall. */
-  bumper?: boolean
-}
-
-/** An arc wall — part of a circle, used for curved guide rails. */
-export interface ArcWall {
-  kind: 'arc'
-  center: Vec2
-  radius: number
-  /** Start angle in radians. */
-  startAngle: number
-  /** End angle in radians. */
-  endAngle: number
-  /** Normal direction: 1 = outward, -1 = inward. */
-  normalDir: 1 | -1
-  restitution: number
-}
-
-/** A rotating flipper. */
-export interface Flipper {
-  kind: 'flipper'
-  /** Pivot point (fixed). */
-  pivot: Vec2
-  /** Length of the flipper. */
-  length: number
-  /** Current angle in radians (0 = pointing right, measured clockwise). */
-  angle: number
-  /** Rest angle when at rest. */
-  restAngle: number
-  /** Active angle when flipped up. */
-  activeAngle: number
-  /** Angular velocity (rad/s). */
-  angularVelocity: number
-  /** Angular speed when activating (rad/s). */
-  flipSpeed: number
-  /** Angular speed when returning (rad/s). */
-  returnSpeed: number
-  /** Restitution. */
-  restitution: number
-  /** Whether the flipper is currently being activated. */
-  active: boolean
-  /** Collision radius (thickness). */
-  radius: number
+interface FlipperRig {
   side: 'left' | 'right'
-}
-
-/** A slingshot — a triangular bumper that kicks the ball. */
-export interface Slingshot {
-  kind: 'slingshot'
-  /** Three vertices of the triangle. */
-  vertices: [Vec2, Vec2, Vec2]
-  /** Normal of the active face (pointing into playfield). */
-  faceNormal: Vec2
-  /** Restitution (typically high, 0.8-1.0). */
-  restitution: number
-  /** Kick impulse magnitude. */
-  kick: number
-}
-
-export type Collider = SegmentWall | CircleWall | ArcWall | Flipper | Slingshot
-
-// ---------------------------------------------------------------------------
-// Ball
-// ---------------------------------------------------------------------------
-
-export interface Ball {
-  pos: Vec2
-  vel: Vec2
+  body: Body
+  joint: RevoluteJoint
+  active: boolean
+  pivot: Point
+  length: number
   radius: number
-  /** Set to false when the ball drains. */
-  alive: boolean
 }
 
-// ---------------------------------------------------------------------------
-// Collision helpers
-// ---------------------------------------------------------------------------
-
-/**
- * Closest point on segment [a,b] to point p.
- * Returns the point and the parameter t in [0,1].
- */
-export function closestPointOnSegment(p: Vec2, a: Vec2, b: Vec2): { point: Vec2; t: number } {
-  const ab = vsub(b, a)
-  const abLenSq = vlenSq(ab)
-  if (abLenSq < 1e-9) return { point: a, t: 0 }
-  const t = clamp(vdot(vsub(p, a), ab) / abLenSq, 0, 1)
-  return { point: vlerp(a, b, t), t }
+interface PendingKick {
+  body: Body
+  impulse: Vec2
 }
 
-/**
- * Check if a circle (ball) penetrates a line segment.
- * Returns the penetration depth, contact normal, and contact point if colliding.
- */
-export function circleVsSegment(
-  ball: Ball,
-  wall: SegmentWall,
-): { depth: number; normal: Vec2; contact: Vec2 } | null {
-  const { point } = closestPointOnSegment(ball.pos, wall.a, wall.b)
-  const diff = vsub(ball.pos, point)
-  const distSq = vlenSq(diff)
-  if (distSq >= ball.radius * ball.radius) return null
-  const dist = Math.sqrt(distSq)
-  // Normal from wall surface toward ball center
-  let normal: Vec2
-  if (dist < 1e-6) {
-    normal = wall.normal
-  } else {
-    normal = { x: diff.x / dist, y: diff.y / dist }
-    // Ensure normal aligns with the wall's defined normal direction
-    if (vdot(normal, wall.normal) < 0) {
-      normal = { x: -normal.x, y: -normal.y }
+function meterPoint(point: Point): Vec2 {
+  return Vec2(point.x / SCALE, point.y / SCALE)
+}
+
+function pixels(value: number): number {
+  return value * SCALE
+}
+
+function fixtureData(fixture: Fixture): FixtureData | null {
+  return (fixture.getUserData() as FixtureData | undefined) ?? null
+}
+
+function bodyData(body: Body): BallData | null {
+  return (body.getUserData() as BallData | undefined) ?? null
+}
+
+/** Planck-backed fixed-step pinball simulation with CCD-enabled balls. */
+export class PinballPhysics {
+  private readonly world: World
+  private readonly ground: Body
+  private readonly balls = new Map<string, Body>()
+  private readonly targets = new Map<string, Fixture>()
+  private readonly flippers: Record<'left' | 'right', FlipperRig>
+  private readonly events: PhysicsEvent[] = []
+  private readonly pendingKicks: PendingKick[] = []
+  private accumulator = 0
+
+  constructor() {
+    this.world = new World({
+      gravity: Vec2(0, 31),
+      allowSleep: false,
+      continuousPhysics: true,
+      warmStarting: true,
+    })
+    this.ground = this.world.createBody()
+    this.buildStaticTable()
+    this.flippers = {
+      left: this.createFlipper('left'),
+      right: this.createFlipper('right'),
     }
-  }
-  const depth = ball.radius - dist
-  return { depth, normal, contact: point }
-}
-
-/**
- * Circle vs circle collision (ball vs bumper/post).
- */
-export function circleVsCircle(
-  ball: Ball,
-  wall: CircleWall,
-): { depth: number; normal: Vec2; contact: Vec2 } | null {
-  const diff = vsub(ball.pos, wall.center)
-  const distSq = vlenSq(diff)
-  const minDist = ball.radius + wall.radius
-  if (distSq >= minDist * minDist) return null
-  const dist = Math.sqrt(distSq)
-  let normal: Vec2
-  if (dist < 1e-6) {
-    normal = { x: 0, y: -1 }
-  } else {
-    normal = { x: diff.x / dist, y: diff.y / dist }
-  }
-  return { depth: minDist - dist, normal, contact: vadd(wall.center, vscale(normal, wall.radius)) }
-}
-
-/**
- * Check if an angle is within an arc's range [startAngle, endAngle].
- * Handles arcs that wrap around -PI/PI.
- */
-function angleInRange(angle: number, start: number, end: number): boolean {
-  // Normalize to [0, 2PI)
-  const TWO_PI = Math.PI * 2
-  let a = angle
-  while (a < 0) a += TWO_PI
-  while (a >= TWO_PI) a -= TWO_PI
-  let s = start
-  let e = end
-  while (s < 0) s += TWO_PI
-  while (s >= TWO_PI) s -= TWO_PI
-  while (e < 0) e += TWO_PI
-  while (e >= TWO_PI) e -= TWO_PI
-  if (s <= e) return a >= s && a <= e
-  return a >= s || a <= e
-}
-
-/**
- * Circle vs arc collision.
- * The arc is a curve at `radius` from center, spanning [startAngle, endAngle].
- * normalDir=1 means the wall faces outward (ball collides from outside, dist > radius).
- * normalDir=-1 means the wall faces inward (ball collides from inside, dist < radius).
- */
-export function circleVsArc(
-  ball: Ball,
-  wall: ArcWall,
-): { depth: number; normal: Vec2; contact: Vec2 } | null {
-  const diff = vsub(ball.pos, wall.center)
-  const dist = vlen(diff)
-  if (dist < 1e-6) return null
-
-  const angle = Math.atan2(diff.y, diff.x)
-  if (!angleInRange(angle, wall.startAngle, wall.endAngle)) return null
-
-  // Ball must be on the correct side of the arc
-  if (wall.normalDir === 1 && dist < wall.radius) return null
-  if (wall.normalDir === -1 && dist > wall.radius) return null
-
-  // Surface distance = how far the ball center is from the arc curve
-  const surfaceDist = Math.abs(dist - wall.radius)
-  if (surfaceDist >= ball.radius) return null
-
-  const radialDir: Vec2 = { x: diff.x / dist, y: diff.y / dist }
-  // Normal points from arc surface toward ball
-  const normal: Vec2 = dist > wall.radius
-    ? radialDir
-    : { x: -radialDir.x, y: -radialDir.y }
-
-  const contact = vadd(wall.center, vscale(radialDir, wall.radius))
-  return { depth: ball.radius - surfaceDist, normal, contact }
-}
-
-/**
- * Get flipper tip position at current angle.
- */
-export function flipperTip(f: Flipper): Vec2 {
-  return {
-    x: f.pivot.x + Math.cos(f.angle) * f.length,
-    y: f.pivot.y + Math.sin(f.angle) * f.length,
-  }
-}
-
-/**
- * Circle vs rotating flipper collision.
- * The flipper is a capsule (segment with radius). We also account for
- * the tangential velocity at the contact point to give the ball a kick.
- */
-export function circleVsFlipper(
-  ball: Ball,
-  f: Flipper,
-): { depth: number; normal: Vec2; contact: Vec2; surfaceVel: Vec2 } | null {
-  const tip = flipperTip(f)
-  const { point } = closestPointOnSegment(ball.pos, f.pivot, tip)
-  const diff = vsub(ball.pos, point)
-  const distSq = vlenSq(diff)
-  const minDist = ball.radius + f.radius
-  if (distSq >= minDist * minDist) return null
-
-  const dist = Math.sqrt(distSq)
-  let normal: Vec2
-  if (dist < 1e-6) {
-    // Ball is right on the flipper — push perpendicular
-    normal = vperp(vnorm(vsub(tip, f.pivot)))
-  } else {
-    normal = { x: diff.x / dist, y: diff.y / dist }
+    this.world.on('begin-contact', (contact) => this.onBeginContact(contact))
   }
 
-  // Tangential velocity at contact point due to rotation
-  // v = omega × r, in 2D: v = omega * (-ry, rx)
-  const r = vsub(point, f.pivot)
-  const surfaceVel: Vec2 = {
-    x: -f.angularVelocity * r.y,
-    y: f.angularVelocity * r.x,
-  }
-
-  return { depth: minDist - dist, normal, contact: point, surfaceVel }
-}
-
-/**
- * Circle vs slingshot (triangle) collision.
- * Tests against each edge of the triangle.
- */
-export function circleVsSlingshot(
-  ball: Ball,
-  s: Slingshot,
-): { depth: number; normal: Vec2; contact: Vec2; edgeIndex: number } | null {
-  let best: { depth: number; normal: Vec2; contact: Vec2; edgeIndex: number } | null = null
-  for (let i = 0; i < 3; i++) {
-    const a = s.vertices[i]
-    const b = s.vertices[(i + 1) % 3]
-    const { point } = closestPointOnSegment(ball.pos, a, b)
-    const diff = vsub(ball.pos, point)
-    const distSq = vlenSq(diff)
-    if (distSq >= ball.radius * ball.radius) continue
-    const dist = Math.sqrt(distSq)
-    const normal = dist < 1e-6 ? s.faceNormal : { x: diff.x / dist, y: diff.y / dist }
-    const depth = ball.radius - dist
-    if (!best || depth > best.depth) {
-      best = { depth, normal, contact: point, edgeIndex: i }
-    }
-  }
-  return best
-}
-
-// ---------------------------------------------------------------------------
-// Physics world
-// ---------------------------------------------------------------------------
-
-export interface PhysicsWorld {
-  gravity: Vec2
-  /** Linear damping per second (air resistance / rolling friction). */
-  damping: number
-  colliders: Collider[]
-  balls: Ball[]
-}
-
-export function createWorld(gravity: Vec2, damping = 0.0): PhysicsWorld {
-  return { gravity, damping, colliders: [], balls: [] }
-}
-
-/** Collision result returned to the game layer for scoring. */
-export interface CollisionEvent {
-  collider: Collider
-  ball: Ball
-  contact: Vec2
-  normal: Vec2
-}
-
-/**
- * Step the physics world forward by `dt` seconds.
- * Uses sub-stepping for stability. Returns collision events for scoring.
- */
-export function stepWorld(world: PhysicsWorld, dt: number, onCollision?: (e: CollisionEvent) => void): void {
-  const subSteps = 6
-  const subDt = dt / subSteps
-
-  for (let step = 0; step < subSteps; step++) {
-    // Update flippers
-    for (const c of world.colliders) {
-      if (c.kind !== 'flipper') continue
-      updateFlipper(c, subDt)
-    }
-
-    // Integrate balls
-    for (const ball of world.balls) {
-      if (!ball.alive) continue
-      integrateBall(ball, world, subDt)
-    }
-
-    // Collide balls vs everything
-    for (const ball of world.balls) {
-      if (!ball.alive) continue
-      collideBall(ball, world, onCollision)
-    }
-  }
-}
-
-function updateFlipper(f: Flipper, dt: number): void {
-  const target = f.active ? f.activeAngle : f.restAngle
-  const speed = f.active ? f.flipSpeed : f.returnSpeed
-  const diff = target - f.angle
-  if (Math.abs(diff) < 1e-4) {
-    f.angularVelocity = 0
-    f.angle = target
-    return
-  }
-  const omega = Math.sign(diff) * speed
-  f.angularVelocity = omega
-  const delta = omega * dt
-  if (Math.abs(delta) >= Math.abs(diff)) {
-    f.angle = target
-    f.angularVelocity = 0
-  } else {
-    f.angle += delta
-  }
-}
-
-function integrateBall(ball: Ball, world: PhysicsWorld, dt: number): void {
-  // Apply gravity
-  ball.vel.x += world.gravity.x * dt
-  ball.vel.y += world.gravity.y * dt
-
-  // Apply damping
-  const dampFactor = Math.max(0, 1 - world.damping * dt)
-  ball.vel.x *= dampFactor
-  ball.vel.y *= dampFactor
-
-  // Cap velocity to prevent tunneling
-  const maxSpeed = 1800
-  const speed = vlen(ball.vel)
-  if (speed > maxSpeed) {
-    ball.vel.x = (ball.vel.x / speed) * maxSpeed
-    ball.vel.y = (ball.vel.y / speed) * maxSpeed
-  }
-
-  // Integrate position
-  ball.pos.x += ball.vel.x * dt
-  ball.pos.y += ball.vel.y * dt
-}
-
-function collideBall(ball: Ball, world: PhysicsWorld, onCollision?: (e: CollisionEvent) => void): void {
-  for (const c of world.colliders) {
-    switch (c.kind) {
-      case 'segment': {
-        const hit = circleVsSegment(ball, c)
-        if (hit) {
-          resolveCollision(ball, hit.normal, hit.depth, c.restitution)
-          onCollision?.({ collider: c, ball, contact: hit.contact, normal: hit.normal })
-        }
-        break
-      }
-      case 'circle': {
-        const hit = circleVsCircle(ball, c)
-        if (hit) {
-          resolveCollision(ball, hit.normal, hit.depth, c.restitution)
-          onCollision?.({ collider: c, ball, contact: hit.contact, normal: hit.normal })
-        }
-        break
-      }
-      case 'arc': {
-        const hit = circleVsArc(ball, c)
-        if (hit) {
-          resolveCollision(ball, hit.normal, hit.depth, c.restitution)
-          onCollision?.({ collider: c, ball, contact: hit.contact, normal: hit.normal })
-        }
-        break
-      }
-      case 'flipper': {
-        const hit = circleVsFlipper(ball, c)
-        if (hit) {
-          resolveFlipperCollision(ball, hit.normal, hit.depth, c.restitution, hit.surfaceVel)
-          onCollision?.({ collider: c, ball, contact: hit.contact, normal: hit.normal })
-        }
-        break
-      }
-      case 'slingshot': {
-        const hit = circleVsSlingshot(ball, c)
-        if (hit) {
-          resolveSlingshotCollision(ball, hit.normal, hit.depth, c)
-          onCollision?.({ collider: c, ball, contact: hit.contact, normal: hit.normal })
-        }
-        break
+  private buildStaticTable(): void {
+    for (const rail of PLAYFIELD_RAILS) {
+      for (let index = 0; index < rail.points.length - 1; index += 1) {
+        this.ground.createFixture(Edge(meterPoint(rail.points[index]), meterPoint(rail.points[index + 1])), {
+          friction: 0.16,
+          restitution: 0.28,
+          userData: { type: 'element', id: rail.id, kind: 'surface', x: 0, y: 0 } satisfies ElementData,
+        })
       }
     }
-  }
-}
 
-/** Position correction + velocity reflection. */
-function resolveCollision(ball: Ball, normal: Vec2, depth: number, restitution: number): void {
-  // Push ball out of penetration
-  ball.pos.x += normal.x * depth
-  ball.pos.y += normal.y * depth
-
-  // Reflect velocity about normal
-  const vn = vdot(ball.vel, normal)
-  if (vn < 0) {
-    ball.vel.x -= (1 + restitution) * vn * normal.x
-    ball.vel.y -= (1 + restitution) * vn * normal.y
-  }
-}
-
-/** Flipper collision adds surface velocity to the reflection. */
-function resolveFlipperCollision(
-  ball: Ball,
-  normal: Vec2,
-  depth: number,
-  restitution: number,
-  surfaceVel: Vec2,
-): void {
-  ball.pos.x += normal.x * depth
-  ball.pos.y += normal.y * depth
-
-  // Relative velocity (ball relative to flipper surface)
-  const relVel = vsub(ball.vel, surfaceVel)
-  const vn = vdot(relVel, normal)
-  if (vn < 0) {
-    // Reflect relative velocity, then add back surface velocity
-    const reflected: Vec2 = {
-      x: relVel.x - (1 + restitution) * vn * normal.x,
-      y: relVel.y - (1 + restitution) * vn * normal.y,
+    for (const bumper of BUMPERS) {
+      const body = this.world.createBody(meterPoint(bumper))
+      body.createFixture(Circle(bumper.radius / SCALE), {
+        friction: 0.08,
+        restitution: 0.72,
+        userData: { type: 'element', id: bumper.id, kind: 'bumper', x: bumper.x, y: bumper.y } satisfies ElementData,
+      })
     }
-    ball.vel = vadd(reflected, surfaceVel)
-  }
-}
 
-/** Slingshot adds an extra kick impulse along the face normal. */
-function resolveSlingshotCollision(ball: Ball, normal: Vec2, depth: number, s: Slingshot): void {
-  ball.pos.x += normal.x * depth
-  ball.pos.y += normal.y * depth
-
-  const vn = vdot(ball.vel, normal)
-  if (vn < 0) {
-    ball.vel.x -= (1 + s.restitution) * vn * normal.x
-    ball.vel.y -= (1 + s.restitution) * vn * normal.y
-  }
-  // Extra kick
-  ball.vel.x += normal.x * s.kick
-  ball.vel.y += normal.y * s.kick
-}
-
-// ---------------------------------------------------------------------------
-// Utility: build a chain of segments from a list of points
-// ---------------------------------------------------------------------------
-
-export function segmentsFromPoints(
-  points: Vec2[],
-  restitution: number,
-  normalHint?: Vec2,
-): SegmentWall[] {
-  const walls: SegmentWall[] = []
-  for (let i = 0; i < points.length - 1; i++) {
-    const a = points[i]
-    const b = points[i + 1]
-    const dir = vnorm(vsub(b, a))
-    let normal = vperp(dir)
-    if (normalHint && vdot(normal, normalHint) < 0) {
-      normal = { x: -normal.x, y: -normal.y }
+    for (const post of POSTS) {
+      const body = this.world.createBody(meterPoint(post))
+      body.createFixture(Circle(post.radius / SCALE), { friction: 0.22, restitution: 0.36 })
     }
-    walls.push({ kind: 'segment', a, b, normal, restitution })
+
+    for (const sling of SLINGSHOTS) {
+      const body = this.world.createBody()
+      body.createFixture(Polygon(sling.points.map(meterPoint)), {
+        friction: 0.1,
+        restitution: 0.45,
+        userData: {
+          type: 'element',
+          id: sling.id,
+          kind: 'sling',
+          x: sling.points[2].x,
+          y: sling.points[2].y,
+        } satisfies ElementData,
+      })
+    }
+
+    for (const target of DROP_TARGETS) {
+      const body = this.world.createBody({ position: meterPoint(target), angle: target.angle ?? 0 })
+      const fixture = body.createFixture(Box(target.width / SCALE / 2, target.height / SCALE / 2), {
+        friction: 0.2,
+        restitution: 0.18,
+        userData: { type: 'element', id: target.id, kind: 'target', x: target.x, y: target.y } satisfies ElementData,
+      })
+      this.targets.set(target.id, fixture)
+    }
+
+    for (const sensor of SENSORS) {
+      const body = this.world.createBody({ position: meterPoint(sensor), angle: sensor.angle ?? 0 })
+      body.createFixture(Box(sensor.width / SCALE / 2, sensor.height / SCALE / 2), {
+        isSensor: true,
+        userData: { type: 'element', id: sensor.id, kind: sensor.kind, x: sensor.x, y: sensor.y } satisfies ElementData,
+      })
+    }
   }
-  return walls
+
+  private createFlipper(side: 'left' | 'right'): FlipperRig {
+    const spec = FLIPPERS[side]
+    const body = this.world.createDynamicBody({
+      position: meterPoint(spec.pivot),
+      angle: spec.restAngle,
+      angularDamping: 8,
+      allowSleep: false,
+    })
+    body.createFixture(Box(spec.length / SCALE / 2, spec.radius / SCALE, Vec2(spec.length / SCALE / 2, 0)), {
+      density: 4,
+      friction: 0.62,
+      restitution: 0.12,
+    })
+
+    const lowerAngle = side === 'left' ? spec.activeDelta : 0
+    const upperAngle = side === 'left' ? 0 : spec.activeDelta
+    const joint = this.world.createJoint(new RevoluteJoint({
+      enableMotor: true,
+      motorSpeed: 0,
+      maxMotorTorque: 1200,
+      enableLimit: true,
+      lowerAngle,
+      upperAngle,
+    }, this.ground, body, meterPoint(spec.pivot)))
+    if (!joint) throw new Error(`Could not create ${side} flipper joint`)
+
+    return { side, body, joint, active: false, pivot: spec.pivot, length: spec.length, radius: spec.radius }
+  }
+
+  private onBeginContact(contact: Contact): void {
+    const fixtureA = contact.getFixtureA()
+    const fixtureB = contact.getFixtureB()
+    const dataA = fixtureData(fixtureA)
+    const dataB = fixtureData(fixtureB)
+    const bodyA = fixtureA.getBody()
+    const bodyB = fixtureB.getBody()
+    const ballA = bodyData(bodyA)
+    const ballB = bodyData(bodyB)
+
+    const ballData = ballA ?? ballB
+    const ballBody = ballA ? bodyA : ballB ? bodyB : null
+    const element = dataA?.type === 'element' ? dataA : dataB?.type === 'element' ? dataB : null
+    if (!ballData || !ballBody || !element || element.kind === 'surface') return
+
+    const velocity = ballBody.getLinearVelocity()
+    const speed = pixels(Math.hypot(velocity.x, velocity.y))
+    const position = ballBody.getPosition()
+    this.events.push({
+      kind: element.kind,
+      elementId: element.id,
+      ballId: ballData.id,
+      speed,
+      x: pixels(position.x),
+      y: pixels(position.y),
+    })
+
+    if (element.kind === 'bumper') {
+      const delta = Vec2(position.x - element.x / SCALE, position.y - element.y / SCALE)
+      const length = Math.max(0.001, Math.hypot(delta.x, delta.y))
+      this.pendingKicks.push({ body: ballBody, impulse: Vec2(delta.x / length * 0.34, delta.y / length * 0.34) })
+    } else if (element.kind === 'sling') {
+      const sling = SLINGSHOTS.find((candidate) => candidate.id === element.id)
+      if (sling) this.pendingKicks.push({ body: ballBody, impulse: Vec2(sling.kick.x * 0.18, sling.kick.y * 0.18) })
+    }
+  }
+
+  advance(elapsedSeconds: number): void {
+    this.accumulator = Math.min(this.accumulator + Math.max(0, elapsedSeconds), MAX_ACCUMULATED)
+    while (this.accumulator >= FIXED_STEP) {
+      this.driveFlipper(this.flippers.left)
+      this.driveFlipper(this.flippers.right)
+      this.world.step(FIXED_STEP, 10, 6)
+      while (this.pendingKicks.length > 0) {
+        const kick = this.pendingKicks.shift()
+        if (kick && bodyData(kick.body)) kick.body.applyLinearImpulse(kick.impulse, kick.body.getWorldCenter(), true)
+      }
+      for (const body of this.balls.values()) {
+        const velocity = body.getLinearVelocity()
+        const speed = Math.hypot(velocity.x, velocity.y)
+        if (speed > MAX_BALL_SPEED) body.setLinearVelocity(Vec2(velocity.x * MAX_BALL_SPEED / speed, velocity.y * MAX_BALL_SPEED / speed))
+      }
+      this.accumulator -= FIXED_STEP
+    }
+  }
+
+  private driveFlipper(rig: FlipperRig): void {
+    const speed = rig.side === 'left'
+      ? (rig.active ? -25 : 18)
+      : (rig.active ? 25 : -18)
+    rig.joint.setMotorSpeed(speed)
+    rig.joint.setMaxMotorTorque(rig.active ? 1500 : 950)
+  }
+
+  setFlippers(left: boolean, right: boolean): void {
+    this.flippers.left.active = left
+    this.flippers.right.active = right
+  }
+
+  spawnBall(id: string, at: Point = SHOOTER_SPAWN, velocity?: Point): void {
+    if (this.balls.has(id)) return
+    const body = this.world.createDynamicBody({
+      position: meterPoint(at),
+      bullet: true,
+      allowSleep: false,
+      linearDamping: 0.04,
+      angularDamping: 0.08,
+      userData: { type: 'ball', id } satisfies BallData,
+    })
+    body.createFixture(Circle(BALL_RADIUS / SCALE), {
+      density: 1.15,
+      friction: 0.24,
+      restitution: 0.34,
+      userData: { type: 'ball', id } satisfies BallData,
+    })
+    if (velocity) body.setLinearVelocity(Vec2(velocity.x / SCALE, velocity.y / SCALE))
+    this.balls.set(id, body)
+  }
+
+  launchBall(id: string, power: number): boolean {
+    const body = this.balls.get(id)
+    if (!body) return false
+    const launch = 29 + Math.max(0, Math.min(1, power)) * 14
+    body.setLinearVelocity(Vec2(-0.25, -launch))
+    body.setAwake(true)
+    return true
+  }
+
+  removeBall(id: string): boolean {
+    const body = this.balls.get(id)
+    if (!body) return false
+    this.balls.delete(id)
+    this.world.destroyBody(body)
+    return true
+  }
+
+  clearBalls(): void {
+    for (const id of [...this.balls.keys()]) this.removeBall(id)
+  }
+
+  nudge(direction: -1 | 1): void {
+    for (const body of this.balls.values()) {
+      body.applyLinearImpulse(Vec2(direction * 0.12, -0.025), body.getWorldCenter(), true)
+    }
+  }
+
+  setTargetDown(id: string, down: boolean): void {
+    this.targets.get(id)?.setSensor(down)
+  }
+
+  resetTargets(): void {
+    for (const fixture of this.targets.values()) fixture.setSensor(false)
+  }
+
+  drainEvents(): PhysicsEvent[] {
+    return this.events.splice(0)
+  }
+
+  getBallSnapshots(): BallSnapshot[] {
+    return [...this.balls.entries()].map(([id, body]) => {
+      const position = body.getPosition()
+      const velocity = body.getLinearVelocity()
+      return {
+        id,
+        x: pixels(position.x),
+        y: pixels(position.y),
+        angle: body.getAngle(),
+        speed: pixels(Math.hypot(velocity.x, velocity.y)),
+        radius: BALL_RADIUS,
+      }
+    })
+  }
+
+  getFlipperSnapshots(): FlipperSnapshot[] {
+    return [this.flippers.left, this.flippers.right].map((rig) => {
+      const angle = rig.body.getAngle()
+      return {
+        side: rig.side,
+        pivot: rig.pivot,
+        tip: {
+          x: rig.pivot.x + Math.cos(angle) * rig.length,
+          y: rig.pivot.y + Math.sin(angle) * rig.length,
+        },
+        radius: rig.radius,
+        active: rig.active,
+      }
+    })
+  }
+
+  ballIds(): string[] {
+    return [...this.balls.keys()]
+  }
+
+  isOutOfBounds(id: string): boolean {
+    const body = this.balls.get(id)
+    if (!body) return false
+    const position = body.getPosition()
+    return pixels(position.y) > TABLE_HEIGHT + 80 || pixels(position.x) < -80 || pixels(position.x) > TABLE_WIDTH + 80
+  }
 }

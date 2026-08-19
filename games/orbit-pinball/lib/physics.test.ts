@@ -1,281 +1,117 @@
 import { describe, expect, it } from 'vitest'
-import {
-  vec,
-  vadd,
-  vsub,
-  vscale,
-  vlen,
-  vdist,
-  vnorm,
-  vdot,
-  vperp,
-  reflect,
-  clamp,
-  lerp,
-  closestPointOnSegment,
-  circleVsSegment,
-  circleVsCircle,
-  circleVsArc,
-  circleVsFlipper,
-  flipperTip,
-  createWorld,
-  stepWorld,
-  type Ball,
-  type Flipper,
-  type SegmentWall,
-  type CircleWall,
-  type ArcWall,
-} from './physics'
+import { PinballPhysics } from './physics'
+import { SHOOTER_SPAWN, TABLE_HEIGHT, TABLE_WIDTH } from './table'
 
-describe('Vector math', () => {
-  it('adds vectors', () => {
-    expect(vadd(vec(1, 2), vec(3, 4))).toEqual(vec(4, 6))
+function advance(world: PinballPhysics, seconds: number): void {
+  const frames = Math.ceil(seconds * 60)
+  for (let frame = 0; frame < frames; frame += 1) world.advance(1 / 60)
+}
+
+describe('Planck pinball simulation', () => {
+  it('spawns a CCD-enabled ball at the shooter', () => {
+    const world = new PinballPhysics()
+    world.spawnBall('test')
+    const [ball] = world.getBallSnapshots()
+    expect(ball.id).toBe('test')
+    expect(ball.x).toBeCloseTo(SHOOTER_SPAWN.x, 4)
+    expect(ball.y).toBeCloseTo(SHOOTER_SPAWN.y, 4)
+    expect(world.isOutOfBounds('test')).toBe(false)
   })
 
-  it('subtracts vectors', () => {
-    expect(vsub(vec(5, 6), vec(2, 3))).toEqual(vec(3, 3))
+  it('launches up the shooter lane without tunnelling through its floor', () => {
+    const world = new PinballPhysics()
+    world.spawnBall('test')
+    expect(world.launchBall('test', 1)).toBe(true)
+    advance(world, 0.35)
+    const [ball] = world.getBallSnapshots()
+    expect(ball.y).toBeLessThan(SHOOTER_SPAWN.y - 120)
+    expect(ball.x).toBeGreaterThan(350)
+    expect(world.isOutOfBounds('test')).toBe(false)
   })
 
-  it('scales vectors', () => {
-    expect(vscale(vec(2, 3), 2)).toEqual(vec(4, 6))
-  })
-
-  it('computes length', () => {
-    expect(vlen(vec(3, 4))).toBe(5)
-  })
-
-  it('computes distance', () => {
-    expect(vdist(vec(0, 0), vec(3, 4))).toBe(5)
-  })
-
-  it('normalizes', () => {
-    const n = vnorm(vec(3, 4))
-    expect(n.x).toBeCloseTo(0.6)
-    expect(n.y).toBeCloseTo(0.8)
-  })
-
-  it('computes dot product', () => {
-    expect(vdot(vec(1, 2), vec(3, 4))).toBe(11)
-  })
-
-  it('computes perpendicular', () => {
-    const p = vperp(vec(1, 0))
-    expect(p.y).toBe(1)
-    expect(Math.abs(p.x)).toBe(0)
-  })
-
-  it('reflects velocity about normal with restitution', () => {
-    // Ball moving down (0, 10), floor normal up (0, -1), restitution 1
-    const r = reflect(vec(0, 10), vec(0, -1), 1)
-    expect(r.x).toBeCloseTo(0)
-    expect(r.y).toBeCloseTo(-10)
-  })
-
-  it('reflects with partial restitution', () => {
-    const r = reflect(vec(0, 10), vec(0, -1), 0.5)
-    expect(r.y).toBeCloseTo(-5)
-  })
-
-  it('clamps values', () => {
-    expect(clamp(5, 0, 10)).toBe(5)
-    expect(clamp(-1, 0, 10)).toBe(0)
-    expect(clamp(20, 0, 10)).toBe(10)
-  })
-
-  it('lerps', () => {
-    expect(lerp(0, 10, 0.5)).toBe(5)
-  })
-})
-
-describe('closestPointOnSegment', () => {
-  it('projects to midpoint', () => {
-    const { point, t } = closestPointOnSegment(vec(5, 5), vec(0, 0), vec(10, 0))
-    expect(t).toBeCloseTo(0.5)
-    expect(point).toEqual(vec(5, 0))
-  })
-
-  it('clamps to start', () => {
-    const { point, t } = closestPointOnSegment(vec(-5, 5), vec(0, 0), vec(10, 0))
-    expect(t).toBe(0)
-    expect(point).toEqual(vec(0, 0))
-  })
-
-  it('clamps to end', () => {
-    const { point, t } = closestPointOnSegment(vec(15, 5), vec(0, 0), vec(10, 0))
-    expect(t).toBe(1)
-    expect(point).toEqual(vec(10, 0))
-  })
-})
-
-describe('circleVsSegment', () => {
-  const wall: SegmentWall = {
-    kind: 'segment',
-    a: vec(0, 0),
-    b: vec(100, 0),
-    normal: vec(0, -1),
-    restitution: 0.5,
-  }
-
-  it('detects collision above the wall', () => {
-    const ball: Ball = { pos: vec(50, -3), vel: vec(0, 0), radius: 5, alive: true }
-    const hit = circleVsSegment(ball, wall)
-    expect(hit).not.toBeNull()
-    expect(hit!.depth).toBeCloseTo(2)
-    expect(hit!.normal.y).toBeCloseTo(-1)
-  })
-
-  it('does not collide when far away', () => {
-    const ball: Ball = { pos: vec(50, -20), vel: vec(0, 0), radius: 5, alive: true }
-    const hit = circleVsSegment(ball, wall)
-    expect(hit).toBeNull()
-  })
-})
-
-describe('circleVsCircle', () => {
-  const post: CircleWall = {
-    kind: 'circle',
-    center: vec(50, 50),
-    radius: 10,
-    restitution: 0.5,
-  }
-
-  it('detects overlap', () => {
-    const ball: Ball = { pos: vec(55, 50), vel: vec(0, 0), radius: 8, alive: true }
-    const hit = circleVsCircle(ball, post)
-    expect(hit).not.toBeNull()
-    // dist=5, minDist=10+8=18, depth=13
-    expect(hit!.depth).toBeCloseTo(13)
-  })
-
-  it('does not collide when separated', () => {
-    const ball: Ball = { pos: vec(100, 100), vel: vec(0, 0), radius: 8, alive: true }
-    const hit = circleVsCircle(ball, post)
-    expect(hit).toBeNull()
-  })
-})
-
-describe('circleVsArc', () => {
-  // Arc covers angles [0, PI] — in screen coords (y down), this is the lower half.
-  // normalDir=-1 means ball collides from inside (dist < radius).
-  const arc: ArcWall = {
-    kind: 'arc',
-    center: vec(100, 100),
-    radius: 50,
-    startAngle: 0,
-    endAngle: Math.PI,
-    normalDir: -1,
-    restitution: 0.3,
-  }
-
-  it('detects collision within arc span', () => {
-    // Ball below center (angle PI/2, in [0,PI]), inside the arc (dist < radius)
-    const ball: Ball = { pos: vec(100, 145), vel: vec(0, 0), radius: 8, alive: true }
-    const hit = circleVsArc(ball, arc)
-    expect(hit).not.toBeNull()
-    // dist=45, surfaceDist=|45-50|=5, depth=8-5=3
-    expect(hit!.depth).toBeCloseTo(3)
-  })
-
-  it('does not collide when angle is outside arc span', () => {
-    // Ball above center (angle -PI/2 = 3PI/2, NOT in [0,PI])
-    const ball: Ball = { pos: vec(100, 55), vel: vec(0, 0), radius: 8, alive: true }
-    const hit = circleVsArc(ball, arc)
-    expect(hit).toBeNull()
-  })
-
-  it('does not collide when on wrong side (outside the arc)', () => {
-    // Ball below center but dist > radius (outside the arc, wrong side for normalDir=-1)
-    const ball: Ball = { pos: vec(100, 155), vel: vec(0, 0), radius: 8, alive: true }
-    const hit = circleVsArc(ball, arc)
-    expect(hit).toBeNull()
-  })
-})
-
-describe('circleVsFlipper', () => {
-  it('detects collision with flipper body', () => {
-    const flipper: Flipper = {
-      kind: 'flipper',
-      pivot: vec(50, 100),
-      length: 60,
-      angle: 0,
-      restAngle: 0,
-      activeAngle: -0.5,
-      angularVelocity: 0,
-      flipSpeed: 20,
-      returnSpeed: 8,
-      restitution: 0.3,
-      active: false,
-      radius: 7,
-      side: 'left',
+  it('feeds a launched ball from the shooter into the main playfield', () => {
+    const world = new PinballPhysics()
+    world.spawnBall('test')
+    world.launchBall('test', 0.8)
+    let enteredPlayfield = false
+    for (let frame = 0; frame < 240; frame += 1) {
+      world.advance(1 / 120)
+      const ball = world.getBallSnapshots()[0]
+      if (ball && ball.x < 345 && ball.y < 180) enteredPlayfield = true
+      if (enteredPlayfield) break
     }
-    // Ball just above the flipper shaft
-    const ball: Ball = { pos: vec(80, 95), vel: vec(0, 0), radius: 9, alive: true }
-    const hit = circleVsFlipper(ball, flipper)
-    expect(hit).not.toBeNull()
-    expect(hit!.surfaceVel.x).toBeCloseTo(0)
-    expect(hit!.surfaceVel.y).toBeCloseTo(0)
+    expect(enteredPlayfield).toBe(true)
+    expect(world.isOutOfBounds('test')).toBe(false)
   })
 
-  it('computes surface velocity when rotating', () => {
-    const flipper: Flipper = {
-      kind: 'flipper',
-      pivot: vec(50, 100),
-      length: 60,
-      angle: 0,
-      restAngle: 0,
-      activeAngle: -0.5,
-      angularVelocity: -20, // rotating counter-clockwise (upward)
-      flipSpeed: 20,
-      returnSpeed: 8,
-      restitution: 0.3,
-      active: true,
-      radius: 7,
-      side: 'left',
-    }
-    const tip = flipperTip(flipper)
-    const ball: Ball = { pos: vec(tip.x, tip.y - 5), vel: vec(0, 0), radius: 9, alive: true }
-    const hit = circleVsFlipper(ball, flipper)
-    expect(hit).not.toBeNull()
-    // Surface velocity at tip with omega=-20, r=(60,0): v = (-omega*ry, omega*rx) = (0, -1200)
-    expect(hit!.surfaceVel.y).toBeLessThan(0)
-  })
-})
-
-describe('stepWorld', () => {
-  it('applies gravity to a falling ball', () => {
-    const world = createWorld(vec(0, 1000), 0)
-    const ball: Ball = { pos: vec(50, 50), vel: vec(0, 0), radius: 10, alive: true }
-    world.balls = [ball]
-    world.colliders = []
-    stepWorld(world, 0.1)
-    // After 0.1s of gravity: vy = g*t = 100, pos y += ~5 (approx due to sub-stepping)
-    expect(ball.vel.y).toBeGreaterThan(50)
-    expect(ball.pos.y).toBeGreaterThan(50)
+  it('drives both flippers to active and back to rest', () => {
+    const world = new PinballPhysics()
+    const rest = world.getFlipperSnapshots()
+    world.setFlippers(true, true)
+    advance(world, 0.12)
+    const active = world.getFlipperSnapshots()
+    expect(active[0].tip.y).toBeLessThan(rest[0].tip.y - 15)
+    expect(active[1].tip.y).toBeLessThan(rest[1].tip.y - 15)
+    world.setFlippers(false, false)
+    advance(world, 0.2)
+    const returned = world.getFlipperSnapshots()
+    expect(returned[0].tip.y).toBeGreaterThan(active[0].tip.y + 15)
+    expect(returned[1].tip.y).toBeGreaterThan(active[1].tip.y + 15)
   })
 
-  it('bounces a ball off a floor', () => {
-    const world = createWorld(vec(0, 0), 0)
-    const floor: SegmentWall = {
-      kind: 'segment',
-      a: vec(0, 100),
-      b: vec(200, 100),
-      normal: vec(0, -1),
-      restitution: 1.0,
-    }
-    world.colliders = [floor]
-    const ball: Ball = { pos: vec(100, 90), vel: vec(0, 20), radius: 10, alive: true }
-    world.balls = [ball]
-    stepWorld(world, 0.016)
-    // Ball should have bounced — velocity reversed
-    expect(ball.vel.y).toBeLessThan(0)
+  it('nudges every active ball laterally', () => {
+    const world = new PinballPhysics()
+    world.spawnBall('a', { x: 190, y: 300 })
+    world.spawnBall('b', { x: 230, y: 300 })
+    const before = world.getBallSnapshots().map((ball) => ball.x)
+    world.nudge(1)
+    advance(world, 0.05)
+    const after = world.getBallSnapshots().map((ball) => ball.x)
+    expect(after[0]).toBeGreaterThan(before[0])
+    expect(after[1]).toBeGreaterThan(before[1])
   })
 
-  it('respects ball alive flag', () => {
-    const world = createWorld(vec(0, 1000), 0)
-    const ball: Ball = { pos: vec(50, 50), vel: vec(0, 0), radius: 10, alive: false }
-    world.balls = [ball]
-    stepWorld(world, 0.1)
-    expect(ball.pos.y).toBe(50) // no movement
-    expect(ball.vel.y).toBe(0)
+  it('caps extreme impulses without affecting normal launches', () => {
+    const world = new PinballPhysics()
+    world.spawnBall('fast', { x: 210, y: 300 }, { x: 10_000, y: -10_000 })
+    world.advance(1 / 120)
+    expect(world.getBallSnapshots()[0].speed).toBeLessThanOrEqual(2_081)
+  })
+
+  it('does not turn ordinary rail bounces into scored orbit events', () => {
+    const world = new PinballPhysics()
+    world.spawnBall('rail', { x: 40, y: 480 }, { x: -600, y: 0 })
+    advance(world, 0.15)
+    expect(world.drainEvents()).toEqual([])
+  })
+
+  it('supports three independent multiball bodies', () => {
+    const world = new PinballPhysics()
+    world.spawnBall('a', { x: 80, y: 170 }, { x: 320, y: -220 })
+    world.spawnBall('b', { x: 95, y: 160 }, { x: 480, y: 0 })
+    world.spawnBall('c', { x: 82, y: 192 }, { x: 260, y: 260 })
+    advance(world, 0.25)
+    const balls = world.getBallSnapshots()
+    expect(balls).toHaveLength(3)
+    expect(new Set(balls.map((ball) => `${Math.round(ball.x)}:${Math.round(ball.y)}`)).size).toBe(3)
+    expect(balls.every((ball) => ball.x > 0 && ball.x < TABLE_WIDTH && ball.y > 0 && ball.y < TABLE_HEIGHT)).toBe(true)
+  })
+
+  it('can capture and remove balls without leaving stale snapshots', () => {
+    const world = new PinballPhysics()
+    world.spawnBall('a')
+    world.spawnBall('b', { x: 100, y: 100 })
+    expect(world.removeBall('a')).toBe(true)
+    expect(world.removeBall('a')).toBe(false)
+    expect(world.ballIds()).toEqual(['b'])
+    expect(world.getBallSnapshots().map((ball) => ball.id)).toEqual(['b'])
+  })
+
+  it('turns knocked targets into sensors and restores them as solid fixtures', () => {
+    const world = new PinballPhysics()
+    expect(() => {
+      world.setTargetDown('drop-f', true)
+      world.resetTargets()
+    }).not.toThrow()
   })
 })

@@ -1,434 +1,319 @@
-/**
- * Pinball game state model — pure logic, no rendering.
- *
- * Manages: score, ball count, game phase (ready/plunger/playing/ball-over/game-over),
- * drop targets, spinner, rollover lanes, score multipliers, bonus, and combo.
- */
+import type { PhysicsEvent } from './physics'
+import { BALL_SAVE_MS, rolloverIds, targetIds } from './table'
 
-import type { Vec2, Ball, Collider } from './physics'
-import { vec, vdist } from './physics'
-import {
-  type DropTarget,
-  type RolloverLane,
-  type Spinner,
-  type ScoreZone,
-  createDropTargets,
-  createRolloverLanes,
-  createSpinner,
-  createScoreZones,
-  ballSpawnPos,
-  dropTargetColliders,
-} from './table'
-
-export type GamePhase = 'ready' | 'plunger' | 'playing' | 'ball_over' | 'game_over'
+export type GamePhase = 'attract' | 'plunger' | 'playing' | 'ball-over' | 'game-over'
+export type ModeName = 'reactor-rush' | null
 
 export interface PinballState {
   phase: GamePhase
   score: number
-  balls: number
-  maxBalls: number
+  ballsRemaining: number
+  ballNumber: number
+  bonus: number
   multiplier: number
   combo: number
-  /** Timestamp of last bumper hit for combo timing. */
-  lastHitTime: number
-  dropTargets: DropTarget[]
-  rolloverLanes: RolloverLane[]
-  spinner: Spinner
-  scoreZones: ScoreZone[]
-  /** Bonus accumulated during a ball, awarded on ball drain. */
-  bonus: number
-  /** High score persisted in localStorage. */
-  highScore: number
-  /** Whether the multiball mode is active. */
+  comboExpiresAt: number
+  dropTargets: Record<string, boolean>
+  rollovers: Record<string, boolean>
+  lockLit: boolean
+  lockedBalls: number
   multiball: boolean
-  /** Balls remaining in multiball. */
-  multiballBalls: number
-  /** Message to display (e.g., "BONUS!", "MULTIBALL!", etc.) */
+  jackpotValue: number
+  jackpots: number
+  spinnerCharge: number
+  mode: ModeName
+  modeEndsAt: number
+  ballSaveUntil: number
+  nudgeTimes: number[]
+  tilted: boolean
   message: string
-  /** Timestamp when message should clear. */
   messageUntil: number
+  lastShot: string | null
 }
 
-export function createInitialState(highScore = 0): PinballState {
+export type RuleEffect =
+  | { type: 'target-down'; id: string }
+  | { type: 'reset-targets' }
+  | { type: 'capture-ball'; ballId: string }
+  | { type: 'serve-ball' }
+  | { type: 'spawn-multiball'; count: number }
+
+export interface RuleUpdate {
+  state: PinballState
+  effects: RuleEffect[]
+  points: number
+}
+
+function flagRecord(ids: string[]): Record<string, boolean> {
+  return Object.fromEntries(ids.map((id) => [id, false]))
+}
+
+export function createInitialState(): PinballState {
   return {
-    phase: 'ready',
+    phase: 'attract',
     score: 0,
-    balls: 3,
-    maxBalls: 3,
+    ballsRemaining: 3,
+    ballNumber: 1,
+    bonus: 0,
     multiplier: 1,
     combo: 0,
-    lastHitTime: 0,
-    dropTargets: createDropTargets(),
-    rolloverLanes: createRolloverLanes(),
-    spinner: createSpinner(),
-    scoreZones: createScoreZones(),
-    bonus: 0,
-    highScore,
+    comboExpiresAt: 0,
+    dropTargets: flagRecord(targetIds()),
+    rollovers: flagRecord(rolloverIds()),
+    lockLit: false,
+    lockedBalls: 0,
     multiball: false,
-    multiballBalls: 0,
-    message: '',
-    messageUntil: 0,
+    jackpotValue: 50_000,
+    jackpots: 0,
+    spinnerCharge: 0,
+    mode: null,
+    modeEndsAt: 0,
+    ballSaveUntil: 0,
+    nudgeTimes: [],
+    tilted: false,
+    message: 'PRESS START',
+    messageUntil: Number.POSITIVE_INFINITY,
+    lastShot: null,
   }
 }
 
-export function createBall(): Ball {
-  const spawn = ballSpawnPos()
+export function startGame(now: number): PinballState {
   return {
-    pos: { ...spawn },
-    vel: vec(0, 0),
-    radius: 9,
-    alive: true,
+    ...createInitialState(),
+    phase: 'plunger',
+    message: 'CHARGE PLUNGER',
+    messageUntil: now + 8_000,
   }
 }
 
-/**
- * Create a ball launched from the plunger.
- * `power` is 0..1.
- */
-export function launchBall(power: number): Vec2 {
-  // Launch velocity: upward, slightly left to curve into the playfield
-  const maxVel = 1400
-  const speed = maxVel * Math.max(0.1, power)
-  return vec(-50, -speed)
-}
-
-/** Points awarded for each bumper type. */
-const BUMPER_POINTS = 100
-const SLINGSHOT_POINTS = 50
-const FLIPPER_POINTS = 0
-const DROP_TARGET_POINTS = 100
-const DROP_BANK_BONUS = 500
-const SPINNER_POINTS = 25
-const ROLLOVER_POINTS = 50
-
-/** Time window for combo (ms). */
-const COMBO_WINDOW = 2000
-
-/**
- * Handle a collision event and update state.
- * Returns a new state (immutable update).
- */
-export function handleCollision(
-  state: PinballState,
-  collider: Collider,
-  now: number,
-): PinballState {
-  let { score, combo, multiplier, bonus, lastHitTime, message, messageUntil } = state
-
-  const withinCombo = now - lastHitTime < COMBO_WINDOW
-  combo = withinCombo ? combo + 1 : 1
-  lastHitTime = now
-
-  // Multiplier increases with combo
-  multiplier = Math.min(5, 1 + Math.floor(combo / 3))
-
-  let points = 0
-  let isBumper = false
-
-  switch (collider.kind) {
-    case 'circle':
-      if (collider.bumper) {
-        points = BUMPER_POINTS
-        isBumper = true
-      }
-      break
-    case 'slingshot':
-      points = SLINGSHOT_POINTS
-      isBumper = true
-      break
-    case 'flipper':
-      points = FLIPPER_POINTS
-      combo = Math.max(0, combo - 1) // hitting flipper doesn't advance combo
-      break
-    default:
-      // Wall hits give no points but don't break combo either
-      combo = Math.max(0, combo - 1)
-      break
-  }
-
-  if (isBumper && combo >= 5) {
-    message = `${combo}x COMBO!`
-    messageUntil = now + 1500
-  }
-
-  const earned = points * multiplier
-  score += earned
-  bonus += Math.floor(earned * 0.1)
-
+export function launchBall(state: PinballState, now: number): PinballState {
+  if (state.phase !== 'plunger') return state
   return {
     ...state,
-    score,
-    combo,
-    multiplier,
-    bonus,
-    lastHitTime,
-    message,
-    messageUntil,
+    phase: 'playing',
+    ballSaveUntil: now + BALL_SAVE_MS,
+    message: 'BALL SAVE LIT',
+    messageUntil: now + 2_000,
   }
 }
 
-/**
- * Handle drop target collision. Checks if the ball overlaps any standing target.
- */
-export function checkDropTargets(
-  state: PinballState,
-  ball: Ball,
-  now: number,
-): { state: PinballState; newColliders: Collider[] } {
-  const dropTargets = state.dropTargets.map((t) => ({ ...t }))
-  let changed = false
-  let bankCleared = false
-  let totalPoints = 0
+function withMessage(state: PinballState, message: string, now: number, duration = 1_600): PinballState {
+  return { ...state, message, messageUntil: now + duration }
+}
 
-  for (const target of dropTargets) {
-    if (target.knockedDown) continue
-    // Check if ball overlaps the target rectangle
-    const closestX = Math.max(target.pos.x, Math.min(ball.pos.x, target.pos.x + target.width))
-    const closestY = Math.max(target.pos.y, Math.min(ball.pos.y, target.pos.y + target.height))
-    const dx = ball.pos.x - closestX
-    const dy = ball.pos.y - closestY
-    if (dx * dx + dy * dy < ball.radius * ball.radius) {
-      target.knockedDown = true
-      changed = true
-      totalPoints += DROP_TARGET_POINTS * state.multiplier
-    }
-  }
-
-  if (!changed) {
-    return { state, newColliders: [] }
-  }
-
-  // Check if entire bank is cleared
-  if (dropTargets.every((t) => t.knockedDown)) {
-    bankCleared = true
-    totalPoints += DROP_BANK_BONUS * state.multiplier
-  }
-
-  const newColliders = dropTargets.flatMap(dropTargetColliders)
-
+function addScore(state: PinballState, base: number, now: number, shot: string, comboEligible = true): { state: PinballState; points: number } {
+  const activeModeFactor = state.mode === 'reactor-rush' && now < state.modeEndsAt ? 2 : 1
+  const combo = comboEligible && now <= state.comboExpiresAt ? Math.min(5, state.combo + 1) : comboEligible ? 1 : state.combo
+  const comboFactor = comboEligible ? combo : 1
+  const points = Math.round(base * state.multiplier * activeModeFactor * comboFactor)
   return {
+    points,
     state: {
       ...state,
-      dropTargets,
-      score: state.score + totalPoints,
-      bonus: state.bonus + Math.floor(totalPoints * 0.1),
-      message: bankCleared ? 'BANK CLEAR!' : 'TARGET DOWN',
-      messageUntil: now + 1500,
+      score: state.score + points,
+      bonus: state.bonus + Math.round(base * 0.1),
+      combo,
+      comboExpiresAt: comboEligible ? now + 2_400 : state.comboExpiresAt,
+      lastShot: shot,
     },
-    newColliders,
   }
 }
 
-/**
- * Check rollover lanes. Ball passing over a lane lights it and scores.
- */
-export function checkRolloverLanes(
-  state: PinballState,
-  ball: Ball,
-  now: number,
-): PinballState {
-  let changed = false
+export function handlePhysicsEvent(current: PinballState, event: PhysicsEvent, now: number): RuleUpdate {
+  if (current.phase !== 'playing' || current.tilted || event.kind === 'drain') {
+    return { state: current, effects: [], points: 0 }
+  }
+
+  let state = current
   let points = 0
-  const rolloverLanes = state.rolloverLanes.map((l) => ({ ...l }))
-
-  for (const lane of rolloverLanes) {
-    if (lane.lit) continue
-    if (vdist(ball.pos, lane.pos) < lane.radius + ball.radius) {
-      lane.lit = true
-      changed = true
-      points += ROLLOVER_POINTS * state.multiplier
-    }
+  const effects: RuleEffect[] = []
+  const award = (base: number, label: string, comboEligible = true) => {
+    const scored = addScore(state, base, now, label, comboEligible)
+    state = scored.state
+    points += scored.points
   }
 
-  if (!changed) return state
-
-  // If all lanes lit, reset and give bonus
-  if (rolloverLanes.every((l) => l.lit)) {
-    points += 300 * state.multiplier
-    rolloverLanes.forEach((l) => { l.lit = false })
-  }
-
-  return {
-    ...state,
-    rolloverLanes,
-    score: state.score + points,
-    message: 'LANE COMPLETE',
-    messageUntil: now + 1000,
-  }
-}
-
-/**
- * Check score zones.
- */
-export function checkScoreZones(
-  state: PinballState,
-  ball: Ball,
-  now: number,
-): PinballState {
-  let points = 0
-  let changed = false
-  const scoreZones = state.scoreZones.map((z) => ({ ...z }))
-
-  for (const zone of scoreZones) {
-    if (now - zone.lastTriggered < zone.cooldownMs) continue
-    const closestX = Math.max(zone.pos.x, Math.min(ball.pos.x, zone.pos.x + zone.width))
-    const closestY = Math.max(zone.pos.y, Math.min(ball.pos.y, zone.pos.y + zone.height))
-    const dx = ball.pos.x - closestX
-    const dy = ball.pos.y - closestY
-    if (dx * dx + dy * dy < ball.radius * ball.radius) {
-      zone.lastTriggered = now
-      changed = true
-      points += zone.points * state.multiplier
-    }
-  }
-
-  if (!changed) return state
-
-  return {
-    ...state,
-    scoreZones,
-    score: state.score + points,
-  }
-}
-
-/**
- * Update spinner. If ball is near and moving fast, spin it.
- */
-export function updateSpinner(
-  state: PinballState,
-  ball: Ball,
-  dt: number,
-): PinballState {
-  const spinner = { ...state.spinner }
-  const dist = vdist(ball.pos, spinner.pos)
-
-  // If ball is close and moving, spin
-  if (dist < 20 && (Math.abs(ball.vel.x) + Math.abs(ball.vel.y)) > 50) {
-    spinner.speed = 20
-  }
-
-  // Decay spin
-  spinner.speed *= Math.max(0, 1 - 2 * dt)
-  spinner.rotation += spinner.speed * dt
-
-  // Count rotations
-  const newCount = Math.floor(Math.abs(spinner.rotation) / (Math.PI * 2))
-  let points = 0
-  if (newCount > spinner.count) {
-    const delta = newCount - spinner.count
-    spinner.count = newCount
-    points = delta * SPINNER_POINTS * state.multiplier
-  }
-
-  if (points === 0) return state
-
-  return {
-    ...state,
-    spinner,
-    score: state.score + points,
-  }
-}
-
-/**
- * Called when a ball drains. Handles ball count decrement, bonus award,
- * and game-over transition.
- */
-export function handleBallDrain(state: PinballState, now: number): PinballState {
-  if (state.multiball) {
-    const remaining = state.multiballBalls - 1
-    if (remaining > 0) {
-      return {
-        ...state,
-        multiballBalls: remaining,
-        message: `${remaining} BALLS LEFT`,
-        messageUntil: now + 1500,
+  switch (event.kind) {
+    case 'bumper':
+      award(500, 'POP BUMPER')
+      if (state.combo >= 4) state = withMessage(state, `${state.combo}× COMBO`, now, 900)
+      break
+    case 'sling':
+      award(175, 'SLINGSHOT')
+      break
+    case 'target': {
+      if (state.dropTargets[event.elementId]) break
+      award(1_250, 'FORGE TARGET')
+      const dropTargets = { ...state.dropTargets, [event.elementId]: true }
+      state = { ...state, dropTargets }
+      effects.push({ type: 'target-down', id: event.elementId })
+      if (Object.values(dropTargets).every(Boolean)) {
+        award(15_000, 'FORGE COMPLETE', false)
+        state = withMessage({ ...state, lockLit: true }, 'BALL LOCK LIT', now, 2_500)
       }
+      break
     }
-    // Multiball ended
+    case 'rollover': {
+      if (state.rollovers[event.elementId]) break
+      award(800, 'N·E·O·N LANE', false)
+      const rollovers = { ...state.rollovers, [event.elementId]: true }
+      state = { ...state, rollovers }
+      if (Object.values(rollovers).every(Boolean)) {
+        const multiplier = Math.min(5, state.multiplier + 1)
+        award(8_000, 'NEON COMPLETE', false)
+        state = withMessage({ ...state, multiplier, rollovers: flagRecord(rolloverIds()) }, `${multiplier}× PLAYFIELD`, now, 2_200)
+      }
+      break
+    }
+    case 'spinner':
+      award(350, 'TURBINE')
+      state = { ...state, spinnerCharge: Math.min(12, state.spinnerCharge + 1) }
+      if (state.spinnerCharge === 12) state = withMessage(state, 'REACTOR CHARGED', now)
+      break
+    case 'orbit':
+      // Only named entry sensors represent a completed orbit shot.
+      if (!event.elementId.endsWith('orbit')) break
+      award(3_500, event.elementId === 'left-orbit' ? 'LEFT ORBIT' : 'RIGHT ORBIT')
+      break
+    case 'ramp': {
+      const cashout = 5_000 + state.spinnerCharge * 1_000
+      award(cashout, 'REACTOR RAMP')
+      state = withMessage({ ...state, spinnerCharge: 0 }, state.spinnerCharge >= 8 ? 'TURBINE CASHOUT' : 'RAMP MADE', now)
+      break
+    }
+    case 'scoop':
+      award(4_000, 'CONTROL SCOOP')
+      state = withMessage({ ...state, mode: 'reactor-rush', modeEndsAt: now + 30_000 }, 'REACTOR RUSH · 2× SCORING', now, 2_800)
+      break
+    case 'lock':
+      if (!state.lockLit || state.multiball) {
+        award(2_000, 'LOCK LANE')
+        break
+      }
+      effects.push({ type: 'capture-ball', ballId: event.ballId })
+      if (state.lockedBalls === 0) {
+        state = withMessage({ ...state, lockedBalls: 1, lockLit: false, phase: 'plunger' }, 'BALL 1 LOCKED', now, 2_400)
+        effects.push({ type: 'reset-targets' }, { type: 'serve-ball' })
+        state = { ...state, dropTargets: flagRecord(targetIds()) }
+      } else {
+        state = withMessage({
+          ...state,
+          lockedBalls: 0,
+          lockLit: false,
+          multiball: true,
+          jackpotValue: 50_000,
+          dropTargets: flagRecord(targetIds()),
+        }, 'MULTIBALL · JACKPOT LIT', now, 3_000)
+        effects.push({ type: 'reset-targets' }, { type: 'spawn-multiball', count: 3 })
+      }
+      break
+    case 'jackpot':
+      if (state.multiball) {
+        award(state.jackpotValue, 'JACKPOT', false)
+        state = withMessage({
+          ...state,
+          jackpots: state.jackpots + 1,
+          jackpotValue: Math.min(250_000, state.jackpotValue + 25_000),
+        }, `JACKPOT ${state.jackpotValue.toLocaleString()}`, now, 2_500)
+      }
+      break
+    case 'inlane':
+      award(1_000, 'RETURN LANE')
+      break
+    case 'outlane':
+      award(500, 'OUTLANE', false)
+      break
+  }
+
+  return { state, effects, points }
+}
+
+export function handleDrain(current: PinballState, now: number, ballsStillInPlay: number): RuleUpdate {
+  if (ballsStillInPlay > 0) {
+    const multiball = ballsStillInPlay > 1
+    const state = current.multiball && !multiball
+      ? withMessage({ ...current, multiball: false }, 'MULTIBALL ENDED', now)
+      : current
+    return { state, effects: [], points: 0 }
+  }
+
+  if (!current.tilted && now <= current.ballSaveUntil) {
     return {
-      ...state,
-      multiball: false,
-      multiballBalls: 0,
-      combo: 0,
-      multiplier: 1,
-      message: 'MULTIBALL ENDED',
-      messageUntil: now + 1500,
+      state: withMessage({ ...current, phase: 'plunger', ballSaveUntil: 0 }, 'BALL SAVED', now, 2_200),
+      effects: [{ type: 'serve-ball' }],
+      points: 0,
     }
   }
 
-  const balls = state.balls - 1
-  const bonusEarned = state.bonus * state.multiplier
-  const score = state.score + bonusEarned
-
-  if (balls <= 0) {
-    const highScore = Math.max(state.highScore, score)
+  const bonusPoints = current.bonus * current.multiplier
+  const ballsRemaining = current.ballsRemaining - 1
+  if (ballsRemaining <= 0) {
     return {
-      ...state,
-      balls: 0,
-      score,
+      state: withMessage({
+        ...current,
+        phase: 'game-over',
+        score: current.score + bonusPoints,
+        ballsRemaining: 0,
+        bonus: 0,
+        multiball: false,
+      }, 'GAME OVER', now, Number.POSITIVE_INFINITY),
+      effects: [],
+      points: bonusPoints,
+    }
+  }
+
+  return {
+    state: withMessage({
+      ...current,
+      phase: 'ball-over',
+      score: current.score + bonusPoints,
+      ballsRemaining,
+      ballNumber: current.ballNumber + 1,
       bonus: 0,
-      phase: 'game_over',
+      multiball: false,
+      tilted: false,
+      nudgeTimes: [],
       combo: 0,
-      multiplier: 1,
-      highScore,
-      message: 'GAME OVER',
-      messageUntil: now + 3000,
-    }
+      ballSaveUntil: 0,
+    }, `BONUS ${bonusPoints.toLocaleString()}`, now, 2_000),
+    effects: [],
+    points: bonusPoints,
   }
+}
 
+export function serveNextBall(state: PinballState, now: number): RuleUpdate {
+  if (state.phase !== 'ball-over') return { state, effects: [], points: 0 }
   return {
-    ...state,
-    balls,
-    score,
-    bonus: 0,
-    phase: 'plunger',
-    combo: 0,
-    multiplier: 1,
-    message: `BALL ${state.maxBalls - balls + 1}`,
-    messageUntil: now + 1500,
+    state: withMessage({ ...state, phase: 'plunger' }, `BALL ${state.ballNumber}`, now, 1_500),
+    effects: [{ type: 'serve-ball' }],
+    points: 0,
   }
 }
 
-/**
- * Start a new game.
- */
-export function startGame(state: PinballState): PinballState {
-  const fresh = createInitialState(state.highScore)
-  return { ...fresh, phase: 'plunger' }
-}
-
-/**
- * Check if all drop targets are down and should reset.
- */
-export function maybeResetDropTargets(state: PinballState, now: number): PinballState {
-  if (state.dropTargets.every((t) => t.knockedDown)) {
-    return {
-      ...state,
-      dropTargets: createDropTargets(),
-      message: 'TARGETS RESET',
-      messageUntil: now + 1000,
-    }
+export function registerNudge(state: PinballState, now: number): PinballState {
+  if (state.phase !== 'playing' || state.tilted) return state
+  const nudgeTimes = [...state.nudgeTimes.filter((time) => now - time < 3_000), now]
+  if (nudgeTimes.length >= 3) {
+    return withMessage({ ...state, nudgeTimes, tilted: true, combo: 0, ballSaveUntil: 0 }, 'TILT · FLIPPERS DISABLED', now, 4_000)
   }
-  return state
+  return withMessage({ ...state, nudgeTimes }, nudgeTimes.length === 2 ? 'DANGER' : 'NUDGE', now, 900)
 }
 
-/**
- * Trigger multiball (e.g., when all drop targets are cleared twice).
- */
-export function triggerMultiball(state: PinballState, now: number): PinballState {
-  if (state.multiball) return state
-  return {
-    ...state,
-    multiball: true,
-    multiballBalls: 2,
-    message: 'MULTIBALL!',
-    messageUntil: now + 2000,
+export function tickState(state: PinballState, now: number): PinballState {
+  let next = state
+  if (next.combo > 0 && now > next.comboExpiresAt) next = { ...next, combo: 0 }
+  if (next.mode && now >= next.modeEndsAt) next = withMessage({ ...next, mode: null, modeEndsAt: 0 }, 'REACTOR RUSH COMPLETE', now)
+  if (next.message && now > next.messageUntil) {
+    next = { ...next, message: objectiveFor(next), messageUntil: Number.POSITIVE_INFINITY }
   }
+  return next
 }
 
-/**
- * Get the dynamic colliders for the current state (drop targets change).
- */
-export function getDynamicColliders(state: PinballState): Collider[] {
-  return state.dropTargets.flatMap(dropTargetColliders)
+export function objectiveFor(state: PinballState): string {
+  if (state.tilted) return 'TILT'
+  if (state.multiball) return `SHOOT CORE FOR ${state.jackpotValue.toLocaleString()}`
+  if (state.lockLit) return state.lockedBalls > 0 ? 'LOCK BALL 2' : 'SHOOT LOCK'
+  if (state.mode) return 'REACTOR RUSH · ALL SCORING 2×'
+  if (state.spinnerCharge >= 8) return 'SHOOT RAMP · CASH OUT TURBINE'
+  return 'COMPLETE F·O·R·G·E TO LIGHT LOCK'
 }

@@ -29,7 +29,7 @@ Internal modules live in isolated `games/*` workspaces. Consensus Radar is the r
 
 ### Browser-local game
 
-Use for classics and experiments that do not need shared persistence. Game owns its React/canvas state and pure rule modules inside one workspace; portal only discovers, launches, and closes it. Minefield and Paintbox exercise DOM and canvas drawing without adding server coupling. Pinball is a fully original browser-local game with its own 2D physics engine, canvas renderer, and pure model modules inside `games/orbit-pinball/`.
+Use for classics and experiments that do not need shared persistence. Game owns its React/canvas state and pure rule modules inside one workspace; portal only discovers, launches, and closes it. Minefield and Paintbox exercise DOM and canvas drawing without adding server coupling. Neon Forge is a browser-local game with original table/rule/rendering modules and a narrow Planck.js adapter for fixed-step collisions and flipper joints inside `games/orbit-pinball/`.
 
 ### External URL game
 
