@@ -11,6 +11,7 @@ import {
   handleDrain,
   handlePhysicsEvent,
   launchBall as markBallLaunched,
+  objectiveFor,
   registerNudge,
   serveNextBall,
   startGame,
@@ -291,6 +292,8 @@ export function PinballGame() {
     keysRef.current[side] = active
   }
   const showOverlay = state.phase === 'attract' || state.phase === 'game-over'
+  const forgeProgress = Object.values(state.dropTargets).filter(Boolean).length
+  const neonProgress = Object.values(state.rollovers).filter(Boolean).length
 
   return (
     <main className="pinball-app">
@@ -324,6 +327,22 @@ export function PinballGame() {
           <span>LOCK <b>{state.lockedBalls}/2</b></span>
           <span>{state.multiball ? 'MULTIBALL' : state.mode ? 'REACTOR RUSH' : `TURBINE ${state.spinnerCharge}/12`}</span>
         </div>
+        <aside className="forge-briefing" aria-label="Current pinball objectives">
+          <small>ACTIVE DIRECTIVE</small>
+          <strong>{objectiveFor(state)}</strong>
+          <div className="forge-progress-grid">
+            <span><i>F·O·R·G·E</i><b>{forgeProgress}/5</b></span>
+            <span><i>N·E·O·N</i><b>{neonProgress}/4</b></span>
+            <span><i>BALL LOCK</i><b>{state.lockedBalls}/2</b></span>
+            <span><i>JACKPOTS</i><b>{state.jackpots}</b></span>
+          </div>
+          <ol>
+            <li><b>01</b><span>Break the green target bank to arm lock.</span></li>
+            <li><b>02</b><span>Feed the left lock twice for multiball.</span></li>
+            <li><b>03</b><span>Attack the reactor core for jackpots.</span></li>
+          </ol>
+          <p><span>CONTROL SCOOP</span> starts 30 seconds of double scoring. Spin the turbine, then cash it out on the center ramp.</p>
+        </aside>
         <div className="forge-canvas-wrap">
           <canvas ref={canvasRef} aria-label="Neon Forge pinball playfield" />
           {showOverlay && (

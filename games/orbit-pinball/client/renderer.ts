@@ -136,6 +136,88 @@ function drawBackdrop(ctx: CanvasRenderingContext2D, now: number): void {
   for (let y = 130; y < 680; y += 22) ctx.fillRect(354, y, 47, 1)
 }
 
+function drawPlayfieldPlastics(ctx: CanvasRenderingContext2D, now: number): void {
+  const glassPanel = (points: readonly Point[], color: string): void => {
+    ctx.save()
+    polygon(ctx, points)
+    const gradient = ctx.createLinearGradient(points[0].x, points[0].y, points[points.length - 1].x, points[points.length - 1].y)
+    gradient.addColorStop(0, 'rgba(20, 44, 68, .82)')
+    gradient.addColorStop(1, 'rgba(4, 12, 25, .32)')
+    ctx.fillStyle = gradient
+    ctx.fill()
+    ctx.strokeStyle = color
+    ctx.globalAlpha = .58
+    ctx.lineWidth = 1.5
+    ctx.stroke()
+    ctx.globalAlpha = .18
+    ctx.strokeStyle = C.white
+    ctx.lineWidth = 1
+    ctx.translate(3, 3)
+    polygon(ctx, points)
+    ctx.stroke()
+    ctx.restore()
+  }
+
+  glassPanel([
+    { x: 34, y: 124 }, { x: 83, y: 77 }, { x: 118, y: 91 },
+    { x: 87, y: 176 }, { x: 60, y: 284 }, { x: 39, y: 333 },
+  ], C.cyan)
+  glassPanel([
+    { x: 292, y: 92 }, { x: 326, y: 124 }, { x: 340, y: 324 },
+    { x: 319, y: 282 }, { x: 296, y: 169 },
+  ], C.blue)
+
+  const apron = ctx.createLinearGradient(0, 515, 0, 710)
+  apron.addColorStop(0, 'rgba(10, 26, 46, .12)')
+  apron.addColorStop(.62, 'rgba(7, 18, 34, .72)')
+  apron.addColorStop(1, 'rgba(2, 6, 14, .96)')
+  ctx.fillStyle = apron
+  polygon(ctx, [
+    { x: 30, y: 512 }, { x: 72, y: 526 }, { x: 96, y: 615 },
+    { x: 118, y: 705 }, { x: 290, y: 705 }, { x: 310, y: 615 },
+    { x: 334, y: 526 }, { x: 351, y: 512 }, { x: 351, y: 706 }, { x: 30, y: 706 },
+  ])
+  ctx.fill()
+
+  const pulse = .42 + Math.sin(now / 420) * .12
+  ctx.save()
+  ctx.globalAlpha = pulse
+  ctx.fillStyle = C.cyan
+  for (const [x, direction] of [[68, -1], [316, 1]] as const) {
+    ctx.save()
+    ctx.translate(x, 577)
+    ctx.scale(direction, 1)
+    polygon(ctx, [{ x: -7, y: 11 }, { x: 0, y: -10 }, { x: 7, y: 11 }, { x: 0, y: 5 }])
+    ctx.fill()
+    ctx.restore()
+  }
+  ctx.restore()
+
+  ctx.save()
+  ctx.fillStyle = '#405e76'
+  ctx.font = '800 9px system-ui, sans-serif'
+  ctx.textAlign = 'center'
+  ctx.fillText('RETURN', 69, 603)
+  ctx.fillText('RETURN', 314, 603)
+  ctx.fillStyle = C.amber
+  ctx.font = '900 10px system-ui, sans-serif'
+  ctx.translate(387, 405)
+  ctx.rotate(-Math.PI / 2)
+  ctx.fillText('TURBINE LAUNCH', 0, 0)
+  ctx.restore()
+
+  ctx.save()
+  ctx.globalAlpha = .36
+  ctx.strokeStyle = C.violet
+  ctx.lineWidth = 1.5
+  for (let radius = 36; radius <= 96; radius += 20) {
+    ctx.beginPath()
+    ctx.arc(238, 365, radius, Math.PI * .63, Math.PI * 1.62)
+    ctx.stroke()
+  }
+  ctx.restore()
+}
+
 function drawBrand(ctx: CanvasRenderingContext2D): void {
   ctx.save()
   ctx.textAlign = 'center'
@@ -259,6 +341,12 @@ function drawSlings(ctx: CanvasRenderingContext2D): void {
     ctx.strokeStyle = C.red
     ctx.lineWidth = 3
     ctx.stroke()
+    ctx.globalAlpha = .65
+    ctx.strokeStyle = C.white
+    ctx.lineWidth = 1
+    ctx.translate(0, 4)
+    polygon(ctx, sling.points)
+    ctx.stroke()
     ctx.restore()
   }
 }
@@ -279,7 +367,7 @@ function drawTargets(ctx: CanvasRenderingContext2D, state: PinballState): void {
     if (!down) {
       ctx.shadowBlur = 0
       ctx.fillStyle = C.white
-      ctx.font = '800 8px system-ui, sans-serif'
+      ctx.font = '900 10px system-ui, sans-serif'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
       ctx.fillText(target.label, 0, 0)
@@ -318,7 +406,7 @@ function drawSensors(ctx: CanvasRenderingContext2D, state: PinballState, now: nu
 
   drawInsert(ctx, 84, 155, 14, state.lockLit, C.green, `${state.lockedBalls}/2`)
   ctx.fillStyle = state.lockLit ? C.green : '#69819b'
-  ctx.font = '800 8px system-ui, sans-serif'
+  ctx.font = '900 10px system-ui, sans-serif'
   ctx.textAlign = 'center'
   ctx.fillText('LOCK', 84, 180)
 
@@ -329,11 +417,11 @@ function drawSensors(ctx: CanvasRenderingContext2D, state: PinballState, now: nu
   ctx.save()
   ctx.globalAlpha = alpha
   ctx.fillStyle = state.multiball ? C.magenta : C.cyan
-  ctx.font = '900 8px system-ui, sans-serif'
+  ctx.font = '900 11px system-ui, sans-serif'
   ctx.textAlign = 'center'
   ctx.fillText('↟ ORBIT', 57, 318)
   ctx.fillText('ORBIT ↟', 319, 318)
-  ctx.fillText('REACTOR RAMP', 215, 520)
+  ctx.fillText('CORE RAMP', 215, 520)
   ctx.restore()
 }
 
@@ -454,6 +542,7 @@ function drawEffects(ctx: CanvasRenderingContext2D, effects: VisualEffect[], now
 export function renderTable(ctx: CanvasRenderingContext2D, scene: RenderScene): void {
   ctx.clearRect(0, 0, TABLE_WIDTH, TABLE_HEIGHT)
   drawBackdrop(ctx, scene.now)
+  drawPlayfieldPlastics(ctx, scene.now)
   drawBrand(ctx)
   drawRamp(ctx, scene.state, scene.now)
   drawRails(ctx)
