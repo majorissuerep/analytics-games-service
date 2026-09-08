@@ -29,7 +29,7 @@
 - [OS.js](https://github.com/os-js/OS.js), BSD-2-Clause: mature application/package and web-desktop extension reference; not embedded because platform already has a smaller typed shell.
 - [JS Paint](https://github.com/1j01/jspaint), MIT: high-quality browser painting reference. Paintbox is original, smaller, browser-local code rather than copied JS Paint UI/assets.
 - [Webamp](https://github.com/captbaritone/webamp), MIT: proven embeddable nostalgic application reference; candidate future multimedia plugin, not currently bundled.
-- [lrusso/Pinball](https://github.com/lrusso/Pinball), complete Phaser/Box2D browser pinball: runtime vendored at commit `fcf63f97d24467248fe1eaa89adaf273209f3da2`. Upstream declares no license; provenance and separation are documented in `public/vendor/pinball/UPSTREAM.md`.
+- [Planck.js](https://piqnt.com/planck.js/), MIT: deterministic Box2D-derived collision detection, continuous collision detection, and motorized joints beneath the original Neon Forge rules, table geometry, rendering, audio, and visual design. The game adds flippers, pop bumpers, slingshots, a five-target bank, spinner cashout, N·E·O·N rollovers, orbits, ramp, scoop mode, ball locks, multiball, jackpots, ball save, nudge, and tilt. Source is in `games/orbit-pinball/`; no surveyed pinball source or assets are copied.
 
 ## Copyright/trademark boundary
 

@@ -48,8 +48,8 @@ const KNOWLEDGE: readonly KnowledgeEntry[] = [
     content: `Minefield (games/minefield): reveal covered squares with left-click. A number is the count of mines touching that square. Right-click a covered square to flag it. The first reveal is always safe. Clear every non-mine square to win. Beginner is 9×9/10 mines, intermediate 16×16/40, expert 30×16/99. Rules are in games/minefield/model.ts and UI is in games/minefield/client/MinefieldGame.tsx.`,
   },
   {
-    keywords: ['pinball', 'classic', 'flipper', 'ball', 'arcade'],
-    content: `Classic Pinball is the complete upstream lrusso/Pinball browser game, vendored under public/vendor/pinball at commit fcf63f97d24467248fe1eaa89adaf273209f3da2. Press the large play button, use the left and right sides of the table for flippers, hit bumpers, collect stars, and keep the ball above the drain. Its platform manifest is games/orbit-pinball/manifest.ts and provenance is documented in public/vendor/pinball/UPSTREAM.md.`,
+    keywords: ['pinball', 'flipper', 'ball', 'arcade'],
+    content: `Neon Forge Pinball (games/orbit-pinball) is an original reactor-themed table. Planck.js provides fixed-step collision detection, CCD, and flipper joints; the table geometry, rules, rendering, synthesized opt-in audio, and visual design are repository-authored. Hold Space to charge and release the plunger. Use Left/Z and Right/Slash for flippers. Complete F·O·R·G·E to light lock, lock two balls for three-ball multiball, and shoot the core for escalating jackpots. N·E·O·N lanes raise the playfield multiplier, the turbine builds a ramp cashout, and the scoop starts Reactor Rush. Nudge with N, but three quick nudges tilt. Physics integration is in games/orbit-pinball/lib/physics.ts, table geometry in table.ts, rules in model.ts, and rendering/UI in client/.`,
   },
   {
     keywords: ['paintbox', 'paint', 'draw', 'canvas', 'brush', 'png', 'eraser'],

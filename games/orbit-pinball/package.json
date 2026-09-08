@@ -2,7 +2,15 @@
   "name": "@analytics-games/orbit-pinball",
   "version": "1.0.0",
   "private": true,
-  "description": "Manifest workspace for the vendored upstream browser pinball game",
-  "scripts": { "check": "tsc --noEmit -p tsconfig.json" },
-  "peerDependencies": { "react": ">=19" }
+  "description": "Original Neon Forge pinball table with Planck.js physics",
+  "scripts": {
+    "check": "tsc --noEmit -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "react": ">=19"
+  },
+  "dependencies": {
+    "planck": "1.4.2",
+    "stage-js": "1.0.1"
+  }
 }

@@ -78,4 +78,4 @@ db/migrations/               PostgreSQL schema
 docs/                        architecture + author guide
 ```
 
-Built-ins: Chess, Consensus Radar, Minefield, upstream Classic Pinball, and Paintbox. Desktop plugins: Pip Assistant, Sticky Note, Game Shuffle, and Game Counter.
+Built-ins: Chess, Consensus Radar, Minefield, Neon Forge Pinball, and Paintbox. Desktop plugins: Pip Assistant, Sticky Note, Game Shuffle, and Game Counter.

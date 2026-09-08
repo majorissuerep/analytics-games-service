@@ -54,7 +54,7 @@ All events also receive `platform: "web"` from the analytics controller.
 - Consensus Radar: final phase reached.
 - Minefield: won or lost.
 - Paintbox: PNG save.
-- Pinball currently has no terminal game-over state; track its start/end but do not fabricate a completion event.
+- Pinball: game over when all balls drain.
 
 ### Governance and verification
 
