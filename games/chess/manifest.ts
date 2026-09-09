@@ -5,7 +5,7 @@ export const chessManifest = {
   version: 2,
   title: 'Chess',
   eyebrow: 'Classic strategy',
-  description: 'Play polished classical chess against Stockfish 18, the tuned opening-style model, locally, or in a protected online room.',
+  description: 'Play polished classical chess against Stockfish 18 or 19, the tuned opening-style model, locally, or in a protected online room.',
   accent: '#7a4f2b',
   accentSoft: 'linear-gradient(135deg, #f0d9b5, #8b5e3c)',
   minPlayers: 1,
@@ -13,7 +13,7 @@ export const chessManifest = {
   estimatedMinutes: '5–45 min',
   tags: ['strategy', 'rooms', 'bot', 'classic'],
   instructions: [
-    { title: 'Choose a mode', detail: 'Play Stockfish 18, the tuned opening-style model, pass the board locally, or use a timed online room (bullet → long).' },
+    { title: 'Choose a mode', detail: 'Play Stockfish 18 or 19, the tuned opening-style model, pass the board locally, or use a timed online room (bullet → long).' },
     { title: 'Pick a color', detail: 'Choose White, Black, or Random before the game starts.' },
     { title: 'Move', detail: 'Select a piece, then a highlighted legal destination. Checkmate wins; running out of time loses.' },
   ],

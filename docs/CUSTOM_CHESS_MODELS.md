@@ -15,7 +15,7 @@ Canonical product/security contract: [`../specs/chess-custom-model-runtime.md`](
 - Immutable public Hugging Face import with executable/remote-code rejection
 - Optional checksum-bound S3-compatible quarantine upload
 
-Stockfish 18 and the bundled `Tuned Opening Style` CPU opponent are built-in opponents. The tuned runtime uses the committed ONNX export and opening book through `onnxruntime-web`'s single-threaded WASM backend; the Python sidecar remains an optional local override. Community custom models remain unavailable until a revision completes scanning, admin approval, KServe deployment, and contract canary verification. Pending or approved-but-not-ready community revisions are never listed as playable. Ready community revisions automatically appear in the opponent selector; the server re-derives legal moves from FEN and rejects malformed, stale, or illegal runtime output. The built-in tuned path follows the same legal-output validation.
+Stockfish 18 remains the default opponent, Stockfish 19 is an additional selectable browser opponent, and the bundled `Tuned Opening Style` CPU opponent is also built in. Computer games show a side evaluation bar calculated by an independent Stockfish 19 search. The tuned runtime uses the committed ONNX export and opening book through `onnxruntime-web`'s single-threaded WASM backend; the Python sidecar remains an optional local override. Community custom models remain unavailable until a revision completes scanning, admin approval, KServe deployment, and contract canary verification. Pending or approved-but-not-ready community revisions are never listed as playable. Ready community revisions automatically appear in the opponent selector; the server re-derives legal moves from FEN and rejects malformed, stale, or illegal runtime output. The built-in tuned path follows the same legal-output validation.
 
 ## Required production secrets
 
@@ -63,7 +63,8 @@ Approval is accepted only from `pending_review`; it does not make a model playab
 
 ## Model arena and replay
 
-- Any two `ready` revisions may be selected; Stockfish 18 is always available.
+- Any two `ready` revisions may be selected; Stockfish 18 remains the default built-in opponent and Stockfish 19 is also available.
+- Computer games render the Stockfish 19 side evaluation bar; model-arena replays do not create a separate evaluation stream.
 - Each model receives at most 3,000 ms per turn. Browser Stockfish searches for 2,800 ms, reserving time to persist the move. Remote KServe inference receives the same 2,800 ms compute budget.
 - A random control token authorizes move and pause mutations. Only its SHA-256 digest is stored; the browser keeps the token in local storage so the creator can resume after reload.
 - Every accepted move stores UCI, SAN, resulting FEN, duration, timestamp, full PGN, and an optimistic-concurrency version in PostgreSQL.

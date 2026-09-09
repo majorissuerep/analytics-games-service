@@ -10,9 +10,12 @@ import type { ChessColorChoice, ChessGameView } from '../model'
 import {
   STOCKFISH_LEVELS,
   StockfishBrowserEngine,
+  stockfishEngineIdForRevision,
   stockfishLevel,
   type StockfishLevelId,
+  type StockfishEvaluation,
 } from './stockfish'
+import { EvaluationBar } from './EvaluationBar'
 import { ModelSubmissionPanel } from './ModelSubmissionPanel'
 import { ModelArena } from './ModelArena'
 import {
@@ -84,6 +87,7 @@ export function ChessGame() {
   const [modelRevision, setModelRevision] = useState('builtin-stockfish-18')
   const [modelOptions, setModelOptions] = useState<ModelOption[]>([
     { revisionId: 'builtin-stockfish-18', displayName: 'Stockfish 18', runtimeId: 'builtin-stockfish-18' },
+    { revisionId: 'builtin-stockfish-19', displayName: 'Stockfish 19', runtimeId: 'builtin-stockfish-19' },
     { revisionId: BUILTIN_STYLED_OPENING_MODEL.revisionId, displayName: BUILTIN_STYLED_OPENING_MODEL.displayName, runtimeId: BUILTIN_STYLED_OPENING_MODEL.runtimeId },
   ])
   const [localFen, setLocalFen] = useState(() => new Chess().fen())
@@ -97,8 +101,11 @@ export function ChessGame() {
   const [promotion, setPromotion] = useState<PendingPromotion>(null)
   const [engineThinking, setEngineThinking] = useState(false)
   const [engineError, setEngineError] = useState('')
+  const [evaluation, setEvaluation] = useState<StockfishEvaluation | null>(null)
+  const [evaluationError, setEvaluationError] = useState('')
   const [soundOn, setSoundOn] = useState(() => isSoundEnabled())
   const engineRef = useRef<StockfishBrowserEngine | null>(null)
+  const evaluationEngineRef = useRef<StockfishBrowserEngine | null>(null)
   const [playerId, setPlayerId] = useState('')
   const [name, setName] = useState('')
   const [roomCode, setRoomCode] = useState('')
@@ -123,6 +130,7 @@ export function ChessGame() {
 
   useEffect(() => () => {
     engineRef.current?.destroy()
+    evaluationEngineRef.current?.destroy()
     disposeChessSound()
   }, [])
 
@@ -229,9 +237,15 @@ export function ChessGame() {
       setEngineError('')
       try {
         let move: { from: Square; to: Square; promotion?: 'q' | 'r' | 'b' | 'n' }
-        if (modelRevision === 'builtin-stockfish-18') {
-          engineRef.current ??= new StockfishBrowserEngine()
-          move = await engineRef.current.findBestMove(localFen, levelId)
+        const stockfishId = stockfishEngineIdForRevision(modelRevision)
+        if (stockfishId) {
+          let opponentEngine = engineRef.current
+          if (!opponentEngine || opponentEngine.engineId !== stockfishId) {
+            opponentEngine?.destroy()
+            opponentEngine = new StockfishBrowserEngine({ engineId: stockfishId })
+            engineRef.current = opponentEngine
+          }
+          move = await opponentEngine.findBestMove(localFen, levelId)
         } else {
           const legalMoves = chess.moves({ verbose: true }).map(item => `${item.from}${item.to}${item.promotion ?? ''}`)
           const response = await fetch(`/api/chess-models/${encodeURIComponent(modelRevision)}/move`, {
@@ -260,9 +274,29 @@ export function ChessGame() {
     return () => { cancelled = true }
   }, [activeStyledRepertoireId, applyMove, chess, humanColor, levelId, localFen, localHistory, localResult, mode, modelRevision])
 
+  useEffect(() => {
+    if (mode !== 'bot' || localResult) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setEvaluation(null)
+      setEvaluationError('')
+      return
+    }
+    let cancelled = false
+    const evaluator = evaluationEngineRef.current ?? (evaluationEngineRef.current = new StockfishBrowserEngine({ engineId: 'stockfish-19' }))
+    setEvaluationError('')
+    void evaluator.evaluate(localFen, 250).then((nextEvaluation) => {
+      if (!cancelled && nextEvaluation) setEvaluation(nextEvaluation)
+    }).catch((error: unknown) => {
+      if (!cancelled) setEvaluationError(error instanceof Error ? error.message : 'Stockfish 19 evaluation failed.')
+    })
+    return () => { cancelled = true }
+  }, [localFen, localResult, mode])
+
   function resetToSetup() {
     engineRef.current?.destroy()
     engineRef.current = null
+    evaluationEngineRef.current?.destroy()
+    evaluationEngineRef.current = null
     roomClient.clear()
     setUndoStack([])
     setLocalHistory([])
@@ -272,6 +306,8 @@ export function ChessGame() {
     setPromotion(null)
     setNotice('')
     setEngineError('')
+    setEvaluation(null)
+    setEvaluationError('')
     setEngineThinking(false)
   }
 
@@ -288,6 +324,8 @@ export function ChessGame() {
     setLastMove(null)
     setPromotion(null)
     setEngineError('')
+    setEvaluation(null)
+    setEvaluationError('')
     setEngineThinking(false)
     setMode(nextMode)
   }
@@ -432,7 +470,7 @@ export function ChessGame() {
 
             {setupMode === 'bot' && <>
               <div className="chess-field"><label htmlFor="opponent-model">Opponent model</label><select id="opponent-model" value={modelRevision} onChange={(event) => setModelRevision(event.target.value)}>{modelOptions.map((model) => <option key={model.revisionId} value={model.revisionId}>{model.displayName}</option>)}</select><small>Only scanned, approved, deployed, and healthy models appear here.</small></div>
-              <div className="chess-field"><label htmlFor="stockfish-level">Stockfish difficulty</label><select id="stockfish-level" disabled={modelRevision !== 'builtin-stockfish-18'} value={levelId} onChange={(event) => setLevelId(event.target.value as StockfishLevelId)}>{STOCKFISH_LEVELS.map((item) => <option key={item.id} value={item.id}>{item.label} · Skill {item.skill}/20</option>)}</select><small>{modelRevision === 'builtin-stockfish-18' ? `${level.description}. Stockfish 18 WASM, ${level.moveTimeMs} ms search per move.` : 'Custom model strength and move budget are controlled by its approved runtime profile.'}</small></div>
+              <div className="chess-field"><label htmlFor="stockfish-level">Stockfish difficulty</label><select id="stockfish-level" disabled={!stockfishEngineIdForRevision(modelRevision)} value={levelId} onChange={(event) => setLevelId(event.target.value as StockfishLevelId)}>{STOCKFISH_LEVELS.map((item) => <option key={item.id} value={item.id}>{item.label} · Skill {item.skill}/20</option>)}</select><small>{stockfishEngineIdForRevision(modelRevision) ? `${level.description}. ${opponentName} WASM, ${level.moveTimeMs} ms search per move.` : 'Custom model strength and move budget are controlled by its approved runtime profile.'}</small></div>
               {modelRevision === BUILTIN_STYLED_OPENING && <div className="chess-field"><label htmlFor="styled-repertoire">Opening repertoire</label><select id="styled-repertoire" value={effectiveStyledRepertoireId} onChange={(event) => setStyledRepertoireId(event.target.value as StyledRepertoireId)}>{styledRepertoireOptions.map((repertoire) => <option key={repertoire.id} value={repertoire.id}>{repertoire.label}</option>)}</select><small>Choose the tuned model&apos;s explicit selector. White repertoires are used when the model plays White; Black repertoires when it plays Black.</small></div>}
               <button className="chess-primary" onClick={() => startLocal('bot')}>Play {opponentName}</button>
             </>}
@@ -485,7 +523,8 @@ export function ChessGame() {
           </div>
           <aside className="chess-sidebar">
             <div className="chess-status"><span className={`turn-dot ${chess.turn() === 'w' ? 'white' : 'black'}`} /><div><small>{mode === 'bot' ? `You are ${humanColor === 'w' ? 'White' : 'Black'}` : mode === 'local' ? 'Pass and play' : onlineColor ? `You are ${onlineColor === 'w' ? 'White' : 'Black'}` : 'Online game'}</small><h2>{status}</h2></div></div>
-            {mode === 'bot' && <div className="chess-opponent"><span>♞</span><div><b>{opponentName}</b><small>{modelRevision === 'builtin-stockfish-18' ? `${level.label} · Skill ${level.skill}/20` : 'Custom model'}</small></div></div>}
+            {mode === 'bot' && <div className="chess-opponent"><span>♞</span><div><b>{opponentName}</b><small>{stockfishEngineIdForRevision(modelRevision) ? `${level.label} · Skill ${level.skill}/20` : 'Custom model'}</small></div></div>}
+            {mode === 'bot' && <EvaluationBar evaluation={evaluation} error={evaluationError || undefined} />}
             {engineError && <p className="chess-notice" role="alert">{engineError}</p>}
             {mode === 'online' && roomClient.room && <div className="chess-room-panel"><small>ROOM CODE</small><div><strong>{roomClient.room.code}</strong><button onClick={() => void navigator.clipboard.writeText(roomClient.room?.code ?? '')}>Copy</button></div><p>{roomClient.room.players.map((player) => player.name).join('  vs  ')}</p>{online?.phase === 'lobby' && roomClient.room.hostId === playerId && <button className="chess-primary" disabled={roomClient.room.players.length !== 2 || roomClient.pending} onClick={() => void roomClient.dispatch({ type: 'chess.start', hostColor: colorChoice, timeControlId })}>{roomClient.room.players.length === 2 ? 'Start match' : 'Waiting for opponent…'}</button>}</div>}
             {mode === 'online' && online?.timeControlId && (
