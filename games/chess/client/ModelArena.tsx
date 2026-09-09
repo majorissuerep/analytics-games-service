@@ -5,7 +5,7 @@ import { Chess } from 'chess.js'
 import { Chessboard } from 'react-chessboard'
 import type { ModelMatchState } from '@/lib/chess-models/model-match'
 import { emitGameSessionCompleted } from '@/lib/analytics/game-events'
-import { StockfishBrowserEngine } from './stockfish'
+import { StockfishBrowserEngine, stockfishEngineIdForRevision } from './stockfish'
 
 type ModelOption = { revisionId: string; displayName: string }
 type MatchRecord = {
@@ -69,9 +69,15 @@ export function ModelArena({ models }: { models: ModelOption[] }) {
         const chess = new Chess(match.state.fen)
         const revisionId = chess.turn() === 'w' ? match.white_revision_id : match.black_revision_id
         let uci: string
-        if (revisionId === BUILTIN) {
-          engineRef.current ??= new StockfishBrowserEngine()
-          const move = await engineRef.current.findBestMoveTimed(match.state.fen, 2800)
+        const stockfishId = stockfishEngineIdForRevision(revisionId)
+        if (stockfishId) {
+          let arenaEngine = engineRef.current
+          if (!arenaEngine || arenaEngine.engineId !== stockfishId) {
+            arenaEngine?.destroy()
+            arenaEngine = new StockfishBrowserEngine({ engineId: stockfishId })
+            engineRef.current = arenaEngine
+          }
+          const move = await arenaEngine.findBestMoveTimed(match.state.fen, 2800)
           uci = `${move.from}${move.to}${move.promotion ?? ''}`
         } else {
           const legalMoves = chess.moves({ verbose: true }).map(move => `${move.from}${move.to}${move.promotion ?? ''}`)

@@ -17,7 +17,8 @@ Production baseline plus the local production build after adding Chess. Covered 
 
 The initial Chess release failed product acceptance despite green CI. Its bot was a handcrafted random/capture heuristic, the board was a crude Unicode grid, and the newly introduced `analytics-games-service` Vercel project lacked `DATABASE_URL`, so every room creation returned HTTP 500. Those defects were reproduced directly in production and replaced rather than cosmetically patched.
 
-- Computer play now runs Stockfish 18 lite single-threaded WASM in a dedicated Web Worker.
+- Computer play now runs Stockfish 18 or Stockfish 19 browser engines; Stockfish 18 remains the default and Stockfish 19 uses the bundled smallnet/NNUE build.
+- Every computer game displays an independent Stockfish 19 side evaluation bar with White-perspective centipawn and mate scores.
 - Five difficulty profiles use Stockfish `Skill Level` 0/5/10/15/20 and increasing bounded search times.
 - The UI now uses the MIT `react-chessboard` foundation with standard pieces, drag/drop, click moves, animation, notation, legal-target highlighting, last-move highlighting, explicit promotion choice, and a responsive game/sidebar layout.
 - Production deployment now resolves the `analytics-games-service` Vercel project by name, provisions its encrypted `DATABASE_URL`, and requires a successful stateful Chess-room API smoke test before browser acceptance or promotion.
@@ -37,7 +38,8 @@ No unresolved Critical, High, or Medium functional defects remain in this pass.
 ## Chess coverage
 
 - Color selection: White, Black, Random.
-- Stockfish modes: Beginner, Casual, Club, Advanced, and Expert using genuine Stockfish 18 search at increasing skill/time bounds.
+- Stockfish modes: Beginner, Casual, Club, Advanced, and Expert using genuine Stockfish 18 or 19 search at increasing skill/time bounds.
+- Computer evaluation: the sidebar bar is powered by a separate Stockfish 19 search and updates with each local computer-game position.
 - Local pass-and-play: alternating legal turns on one device.
 - Online rooms: create/join, optional password rejection/success, two-player seating, host-selected color, synchronized legal moves, resignation/rematch server rules.
 - Online time controls: host picks bullet/blitz/rapid/long (base + optional increment) before starting; live countdown clocks for both sides; loss-on-time when a clock expires (unless the opponent lacks mating material); a timeout claim is reflected to all players.

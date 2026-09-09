@@ -28,7 +28,7 @@ Local development also initializes missing tables on first API use. Canonical en
 
 ## Tuned opening model
 
-Chess keeps Stockfish 18 as the default browser engine and adds `Tuned Opening Style` as a separate opponent. The tuned model is the selector-conditioned Otter checkpoint from the sibling `ml-anti-stockfish-service` project. Production runs the committed ONNX export through `onnxruntime-web`'s single-threaded WASM CPU backend; it does not require Python, CUDA, or a second service. The model, vocabularies, compact opening book, provenance metadata, and reproducible builder live in `public/models/` and `scripts/build_styled_runtime_artifacts.py`.
+Chess keeps Stockfish 18 as the default browser opponent and adds Stockfish 19 as a selectable alternative. Computer games also show a side evaluation bar powered independently by Stockfish 19; scores are displayed from White's perspective with mate handling. `Tuned Opening Style` remains a separate opponent. The tuned model is the selector-conditioned Otter checkpoint from the sibling `ml-anti-stockfish-service` project. Production runs the committed ONNX export through `onnxruntime-web`'s single-threaded WASM CPU backend; it does not require Python, CUDA, or a second service. The model, vocabularies, compact opening book, provenance metadata, and reproducible builder live in `public/models/` and `scripts/build_styled_runtime_artifacts.py`.
 
 The optional Python sidecar remains useful for local parity checks:
 

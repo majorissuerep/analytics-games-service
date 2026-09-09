@@ -97,6 +97,18 @@ export const BUILTIN_STOCKFISH: PublicChessModel = {
   status: 'ready',
 }
 
+export const BUILTIN_STOCKFISH_19: PublicChessModel = {
+  id: 'builtin-stockfish-19',
+  slug: 'stockfish-19',
+  displayName: 'Stockfish 19',
+  description: 'Built-in Stockfish 19 smallnet WASM engine with five difficulty levels.',
+  runtimeId: 'builtin-stockfish-19',
+  revisionId: 'builtin-stockfish-19',
+  sourceType: 'builtin',
+  license: 'GPL-3.0',
+  status: 'ready',
+}
+
 export const BUILTIN_STYLED: PublicChessModel = {
   id: BUILTIN_STYLED_OPENING,
   slug: 'styled-opening-otter',

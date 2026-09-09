@@ -5,7 +5,7 @@
 
 ## Summary
 
-Add a safe, revisioned registry for community Chess models while preserving Stockfish 18, local play, and online rooms. Public users may submit either a quarantined model package or an immutable Hugging Face model revision. Only an administrator may approve a revision; only approved revisions may be selected for play or deployed to KServe.
+Add a safe, revisioned registry for community Chess models while preserving Stockfish 18 as the default, Stockfish 19 as an additional browser opponent, local play, and online rooms. Computer games also expose a Stockfish 19 evaluation bar. Public users may submit either a quarantined model package or an immutable Hugging Face model revision. Only an administrator may approve a revision; only approved revisions may be selected for play or deployed to KServe.
 
 ## Scope
 
@@ -77,7 +77,8 @@ Initial limits: 1 GiB compressed, 2 GiB expanded, 32 files, 500 million paramete
 
 | Runtime ID | KServe stack | Accepted data | Initial accelerator | Notes |
 |---|---|---|---|---|
-| `builtin-stockfish-18` | Existing browser Web Worker/WASM | Vendored Stockfish build | Client CPU | Always available; not uploaded or modified through registry. |
+| `builtin-stockfish-18` | Existing browser Web Worker/WASM | Vendored Stockfish build | Client CPU | Always available; default opponent; not uploaded or modified through registry. |
+| `builtin-stockfish-19` | Browser WASM module with bundled NNUE | Vendored Stockfish 19 smallnet build | Client CPU | Always available; selectable opponent and evaluation engine; not uploaded or modified through registry. |
 | `onnx-policy-v1` | KServe `ServingRuntime` backed by NVIDIA Triton ONNX backend | One validated `.onnx` graph, static allowlisted operators | Server CPU; optional reviewed GPU profile | Preferred custom-model format; no Python deserialization. |
 | `hf-transformers-chess-v1` | KServe Hugging Face `ServingRuntime` with `safetensors` | Immutable Hub revision or package; allowlisted architecture/config/tokenizer files | Server CPU/GPU by admin profile | `trust_remote_code=false`; no `.bin`, `.pt`, `.pth`, `.pkl`, Python, or shell files. |
 
@@ -252,7 +253,7 @@ Feature: Safe community Chess models
   Scenario: Existing play remains available
     Given no custom model is ready
     When a player opens Chess
-    Then Stockfish 18, local play, and online rooms work unchanged
+    Then Stockfish 18 remains the default, Stockfish 19 is selectable, the Stockfish 19 evaluation bar works in computer games, local play works, and online rooms work unchanged
 
   Scenario: Public direct upload is quarantined
     Given a valid onnx-policy-v1 manifest within limits
