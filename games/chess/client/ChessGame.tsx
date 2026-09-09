@@ -283,13 +283,19 @@ export function ChessGame() {
     }
     let cancelled = false
     const evaluator = evaluationEngineRef.current ?? (evaluationEngineRef.current = new StockfishBrowserEngine({ engineId: 'stockfish-19' }))
+    setEvaluation(null)
     setEvaluationError('')
-    void evaluator.evaluate(localFen, 250).then((nextEvaluation) => {
-      if (!cancelled && nextEvaluation) setEvaluation(nextEvaluation)
-    }).catch((error: unknown) => {
-      if (!cancelled) setEvaluationError(error instanceof Error ? error.message : 'Stockfish 19 evaluation failed.')
-    })
-    return () => { cancelled = true }
+    const timer = window.setTimeout(() => {
+      void evaluator.evaluate(localFen).then((nextEvaluation) => {
+        if (!cancelled && nextEvaluation) setEvaluation(nextEvaluation)
+      }).catch((error: unknown) => {
+        if (!cancelled) setEvaluationError(error instanceof Error ? error.message : 'Stockfish 19 evaluation failed.')
+      })
+    }, 180)
+    return () => {
+      cancelled = true
+      window.clearTimeout(timer)
+    }
   }, [localFen, localResult, mode])
 
   function resetToSetup() {
