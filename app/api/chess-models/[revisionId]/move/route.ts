@@ -2,13 +2,16 @@ import { Chess } from 'chess.js'
 import { NextResponse } from 'next/server'
 import { chessModelMoveRequestSchema } from '@/lib/chess-models/contracts'
 import { getReadyModelDeployment } from '@/lib/chess-models/repository'
+import { defaultStyledRepertoireForModelColor, BUILTIN_STYLED_OPENING } from '@/lib/chess-models/styled'
+import { requestStyledMove } from '@/lib/chess-models/styled-runtime'
+
+export const runtime = 'nodejs'
+export const maxDuration = 10
 
 export async function POST(request: Request, context: { params: Promise<{ revisionId: string }> }) {
   const parsed = chessModelMoveRequestSchema.safeParse(await request.json().catch(() => null))
   if (!parsed.success) return NextResponse.json({ error: 'Invalid inference request' }, { status: 400 })
   const { revisionId } = await context.params
-  const deployment = await getReadyModelDeployment(revisionId)
-  if (!deployment) return NextResponse.json({ error: 'Model revision is not ready' }, { status: 404 })
 
   try {
     const chess = new Chess(parsed.data.fen)
@@ -17,6 +20,22 @@ export async function POST(request: Request, context: { params: Promise<{ revisi
     if (authoritative.length !== supplied.length || authoritative.some((move, index) => move !== supplied[index])) {
       return NextResponse.json({ error: 'Legal move set does not match FEN' }, { status: 400 })
     }
+
+    if (revisionId === BUILTIN_STYLED_OPENING) {
+      const turn = parsed.data.fen.split(' ')[1]
+      const repertoireId = parsed.data.repertoireId ?? defaultStyledRepertoireForModelColor(turn === 'w' ? 'w' : 'b')
+      const result = await requestStyledMove({
+        fen: parsed.data.fen,
+        history: parsed.data.history,
+        repertoireId,
+        legalMoves: supplied,
+        moveTimeMs: parsed.data.moveTimeMs,
+      })
+      return NextResponse.json({ move: result.move, revisionId, repertoireId })
+    }
+
+    const deployment = await getReadyModelDeployment(revisionId)
+    if (!deployment) return NextResponse.json({ error: 'Model revision is not ready' }, { status: 404 })
 
     const endpoint = new URL(deployment.endpoint)
     endpoint.pathname = `/v2/models/${encodeURIComponent(deployment.slug)}/versions/${encodeURIComponent(deployment.revision_id)}/infer`

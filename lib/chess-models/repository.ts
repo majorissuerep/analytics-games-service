@@ -1,6 +1,6 @@
 import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto'
 import { pool } from '@/lib/db/index'
-import { BUILTIN_STOCKFISH, type ChessModelSubmission, type PublicChessModel } from './contracts'
+import { BUILTIN_STOCKFISH, BUILTIN_STYLED, type ChessModelSubmission, type PublicChessModel } from './contracts'
 
 function hashReceipt(receipt: string) {
   return createHash('sha256').update(receipt).digest('hex')
@@ -25,7 +25,7 @@ export async function listPublicModels(): Promise<PublicChessModel[]> {
     JOIN chess_model_revisions r ON r.id = m.current_ready_revision
     WHERE m.visibility = 'public' AND m.disabled = FALSE AND m.archived = FALSE AND r.state = 'ready'
     ORDER BY m.display_name ASC`)
-  return [BUILTIN_STOCKFISH, ...result.rows.map(row => ({
+  return [BUILTIN_STOCKFISH, BUILTIN_STYLED, ...result.rows.map(row => ({
     id: row.id,
     slug: row.slug,
     displayName: row.display_name,

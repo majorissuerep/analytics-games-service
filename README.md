@@ -26,6 +26,20 @@ Production and preview workflows run the idempotent `scripts/migrate.mjs` before
 Local development also initializes missing tables on first API use. Canonical engine DDL:
 `db/migrations/0001_game_platform.sql`.
 
+## Tuned opening model
+
+Chess keeps Stockfish 18 as the default browser engine and adds `Tuned Opening Style` as a separate opponent. The tuned model is the selector-conditioned Otter checkpoint from the sibling `ml-anti-stockfish-service` project. Production runs the committed ONNX export through `onnxruntime-web`'s single-threaded WASM CPU backend; it does not require Python, CUDA, or a second service. The model, vocabularies, compact opening book, provenance metadata, and reproducible builder live in `public/models/` and `scripts/build_styled_runtime_artifacts.py`.
+
+The optional Python sidecar remains useful for local parity checks:
+
+```bash
+npm run chess-styled:serve
+```
+
+Set `STYLED_CHESS_INFERENCE_URL=http://127.0.0.1:8765` only when intentionally using that sidecar. Leave it unset for the bundled CPU runtime used by the deployed Next.js service. Artifact paths can be overridden with `STYLED_CHESS_ONNX_PATH`, `STYLED_CHESS_POLICY_VOCAB_PATH`, `STYLED_CHESS_HISTORY_VOCAB_PATH`, and `STYLED_CHESS_BOOK_PATH`.
+
+In Chess → Computer, select `Tuned Opening Style`, choose one of Italian Game, Queen's Gambit, Caro–Kann Defense, or Slav Defense, and start the game. The browser sends the complete UCI history and legal move set to the Next.js route; the route validates the move against `chess.js` before applying it. The runtime enforces the trained opening book when the current line is known and falls back to the legal neural policy after a deviation. If inference returns malformed output, no move is applied and the UI reports a safe failure; Stockfish remains available.
+
 ## Quality and security
 
 `npm run check` runs ESLint (Next.js, TypeScript, React, and security rules), tests,

@@ -15,6 +15,14 @@ import {
 } from './stockfish'
 import { ModelSubmissionPanel } from './ModelSubmissionPanel'
 import { ModelArena } from './ModelArena'
+import {
+  BUILTIN_STYLED_OPENING,
+  BUILTIN_STYLED_OPENING_MODEL,
+  defaultStyledRepertoireForModelColor,
+  STYLED_REPERTOIRES,
+  styledRepertoiresForModelColor,
+  type StyledRepertoireId,
+} from '@/lib/chess-models/styled'
 import { disposeChessSound, isSoundEnabled, playMoveSound, playUndoSound, setSoundEnabled } from './sound'
 import { descriptorFromDiff, kingSquare, outcomeInfo, pinnedSquares, resultFor, type GameOverInfo } from './chess-logic'
 import {
@@ -47,6 +55,12 @@ function chosenColor(choice: ChessColorChoice): Color {
   return choice === 'white' ? 'w' : 'b'
 }
 
+function repertoireForModelColor(repertoireId: StyledRepertoireId, color: Color): StyledRepertoireId {
+  const selected = STYLED_REPERTOIRES.find((repertoire) => repertoire.id === repertoireId)
+  const selectedSide = color === 'w' ? 'white' : 'black'
+  return selected?.side === selectedSide ? repertoireId : defaultStyledRepertoireForModelColor(color)
+}
+
 const selectedStyle: CSSProperties = { boxShadow: 'inset 0 0 0 4px #f6c344' }
 const lastMoveStyle: CSSProperties = { background: 'rgba(246,195,68,.48)' }
 const checkStyle: CSSProperties = {
@@ -68,9 +82,15 @@ export function ChessGame() {
   const [humanColor, setHumanColor] = useState<Color>('w')
   const [levelId, setLevelId] = useState<StockfishLevelId>('club')
   const [modelRevision, setModelRevision] = useState('builtin-stockfish-18')
-  const [modelOptions, setModelOptions] = useState<ModelOption[]>([{ revisionId: 'builtin-stockfish-18', displayName: 'Stockfish 18', runtimeId: 'builtin-stockfish-18' }])
+  const [modelOptions, setModelOptions] = useState<ModelOption[]>([
+    { revisionId: 'builtin-stockfish-18', displayName: 'Stockfish 18', runtimeId: 'builtin-stockfish-18' },
+    { revisionId: BUILTIN_STYLED_OPENING_MODEL.revisionId, displayName: BUILTIN_STYLED_OPENING_MODEL.displayName, runtimeId: BUILTIN_STYLED_OPENING_MODEL.runtimeId },
+  ])
   const [localFen, setLocalFen] = useState(() => new Chess().fen())
   const [localPgn, setLocalPgn] = useState('')
+  const [localHistory, setLocalHistory] = useState<string[]>([])
+  const [styledRepertoireId, setStyledRepertoireId] = useState<StyledRepertoireId>('black_caro_kann')
+  const [activeStyledRepertoireId, setActiveStyledRepertoireId] = useState<StyledRepertoireId>('black_caro_kann')
   const [localResult, setLocalResult] = useState('')
   const [selected, setSelected] = useState<Square | null>(null)
   const [lastMove, setLastMove] = useState<{ from: Square; to: Square } | null>(null)
@@ -87,7 +107,7 @@ export function ChessGame() {
   const [timeControlId, setTimeControlId] = useState(DEFAULT_CHESS_TIME_ID)
   const [clockNow, setClockNow] = useState(() => Date.now())
   const roomClient = useGameRoom<ChessGameView>({ gameId: 'chess', playerId, pollMs: 1000 })
-  const [undoStack, setUndoStack] = useState<Array<{ fen: string; pgn: string }>>([])
+  const [undoStack, setUndoStack] = useState<Array<{ fen: string; pgn: string; history: string[] }>>([])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -107,6 +127,15 @@ export function ChessGame() {
   }, [])
 
   const online = roomClient.room?.game ?? null
+  const styledRepertoireOptions = useMemo(() => {
+    if (colorChoice === 'random') return STYLED_REPERTOIRES
+    return styledRepertoiresForModelColor(colorChoice === 'black' ? 'w' : 'b')
+  }, [colorChoice])
+
+  const effectiveStyledRepertoireId = styledRepertoireOptions.some((repertoire) => repertoire.id === styledRepertoireId)
+    ? styledRepertoireId
+    : styledRepertoireOptions[0]?.id ?? 'black_caro_kann'
+
   const fen = mode === 'online' && online ? online.fen : localFen
   const chess = useMemo(() => new Chess(fen), [fen])
   const onlineColor: Color | null = online?.whiteId === playerId ? 'w' : online?.blackId === playerId ? 'b' : null
@@ -159,16 +188,19 @@ export function ChessGame() {
   /** Commit a real move onto the local board, keeping an undo snapshot first. */
   const applyMove = useCallback((move: { from: Square; to: Square; promotion?: 'q' | 'r' | 'b' | 'n' }, painter = 'q') => {
     const next = new Chess(localFen)
-    try { next.move({ from: move.from, to: move.to, promotion: move.promotion ?? painter }) } catch { return false }
-    setUndoStack((stack) => [...stack, { fen: localFen, pgn: localPgn }])
+    let applied
+    try { applied = next.move({ from: move.from, to: move.to, promotion: move.promotion ?? painter }) } catch { return false }
+    const moveUci = `${applied.from}${applied.to}${applied.promotion ?? ''}`
+    setUndoStack((stack) => [...stack, { fen: localFen, pgn: localPgn, history: localHistory }])
     setLocalFen(next.fen())
     setLocalPgn(next.pgn())
+    setLocalHistory((history) => [...history, moveUci])
     setLocalResult(resultFor(next))
     setLastMove({ from: move.from, to: move.to })
     setSelected(null)
     setPromotion(null)
     return true
-  }, [localFen, localPgn])
+  }, [localFen, localHistory, localPgn])
 
   // Fire the correct sound whenever the effective board position advances by
   // exactly one move. The display last-move is null after a reset/undo, which
@@ -204,7 +236,13 @@ export function ChessGame() {
           const legalMoves = chess.moves({ verbose: true }).map(item => `${item.from}${item.to}${item.promotion ?? ''}`)
           const response = await fetch(`/api/chess-models/${encodeURIComponent(modelRevision)}/move`, {
             method: 'POST', headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ fen: localFen, legalMoves, moveTimeMs: 500 }),
+            body: JSON.stringify({
+              fen: localFen,
+              legalMoves,
+              history: localHistory,
+              repertoireId: activeStyledRepertoireId,
+              moveTimeMs: modelRevision === BUILTIN_STYLED_OPENING ? 2800 : 500,
+            }),
           })
           const result = await response.json() as { move?: string; error?: string }
           if (!response.ok || !result.move) throw new Error(result.error || 'Custom model failed to move')
@@ -220,13 +258,14 @@ export function ChessGame() {
     }
     void run()
     return () => { cancelled = true }
-  }, [applyMove, chess, humanColor, levelId, localFen, localResult, mode, modelRevision])
+  }, [activeStyledRepertoireId, applyMove, chess, humanColor, levelId, localFen, localHistory, localResult, mode, modelRevision])
 
   function resetToSetup() {
     engineRef.current?.destroy()
     engineRef.current = null
     roomClient.clear()
     setUndoStack([])
+    setLocalHistory([])
     setMode('setup')
     setSelected(null)
     setLastMove(null)
@@ -237,10 +276,13 @@ export function ChessGame() {
   }
 
   function startLocal(nextMode: 'bot' | 'local') {
-    setHumanColor(nextMode === 'bot' ? chosenColor(colorChoice) : colorChoice === 'black' ? 'b' : 'w')
+    const nextHumanColor = nextMode === 'bot' ? chosenColor(colorChoice) : colorChoice === 'black' ? 'b' : 'w'
+    setHumanColor(nextHumanColor)
+    setActiveStyledRepertoireId(repertoireForModelColor(effectiveStyledRepertoireId, nextHumanColor))
     setUndoStack([])
     setLocalFen(new Chess().fen())
     setLocalPgn('')
+    setLocalHistory([])
     setLocalResult('')
     setSelected(null)
     setLastMove(null)
@@ -302,10 +344,11 @@ export function ChessGame() {
     const required = mode === 'bot' ? 2 : 1
     if (mode === 'online' || engineThinking || stack.length < required) return
     const rest = stack.slice(0, stack.length - required)
-    const restore = rest.length ? rest[rest.length - 1] : { fen: new Chess().fen(), pgn: '' }
+    const restore = rest.length ? rest[rest.length - 1] : { fen: new Chess().fen(), pgn: '', history: [] as string[] }
     setUndoStack(rest)
     setLocalFen(restore.fen)
     setLocalPgn(restore.pgn)
+    setLocalHistory(restore.history)
     setLocalResult('')
     setSelected(null)
     setLastMove(null)
@@ -390,6 +433,7 @@ export function ChessGame() {
             {setupMode === 'bot' && <>
               <div className="chess-field"><label htmlFor="opponent-model">Opponent model</label><select id="opponent-model" value={modelRevision} onChange={(event) => setModelRevision(event.target.value)}>{modelOptions.map((model) => <option key={model.revisionId} value={model.revisionId}>{model.displayName}</option>)}</select><small>Only scanned, approved, deployed, and healthy models appear here.</small></div>
               <div className="chess-field"><label htmlFor="stockfish-level">Stockfish difficulty</label><select id="stockfish-level" disabled={modelRevision !== 'builtin-stockfish-18'} value={levelId} onChange={(event) => setLevelId(event.target.value as StockfishLevelId)}>{STOCKFISH_LEVELS.map((item) => <option key={item.id} value={item.id}>{item.label} · Skill {item.skill}/20</option>)}</select><small>{modelRevision === 'builtin-stockfish-18' ? `${level.description}. Stockfish 18 WASM, ${level.moveTimeMs} ms search per move.` : 'Custom model strength and move budget are controlled by its approved runtime profile.'}</small></div>
+              {modelRevision === BUILTIN_STYLED_OPENING && <div className="chess-field"><label htmlFor="styled-repertoire">Opening repertoire</label><select id="styled-repertoire" value={effectiveStyledRepertoireId} onChange={(event) => setStyledRepertoireId(event.target.value as StyledRepertoireId)}>{styledRepertoireOptions.map((repertoire) => <option key={repertoire.id} value={repertoire.id}>{repertoire.label}</option>)}</select><small>Choose the tuned model&apos;s explicit selector. White repertoires are used when the model plays White; Black repertoires when it plays Black.</small></div>}
               <button className="chess-primary" onClick={() => startLocal('bot')}>Play {opponentName}</button>
             </>}
 
