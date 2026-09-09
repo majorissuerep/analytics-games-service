@@ -39,7 +39,7 @@ No unresolved Critical, High, or Medium functional defects remain in this pass.
 
 - Color selection: White, Black, Random.
 - Stockfish modes: Beginner, Casual, Club, Advanced, and Expert using genuine Stockfish 18 or 19 search at increasing skill/time bounds.
-- Computer evaluation: the sidebar bar is powered by a separate Stockfish 19 search and updates with each local computer-game position.
+- Computer evaluation: the sidebar bar is powered by a separate Stockfish 19 search, clears stale scores on every position change, waits 180 ms for the position to settle, then uses one CPU thread, a 16 MB hash, and at most 8,000 nodes.
 - Local pass-and-play: alternating legal turns on one device.
 - Online rooms: create/join, optional password rejection/success, two-player seating, host-selected color, synchronized legal moves, resignation/rematch server rules.
 - Online time controls: host picks bullet/blitz/rapid/long (base + optional increment) before starting; live countdown clocks for both sides; loss-on-time when a clock expires (unless the opponent lacks mating material); a timeout claim is reflected to all players.

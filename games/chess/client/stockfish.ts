@@ -45,6 +45,8 @@ export const STOCKFISH_LEVELS: readonly StockfishLevel[] = [
   { id: 'expert', label: 'Expert', description: 'Full skill, longer search', skill: 20, moveTimeMs: 1000 },
 ]
 
+export const STOCKFISH_EVALUATION_NODES = 8000
+
 export interface StockfishEvaluation {
   scoreCp: number
   mate: number | null
@@ -85,8 +87,17 @@ export function buildStockfishTimedSearchCommands(fen: string, moveTimeMs: numbe
   return ['stop', 'setoption name Skill Level value 20', `position fen ${fen}`, `go movetime ${moveTimeMs}`]
 }
 
-export function buildStockfishEvaluationCommands(fen: string, moveTimeMs: number) {
-  return buildStockfishTimedSearchCommands(fen, moveTimeMs)
+export function buildStockfishEvaluationCommands(fen: string, nodes = STOCKFISH_EVALUATION_NODES) {
+  const requestedNodes = Number.isFinite(nodes) ? Math.floor(nodes) : STOCKFISH_EVALUATION_NODES
+  const boundedNodes = Math.max(1000, Math.min(STOCKFISH_EVALUATION_NODES, requestedNodes))
+  return [
+    'stop',
+    'setoption name Threads value 1',
+    'setoption name Hash value 16',
+    'setoption name Skill Level value 20',
+    `position fen ${fen}`,
+    `go nodes ${boundedNodes}`,
+  ]
 }
 
 export function parseBestMove(line: string): EngineMove | null {
@@ -207,6 +218,7 @@ export class StockfishBrowserEngine {
   private readonly engineLabel: string
   private readonly readyPromise: Promise<void>
   private resolveReady: (() => void) | null = null
+  private rejectReady: ((error: Error) => void) | null = null
   private pendingSearch: PendingSearch | null = null
   private initialized = false
   private destroyed = false
@@ -221,7 +233,10 @@ export class StockfishBrowserEngine {
     this.worker = this.engineId === 'stockfish-19'
       ? new Stockfish19DirectTransport(engine.workerUrl)
       : workerFactory(engine.workerUrl)
-    this.readyPromise = new Promise((resolve) => { this.resolveReady = resolve })
+    this.readyPromise = new Promise((resolve, reject) => {
+      this.resolveReady = resolve
+      this.rejectReady = reject
+    })
     this.worker.addEventListener('message', this.onMessage)
     this.worker.addEventListener('error', this.onError)
   }
@@ -239,7 +254,11 @@ export class StockfishBrowserEngine {
         this.worker.postMessage('uci')
         this.worker.postMessage('isready')
       }
-      if (line === 'readyok') this.resolveReady?.()
+      if (line === 'readyok') {
+        this.resolveReady?.()
+        this.resolveReady = null
+        this.rejectReady = null
+      }
       const evaluation = parseInfoEvaluation(line, this.sideToMove)
       if (evaluation && this.pendingSearch?.kind === 'evaluation') this.pendingSearch.latest = evaluation
       const move = parseBestMove(line)
@@ -252,8 +271,13 @@ export class StockfishBrowserEngine {
     }
   }
 
-  private onError = () => {
-    this.failPending(new Error(`${this.engineLabel} failed to load. Reload the game and try again.`))
+  private onError = (event: ErrorEvent) => {
+    const suffix = event.message ? `: ${event.message}` : ''
+    const error = new Error(`${this.engineLabel} failed to load. Reload the game and try again${suffix}.`)
+    this.rejectReady?.(error)
+    this.rejectReady = null
+    this.resolveReady = null
+    this.failPending(error)
   }
 
   private failPending(error: Error) {
@@ -295,13 +319,13 @@ export class StockfishBrowserEngine {
     })
   }
 
-  evaluate(fen: string, moveTimeMs = 250) {
+  evaluate(fen: string, nodes = STOCKFISH_EVALUATION_NODES) {
     const request = this.evaluationQueue.then(async () => {
       await this.readyPromise
       this.assertActive()
       this.replacePending()
       return new Promise<StockfishEvaluation | null>((resolve, reject) => {
-        this.startSearch(fen, { kind: 'evaluation', resolve, reject, latest: null }, buildStockfishEvaluationCommands(fen, moveTimeMs))
+        this.startSearch(fen, { kind: 'evaluation', resolve, reject, latest: null }, buildStockfishEvaluationCommands(fen, nodes))
       })
     })
     this.evaluationQueue = request.then(() => undefined, () => undefined)
@@ -311,7 +335,11 @@ export class StockfishBrowserEngine {
   destroy() {
     if (this.destroyed) return
     this.destroyed = true
-    this.failPending(new Error(`${this.engineLabel} was stopped.`))
+    const error = new Error(`${this.engineLabel} was stopped.`)
+    this.rejectReady?.(error)
+    this.rejectReady = null
+    this.resolveReady = null
+    this.failPending(error)
     this.worker.postMessage('quit')
     this.worker.terminate()
   }
