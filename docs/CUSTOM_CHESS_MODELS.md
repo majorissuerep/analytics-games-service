@@ -15,7 +15,7 @@ Canonical product/security contract: [`../specs/chess-custom-model-runtime.md`](
 - Immutable public Hugging Face import with executable/remote-code rejection
 - Optional checksum-bound S3-compatible quarantine upload
 
-Stockfish 18 remains the only executable opponent until a revision completes scanning, admin approval, KServe deployment, and contract canary verification. Pending or approved-but-not-ready revisions are never listed as playable. Ready custom revisions automatically appear in the opponent selector; the server re-derives legal moves from FEN and rejects malformed, stale, or illegal runtime output.
+Stockfish 18 and the bundled `Tuned Opening Style` CPU opponent are built-in opponents. The tuned runtime uses the committed ONNX export and opening book through `onnxruntime-web`'s single-threaded WASM backend; the Python sidecar remains an optional local override. Community custom models remain unavailable until a revision completes scanning, admin approval, KServe deployment, and contract canary verification. Pending or approved-but-not-ready community revisions are never listed as playable. Ready community revisions automatically appear in the opponent selector; the server re-derives legal moves from FEN and rejects malformed, stale, or illegal runtime output. The built-in tuned path follows the same legal-output validation.
 
 ## Required production secrets
 

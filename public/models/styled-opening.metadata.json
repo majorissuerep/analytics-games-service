@@ -1,0 +1,15 @@
+{
+  "book_records": 47356,
+  "checkpoint_sha256": "8d54ae51e913f6dc436be36c71f32f10985a499f00d9cccec4629a253a4ea56f",
+  "format_version": 1,
+  "model_type": "styled_otter_cpu_onnx",
+  "onnx_sha256": "0ea625418434d75c1661ca0c0b3586d7b5e1e80d2c426f755efedcfccc876efe",
+  "opset": 17,
+  "repertoires": [
+    "white_italian",
+    "white_queen_gambit",
+    "black_caro_kann",
+    "black_slav"
+  ],
+  "runtime": "onnxruntime-web WASM CPU"
+}

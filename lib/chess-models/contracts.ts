@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { BUILTIN_STYLED_OPENING, STYLED_REPERTOIRE_IDS } from './styled'
 
 export const CHESS_MODEL_RUNTIMES = ['onnx-policy-v1', 'hf-transformers-chess-v1'] as const
 export const CHESS_MODEL_STATES = [
@@ -53,6 +54,8 @@ export const chessModelMoveRequestSchema = z.object({
   fen: z.string().min(10).max(120),
   legalMoves: z.array(z.string().regex(/^[a-h][1-8][a-h][1-8][qrbn]?$/)).min(1).max(256),
   moveTimeMs: z.number().int().min(50).max(5000),
+  history: z.array(z.string().regex(/^[a-h][1-8][a-h][1-8][qrbn]?$/)).max(1000).default([]),
+  repertoireId: z.enum(STYLED_REPERTOIRE_IDS).optional(),
 }).strict()
 
 export const createModelMatchSchema = z.object({
@@ -91,5 +94,17 @@ export const BUILTIN_STOCKFISH: PublicChessModel = {
   revisionId: 'builtin-stockfish-18',
   sourceType: 'builtin',
   license: 'GPL-3.0',
+  status: 'ready',
+}
+
+export const BUILTIN_STYLED: PublicChessModel = {
+  id: BUILTIN_STYLED_OPENING,
+  slug: 'styled-opening-otter',
+  displayName: 'Tuned Opening Style',
+  description: 'Local selector-conditioned Otter policy with four trained opening repertoires.',
+  runtimeId: BUILTIN_STYLED_OPENING,
+  revisionId: BUILTIN_STYLED_OPENING,
+  sourceType: 'builtin-local',
+  license: 'local-research-checkpoint',
   status: 'ready',
 }

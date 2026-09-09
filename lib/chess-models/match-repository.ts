@@ -1,5 +1,6 @@
 import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto'
 import { pool } from '@/lib/db/index'
+import { BUILTIN_STYLED } from './contracts'
 import { applyMatchMove, createModelMatchState, setMatchPaused, type ModelMatchState } from './model-match'
 
 function hashToken(token: string) {
@@ -8,6 +9,7 @@ function hashToken(token: string) {
 
 async function resolveModel(revisionId: string) {
   if (revisionId === 'builtin-stockfish-18') return { revisionId, displayName: 'Stockfish 18' }
+  if (revisionId === BUILTIN_STYLED.revisionId) return { revisionId, displayName: BUILTIN_STYLED.displayName }
   const result = await pool.query<{ revision_id: string; display_name: string }>(
     `SELECT r.id AS revision_id, m.display_name FROM chess_models m
      JOIN chess_model_revisions r ON r.id = m.current_ready_revision

@@ -77,7 +77,13 @@ export function ModelArena({ models }: { models: ModelOption[] }) {
           const legalMoves = chess.moves({ verbose: true }).map(move => `${move.from}${move.to}${move.promotion ?? ''}`)
           const response = await fetch(`/api/chess-models/${encodeURIComponent(revisionId)}/move`, {
             method: 'POST', headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ fen: match.state.fen, legalMoves, moveTimeMs: 2800 }),
+            body: JSON.stringify({
+              fen: match.state.fen,
+              legalMoves,
+              history: match.state.moves.map(move => move.uci),
+              repertoireId: chess.turn() === 'w' ? 'white_italian' : 'black_caro_kann',
+              moveTimeMs: 2800,
+            }),
           })
           const body = await response.json() as { move?: string; error?: string }
           if (!response.ok || !body.move) throw new Error(body.error || 'Model inference failed')
