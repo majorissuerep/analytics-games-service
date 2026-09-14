@@ -440,15 +440,27 @@ test('Classic Pinball cabinet scales the table, persists mute, and exits through
   page.on('pageerror', (error) => errors.push(error.message))
 
   await page.setViewportSize({ width: 1280, height: 800 })
-  await page.goto('/games/orbit-pinball')
+
+  // Hold the 1.8MB upstream bundle back so the slow-first-open loader is
+  // observable deterministically, then release it.
+  let releaseUpstream: (() => void) | null = null
+  const upstreamGate = new Promise<void>((resolve) => { releaseUpstream = resolve })
+  await page.route('**/vendor/pinball/PinballGame.js', async (route) => {
+    await upstreamGate
+    await route.continue()
+  })
+
+  await page.goto('/games/orbit-pinball', { waitUntil: 'domcontentloaded' })
 
   const cabinet = page.frameLocator('iframe[title="Classic Pinball"]')
   const cabinetFrame = page.locator('iframe[title="Classic Pinball"]')
 
-  // Branded loader shows immediately and hides once the cabinet marks the game ready.
+  // Branded loader shows while the bundle is held back…
   const loader = cabinet.locator('[data-pinball-loader]')
   await expect(cabinet.locator('[data-pinball-loader-text]')).toContainText('Loading Classic Pinball')
   await expect(loader).toBeVisible()
+  // …and hides once the cabinet marks the game ready.
+  releaseUpstream!()
   await expect(loader).toHaveClass(/is-loaded/, { timeout: 30_000 })
 
   // Upstream game canvas keeps its untouched 320x608 backing store inside the nested frame.

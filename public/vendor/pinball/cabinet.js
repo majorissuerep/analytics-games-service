@@ -2,16 +2,25 @@
  *
  * Wires the pure helpers in cabinet-core.js to the cabinet chrome:
  * letterboxed scaling, branded loader, persistent mute, and the
- * game-bridge exit channel.
+ * game-bridge exit channel. Loaded as an ES module (see cabinet.html);
+ * module scripts execute after the document is parsed, so the DOM is
+ * ready without extra waiting.
  *
  * Upstream purity: PinballGame.htm / PinballGame.js are never modified;
  * this script only reaches into the nested frame at runtime (same-origin)
  * to reflect the persisted sound preference onto the upstream globals.
  */
-(function () {
-  'use strict'
-
-  var core = window.PinballCabinetCore
+import {
+  CABINET_SOUND_STORAGE_KEY,
+  UPSTREAM_SOUND_COOKIE_NAME,
+  bridgeExitMessage,
+  computeStageSize,
+  cookieAssignment,
+  muteButtonState,
+  normalizeSoundPreference,
+  readCookie,
+  resolveInitialSound,
+} from './cabinet-core.js'
 
   var elements = {
     bar: document.querySelector('[data-pinball-bar]'),
@@ -49,7 +58,7 @@
   function postExit() {
     var target = window.parent
     if (target === window) return
-    target.postMessage(core.bridgeExitMessage(), window.location.origin)
+    target.postMessage(bridgeExitMessage(), window.location.origin)
   }
 
   /* --- Loader ---------------------------------------------------------- */
@@ -78,24 +87,24 @@
   function desiredSoundOn() {
     var stored = null
     try {
-      stored = core.normalizeSoundPreference(JSON.parse(window.localStorage.getItem(core.CABINET_SOUND_STORAGE_KEY)))
+      stored = normalizeSoundPreference(JSON.parse(window.localStorage.getItem(CABINET_SOUND_STORAGE_KEY)))
     } catch (error) {
       stored = null
     }
-    var resolved = core.resolveInitialSound({
+    var resolved = resolveInitialSound({
       storage: stored,
-      cookie: core.readCookie(document.cookie, core.UPSTREAM_SOUND_COOKIE_NAME),
+      cookie: readCookie(document.cookie, UPSTREAM_SOUND_COOKIE_NAME),
     })
     return resolved === null ? true : resolved
   }
 
   function persistSound(soundOn) {
     try {
-      window.localStorage.setItem(core.CABINET_SOUND_STORAGE_KEY, JSON.stringify(soundOn))
+      window.localStorage.setItem(CABINET_SOUND_STORAGE_KEY, JSON.stringify(soundOn))
     } catch (error) {
       /* Private-mode fallback: the cookie write below still applies. */
     }
-    document.cookie = core.cookieAssignment(core.UPSTREAM_SOUND_COOKIE_NAME, String(soundOn))
+    document.cookie = cookieAssignment(UPSTREAM_SOUND_COOKIE_NAME, String(soundOn))
   }
 
   function nestedWindow() {
@@ -124,7 +133,7 @@
 
   function applySound(soundOn) {
     state.soundOn = soundOn
-    var presentation = core.muteButtonState(soundOn)
+    var presentation = muteButtonState(soundOn)
     elements.mute.setAttribute('aria-pressed', presentation.pressed ? 'true' : 'false')
     elements.mute.setAttribute('aria-label', presentation.announcement)
     if (elements.muteLabel) elements.muteLabel.textContent = presentation.label
@@ -150,7 +159,7 @@
   }
 
   function resize() {
-    var next = core.computeStageSize(stageViewport())
+    var next = computeStageSize(stageViewport())
     if (next.width === state.stageWidth && next.height === state.stageHeight) return
     var firstSizing = state.stageWidth === 0
     state.stageWidth = next.width
@@ -224,8 +233,8 @@
 
   init()
 
-  window.PinballCabinet = {
-    markLoaded: markLoaded,
-    applySound: applySound,
-  }
-})()
+// Exposed for ad-hoc debugging in devtools.
+window.PinballCabinet = {
+  markLoaded: markLoaded,
+  applySound: applySound,
+}
