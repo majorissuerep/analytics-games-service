@@ -459,8 +459,8 @@ test('Classic Pinball cabinet scales the table, persists mute, and exits through
   await expect(canvas).toHaveAttribute('height', '608')
 
   // The nested frame is letterboxed to the upstream aspect ratio inside the stage.
-  const geometry = await cabinetFrame.evaluate((iframe) => {
-    const doc = iframe.contentDocument
+  const geometry = await cabinetFrame.evaluate((outerFrame) => {
+    const doc = (outerFrame as HTMLIFrameElement).contentDocument
     const stage = doc?.querySelector('[data-pinball-stage]')
     const game = doc?.querySelector('iframe[title="Pinball"]')
     if (!stage || !game) return null
@@ -492,8 +492,9 @@ test('Classic Pinball cabinet scales the table, persists mute, and exits through
 
   // Sound governance: the nested upstream game reflects the muted preference.
   const reloadedCabinetFrame = page.locator('iframe[title="Classic Pinball"]')
-  await expect.poll(() => reloadedCabinetFrame.evaluate((iframe) => {
-    const nested = iframe.contentDocument?.querySelector('iframe[title="Pinball"]') as HTMLIFrameElement | null
+  await expect.poll(() => reloadedCabinetFrame.evaluate((outerFrame) => {
+    const cabinetDoc = (outerFrame as HTMLIFrameElement).contentDocument
+    const nested = cabinetDoc?.querySelector('iframe[title="Pinball"]') as HTMLIFrameElement | null
     const nestedWindow = nested?.contentWindow as { GAME_SOUND_ENABLED?: boolean } | null
     return nestedWindow?.GAME_SOUND_ENABLED
   })).toBe(false)

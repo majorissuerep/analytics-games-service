@@ -15,9 +15,8 @@ export const orbitPinballManifest = {
   tags: ['solo', 'arcade', 'classic'],
   instructions: [
     { title: 'Launch', detail: 'Open the game and press the large play button on the arcade menu.' },
-    { title: 'Control', detail: 'Use A / D or the left and right sides of the table for the flippers; hold Space to charge the plunger.' },
-    { title: 'Score', detail: 'Hit bumpers, collect stars, and keep the ball above the drain. Toggle SFX from the cabinet bar.' },
-    { title: 'Exit', detail: 'Use Exit in the cabinet bar (or the window close button) to return to the desktop.' },
+    { title: 'Control', detail: 'Flip with A / D or the screen edges; hold Space to charge the plunger. Toggle SFX from the cabinet bar.' },
+    { title: 'Score', detail: 'Hit bumpers, collect stars, and keep the ball above the drain — then use Exit in the cabinet bar to return.' },
   ],
   preferredWindow: { width: 430, height: 760 },
   status: 'live',
