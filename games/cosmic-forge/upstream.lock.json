@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/The-Powder-Toy/The-Powder-Toy.git",
+  "commit": "b31f4462bc7d217159b83859a35405db9b640455",
+  "commitDate": "2026-08-21",
+  "emscriptenVersion": "3.1.72",
+  "patches": []
+}

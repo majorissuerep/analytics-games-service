@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "kind": "system",
+  "id": "first-light",
+  "version": 1,
+  "name": "First Light",
+  "primaryBodyId": "forge-star",
+  "bodyIds": [
+    "forge-star",
+    "cinder"
+  ],
+  "orbits": [
+    {
+      "bodyId": "cinder",
+      "parentBodyId": "forge-star",
+      "semiMajorAxisM": 1.495978707e11,
+      "eccentricity": 0.0167
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "kind": "body",
+  "id": "cinder",
+  "version": 1,
+  "name": "Cinder",
+  "classification": "rocky-planet",
+  "physics": {
+    "massKg": 5.9722e24,
+    "radiusM": 6.371e6,
+    "surfaceTemperatureK": 288
+  },
+  "presentation": {
+    "color": "#a86f4c"
+  }
+}

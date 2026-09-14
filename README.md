@@ -22,6 +22,26 @@ npm run dev
 
 Pip's optional repository-aware chat requires `OPENROUTER_API_KEY` as a server-side deployment secret. Without it, the desktop and games continue to work and Pip reports that chat is not configured. The key is never exposed to the browser.
 
+## Self-hosted event tracking
+
+Product analytics uses the self-hosted event platform in the MicroK8s cluster.
+The browser keeps explicit opt-in consent and sends only the fixed event
+taxonomy to the same-origin `/api/analytics/events` relay. The relay holds the
+server-only Site write key and forwards to the protected origin:
+
+```text
+EVENT_TRACKING_ENABLED=true
+EVENT_TRACKING_URL=https://events.theincompetent.app
+EVENT_WRITE_KEY=<secret-manager value; never a NEXT_PUBLIC_* variable>
+```
+
+Use the local cluster guides for onboarding, schemas, operations, and proof
+limits: `https://github.com/majorissuerep/microk8s-setup/tree/main/docs/event-tracking`.
+The cluster accepts server-mode `POST /api/s/s2s/track` only through its
+case-sensitive `X-Write-Key` edge. Browser, mobile, and desktop clients must
+never call that origin directly. The app migration details and verification
+commands are in [docs/EVENT_TRACKING.md](docs/EVENT_TRACKING.md).
+
 Production and preview workflows run the idempotent `scripts/migrate.mjs` before deployment.
 Local development also initializes missing tables on first API use. Canonical engine DDL:
 `db/migrations/0001_game_platform.sql`.

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "kind": "evaluation",
+  "id": "cinder-material-lab",
+  "version": 1,
+  "name": "Cinder material lab",
+  "systemId": "first-light",
+  "focusBodyId": "cinder",
+  "projection": "local-material-lab",
+  "scale": {
+    "widthM": 1000,
+    "heightM": 625,
+    "metersPerCell": 1.634
+  },
+  "sceneScript": "scene.lua"
+}

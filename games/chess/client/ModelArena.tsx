@@ -5,7 +5,7 @@ import { Chess } from 'chess.js'
 import { Chessboard } from 'react-chessboard'
 import type { ModelMatchState } from '@/lib/chess-models/model-match'
 import { emitGameSessionCompleted } from '@/lib/analytics/game-events'
-import { StockfishBrowserEngine, stockfishEngineIdForRevision } from './stockfish'
+import { StockfishBrowserEngine } from './stockfish'
 
 type ModelOption = { revisionId: string; displayName: string }
 type MatchRecord = {
@@ -21,10 +21,12 @@ type MatchRecord = {
 }
 
 const BUILTIN = 'builtin-stockfish-18'
+const TURN_BUDGET_OPTIONS = [1000, 2000, 3000, 5000, 10000]
 
 export function ModelArena({ models }: { models: ModelOption[] }) {
   const [whiteRevisionId, setWhiteRevisionId] = useState(BUILTIN)
   const [blackRevisionId, setBlackRevisionId] = useState(BUILTIN)
+  const [turnBudgetMs, setTurnBudgetMs] = useState(3000)
   const [match, setMatch] = useState<MatchRecord | null>(null)
   const [matches, setMatches] = useState<MatchRecord[]>([])
   const [controlToken, setControlToken] = useState('')
@@ -41,7 +43,10 @@ export function ModelArena({ models }: { models: ModelOption[] }) {
   }
 
   useEffect(() => {
-    fetch('/api/chess-model-matches').then(response => response.json()).then((body: { matches?: MatchRecord[] }) => setMatches(body.matches ?? [])).catch(() => undefined)
+    fetch('/api/chess-model-matches').then(response => {
+      if (!response.ok) throw new Error(`Archive unavailable (${response.status})`)
+      return response.json()
+    }).then((body: { matches?: MatchRecord[] }) => setMatches(body.matches ?? [])).catch(() => setError('Could not load the saved-match archive. Is the database running?'))
   }, [])
   useEffect(() => () => engineRef.current?.destroy(), [])
 
@@ -65,31 +70,20 @@ export function ModelArena({ models }: { models: ModelOption[] }) {
       setThinking(true)
       setError('')
       const started = performance.now()
+      const searchMs = Math.max(200, match.state.turnBudgetMs - 200)
       try {
         const chess = new Chess(match.state.fen)
         const revisionId = chess.turn() === 'w' ? match.white_revision_id : match.black_revision_id
         let uci: string
-        const stockfishId = stockfishEngineIdForRevision(revisionId)
-        if (stockfishId) {
-          let arenaEngine = engineRef.current
-          if (!arenaEngine || arenaEngine.engineId !== stockfishId) {
-            arenaEngine?.destroy()
-            arenaEngine = new StockfishBrowserEngine({ engineId: stockfishId })
-            engineRef.current = arenaEngine
-          }
-          const move = await arenaEngine.findBestMoveTimed(match.state.fen, 2800)
+        if (revisionId === BUILTIN) {
+          engineRef.current ??= new StockfishBrowserEngine()
+          const move = await engineRef.current.findBestMoveTimed(match.state.fen, searchMs)
           uci = `${move.from}${move.to}${move.promotion ?? ''}`
         } else {
           const legalMoves = chess.moves({ verbose: true }).map(move => `${move.from}${move.to}${move.promotion ?? ''}`)
           const response = await fetch(`/api/chess-models/${encodeURIComponent(revisionId)}/move`, {
             method: 'POST', headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({
-              fen: match.state.fen,
-              legalMoves,
-              history: match.state.moves.map(move => move.uci),
-              repertoireId: chess.turn() === 'w' ? 'white_italian' : 'black_caro_kann',
-              moveTimeMs: 2800,
-            }),
+            body: JSON.stringify({ fen: match.state.fen, legalMoves, moveTimeMs: searchMs }),
           })
           const body = await response.json() as { move?: string; error?: string }
           if (!response.ok || !body.move) throw new Error(body.error || 'Model inference failed')
@@ -99,7 +93,7 @@ export function ModelArena({ models }: { models: ModelOption[] }) {
         const response = await fetch(`/api/chess-model-matches/${match.id}/moves`, {
           method: 'POST',
           headers: { 'content-type': 'application/json', authorization: `Bearer ${controlToken}` },
-          body: JSON.stringify({ uci, durationMs: Math.min(3000, Math.round(performance.now() - started)), expectedPly: match.state.moves.length }),
+          body: JSON.stringify({ uci, durationMs: Math.min(match.state.turnBudgetMs, Math.round(performance.now() - started)), expectedPly: match.state.moves.length }),
         })
         const body = await response.json() as { match?: MatchRecord; error?: string }
         if (!response.ok || !body.match) throw new Error(body.error || 'Could not save move')
@@ -123,7 +117,7 @@ export function ModelArena({ models }: { models: ModelOption[] }) {
     setError('')
     const response = await fetch('/api/chess-model-matches', {
       method: 'POST', headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ whiteRevisionId, blackRevisionId }),
+      body: JSON.stringify({ whiteRevisionId, blackRevisionId, turnBudgetMs }),
     })
     const body = await response.json() as { match?: { id: string; controlToken: string; state: ModelMatchState; whiteModelName: string; blackModelName: string }; error?: string }
     if (!response.ok || !body.match) return setError(body.error || 'Could not create match')
@@ -155,16 +149,17 @@ export function ModelArena({ models }: { models: ModelOption[] }) {
   }
 
   return <section className="chess-arena" aria-label="Model arena">
-    <h2>Model arena</h2><p>Two approved models play with a strict three-second turn budget. Every position is saved for replay.</p>
+    <h2>Model arena</h2><p>Two approved models play with a configurable turn budget. Every position is saved for replay.</p>
     <div className="chess-model-grid">
       <label>White model<select aria-label="White model" value={whiteRevisionId} onChange={event => setWhiteRevisionId(event.target.value)}>{models.map(model => <option key={model.revisionId} value={model.revisionId}>{model.displayName}</option>)}</select></label>
       <label>Black model<select aria-label="Black model" value={blackRevisionId} onChange={event => setBlackRevisionId(event.target.value)}>{models.map(model => <option key={model.revisionId} value={model.revisionId}>{model.displayName}</option>)}</select></label>
+      <label>Turn budget<select aria-label="Turn budget" value={turnBudgetMs} onChange={event => setTurnBudgetMs(Number(event.target.value))}>{TURN_BUDGET_OPTIONS.map(budget => <option key={budget} value={budget}>{budget / 1000} second{budget >= 2000 ? 's' : ''} per move</option>)}</select></label>
     </div>
     <button className="chess-primary" onClick={() => void createMatch()}>Start model match</button>
     {error && <p className="chess-notice" role="alert">{error}</p>}
     {match && <div className="chess-arena-live">
       <div><Chessboard options={{ id: 'model-arena-board', position: replayFen, allowDragging: false, animationDurationInMs: 180, lightSquareStyle: { backgroundColor: '#e8d7b7' }, darkSquareStyle: { backgroundColor: '#66866f' } }} /></div>
-      <aside><h3>{match.white_model_name} vs {match.black_model_name}</h3><p>{match.state.status}{thinking ? ' · thinking' : ''} · {match.state.moves.length} plies · 3s/turn</p>
+      <aside><h3>{match.white_model_name} vs {match.black_model_name}</h3><p>{match.state.status}{thinking ? ' · thinking' : ''} · {match.state.moves.length} plies · {match.state.turnBudgetMs / 1000}s/turn</p>
         {controlToken && match.state.status !== 'completed' && <button onClick={() => void togglePause()}>{match.state.status === 'paused' ? 'Resume match' : 'Pause match'}</button>}
         <div className="chess-replay-controls"><button onClick={() => setReplayPly(0)}>⏮</button><button onClick={() => setReplayPly(value => Math.max(0, value - 1))}>◀</button><button onClick={() => setReplayPlaying(value => !value)}>{replayPlaying ? 'Pause replay' : 'Play replay'}</button><button onClick={() => setReplayPly(value => Math.min(match.state.moves.length, value + 1))}>▶</button><button onClick={() => setReplayPly(match.state.moves.length)}>⏭</button></div>
         <p>Replay position {replayPly}/{match.state.moves.length}</p><div className="chess-arena-moves">{match.state.moves.map(move => <button key={move.ply} onClick={() => setReplayPly(move.ply)}>{move.ply}. {move.san}</button>)}</div>

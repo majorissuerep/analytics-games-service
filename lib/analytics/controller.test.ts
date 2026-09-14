@@ -24,14 +24,10 @@ describe('analytics consent', () => {
     const storage = memoryStorage()
     const analytics = createAnalyticsController(client, storage)
 
-    analytics.initialize('project-token', false)
+    analytics.initialize(true, false)
     analytics.track('platform_viewed', { games_available: 5 })
 
-    expect(client.init).toHaveBeenCalledWith('project-token', expect.objectContaining({
-      api_host: 'https://api-eu.mixpanel.com',
-      opt_out_tracking_by_default: true,
-      persistence: 'localStorage',
-    }))
+    expect(client.init).toHaveBeenCalledWith({ debug: false })
     expect(client.track).not.toHaveBeenCalled()
 
     analytics.setConsent('granted')
@@ -54,7 +50,7 @@ describe('analytics consent', () => {
     }
     const storage = memoryStorage({ [ANALYTICS_CONSENT_KEY]: 'granted' })
     const analytics = createAnalyticsController(client, storage)
-    analytics.initialize('project-token', false)
+    analytics.initialize(true, false)
 
     analytics.trackGameSessionStarted({ game_id: 'minefield', game_title: 'Minefield' })
     analytics.trackGameSessionStarted({ game_id: 'chess', game_title: 'Chess' })
