@@ -34,3 +34,44 @@
 		<script src="PinballGame.js"></script>
 	</body>
 </html>
+<!-- ============================================================
+     Platform integration (analytics-games-service). Appended by the
+     platform; NOT part of upstream lrusso/Pinball. Upstream markup and
+     PinballGame.js above are unmodified - see UPSTREAM.md. This block:
+       1. pings 'pinball:menu-ready' to the cabinet so its branded loader
+          hides only when the menu is actually visible, and
+       2. reflects the cabinet's persisted sound preference onto the
+          upstream GAME_SOUND_ENABLED global / Phaser sound manager.
+     ============================================================ -->
+<script>
+(function () {
+  'use strict'
+  var parentWindow = window.parent
+  if (!parentWindow || parentWindow === window) return
+  var post = function (message) { parentWindow.postMessage(message, window.location.origin) }
+
+  // Loader handoff: tell the cabinet the menu scene is visible.
+  var notifyReady = function () { post('pinball:menu-ready') }
+  if (document.readyState === 'complete') {
+    window.setTimeout(notifyReady, 400)
+  } else {
+    window.addEventListener('load', function () { window.setTimeout(notifyReady, 400) })
+  }
+
+  // Sound governance: accept { pinballSound: boolean } from the cabinet.
+  // PinballGame.js exposes `game` and `GAME_SOUND_ENABLED` as globals.
+  window.addEventListener('message', function (event) {
+    if (event.origin !== window.location.origin) return
+    if (!event.data || typeof event.data !== 'object') return
+    if (event.data.pinballSound !== true && event.data.pinballSound !== false) return
+    var on = event.data.pinballSound === true
+    try {
+      window.GAME_SOUND_ENABLED = on
+      if (window.game && window.game.sound) window.game.sound.mute = !on
+      post(on)
+    } catch (error) {
+      /* Upstream globals not ready yet; the cabinet retries. */
+    }
+  })
+})()
+</script>
