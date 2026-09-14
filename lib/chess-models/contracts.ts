@@ -58,11 +58,12 @@ export const chessModelMoveRequestSchema = z.object({
 export const createModelMatchSchema = z.object({
   whiteRevisionId: z.string().min(3).max(100),
   blackRevisionId: z.string().min(3).max(100),
+  turnBudgetMs: z.number().int().min(1000).max(10000).optional(),
 }).strict()
 
 export const modelMatchMoveSchema = z.object({
   uci: z.string().regex(/^[a-h][1-8][a-h][1-8][qrbn]?$/),
-  durationMs: z.number().int().min(0).max(3000),
+  durationMs: z.number().int().min(0).max(10000),
   expectedPly: z.number().int().min(0).max(1000),
 }).strict()
 

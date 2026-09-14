@@ -1,0 +1,15 @@
+{
+  "name": "@analytics-games/cosmic-forge-dev",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Two-scale development kit for universe assets and Powder Toy evaluation scenes",
+  "type": "module",
+  "scripts": {
+    "check": "node --test tools/*.node-test.mjs && node tools/validate-content.mjs",
+    "assemble": "node tools/assemble-runtime.mjs",
+    "fetch:engine": "node tools/fetch-upstream.mjs",
+    "build:engine": "bash tools/build-wasm.sh",
+    "dev": "node tools/serve.mjs",
+    "verify:workbench": "node tools/verify-workbench.mjs"
+  }
+}

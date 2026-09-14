@@ -182,6 +182,9 @@ export function DesktopShell({ games }: DesktopShellProps) {
             viewport,
             window.gameId ? gamesById.get(window.gameId) : undefined,
           )
+          const topFocusedId = [...windows]
+            .filter((candidate) => !candidate.minimized)
+            .sort((a, b) => b.zIndex - a.zIndex)[0]?.id ?? null
           return (
             <Rnd
               key={window.id}
@@ -215,6 +218,7 @@ export function DesktopShell({ games }: DesktopShellProps) {
                     games={games}
                     plugins={enabledPlugins}
                     setPlugin={setPlugin}
+                    focused={topFocusedId === window.id}
                     openGame={(game) => openGame(game.id, game.title)}
                     close={() => closeWindow(window.id)}
                   />
@@ -284,6 +288,7 @@ function WindowContent({
   games,
   plugins,
   setPlugin,
+  focused,
   openGame,
   close,
 }: {
@@ -291,12 +296,26 @@ function WindowContent({
   games: GameManifest[]
   plugins: Record<string, boolean>
   setPlugin(id: string, enabled: boolean): void
+  focused: boolean
   openGame(game: GameManifest): void
   close(): void
 }) {
   if (window.kind === 'game' && window.gameId) {
     const game = games.find((candidate) => candidate.id === window.gameId)
-    return game ? <GameFrame game={game} onExit={close} /> : <p>Game is no longer registered.</p>
+    if (!game) return <p>Game is no longer registered.</p>
+    // Externally hosted games keep playing (audio included) while their iframe
+    // is mounted, so an unfocused window is suspended: the iframe unmounts and
+    // a paused placeholder takes its place. Internal games stay mounted and
+    // keep their state.
+    if (game.integration.kind === 'external' && !focused) {
+      return (
+        <div className="external-game-suspended">
+          <p><strong>{game.title} is paused</strong></p>
+          <p>Its audio and animation stop while another window is active. Click this window to resume.</p>
+        </div>
+      )
+    }
+    return <GameFrame game={game} onExit={close} />
   }
 
   if (window.systemId === 'plugins') {

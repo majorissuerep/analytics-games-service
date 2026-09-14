@@ -15,3 +15,7 @@ test-results/
 research/sources/
 .venv-pip-agent/
 __pycache__/
+
+# Generated Powder Toy source, toolchain, builds, and assembled workbench
+.cache/powder-toy/
+vendor/native/

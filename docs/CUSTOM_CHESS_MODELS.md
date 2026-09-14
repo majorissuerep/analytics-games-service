@@ -10,6 +10,7 @@ Canonical product/security contract: [`../specs/chess-custom-model-runtime.md`](
 - Admin metadata changes: `PATCH /api/admin/chess-models/{modelId}`
 - Admin review: `POST /api/admin/chess-models/{modelId}/revisions/{revisionId}/decision`
 - Durable model matches: `GET/POST /api/chess-model-matches` plus move and pause endpoints
+- Idempotent schema bootstrap (`lib/chess-models/ensure-schema.ts`, wired into every repository read/write) and `db/migrations/0003_chess_models.sql`
 - Package schema: `/schemas/chess-model-v1.json`
 - KServe runtime/security definitions: `deploy/kserve/`
 - Immutable public Hugging Face import with executable/remote-code rejection
@@ -64,7 +65,7 @@ Approval is accepted only from `pending_review`; it does not make a model playab
 ## Model arena and replay
 
 - Any two `ready` revisions may be selected; Stockfish 18 is always available.
-- Each model receives at most 3,000 ms per turn. Browser Stockfish searches for 2,800 ms, reserving time to persist the move. Remote KServe inference receives the same 2,800 ms compute budget.
+- Turn budget is configurable per match: 1,000–10,000 ms (default 3,000 ms), stored in the match state and enforced server-side. Each side's compute budget is the configured budget minus 200 ms reserved for persisting the move; browser Stockfish and remote KServe inference receive the same budget.
 - A random control token authorizes move and pause mutations. Only its SHA-256 digest is stored; the browser keeps the token in local storage so the creator can resume after reload.
 - Every accepted move stores UCI, SAN, resulting FEN, duration, timestamp, full PGN, and an optimistic-concurrency version in PostgreSQL.
 - Match records and replay snapshots are public and immutable through replay APIs. Controls support first, previous, play/pause replay, next, and last position.

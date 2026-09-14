@@ -27,9 +27,12 @@ const AnalyticsContext = createContext<AnalyticsContextValue>({
   configured: false,
 })
 
-const subscribeToWindowPosition = () => () => {}
+const subscribeToWindowPosition = (onStoreChange: () => void) => {
+  const frame = window.requestAnimationFrame(onStoreChange)
+  return () => window.cancelAnimationFrame(frame)
+}
 
-export function AnalyticsProvider({ token, children }: { token?: string; children: ReactNode }) {
+export function AnalyticsProvider({ enabled, children }: { enabled: boolean; children: ReactNode }) {
   const consent = useSyncExternalStore(
     subscribeToAnalytics,
     getAnalyticsConsent,
@@ -43,19 +46,19 @@ export function AnalyticsProvider({ token, children }: { token?: string; childre
   )
 
   useEffect(() => {
-    if (token && isTopLevel) initializeAnalytics(token)
-  }, [isTopLevel, token])
+    if (enabled && isTopLevel) initializeAnalytics(enabled)
+  }, [enabled, isTopLevel])
 
-  const showDialog = Boolean(token && isTopLevel && (consent === 'unknown' || settingsOpen))
+  const showDialog = Boolean(enabled && isTopLevel && (consent === 'unknown' || settingsOpen))
 
   return (
-    <AnalyticsContext.Provider value={{ consent, configured: Boolean(token) }}>
+    <AnalyticsContext.Provider value={{ consent, configured: enabled }}>
       {children}
       {showDialog ? (
         <section className="analytics-consent" role="dialog" aria-label="Analytics privacy settings" aria-live="polite">
           <div>
             <strong>Help improve Analytics Games</strong>
-            <p>Allow privacy-safe Mixpanel analytics so we can understand game launches, completions, multiplayer starts, and return visits. We never send names, room codes, or message content.</p>
+            <p>Allow privacy-safe self-hosted analytics so we can understand game launches, completions, multiplayer starts, and return visits. We never send names, room codes, or message content.</p>
           </div>
           <div className="analytics-consent-actions">
             <button
@@ -79,7 +82,7 @@ export function AnalyticsProvider({ token, children }: { token?: string; childre
             </button>
           </div>
         </section>
-      ) : token && isTopLevel ? (
+      ) : enabled && isTopLevel ? (
         <button className="analytics-settings-button" type="button" onClick={() => setSettingsOpen(true)}>
           Privacy
         </button>

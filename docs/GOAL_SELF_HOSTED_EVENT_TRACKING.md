@@ -2,9 +2,20 @@
 
 ## Status
 
-**Next primary target. Planning only — no implementation is authorized by this document.**
+**Migration implementation is in progress. The acceptance criteria below remain open until the self-hosted pipeline is qualified end to end.**
 
-The current Mixpanel integration remains the production analytics path until the self-hosted system reaches verified functional, privacy, reliability, and operational parity.
+The application relay and fixed event contract are implemented behind an explicit
+configuration gate. Production enablement, downstream durability proof, parity,
+and rollback approval are still required before calling the migration complete.
+
+## Current migration increment
+
+The application now sends consented events through a same-origin server relay to
+the cluster's authenticated server-mode ingest endpoint. The browser never gets
+the Site write key, and Mixpanel is no longer a runtime dependency in this
+working tree. This is an implementation increment, not proof of the full target
+below: the positive canary and downstream Kafka, Rotor, Bulker, ClickHouse,
+query, replay, recovery, and reconciliation gates remain unverified.
 
 ## Goal
 
@@ -129,12 +140,12 @@ No implementation should begin until the deployment topology, ownership, backup 
 
 ## Migration direction
 
-1. Keep Mixpanel as the production baseline.
-2. Introduce the self-hosted pipeline behind an explicit configuration gate.
-3. Run consent-respecting dual delivery only after privacy and durability gates pass.
+1. Preserve existing Mixpanel data as the historical comparison baseline.
+2. Enable the self-hosted pipeline behind an explicit configuration gate.
+3. Run the documented synthetic canary and prove each required downstream hop.
 4. Reconcile event cardinality, lateness, duplicates, funnels, and retention cohorts.
 5. Move internal reporting to the owned query layer only after sustained parity.
-6. Disable Mixpanel delivery only through a separate reviewed decision with rollback criteria.
+6. Remove legacy Mixpanel deployment configuration through a separate reviewed decision with rollback criteria.
 
 This sequence is directional, not an implementation plan.
 

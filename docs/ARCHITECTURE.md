@@ -31,6 +31,8 @@ Internal modules live in isolated `games/*` workspaces. Consensus Radar is the r
 
 Use for classics and experiments that do not need shared persistence. Game owns its React/canvas state and pure rule modules inside one workspace; portal only discovers, launches, and closes it. Minefield and Paintbox exercise DOM and canvas drawing without adding server coupling. Internal manifests may also declare a same-origin static `launchPath`; Classic Pinball uses this to isolate its pinned upstream runtime under `public/vendor/pinball`.
 
+Vendored copyleft applications stay separate from the launcher and carry their own licence, provenance, corresponding source, and build records. The Powder Toy integration follows the accepted [GPLv3 WebAssembly component decision](decisions/powder-toy-wasm-gpl-component.md).
+
 ### External URL game
 
 Use when another team owns deployment and repository:

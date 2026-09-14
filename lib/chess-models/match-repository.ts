@@ -1,5 +1,6 @@
 import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto'
 import { pool } from '@/lib/db/index'
+import { ensureChessModelSchema } from './ensure-schema'
 import { applyMatchMove, createModelMatchState, setMatchPaused, type ModelMatchState } from './model-match'
 
 function hashToken(token: string) {
@@ -16,7 +17,8 @@ async function resolveModel(revisionId: string) {
   return result.rows[0] ? { revisionId: result.rows[0].revision_id, displayName: result.rows[0].display_name } : null
 }
 
-export async function createPersistedModelMatch(whiteRevisionId: string, blackRevisionId: string, sourceIpHash?: string) {
+export async function createPersistedModelMatch(whiteRevisionId: string, blackRevisionId: string, sourceIpHash?: string, turnBudgetMs = 3000) {
+  await ensureChessModelSchema()
   if (process.env.NODE_ENV === 'production' && !sourceIpHash) throw new Error('Match abuse protection is not configured')
   if (sourceIpHash) {
     const recent = await pool.query<{ count: string }>(`SELECT COUNT(*)::text AS count FROM chess_model_matches
@@ -27,7 +29,7 @@ export async function createPersistedModelMatch(whiteRevisionId: string, blackRe
   if (!white || !black) throw new Error('Both model revisions must be ready')
   const id = `match_${randomUUID()}`
   const controlToken = randomBytes(32).toString('base64url')
-  const state = createModelMatchState(white.revisionId, black.revisionId, new Date())
+  const state = createModelMatchState(white.revisionId, black.revisionId, new Date(), turnBudgetMs)
   await pool.query(`INSERT INTO chess_model_matches
     (id, white_revision_id, black_revision_id, white_model_name, black_model_name, control_token_hash, source_ip_hash, state, status)
     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
@@ -50,12 +52,14 @@ export type ModelMatchRecord = {
 }
 
 export async function getModelMatch(id: string) {
+  await ensureChessModelSchema()
   const result = await pool.query<ModelMatchRecord>(`SELECT id, white_revision_id, black_revision_id, white_model_name,
     black_model_name, state, status, result, version, created_at, updated_at FROM chess_model_matches WHERE id = $1`, [id])
   return result.rows[0] ?? null
 }
 
 export async function listModelMatches(limit = 30) {
+  await ensureChessModelSchema()
   const result = await pool.query<ModelMatchRecord>(`SELECT id, white_revision_id, black_revision_id, white_model_name,
     black_model_name, state, status, result, version, created_at, updated_at FROM chess_model_matches
     ORDER BY created_at DESC LIMIT $1`, [Math.min(Math.max(limit, 1), 100)])
@@ -73,6 +77,7 @@ async function requireControl(id: string, token: string) {
 }
 
 export async function appendPersistedMatchMove(id: string, token: string, uci: string, durationMs: number, expectedPly: number) {
+  await ensureChessModelSchema()
   const row = await requireControl(id, token)
   const state = applyMatchMove(row.state, uci, durationMs, new Date(), expectedPly)
   const result = await pool.query<ModelMatchRecord>(`UPDATE chess_model_matches SET state=$1, status=$2, result=$3,
@@ -83,6 +88,7 @@ export async function appendPersistedMatchMove(id: string, token: string, uci: s
 }
 
 export async function pausePersistedModelMatch(id: string, token: string, paused: boolean) {
+  await ensureChessModelSchema()
   const row = await requireControl(id, token)
   const state = setMatchPaused(row.state, paused)
   const result = await pool.query<ModelMatchRecord>(`UPDATE chess_model_matches SET state=$1, status=$2,

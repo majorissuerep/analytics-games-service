@@ -8,7 +8,7 @@ import {
 } from '@analytics-games/game-bridge'
 
 export const GAME_COMPLETION_EVENT = 'analytics-games:game-session-completed'
-const MIXPANEL_COMPLETION_EVENT = 'game_session_completed'
+const COMPLETION_EVENT_NAME = 'game_session_completed'
 const COMPLETION_RESULTS = new Set([
   'completed',
   'drawing_saved',
@@ -31,7 +31,7 @@ function normalizeResult(value: unknown) {
 export function gameCompletionFromMessage(value: unknown): string | null {
   if (!isGameToHostMessage(value) || value.type !== 'game.telemetry') return null
   if (!value.payload || typeof value.payload !== 'object') return null
-  if (value.payload.name !== MIXPANEL_COMPLETION_EVENT) return null
+  if (value.payload.name !== COMPLETION_EVENT_NAME) return null
   return normalizeResult(value.payload.value)
 }
 
@@ -49,7 +49,7 @@ export function emitGameSessionCompleted(result: string) {
     protocol: ANALYTICS_GAME_BRIDGE,
     version: ANALYTICS_GAME_BRIDGE_VERSION,
     type: 'game.telemetry',
-    payload: { name: MIXPANEL_COMPLETION_EVENT, value: normalizedResult },
+    payload: { name: COMPLETION_EVENT_NAME, value: normalizedResult },
   }
 
   if (window.parent !== window) {

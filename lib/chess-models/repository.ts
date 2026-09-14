@@ -1,5 +1,6 @@
 import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto'
 import { pool } from '@/lib/db/index'
+import { ensureChessModelSchema } from './ensure-schema'
 import { BUILTIN_STOCKFISH, type ChessModelSubmission, type PublicChessModel } from './contracts'
 
 function hashReceipt(receipt: string) {
@@ -16,6 +17,7 @@ export function isAdminRequest(request: Request) {
 }
 
 export async function listPublicModels(): Promise<PublicChessModel[]> {
+  await ensureChessModelSchema()
   const result = await pool.query<{
     id: string; slug: string; display_name: string; description: string; runtime_id: string
     revision_id: string; source_type: string; license: string
@@ -39,6 +41,7 @@ export async function listPublicModels(): Promise<PublicChessModel[]> {
 }
 
 export async function listAdminModels() {
+  await ensureChessModelSchema()
   const result = await pool.query(`SELECT m.id, m.slug, m.display_name, m.description, m.disabled, m.archived,
     r.id AS revision_id, r.revision_number, r.runtime_id, r.source_type, r.source_ref, r.license, r.state,
     r.scan_report, r.rejection_reason, r.created_at, r.updated_at
@@ -48,6 +51,7 @@ export async function listAdminModels() {
 }
 
 export async function listPublicModelRegistry() {
+  await ensureChessModelSchema()
   const result = await pool.query(`SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
     r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
     WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100`)
@@ -56,6 +60,7 @@ export async function listPublicModelRegistry() {
 }
 
 export async function assertSubmissionAllowed(sourceIpHash?: string) {
+  await ensureChessModelSchema()
   if (process.env.NODE_ENV === 'production' && !sourceIpHash) throw new Error('Public submission abuse protection is not configured')
   if (!sourceIpHash) return
   const result = await pool.query<{ count: string }>(
@@ -65,6 +70,7 @@ export async function assertSubmissionAllowed(sourceIpHash?: string) {
 }
 
 export async function createSubmission(input: ChessModelSubmission, sourceIpHash?: string) {
+  await ensureChessModelSchema()
   const modelId = `mdl_${randomUUID()}`
   const revisionId = `rev_${randomUUID()}`
   const submissionId = `sub_${randomUUID()}`
@@ -100,6 +106,7 @@ export async function createSubmission(input: ChessModelSubmission, sourceIpHash
 }
 
 export async function getSubmissionStatus(receipt: string) {
+  await ensureChessModelSchema()
   const result = await pool.query<{ display_name: string; state: string; rejection_reason: string | null; updated_at: Date }>(
     `SELECT m.display_name, r.state, r.rejection_reason, r.updated_at
      FROM chess_model_submissions s
@@ -110,6 +117,7 @@ export async function getSubmissionStatus(receipt: string) {
 }
 
 export async function recordAutomatedInspection(revisionId: string, report: unknown) {
+  await ensureChessModelSchema()
   await pool.query(`UPDATE chess_model_revisions
     SET state = 'pending_review', scan_report = $1, scan_policy = 'hf-metadata-v1', updated_at = NOW()
     WHERE id = $2 AND state = 'pending_scan'`, [JSON.stringify(report), revisionId])
@@ -118,6 +126,7 @@ export async function recordAutomatedInspection(revisionId: string, report: unkn
 }
 
 export async function patchModel(modelId: string, patch: { displayName?: string; description?: string; disabled?: boolean; archived?: boolean }) {
+  await ensureChessModelSchema()
   const entries = Object.entries(patch).filter(([, value]) => value !== undefined)
   const columns: Record<string, string> = { displayName: 'display_name', description: 'description', disabled: 'disabled', archived: 'archived' }
   const set = entries.map(([key], index) => `${columns[key]} = $${index + 2}`).join(', ')
@@ -130,6 +139,7 @@ export async function patchModel(modelId: string, patch: { displayName?: string;
 }
 
 export async function decideRevision(modelId: string, revisionId: string, decision: 'approve' | 'reject', reason?: string) {
+  await ensureChessModelSchema()
   const nextState = decision === 'approve' ? 'approved' : 'rejected'
   const result = await pool.query(`UPDATE chess_model_revisions SET state = $1, approved_by = $2,
     approved_at = CASE WHEN $1 = 'approved' THEN NOW() ELSE NULL END, rejection_reason = $3, updated_at = NOW()
@@ -142,6 +152,7 @@ export async function decideRevision(modelId: string, revisionId: string, decisi
 }
 
 export async function getReadyModelDeployment(revisionId: string) {
+  await ensureChessModelSchema()
   const result = await pool.query<{ slug: string; revision_id: string; endpoint: string }>(
     `SELECT m.slug, r.id AS revision_id, d.endpoint
      FROM chess_model_revisions r

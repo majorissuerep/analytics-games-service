@@ -13,7 +13,7 @@ export type ModelMatchState = {
   whiteRevisionId: string
   blackRevisionId: string
   status: 'active' | 'paused' | 'completed' | 'failed'
-  turnBudgetMs: 3000
+  turnBudgetMs: number
   fen: string
   pgn: string
   moves: ModelMatchMove[]
@@ -27,13 +27,13 @@ function resultFor(chess: Chess) {
   return ''
 }
 
-export function createModelMatchState(whiteRevisionId: string, blackRevisionId: string, now: Date): ModelMatchState {
+export function createModelMatchState(whiteRevisionId: string, blackRevisionId: string, now: Date, turnBudgetMs = 3000): ModelMatchState {
   const chess = new Chess()
   return {
     whiteRevisionId,
     blackRevisionId,
     status: 'active',
-    turnBudgetMs: 3000,
+    turnBudgetMs,
     fen: chess.fen(),
     pgn: '',
     moves: [],

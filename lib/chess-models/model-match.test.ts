@@ -28,6 +28,14 @@ describe('model match state', () => {
     expect(() => applyMatchMove(setMatchPaused(match, true), 'e2e4', 100, new Date())).toThrow('paused')
   })
 
+  it('honors a custom turn budget for both creation and move validation', () => {
+    const match = createModelMatchState('white-rev', 'black-rev', new Date(), 10000)
+    expect(match.turnBudgetMs).toBe(10000)
+    expect(() => applyMatchMove(match, 'e2e4', 8000, new Date())).not.toThrow()
+    const tight = createModelMatchState('white-rev', 'black-rev', new Date(), 1000)
+    expect(() => applyMatchMove(tight, 'e2e4', 1500, new Date())).toThrow('budget')
+  })
+
   it('pauses and resumes without changing board history', () => {
     const match = createModelMatchState('white-rev', 'black-rev', new Date())
     const paused = setMatchPaused(match, true)

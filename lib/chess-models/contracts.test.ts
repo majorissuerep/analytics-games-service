@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { chessModelSubmissionSchema, adminDecisionSchema } from './contracts'
+import { chessModelSubmissionSchema, adminDecisionSchema, createModelMatchSchema, modelMatchMoveSchema } from './contracts'
 import { inspectHuggingFaceRevision } from './huggingface'
 
 afterEach(() => vi.unstubAllGlobals())
@@ -21,6 +21,18 @@ describe('safe Chess model contracts', () => {
   it('requires a reason when an admin rejects a revision', () => {
     expect(adminDecisionSchema.safeParse({ decision: 'reject' }).success).toBe(false)
     expect(adminDecisionSchema.safeParse({ decision: 'reject', reason: 'Unsupported operators' }).success).toBe(true)
+  })
+
+  it('accepts an optional arena turn budget within a 1-10 second range', () => {
+    expect(createModelMatchSchema.safeParse({ whiteRevisionId: 'builtin-stockfish-18', blackRevisionId: 'builtin-stockfish-18' }).success).toBe(true)
+    expect(createModelMatchSchema.safeParse({ whiteRevisionId: 'rev-white', blackRevisionId: 'rev-black', turnBudgetMs: 10000 }).success).toBe(true)
+    expect(createModelMatchSchema.safeParse({ whiteRevisionId: 'rev-white', blackRevisionId: 'rev-black', turnBudgetMs: 999 }).success).toBe(false)
+    expect(createModelMatchSchema.safeParse({ whiteRevisionId: 'rev-white', blackRevisionId: 'rev-black', turnBudgetMs: 10001 }).success).toBe(false)
+  })
+
+  it('allows reported move durations up to the ten second arena ceiling', () => {
+    expect(modelMatchMoveSchema.safeParse({ uci: 'e2e4', durationMs: 10000, expectedPly: 0 }).success).toBe(true)
+    expect(modelMatchMoveSchema.safeParse({ uci: 'e2e4', durationMs: 10001, expectedPly: 0 }).success).toBe(false)
   })
 
   it('rejects forbidden files in Hugging Face revisions', async () => {

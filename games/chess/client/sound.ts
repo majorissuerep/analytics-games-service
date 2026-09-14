@@ -30,7 +30,13 @@ function loadPreference(): boolean {
 
 let enabled = loadPreference()
 let ctx: AudioContext | null = null
-let lastEndTime = 0
+
+// Browsers only allow creating/resuming an AudioContext inside a user gesture.
+// Arm the context on the first pointerdown so move sounds fired later from
+// effects (outside the gesture) still play.
+if (typeof window !== 'undefined') {
+  window.addEventListener('pointerdown', () => getContext(), { once: true })
+}
 
 export function setSoundEnabled(next: boolean): void {
   enabled = next
@@ -70,9 +76,10 @@ function tone(
   const audio = getContext()
   if (!audio) return
   const { volume = 0.22, type = 'sine', delay = 0, attack = 0.004, slideTo } = opts
-
-  const start = Math.max(0, lastEndTime) + delay
-  lastEndTime = start + duration + 0.02
+  // Schedule relative to the current context time. Chord voices are sequenced
+  // with explicit `delay` offsets, never with a shared accumulator — a growing
+  // base time would push later sounds further into the future on every move.
+  const start = delay
 
   const osc = audio.createOscillator()
   const gain = audio.createGain()
@@ -94,8 +101,7 @@ function noiseBurst(duration: number, opts: { volume?: number; delay?: number; f
   const audio = getContext()
   if (!audio) return
   const { volume = 0.16, delay = 0, filter = 2200 } = opts
-  const start = Math.max(0, lastEndTime) + delay
-  lastEndTime = start + duration + 0.02
+  const start = delay
 
   const buffer = audio.createBuffer(1, Math.max(1, Math.floor(audio.sampleRate * duration)), audio.sampleRate)
   const data = buffer.getChannelData(0)
