@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import { Analytics } from '@vercel/analytics/next'
 import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider'
+import { eventTrackingConfigured } from '@/lib/analytics/server-config'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -20,10 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AnalyticsProvider token={process.env.MIXPANEL_PROJECT_TOKEN}>
+        <AnalyticsProvider enabled={eventTrackingConfigured()}>
           {children}
         </AnalyticsProvider>
-        <Analytics />
       </body>
     </html>
   )

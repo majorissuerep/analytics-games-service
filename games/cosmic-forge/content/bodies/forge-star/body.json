@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "kind": "body",
+  "id": "forge-star",
+  "version": 1,
+  "name": "Forge Star",
+  "classification": "star",
+  "physics": {
+    "massKg": 1.98847e30,
+    "radiusM": 6.957e8,
+    "surfaceTemperatureK": 5772
+  },
+  "presentation": {
+    "color": "#ffd27d"
+  }
+}

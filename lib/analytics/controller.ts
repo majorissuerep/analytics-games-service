@@ -12,13 +12,7 @@ export type AnalyticsEventName =
   | 'multiplayer_room_started'
 
 export interface AnalyticsClient {
-  init(token: string, options: {
-    api_host: 'https://api-eu.mixpanel.com'
-    debug: boolean
-    persistence: 'localStorage'
-    opt_out_tracking_by_default: true
-    track_pageview: false
-  }): void
+  init(options: { debug: boolean }): void
   track(event: string, properties: Record<string, string | number | boolean>): void
   opt_in_tracking(): void
   opt_out_tracking(): void
@@ -34,15 +28,9 @@ export function createAnalyticsController(client: AnalyticsClient, storage: Anal
   let consent: AnalyticsConsent = 'unknown'
 
   return {
-    initialize(token: string, debug: boolean) {
-      if (initialized || !token) return
-      client.init(token, {
-        api_host: 'https://api-eu.mixpanel.com',
-        debug,
-        persistence: 'localStorage',
-        opt_out_tracking_by_default: true,
-        track_pageview: false,
-      })
+    initialize(enabled: boolean, debug: boolean) {
+      if (initialized || !enabled) return
+      client.init({ debug })
       initialized = true
       const stored = storage.getItem(ANALYTICS_CONSENT_KEY)
       consent = stored === 'granted' || stored === 'denied' ? stored : 'unknown'

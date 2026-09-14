@@ -1,6 +1,5 @@
 'use client'
 
-import mixpanel from 'mixpanel-browser'
 import {
   createAnalyticsController,
   type AnalyticsClient,
@@ -13,32 +12,57 @@ const listeners = new Set<() => void>()
 const onceKeys = new Set<string>()
 let controller: ReturnType<typeof createAnalyticsController> | null = null
 
+const ANALYTICS_RELAY_PATH = '/api/analytics/events'
+const ANALYTICS_ANONYMOUS_ID_KEY = 'analytics-games.analytics-anonymous-id.v1'
+const OPAQUE_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/
+
 const client: AnalyticsClient = {
-  init(token, options) {
-    mixpanel.init(token, {
-      ...options,
-      batch_requests: false,
-      ignore_dnt: false,
+  init() {},
+  track(event, properties) {
+    const anonymousId = getOrCreateAnonymousId()
+    if (!anonymousId) return
+
+    void fetch(ANALYTICS_RELAY_PATH, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'same-origin',
+      keepalive: true,
+      body: JSON.stringify({
+        event,
+        messageId: `web_${crypto.randomUUID()}`,
+        anonymousId,
+        properties,
+      }),
+    }).catch(() => {
+      // Analytics must never break gameplay or surface payloads in the console.
     })
   },
-  track(event, properties) {
-    mixpanel.track(event, properties)
-  },
-  opt_in_tracking() {
-    mixpanel.opt_in_tracking()
-  },
-  opt_out_tracking() {
-    mixpanel.opt_out_tracking()
-  },
+  opt_in_tracking() {},
+  opt_out_tracking() {},
+}
+
+function getOrCreateAnonymousId() {
+  try {
+    const existing = window.localStorage.getItem(ANALYTICS_ANONYMOUS_ID_KEY)
+    if (existing && OPAQUE_ID_PATTERN.test(existing)) return existing
+
+    const next = `anon_${crypto.randomUUID()}`
+    window.localStorage.setItem(ANALYTICS_ANONYMOUS_ID_KEY, next)
+    return next
+  } catch {
+    return null
+  }
 }
 
 function notify() {
   listeners.forEach((listener) => listener())
 }
 
-export function initializeAnalytics(token: string) {
+export function initializeAnalytics(enabled: boolean) {
   controller ??= createAnalyticsController(client, window.localStorage)
-  controller.initialize(token, process.env.NODE_ENV !== 'production')
+  controller.initialize(enabled, process.env.NODE_ENV !== 'production')
   notify()
 }
 

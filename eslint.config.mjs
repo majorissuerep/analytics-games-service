@@ -24,6 +24,7 @@ export default defineConfig([
     },
   },
   globalIgnores([
+    '.cache/**',
     '.next/**',
     '.turbo/**',
     'coverage/**',

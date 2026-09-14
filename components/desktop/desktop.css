@@ -203,3 +203,5 @@
 @media (prefers-reduced-motion: reduce) {
   .paperclip-character { transform: none !important; }
 }
+.external-game-suspended { height: 100%; display: grid; place-content: center; justify-items: center; gap: 6px; padding: 24px; text-align: center; color: #18212e; background: repeating-linear-gradient(45deg, #ece9d8 0 14px, #e2ddca 14px 28px); }
+.external-game-suspended p { margin: 0; max-width: 420px; }

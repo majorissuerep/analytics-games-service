@@ -13,6 +13,7 @@ export function ModelSubmissionPanel() {
   const [description, setDescription] = useState('')
   const [runtime, setRuntime] = useState('onnx-policy-v1')
   const [license, setLicense] = useState('apache-2.0')
+  const [contact, setContact] = useState('')
   const [repoId, setRepoId] = useState('')
   const [revision, setRevision] = useState('')
   const [file, setFile] = useState<File | null>(null)
@@ -20,12 +21,16 @@ export function ModelSubmissionPanel() {
   const [message, setMessage] = useState('')
   const [directUpload, setDirectUpload] = useState(false)
   const [registry, setRegistry] = useState<RegistryModel[]>([])
+  const [registryError, setRegistryError] = useState('')
 
   useEffect(() => {
-    fetch('/api/chess-models').then(response => response.json()).then((body: { capabilities?: { directUpload?: boolean }; registry?: RegistryModel[] }) => {
+    fetch('/api/chess-models').then(response => {
+      if (!response.ok) throw new Error(`Registry unavailable (${response.status})`)
+      return response.json()
+    }).then((body: { capabilities?: { directUpload?: boolean }; registry?: RegistryModel[] }) => {
       setDirectUpload(Boolean(body.capabilities?.directUpload))
       setRegistry(body.registry ?? [])
-    }).catch(() => undefined)
+    }).catch(() => setRegistryError('The model registry is unavailable. Is the database running?'))
   }, [])
 
   async function submit(event: FormEvent) {
@@ -34,6 +39,7 @@ export function ModelSubmissionPanel() {
     setMessage('')
     try {
       let body: Record<string, unknown> = { source, name, displayName, description, runtime, license }
+      if (contact.trim()) body = { ...body, submitterContact: contact.trim() }
       if (source === 'huggingface') {
         body = { ...body, repoId, revision }
       } else {
@@ -65,7 +71,7 @@ export function ModelSubmissionPanel() {
     <button className="chess-model-toggle" onClick={() => setOpen(value => !value)} aria-expanded={open}>
       <span>◇</span><b>Bring your own Chess model</b><small>Safe ONNX or Hugging Face submission</small>
     </button>
-    {registry.length > 0 && <div className="chess-model-registry"><b>Community model registry</b>{registry.map(model => <div key={`${model.slug}-${model.state}`}><span>{model.displayName}<small>{model.runtimeId}</small></span><em>{model.state.replaceAll('_', ' ')}</em></div>)}</div>}
+    {registryError ? <p className="chess-notice" role="alert">{registryError}</p> : registry.length > 0 && <div className="chess-model-registry"><b>Community model registry</b>{registry.map(model => <div key={`${model.slug}-${model.state}`}><span>{model.displayName}<small>{model.runtimeId}</small></span><em>{model.state.replaceAll('_', ' ')}</em></div>)}</div>}
     {open && <form onSubmit={(event) => void submit(event)}>
       <p>Submissions are quarantined, scanned, and require administrator approval before deployment or play.</p>
       <div className="chess-online-tabs">
@@ -78,6 +84,7 @@ export function ModelSubmissionPanel() {
         <label>Runtime<select value={runtime} onChange={event => setRuntime(event.target.value)}><option value="onnx-policy-v1">ONNX policy v1</option><option value="hf-transformers-chess-v1">HF Transformers safetensors v1</option></select></label>
         <label>License<input required value={license} onChange={event => setLicense(event.target.value)} placeholder="apache-2.0" /></label>
       </div>
+      <label>Contact email <span>(optional — for review updates)</span><input type="email" value={contact} onChange={event => setContact(event.target.value)} placeholder="you@example.com" /></label>
       <label>Description<textarea maxLength={1000} value={description} onChange={event => setDescription(event.target.value)} placeholder="Architecture, training data, intended strength…" /></label>
       {source === 'huggingface' ? <div className="chess-model-grid">
         <label>Repository<input required value={repoId} onChange={event => setRepoId(event.target.value)} placeholder="organization/model-name" /></label>
