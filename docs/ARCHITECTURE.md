@@ -33,6 +33,8 @@ Use for classics and experiments that do not need shared persistence. Game owns 
 
 Vendored copyleft applications stay separate from the launcher and carry their own licence, provenance, corresponding source, and build records. The Powder Toy integration follows the accepted [GPLv3 WebAssembly component decision](decisions/powder-toy-wasm-gpl-component.md).
 
+Vendored copyleft applications stay separate from the launcher and carry their own licence, provenance, corresponding source, and build records. The Powder Toy integration follows the accepted [GPLv3 WebAssembly component decision](decisions/powder-toy-wasm-gpl-component.md).
+
 ### External URL game
 
 Use when another team owns deployment and repository:

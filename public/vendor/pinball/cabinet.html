@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Classic Pinball</title>
+  <link rel="stylesheet" href="cabinet.css">
+</head>
+<body>
+  <header class="pinball-bar" data-pinball-bar>
+    <span class="pinball-bar-title"><span aria-hidden="true">🪐</span> Classic Pinball</span>
+    <span class="pinball-bar-actions">
+      <button
+        type="button"
+        class="pinball-bar-button"
+        data-pinball-mute
+        aria-pressed="false"
+        aria-label="Mute game audio"
+      ><span class="pinball-bar-icon" aria-hidden="true">🔊</span><span data-pinball-mute-label>SFX on</span></button>
+      <button type="button" class="pinball-bar-button pinball-bar-exit" data-pinball-exit aria-label="Exit game">
+        <span class="pinball-bar-icon" aria-hidden="true">✕</span><span>Exit</span>
+      </button>
+    </span>
+  </header>
+
+  <main class="pinball-stage" data-pinball-stage>
+    <iframe
+      data-pinball-game
+      src="PinballGame.htm"
+      title="Pinball"
+      class="pinball-game-frame"
+      sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups"
+      allow="autoplay; fullscreen; gamepad; clipboard-write"
+      referrerpolicy="no-referrer"
+    ></iframe>
+  </main>
+
+  <div class="pinball-loader" data-pinball-loader role="status" aria-live="polite">
+    <span class="pinball-loader-spinner" aria-hidden="true"></span>
+    <span class="pinball-loader-text" data-pinball-loader-text>Loading Classic Pinball…</span>
+    <span class="pinball-loader-hint" data-pinball-loader-hint hidden>Still loading — the first open downloads roughly 2&nbsp;MB.</span>
+  </div>
+
+  <script type="module" src="cabinet.js"></script>
+</body>
+</html>

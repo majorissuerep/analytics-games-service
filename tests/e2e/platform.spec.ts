@@ -127,11 +127,11 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   const pinball = page.frameLocator('iframe[title="Neon Forge Pinball"]')
   const pinballCanvas = pinball.locator('canvas')
   await expect(pinballCanvas).toBeVisible()
-  await expect(pinballCanvas).toHaveJSProperty('width', 420)
-  await expect(pinballCanvas).toHaveJSProperty('height', 720)
-  await pinball.getByRole('button', { name: 'START GAME' }).click()
-  await expect(pinball.getByRole('button', { name: 'HOLD LAUNCH' })).toBeEnabled()
-  await page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Neon Forge Pinball"]') }).getByRole('button', { name: 'Close' }).click()
+  await expect(pinballCanvas).toHaveAttribute('width', '320')
+  await expect(pinballCanvas).toHaveAttribute('height', '608')
+  const pinballWindow = page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Classic Pinball"]') })
+  await pinballWindow.getByRole('button', { name: 'Close' }).click()
+  await expect(pinballWindow).toBeHidden()
 
   await expect(page.getByRole('heading', { name: 'Team games live here.' })).toBeVisible()
   expect(errors).toEqual([])
@@ -433,4 +433,93 @@ test('four isolated players complete a full Consensus Radar game', async ({ brow
   } finally {
     await Promise.all(players.map((player) => player.context.close()))
   }
+})
+
+test('Classic Pinball cabinet scales the table, persists mute, and exits through the bridge', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+
+  await page.setViewportSize({ width: 1280, height: 800 })
+
+  // Hold the 1.8MB upstream bundle back so the slow-first-open loader is
+  // observable deterministically, then release it.
+  let releaseUpstream: (() => void) | null = null
+  const upstreamGate = new Promise<void>((resolve) => { releaseUpstream = resolve })
+  await page.route('**/vendor/pinball/PinballGame.js', async (route) => {
+    await upstreamGate
+    await route.continue()
+  })
+
+  await page.goto('/games/orbit-pinball', { waitUntil: 'domcontentloaded' })
+
+  const cabinet = page.frameLocator('iframe[title="Classic Pinball"]')
+  const cabinetFrame = page.locator('iframe[title="Classic Pinball"]')
+
+  // Branded loader shows while the bundle is held back…
+  const loader = cabinet.locator('[data-pinball-loader]')
+  await expect(cabinet.locator('[data-pinball-loader-text]')).toContainText('Loading Classic Pinball')
+  await expect(loader).toBeVisible()
+  // …and hides once the cabinet marks the game ready.
+  releaseUpstream!()
+  await expect(loader).toHaveClass(/is-loaded/, { timeout: 30_000 })
+
+  // Upstream game canvas keeps its untouched 320x608 backing store inside the nested frame.
+  const upstream = cabinet.frameLocator('iframe[title="Pinball"]')
+  const canvas = upstream.locator('canvas')
+  await expect(canvas).toBeVisible()
+  await expect(canvas).toHaveAttribute('width', '320')
+  await expect(canvas).toHaveAttribute('height', '608')
+
+  // The nested frame is letterboxed to the upstream aspect ratio inside the stage.
+  const geometry = await cabinetFrame.evaluate((outerFrame) => {
+    const doc = (outerFrame as HTMLIFrameElement).contentDocument
+    const stage = doc?.querySelector('[data-pinball-stage]')
+    const game = doc?.querySelector('iframe[title="Pinball"]')
+    if (!stage || !game) return null
+    const box = game.getBoundingClientRect()
+    return {
+      stageWidth: stage.clientWidth,
+      stageHeight: stage.clientHeight,
+      frameWidth: box.width,
+      frameHeight: box.height,
+    }
+  })
+  expect(geometry).not.toBeNull()
+  const ratio = geometry!.frameWidth / geometry!.frameHeight
+  expect(Math.abs(ratio - 320 / 608)).toBeLessThan(0.02)
+  expect(geometry!.frameHeight).toBeLessThanOrEqual(geometry!.stageHeight + 1)
+
+  // Mute toggle persists across reloads via localStorage + the upstream cookie.
+  const muteButton = cabinet.locator('[data-pinball-mute]')
+  await expect(muteButton).toHaveAttribute('aria-pressed', 'false')
+  await muteButton.click()
+  await expect(muteButton).toHaveAttribute('aria-pressed', 'true')
+  await expect(cabinet.locator('[data-pinball-mute-label]')).toHaveText('Muted')
+  await expect.poll(() => page.evaluate(() => window.localStorage.getItem('analytics-games.pinball.sound.v1'))).toBe('false')
+
+  await page.reload()
+  const reloadedCabinet = page.frameLocator('iframe[title="Classic Pinball"]')
+  const reloadedMute = reloadedCabinet.locator('[data-pinball-mute]')
+  await expect(reloadedMute).toHaveAttribute('aria-pressed', 'true')
+
+  // Sound governance: the nested upstream game reflects the muted preference.
+  const reloadedCabinetFrame = page.locator('iframe[title="Classic Pinball"]')
+  await expect.poll(() => reloadedCabinetFrame.evaluate((outerFrame) => {
+    const cabinetDoc = (outerFrame as HTMLIFrameElement).contentDocument
+    const nested = cabinetDoc?.querySelector('iframe[title="Pinball"]') as HTMLIFrameElement | null
+    const nestedWindow = nested?.contentWindow as { GAME_SOUND_ENABLED?: boolean } | null
+    return nestedWindow?.GAME_SOUND_ENABLED
+  })).toBe(false)
+
+  await page.screenshot({ path: '/tmp/pinball-cabinet-muted.png', fullPage: false })
+
+  // Unmute for the exit leg so the desktop relaunch starts audible next time.
+  await reloadedMute.click()
+  await expect(reloadedMute).toHaveAttribute('aria-pressed', 'false')
+
+  // Exit posts the bridge game.exit message; the host returns to the desktop.
+  await reloadedCabinet.locator('[data-pinball-exit]').click()
+  await expect(page.getByRole('heading', { name: 'Team games live here.' })).toBeVisible()
+
+  expect(errors).toEqual([])
 })
