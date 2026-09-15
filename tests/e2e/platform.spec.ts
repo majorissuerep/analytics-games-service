@@ -123,9 +123,9 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   await expect(paintbox.getByRole('button', { name: 'Eraser' })).toHaveAttribute('aria-pressed', 'true')
   await page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Paintbox"]') }).getByRole('button', { name: 'Close' }).click()
 
-  await page.locator('.desktop-icon[aria-label="Open Neon Forge Pinball"]').dblclick()
-  const pinball = page.frameLocator('iframe[title="Neon Forge Pinball"]')
-  const pinballCanvas = pinball.locator('canvas')
+  await page.locator('.desktop-icon[aria-label="Open Classic Pinball"]').dblclick()
+  const pinball = page.frameLocator('iframe[title="Classic Pinball"]')
+  const pinballCanvas = pinball.frameLocator('iframe[title="Pinball"]').locator('canvas')
   await expect(pinballCanvas).toBeVisible()
   await expect(pinballCanvas).toHaveAttribute('width', '320')
   await expect(pinballCanvas).toHaveAttribute('height', '608')
