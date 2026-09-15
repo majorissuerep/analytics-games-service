@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const salt = process.env.CHESS_MODEL_ABUSE_SALT
     const isLoopback = ['localhost', '127.0.0.1', '::1'].includes(new URL(request.url).hostname)
     const sourceIpHash = forwarded && salt ? createHash('sha256').update(`${salt}:${forwarded}`).digest('hex') : isLoopback ? 'local-loopback' : undefined
-    const match = await createPersistedModelMatch(parsed.data.whiteRevisionId, parsed.data.blackRevisionId, sourceIpHash)
+    const match = await createPersistedModelMatch(parsed.data.whiteRevisionId, parsed.data.blackRevisionId, sourceIpHash, parsed.data.turnBudgetMs)
     return NextResponse.json({ match }, { status: 201 })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Could not create model match'
