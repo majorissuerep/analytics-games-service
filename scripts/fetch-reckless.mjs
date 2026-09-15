@@ -1,4 +1,6 @@
-#!/usr/bin/env node
+// Target path and URL are module constants (argv may only override the local
+// path); the sha256 comparison is integrity checking, not secret handling.
+/* eslint-disable security/detect-non-literal-fs-filename, security/detect-possible-timing-attacks */
 // Fetch the pinned Reckless 0.9.0 UCI binary for local/CI/production builds.
 // The binary is too large to commit, so builds download it from the upstream
 // GitHub release and verify the exact SHA-256 before use.

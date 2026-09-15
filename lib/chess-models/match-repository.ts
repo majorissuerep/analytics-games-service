@@ -19,7 +19,7 @@ async function resolveModel(revisionId: string) {
   return result.rows[0] ? { revisionId: result.rows[0].revision_id, displayName: result.rows[0].display_name } : null
 }
 
-export async function createPersistedModelMatch(whiteRevisionId: string, blackRevisionId: string, sourceIpHash?: string) {
+export async function createPersistedModelMatch(whiteRevisionId: string, blackRevisionId: string, sourceIpHash?: string, turnBudgetMs = 3000) {
   if (process.env.NODE_ENV === 'production' && !sourceIpHash) throw new Error('Match abuse protection is not configured')
   if (sourceIpHash) {
     const recent = await pool.query<{ count: string }>(`SELECT COUNT(*)::text AS count FROM chess_model_matches
@@ -30,7 +30,7 @@ export async function createPersistedModelMatch(whiteRevisionId: string, blackRe
   if (!white || !black) throw new Error('Both model revisions must be ready')
   const id = `match_${randomUUID()}`
   const controlToken = randomBytes(32).toString('base64url')
-  const state = createModelMatchState(white.revisionId, black.revisionId, new Date())
+  const state = createModelMatchState(white.revisionId, black.revisionId, new Date(), turnBudgetMs)
   await pool.query(`INSERT INTO chess_model_matches
     (id, white_revision_id, black_revision_id, white_model_name, black_model_name, control_token_hash, source_ip_hash, state, status)
     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
