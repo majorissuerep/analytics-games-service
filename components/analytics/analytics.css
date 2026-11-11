@@ -11,12 +11,12 @@
   max-width: 760px;
   margin: 0 auto;
   padding: 16px 18px;
-  border: 2px solid #1f3b66;
-  border-radius: 7px;
-  background: #f7fbff;
-  box-shadow: 0 12px 36px rgb(0 0 0 / 35%);
-  color: #17233a;
-  font: 14px/1.4 Arial, sans-serif;
+  border: 1px solid var(--ui-control-border);
+  border-radius: var(--ui-panel-radius);
+  background: var(--ui-surface);
+  box-shadow: var(--ui-shadow);
+  color: var(--ui-ink);
+  font: 14px/1.5 var(--ui-font);
 }
 
 .analytics-consent strong {
@@ -37,16 +37,16 @@
 .analytics-settings-button {
   min-height: 34px;
   padding: 6px 12px;
-  border: 1px solid #31568f;
+  border: 1px solid var(--ui-control-border);
   border-radius: 4px;
   background: #fff;
-  color: #18345f;
+  color: var(--ui-ink);
   cursor: pointer;
   font-weight: 700;
 }
 
 .analytics-consent .analytics-consent-primary {
-  background: #215ca8;
+  background: var(--ui-accent);
   color: #fff;
 }
 

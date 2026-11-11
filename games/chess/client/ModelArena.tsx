@@ -151,7 +151,7 @@ export function ModelArena({ models }: { models: ModelOption[] }) {
     <button className="chess-primary" onClick={() => void createMatch()}>Start model match</button>
     {error && <p className="chess-notice" role="alert">{error} {match && <button onClick={() => setRetry(value => value + 1)}>Retry move</button>}</p>}
     {match && <div className="chess-arena-live">
-      <div><Chessboard options={{ id: 'model-arena-board', position: replayFen, allowDragging: false, animationDurationInMs: 180, lightSquareStyle: { backgroundColor: '#e8d7b7' }, darkSquareStyle: { backgroundColor: '#66866f' } }} /></div>
+      <div><Chessboard options={{ id: 'model-arena-board', position: replayFen, allowDragging: false, animationDurationInMs: 180, lightSquareStyle: { backgroundColor: 'var(--ui-board-light)' }, darkSquareStyle: { backgroundColor: 'var(--ui-board-dark)' } }} /></div>
       <aside><h3>{match.white_model_name} vs {match.black_model_name}</h3><p>{match.state.status}{thinking ? ' · thinking' : ''} · {match.state.moves.length} plies · {match.state.turnBudgetMs / 1000}s/turn</p>
         {controlToken && match.state.status !== 'completed' && <button onClick={() => void togglePause()}>{match.state.status === 'paused' ? 'Resume match' : 'Pause match'}</button>}
         <div className="chess-replay-controls"><button onClick={() => setReplayPly(0)}>⏮</button><button onClick={() => setReplayPly(value => Math.max(0, value - 1))}>◀</button><button onClick={() => setReplayPlaying(value => !value)}>{replayPlaying ? 'Pause replay' : 'Play replay'}</button><button onClick={() => setReplayPly(value => Math.min(match.state.moves.length, value + 1))}>▶</button><button onClick={() => setReplayPly(match.state.moves.length)}>⏭</button></div>

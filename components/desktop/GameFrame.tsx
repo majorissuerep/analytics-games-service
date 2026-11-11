@@ -99,7 +99,7 @@ export function GameFrame({ game, onExit, launchContext = 'desktop' }: GameFrame
       window.location.assign(url)
     }
     return (
-      <div className="redirect-game-panel">
+      <div className="app-surface redirect-game-panel">
         <h2>{game.title} opens in this tab</h2>
         <p>This game opted out of embedding. It receives a desktop return URL.</p>
         <button onClick={redirect}>Continue to game</button>

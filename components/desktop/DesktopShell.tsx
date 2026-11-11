@@ -309,7 +309,7 @@ function WindowContent({
     // keep their state.
     if (game.integration.kind === 'external' && !focused) {
       return (
-        <div className="external-game-suspended">
+        <div className="app-surface external-game-suspended">
           <p><strong>{game.title} is paused</strong></p>
           <p>Its audio and animation stop while another window is active. Click this window to resume.</p>
         </div>
@@ -320,7 +320,7 @@ function WindowContent({
 
   if (window.systemId === 'plugins') {
     return (
-      <div className="system-panel plugin-manager">
+      <div className="app-surface system-panel plugin-manager">
         <header><h2>Installed desktop plugins</h2><p>Build-time packages with typed, explicit desktop slots.</p></header>
         {DESKTOP_PLUGINS.map((plugin) => (
           <label className="plugin-row" key={plugin.manifest.id}>
@@ -339,7 +339,7 @@ function WindowContent({
 
   if (window.systemId === 'help') {
     return (
-      <div className="system-panel help-panel">
+      <div className="app-surface system-panel help-panel">
         <h2>Bring any web game</h2>
         <ol>
           <li>Host game anywhere over HTTPS.</li>
@@ -354,7 +354,7 @@ function WindowContent({
   }
 
   return (
-    <div className="system-panel welcome-panel">
+    <div className="app-surface system-panel welcome-panel">
       <div className="welcome-logo" aria-hidden><span>AG</span></div>
       <div>
         <p className="welcome-kicker">ANALYTICS GAMES DESKTOP</p>

@@ -18,7 +18,7 @@ function StickyNote() {
 
   if (!visible) return null
   return (
-    <aside className="sticky-note-plugin" aria-label="Desktop sticky note">
+    <aside className="app-surface sticky-note-plugin" aria-label="Desktop sticky note">
       <header><span>Quick note</span><button onClick={() => setVisible(false)} aria-label="Hide sticky note">×</button></header>
       <textarea
         aria-label="Sticky note text"

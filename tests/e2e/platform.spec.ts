@@ -61,7 +61,7 @@ test('desktop opens and closes a readable game while Pip responds', async ({ pag
   const gameFrame = page.frameLocator('iframe[title="Consensus Radar"]')
   const nameHeading = gameFrame.getByRole('heading', { name: 'Як тебе звати?' })
   await expect(nameHeading).toBeVisible()
-  await expect(nameHeading).toHaveCSS('color', 'rgb(232, 243, 255)')
+  await expect(nameHeading).toHaveCSS('color', 'rgb(37, 49, 57)')
 
   const gameWindow = page.locator('.desktop-rnd-window').filter({
     has: page.locator('iframe[title="Consensus Radar"]'),

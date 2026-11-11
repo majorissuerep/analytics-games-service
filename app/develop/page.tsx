@@ -1,16 +1,17 @@
 import Link from 'next/link'
+import './develop.css'
 import { PlatformHeader } from '@/components/platform/PlatformHeader'
 
 const steps = [
   ['01', 'Host it', 'Deploy any browser game on its own HTTPS origin. Any framework works.'],
   ['02', 'Bridge it', 'Send game.ready; receive host.init; send game.exit when player leaves.'],
   ['03', 'Describe it', 'Register strict title, URL, origin, player range, and discovery metadata.'],
-  ['04', 'Ship freely', 'Keep repository, release cadence, backend, and visual stack independent.'],
+  ['04', 'Share the language', 'Use the shared application theme for surfaces, controls, typography, and focus.'],
 ]
 
 export default function DevelopGamePage() {
   return (
-    <main className="platform-shell developer-shell">
+    <main className="app-surface platform-shell developer-shell">
       <PlatformHeader />
       <section className="developer-hero">
         <span className="platform-kicker"><span /> Game integration guide</span>
@@ -62,6 +63,15 @@ parent.postMessage(exitMessage('complete'), PLATFORM_ORIGIN)`}</code></pre>
         </div>
       </section>
 
+      <section className="developer-theme" aria-label="Shared application design">
+        <h2>One application language</h2>
+        <p>Use quiet neutral surfaces, slate controls, clear labels, and color for information. The desktop supplies the XP window frame.</p>
+        <pre><code>{`<link rel="stylesheet" href="https://analytics-games-service.vercel.app/styles/app-theme.css">
+<main class="app-surface">
+  <h1>Your game</h1>
+  <button class="ui-primary">Start game</button>
+</main>`}</code></pre>
+      </section>
       <div className="developer-back">
         <Link href="/">← Back to games</Link>
       </div>

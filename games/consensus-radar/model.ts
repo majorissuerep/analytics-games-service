@@ -4,8 +4,8 @@ import { scaleByKey, type Category, type Lang, type Scale } from './scales'
 export type { Category, Lang, Scale }
 export { scaleByKey }
 
-/** Team colors by index — the upstream palette, up to six teams. */
-export const TEAM_COLORS = ['#5ee0c5', '#ff7a9c', '#7aa2ff', '#ffcf5c', '#5ee08a', '#c08bff']
+/** Readable team identity colors by index, up to six teams. */
+export const TEAM_COLORS = ['#46677c', '#92545e', '#596c9b', '#80672e', '#3e735c', '#7a5d87']
 
 export const MIN_TEAMS = 2
 export const MAX_TEAMS = 6

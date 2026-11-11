@@ -5,6 +5,7 @@ import {
   gameRoot,
   loadAndValidateContent,
   repoRelative,
+  repoRoot,
   runtimeOutputRoot,
   sha256,
 } from './content-lib.mjs'
@@ -13,6 +14,7 @@ const content = await loadAndValidateContent()
 await rm(runtimeOutputRoot, { recursive: true, force: true })
 await mkdir(runtimeOutputRoot, { recursive: true })
 await cp(join(gameRoot, 'runtime'), runtimeOutputRoot, { recursive: true })
+await cp(join(repoRoot, 'public/styles/app-theme.css'), join(runtimeOutputRoot, 'app-theme.css'))
 
 const assets = []
 for (const [group, files] of [

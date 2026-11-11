@@ -1,5 +1,7 @@
 'use client'
 
+import './consensus-radar.css'
+
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import type { LeaderboardRow } from '@/lib/engine/types'
@@ -613,7 +615,7 @@ export function ConsensusRadarGame() {
   // ─────────────────────────────────────────────────────────────────────────
   if (screen === 'name') {
     return (
-      <div className="wrap screen-enter">
+      <div className="app-surface radar-app wrap screen-enter">
         <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} />
         <div className="card">
           <div className="name-screen">
@@ -648,7 +650,7 @@ export function ConsensusRadarGame() {
   // ─────────────────────────────────────────────────────────────────────────
   if (screen === 'join') {
     return (
-      <div className="wrap screen-enter">
+      <div className="app-surface radar-app wrap screen-enter">
         <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
         <div className="card">
           <div className="eyebrow">{t('joinTitle')}</div>
@@ -690,7 +692,7 @@ export function ConsensusRadarGame() {
       .filter(i => roomState.players.filter(p => p.team === i).length === 1)
 
     return (
-      <div className="wrap screen-enter">
+      <div className="app-surface radar-app wrap screen-enter">
         <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
         <div className="card">
           <div className="eyebrow">{t('lobbyTitle')}</div>
@@ -844,7 +846,7 @@ export function ConsensusRadarGame() {
     if (rs.phase === 'clue' && round) {
       if (isCluegiver) {
         return (
-          <div className="wrap screen-enter">
+          <div className="app-surface radar-app wrap screen-enter">
             <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
             <div className="card">
               <RoundMeta />
@@ -885,7 +887,7 @@ export function ConsensusRadarGame() {
       }
       // Everyone else waits for the clue
       return (
-        <div className="wrap screen-enter">
+        <div className="app-surface radar-app wrap screen-enter">
           <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
           <div className="card center">
             <RoundMeta />
@@ -935,7 +937,7 @@ export function ConsensusRadarGame() {
       if (canGuess) {
         const showEditor = editing || !myGuessIn
         return (
-          <div className="wrap screen-enter">
+          <div className="app-surface radar-app wrap screen-enter">
             <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
             <div className="card">
               <RoundMeta />
@@ -992,7 +994,7 @@ export function ConsensusRadarGame() {
 
       // Everyone else: clue-giver, betting rivals, spectators
       return (
-        <div className="wrap screen-enter">
+        <div className="app-surface radar-app wrap screen-enter">
           <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
           <div className="card center">
             <RoundMeta />
@@ -1045,8 +1047,8 @@ export function ConsensusRadarGame() {
       const distance = round.distance ?? Math.round(Math.abs(target - marker) * 10) / 10
       const verdictKey = pts >= 5 ? 'bullseye' : pts >= 3 ? 'close' : pts <= -2 ? 'opposite' : 'far'
       const verdictColor = pts >= 5 ? 'var(--sweep)' : pts >= 3 ? 'var(--warm)' : pts < 0 ? 'var(--hot)' : 'var(--ink-dim)'
-      const deltaBg    = pts >= 5 ? 'var(--sweep)' : pts >= 3 ? 'var(--warm)' : pts < 0 ? 'var(--hot)' : 'var(--panel-3)'
-      const deltaColor = pts > 0 ? '#001a0f' : pts < 0 ? '#fff' : 'var(--ink)'
+      const deltaBg    = pts >= 5 ? 'var(--ui-positive-bg)' : pts >= 3 ? 'var(--ui-warning-bg)' : pts < 0 ? 'var(--ui-negative-bg)' : 'var(--panel-3)'
+      const deltaColor = pts >= 5 ? 'var(--ui-positive)' : pts >= 3 ? 'var(--ui-warning)' : pts < 0 ? 'var(--ui-negative)' : 'var(--ink)'
 
       const guessRows = Object.entries(round.guesses)
         .map(([pid, value]) => ({
@@ -1155,7 +1157,7 @@ export function ConsensusRadarGame() {
 
       if (rs.phase === 'reveal') {
         return (
-          <div className="wrap screen-enter">
+          <div className="app-surface radar-app wrap screen-enter">
             <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
             {revealBody}
             {toast && <div className="toast">{toast}</div>}
@@ -1172,7 +1174,7 @@ export function ConsensusRadarGame() {
       const winners = sorted.filter(team => team.score === top)
 
       return (
-        <div className="wrap screen-enter">
+        <div className="app-surface radar-app wrap screen-enter">
           <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
           <div className="card center">
             <div className="eyebrow">{t('finalTitle')}</div>
@@ -1216,7 +1218,7 @@ export function ConsensusRadarGame() {
 
     // ── Playing but between rounds (clue/guess with no round yet) ──────────
     return (
-      <div className="wrap screen-enter">
+      <div className="app-surface radar-app wrap screen-enter">
         <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
         <div className="card center">
           <RoundMeta />
