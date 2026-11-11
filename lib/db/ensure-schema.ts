@@ -1,4 +1,6 @@
 import { pool } from './index'
+import { RETIRED_GAME_IDS } from '@/lib/platform/retired-games'
+import { RETIRE_GAMES_SQL } from './retire-games'
 
 let schemaPromise: Promise<void> | null = null
 
@@ -51,6 +53,13 @@ async function applySchema() {
     CREATE INDEX IF NOT EXISTS platform_games_enabled_title_idx
       ON platform_games (enabled, title)
   `)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS platform_game_retirements (
+      game_id TEXT PRIMARY KEY,
+      retired_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `)
+  await pool.query(RETIRE_GAMES_SQL, [RETIRED_GAME_IDS])
 }
 
 export async function ensurePlatformSchema() {

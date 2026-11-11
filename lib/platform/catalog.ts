@@ -1,4 +1,5 @@
 import 'server-only'
+import { isRetiredGame } from './retired-games'
 
 import type { GameManifest } from '@/lib/engine/types'
 import { INTERNAL_GAME_CATALOG } from '@/games/catalog'
@@ -10,7 +11,7 @@ export async function listPlatformGames(): Promise<GameManifest[]> {
     const internalIds = new Set(INTERNAL_GAME_CATALOG.map((game) => game.id))
     return [
       ...INTERNAL_GAME_CATALOG,
-      ...externalGames.filter((game) => !internalIds.has(game.id)),
+      ...externalGames.filter((game) => !internalIds.has(game.id) && !isRetiredGame(game.id)),
     ]
   } catch (error) {
     console.error('External game catalog unavailable; serving internal catalog only', error)

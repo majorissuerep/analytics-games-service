@@ -43,7 +43,7 @@ describe('Pip repository knowledge', () => {
 describe('OpenRouter privacy and spend controls', () => {
   it('pins the deepseek flash model, ZDR routing, and bounded output', () => {
     const request = buildOpenRouterRequest(
-      [{ role: 'user', content: 'How does Consensus Radar work?' }],
+      [{ role: 'user', content: 'What is planned for Mafia Online?' }],
       'https://games.example.test',
     )
 
@@ -51,6 +51,6 @@ describe('OpenRouter privacy and spend controls', () => {
     expect(request.provider).toEqual({ zdr: true })
     expect(request.max_tokens).toBeLessThanOrEqual(350)
     expect(request.messages[0].role).toBe('system')
-    expect(request.messages.at(-1)).toEqual({ role: 'user', content: 'How does Consensus Radar work?' })
+    expect(request.messages.at(-1)).toEqual({ role: 'user', content: 'What is planned for Mafia Online?' })
   })
 })

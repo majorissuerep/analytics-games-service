@@ -14,7 +14,7 @@ const tones = [
 ] as const
 const games = [
   ['pink', '♞', 'Chess', 'Analyze, compete, or play together.', 'chess'],
-  ['violet', '◉', 'Consensus Radar', 'Find your team’s shared signal.', 'consensus-radar'],
+  ['violet', '◈', 'Mafia Online', 'Private tables. Coming soon.', 'mafia'],
   ['teal', '⚑', 'Minefield', 'Every clear follows from a clue.', 'minefield'],
   ['amber', '✎', 'Paintbox', 'Make something worth keeping.', 'paintbox'],
 ] as const

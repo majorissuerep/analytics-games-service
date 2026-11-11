@@ -303,7 +303,7 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
                   {sending && <LoadingState scope="inline" label={streamingText === null ? statusLine || 'Pip is preparing a response' : 'Receiving Pip’s response'} onCancel={() => requestRef.current?.abort()} cancelLabel="Stop response" />}
                 </div>
                 <div className="pip-chat-suggestions" aria-label="Suggested questions">
-                  {['How do I play Minefield?', 'Explain Consensus Radar', 'Where do games live in the repo?'].map((question) => (
+                  {['How do I play Minefield?', 'What is planned for Mafia Online?', 'Where do games live in the repo?'].map((question) => (
                     <button key={question} onClick={() => { setDraft(question); inputRef.current?.focus() }}>{question}</button>
                   ))}
                 </div>

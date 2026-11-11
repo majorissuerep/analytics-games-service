@@ -2,7 +2,6 @@ import { expect, test } from '@playwright/test'
 
 const canvas = 'rgb(246, 244, 248)'
 const surface = 'rgb(255, 255, 255)'
-const accent = 'rgb(177, 45, 117)'
 
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => localStorage.setItem('analytics-games.analytics-consent.v1', 'denied'))
@@ -10,7 +9,6 @@ test.beforeEach(async ({ context }) => {
 
 for (const [name, path, root] of [
   ['Chess', '/games/chess', '.chess-app'],
-  ['Consensus Radar', '/games/consensus-radar', '.radar-app'],
   ['Minefield', '/games/minefield', '.minefield-app'],
   ['Paintbox', '/games/paintbox', '.paintbox-app'],
   ['Pinball', '/vendor/pinball/cabinet.html', 'body.app-surface'],
@@ -19,7 +17,7 @@ for (const [name, path, root] of [
 ]) {
   test(`${name} uses the shared application language at desktop and phone sizes`, async ({ page }) => {
     await page.goto(path)
-    const app = page.locator(root)
+    const app = page.locator(root).filter({ visible: true })
     await expect(page.locator('body')).toHaveCSS('background-color', canvas)
     await expect(page.locator('body')).toHaveCSS('background-image', /gradient/)
     await expect(app).toHaveCSS('font-family', /Segoe UI/)
@@ -65,34 +63,6 @@ test('notes, assistant content, and system panels use the same surfaces while th
   const row = page.locator('.plugin-row').first()
   expect(await row.evaluate(element => getComputedStyle(element).backgroundColor)).not.toBe(surface)
   expect(await row.locator('strong').evaluate(element => getComputedStyle(element).color)).not.toBe('rgb(41, 36, 54)')
-})
-
-test('a primary action and keyboard focus carry the same meaning in the redesigned room UI', async ({ page }) => {
-  await page.goto('/games/consensus-radar')
-  await page.getByRole('button', { name: 'EN', exact: true }).click()
-  const input = page.getByPlaceholder('Your name…')
-  await input.focus()
-  await expect(input).toHaveCSS('outline-style', 'solid')
-  await expect(input).toHaveCSS('outline-width', '3px')
-  await expect(page.getByRole('button', { name: /Continue/ })).toHaveCSS('background-color', accent)
-  await expect(page.locator('.logo-big')).toHaveCSS('animation-name', 'none')
-})
-
-test('Radar keeps its identity and translated controls readable on narrow phones', async ({ page }) => {
-  await page.setViewportSize({ width: 320, height: 900 })
-  await page.goto('/games/consensus-radar')
-  for (const language of ['EN', 'УКР']) {
-    await page.getByRole('button', { name: language, exact: true }).click()
-    const brand = await page.locator('.brand').boundingBox()
-    const actions = await page.locator('.topbar-actions').boundingBox()
-    expect(actions!.y).toBeGreaterThanOrEqual(brand!.y + brand!.height)
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
-  }
-  await page.getByRole('button', { name: 'EN', exact: true }).click()
-  await page.getByPlaceholder('Your name…').fill('A player with a long name')
-  await page.getByRole('button', { name: /Continue/ }).click()
-  await expect(page.locator('.player-pill')).toBeVisible()
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
 
 function rgba(value: string) {
@@ -143,12 +113,12 @@ test('saved material preference reaches another app and the static cabinet and s
   await page.getByLabel('Reduce transparency').check()
   for (const app of [page, chess, cabinet]) await expect(app.locator('html')).toHaveAttribute('data-ui-material', 'solid')
   await expect(chess.locator('.chess-toolbar')).toHaveCSS('backdrop-filter', 'none')
-  await expect(cabinet.locator('.pinball-bar')).toHaveCSS('background-color', surface)
+  await expect(cabinet.frameLocator('iframe[title="Space Cadet runtime"]').locator('.pinball-bar')).toHaveCSS('background-color', surface)
   await page.reload()
   await expect(page.getByLabel('Reduce transparency')).toBeChecked()
   await page.getByLabel('Reduce transparency').uncheck()
   await expect(chess.locator('.chess-toolbar')).toHaveCSS('backdrop-filter', /blur/)
-  await expect(cabinet.locator('.pinball-bar')).toHaveCSS('backdrop-filter', /blur/)
+  await expect(cabinet.frameLocator('iframe[title="Space Cadet runtime"]').locator('.pinball-bar')).toHaveCSS('backdrop-filter', /blur/)
 })
 
 test('system transparency, forced colors, and reduced motion preferences preserve usable controls', async ({ page }) => {

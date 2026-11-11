@@ -1,0 +1,299 @@
+{
+  "exitCode": 0,
+  "durationWallSeconds": 53.03,
+  "serverCpuSeconds": 39.33,
+  "serverAverageCpuOneCorePercent": 74.16,
+  "serverPeakRssMiB": 354.25,
+  "serverVersion": "1.13.11",
+  "cliVersion": "2.19.4",
+  "topology": "20 dual audio/video publisher clients + 20 subscriber clients (40 total), conservative proxy for 20 bidirectional players; no game or browser codec validation",
+  "samples": [
+    {
+      "seconds": 0.001,
+      "cpuSeconds": 0.21,
+      "rssKiB": 48812
+    },
+    {
+      "seconds": 1.001,
+      "cpuSeconds": 0.38,
+      "rssKiB": 66028
+    },
+    {
+      "seconds": 2.001,
+      "cpuSeconds": 0.64,
+      "rssKiB": 78168
+    },
+    {
+      "seconds": 3.002,
+      "cpuSeconds": 0.9,
+      "rssKiB": 89952
+    },
+    {
+      "seconds": 4.002,
+      "cpuSeconds": 1.19,
+      "rssKiB": 103200
+    },
+    {
+      "seconds": 5.003,
+      "cpuSeconds": 2.18,
+      "rssKiB": 163112
+    },
+    {
+      "seconds": 6.003,
+      "cpuSeconds": 3.08,
+      "rssKiB": 196212
+    },
+    {
+      "seconds": 7.004,
+      "cpuSeconds": 4.11,
+      "rssKiB": 240412
+    },
+    {
+      "seconds": 8.004,
+      "cpuSeconds": 5.06,
+      "rssKiB": 267136
+    },
+    {
+      "seconds": 9.005,
+      "cpuSeconds": 5.84,
+      "rssKiB": 275616
+    },
+    {
+      "seconds": 10.005,
+      "cpuSeconds": 6.64,
+      "rssKiB": 288128
+    },
+    {
+      "seconds": 11.006,
+      "cpuSeconds": 7.51,
+      "rssKiB": 300976
+    },
+    {
+      "seconds": 12.006,
+      "cpuSeconds": 8.33,
+      "rssKiB": 311268
+    },
+    {
+      "seconds": 13.007,
+      "cpuSeconds": 9.17,
+      "rssKiB": 320620
+    },
+    {
+      "seconds": 14.007,
+      "cpuSeconds": 9.98,
+      "rssKiB": 324472
+    },
+    {
+      "seconds": 15.008,
+      "cpuSeconds": 10.79,
+      "rssKiB": 328656
+    },
+    {
+      "seconds": 16.008,
+      "cpuSeconds": 11.74,
+      "rssKiB": 337964
+    },
+    {
+      "seconds": 17.008,
+      "cpuSeconds": 12.53,
+      "rssKiB": 338464
+    },
+    {
+      "seconds": 18.009,
+      "cpuSeconds": 13.26,
+      "rssKiB": 338596
+    },
+    {
+      "seconds": 19.009,
+      "cpuSeconds": 13.97,
+      "rssKiB": 338736
+    },
+    {
+      "seconds": 20.01,
+      "cpuSeconds": 14.7,
+      "rssKiB": 339084
+    },
+    {
+      "seconds": 21.01,
+      "cpuSeconds": 15.45,
+      "rssKiB": 339304
+    },
+    {
+      "seconds": 22.01,
+      "cpuSeconds": 16.19,
+      "rssKiB": 339556
+    },
+    {
+      "seconds": 23.011,
+      "cpuSeconds": 16.98,
+      "rssKiB": 339732
+    },
+    {
+      "seconds": 24.011,
+      "cpuSeconds": 17.68,
+      "rssKiB": 339868
+    },
+    {
+      "seconds": 25.011,
+      "cpuSeconds": 18.42,
+      "rssKiB": 340320
+    },
+    {
+      "seconds": 26.012,
+      "cpuSeconds": 19.13,
+      "rssKiB": 340632
+    },
+    {
+      "seconds": 27.012,
+      "cpuSeconds": 19.87,
+      "rssKiB": 341024
+    },
+    {
+      "seconds": 28.013,
+      "cpuSeconds": 20.63,
+      "rssKiB": 341544
+    },
+    {
+      "seconds": 29.013,
+      "cpuSeconds": 21.37,
+      "rssKiB": 341852
+    },
+    {
+      "seconds": 30.014,
+      "cpuSeconds": 22.07,
+      "rssKiB": 342204
+    },
+    {
+      "seconds": 31.014,
+      "cpuSeconds": 22.8,
+      "rssKiB": 342576
+    },
+    {
+      "seconds": 32.014,
+      "cpuSeconds": 23.6,
+      "rssKiB": 343156
+    },
+    {
+      "seconds": 33.016,
+      "cpuSeconds": 24.33,
+      "rssKiB": 343644
+    },
+    {
+      "seconds": 34.016,
+      "cpuSeconds": 25.05,
+      "rssKiB": 344112
+    },
+    {
+      "seconds": 35.017,
+      "cpuSeconds": 25.76,
+      "rssKiB": 344688
+    },
+    {
+      "seconds": 36.017,
+      "cpuSeconds": 26.5,
+      "rssKiB": 345156
+    },
+    {
+      "seconds": 37.017,
+      "cpuSeconds": 27.27,
+      "rssKiB": 345632
+    },
+    {
+      "seconds": 38.018,
+      "cpuSeconds": 28.25,
+      "rssKiB": 346192
+    },
+    {
+      "seconds": 39.023,
+      "cpuSeconds": 29.08,
+      "rssKiB": 346616
+    },
+    {
+      "seconds": 40.023,
+      "cpuSeconds": 29.87,
+      "rssKiB": 347144
+    },
+    {
+      "seconds": 41.024,
+      "cpuSeconds": 30.71,
+      "rssKiB": 347780
+    },
+    {
+      "seconds": 42.024,
+      "cpuSeconds": 31.5,
+      "rssKiB": 348120
+    },
+    {
+      "seconds": 43.024,
+      "cpuSeconds": 32.26,
+      "rssKiB": 348364
+    },
+    {
+      "seconds": 44.025,
+      "cpuSeconds": 33.04,
+      "rssKiB": 349532
+    },
+    {
+      "seconds": 45.026,
+      "cpuSeconds": 33.77,
+      "rssKiB": 350740
+    },
+    {
+      "seconds": 46.026,
+      "cpuSeconds": 34.57,
+      "rssKiB": 351852
+    },
+    {
+      "seconds": 47.027,
+      "cpuSeconds": 35.27,
+      "rssKiB": 353188
+    },
+    {
+      "seconds": 48.027,
+      "cpuSeconds": 35.98,
+      "rssKiB": 354324
+    },
+    {
+      "seconds": 49.028,
+      "cpuSeconds": 36.64,
+      "rssKiB": 355732
+    },
+    {
+      "seconds": 50.029,
+      "cpuSeconds": 37.32,
+      "rssKiB": 357972
+    },
+    {
+      "seconds": 51.03,
+      "cpuSeconds": 38.03,
+      "rssKiB": 360732
+    },
+    {
+      "seconds": 52.03,
+      "cpuSeconds": 38.72,
+      "rssKiB": 362756
+    }
+  ],
+  "hardware": {
+    "cpuQuotaCores": 4,
+    "memoryLimitGiB": 16,
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "reportedSubscriberSummary": {
+    "tracksReceived": 800,
+    "tracksExpected": 800,
+    "totalReceiveMbps": 247.3,
+    "averageReceiveMbpsPerSubscriber": 12.4,
+    "reportedDroppedPackets": 0
+  },
+  "limitations": [
+    "Loopback only; no WAN, TURN, browser decode/encode, mobile device, application state, or 15 fps capture validation.",
+    "CLI uses separate publishers and subscribers: 40 connections, not 20 bidirectional browsers.",
+    "CLI preset medium advertises 640x360, with its own encoded samples; rates are not our 350 kbps/15 fps production limits.",
+    "Do not treat the CLI latency field as measured end-to-end latency."
+  ],
+  "binaryArchiveSha256": {
+    "server.tar.gz": "1e9ee90ca301e1842b2887fc77cb122759756a9c8aeb4334ee91de3325ec43fb",
+    "cli.tar.gz": "cb0f769201faa13956a3999bee078ec63fd5f22b855a79c09d648283e50debae"
+  }
+}

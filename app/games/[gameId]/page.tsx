@@ -1,3 +1,4 @@
+import { ComingSoonGame } from '@/components/games/ComingSoonGame'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { StandaloneGameFrame } from '@/components/desktop/StandaloneGameFrame'
@@ -24,7 +25,8 @@ export default async function GamePage({ params, searchParams }: GamePageProps) 
   const { gameId } = await params
   const { embedded } = await searchParams
   const game = await getPlatformGame(gameId)
-  if (!game || game.status === 'coming-soon') notFound()
+  if (!game) notFound()
+  if (game.status === 'coming-soon') return <ComingSoonGame game={game} />
   if (game.integration.kind === 'external' || game.integration.launchPath) return <StandaloneGameFrame game={game} />
   const client = <GameClient gameId={game.id} />
   return embedded === '1'

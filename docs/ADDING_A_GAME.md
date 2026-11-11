@@ -49,7 +49,7 @@ games/my-game/
   client/Game.tsx
 ```
 
-Register only the manifest in `games/catalog.ts` and component in `games/client-registry.tsx`. Keep CSS selectors scoped under one game root. Add pure model tests plus a browser launch/interaction/close check. Minefield and Paintbox are examples. Neon Forge demonstrates an original canvas game whose repository-authored rules/rendering wrap a declared, MIT-licensed Planck.js physics dependency in `games/orbit-pinball/`.
+Register only the manifest in `games/catalog.ts` and component in `games/client-registry.tsx`. Keep CSS selectors scoped under one game root. Add pure model tests plus a browser launch/interaction/close check. Minefield and Paintbox are examples. Space Cadet demonstrates a vendored native WebAssembly engine with separately licensed data, a provenance record, and a platform-owned launch cabinet. Mafia Online demonstrates a coming-soon manifest; it must not register server rules or start a media session.
 
 ## Internal multiplayer engine game
 

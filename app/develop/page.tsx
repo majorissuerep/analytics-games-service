@@ -59,7 +59,7 @@ parent.postMessage(exitMessage('complete'), PLATFORM_ORIGIN)`}</code></pre>
         </div>
         <div>
           <span>INTERNAL SAMPLE</span>
-          <code>games/consensus-radar</code>
+          <code>games/chess</code>
         </div>
       </section>
 

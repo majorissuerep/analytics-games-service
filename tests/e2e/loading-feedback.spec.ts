@@ -48,29 +48,6 @@ test('opening an app keeps the XP desktop usable and supports closing just that 
   release()
 })
 
-test('leaderboard waits inside its modal and exposes error and retry', async ({ page }) => {
-  let resolve!: () => void
-  const gate = new Promise<void>(done => { resolve = done })
-  let attempts = 0
-  await page.route('**/api/games/consensus-radar/leaderboard', async route => {
-    attempts++
-    if (attempts === 1) { await gate; await route.fulfill({ status: 503, json: { error: 'Unavailable' } }) }
-    else await route.fulfill({ json: { rows: [] } })
-  })
-  await page.goto('/games/consensus-radar')
-  await page.getByRole('button', { name: 'EN', exact: true }).click()
-  await page.getByRole('button', { name: 'Leaderboard', exact: true }).click()
-  const modal = page.getByRole('dialog', { name: 'Leaderboard' })
-  await expect(modal.getByRole('progressbar', { name: 'Loading leaderboard' })).toBeVisible()
-  await expect(page.getByPlaceholder('Your name…')).toBeVisible()
-  resolve()
-  await expect(modal.getByRole('alert')).toContainText('Leaderboard unavailable')
-  await expect(modal.getByRole('progressbar')).toHaveCount(0)
-  await modal.getByRole('button', { name: 'Retry leaderboard' }).click()
-  await expect(modal.getByRole('alert')).toHaveCount(0)
-  expect(attempts).toBe(2)
-})
-
 test('PNG export shows local progress while drawing controls remain usable', async ({ page }) => {
   await page.addInitScript(() => {
     const original = HTMLCanvasElement.prototype.toBlob
@@ -185,26 +162,4 @@ test('Minefield verification reports actual attempts and can be stopped without 
   await page.getByRole('button', { name: 'Cancel', exact: true }).click()
   await expect(page.getByRole('progressbar')).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Covered cell, row 5, column 5', exact: true })).toBeEnabled()
-})
-
-test('room creation shows local progress, prevents duplicate submission, and preserves input after failure', async ({ page }) => {
-  let release!: () => void
-  const gate = new Promise<void>(resolve => { release = resolve })
-  await page.route('**/api/rooms', async route => {
-    await gate
-    await route.fulfill({ status: 503, json: { error: { message: 'Room service unavailable. Please retry.' } } })
-  })
-  await page.goto('/games/consensus-radar')
-  await page.getByRole('button', { name: 'EN', exact: true }).click()
-  await page.getByPlaceholder('Your name…').fill('Loading QA')
-  await page.getByRole('button', { name: /Continue/ }).click()
-  const create = page.getByRole('button', { name: /Create room/ })
-  await create.click()
-  await expect(page.getByRole('progressbar', { name: 'Connecting to the room' })).toBeVisible()
-  await expect(create).toBeDisabled()
-  await expect(page.getByRole('button', { name: 'Leaderboard', exact: true })).toBeEnabled()
-  release()
-  await expect(page.getByRole('progressbar')).toHaveCount(0)
-  await expect(create).toBeEnabled()
-  await expect(page.locator('.player-pill')).toHaveText('Loading QA')
 })

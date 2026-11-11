@@ -2,15 +2,11 @@
   "name": "@analytics-games/orbit-pinball",
   "version": "1.0.0",
   "private": true,
-  "description": "Original Neon Forge pinball table with Planck.js physics",
+  "description": "Faithful Space Cadet WebAssembly engine with CC0 artwork and optional local XP data",
   "scripts": {
     "check": "tsc --noEmit -p tsconfig.json"
   },
   "peerDependencies": {
     "react": ">=19"
-  },
-  "dependencies": {
-    "planck": "1.4.2",
-    "stage-js": "1.0.1"
   }
 }
