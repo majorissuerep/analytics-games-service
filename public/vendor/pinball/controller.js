@@ -15,8 +15,16 @@ window.addEventListener('message', event => {
     frame.src = `runtime.html?runtime=1&attempt=${++attempt}`
   }
   if (data?.protocol === 'analytics-games.bridge' && data.version === 1 && ['game.ready','game.exit','game.telemetry'].includes(data.type)) {
+    if (data.type === 'game.ready') {
+      document.getElementById('cabinet-boot')?.remove()
+      frame.style.visibility = 'visible'
+    }
     document.documentElement.dataset.appReady = 'true'
     if (window.parent !== window) window.parent.postMessage(data, location.origin)
     else if (data.type === 'game.exit') location.assign('/')
   }
 })
+
+// Register every handler before navigation. A cached child may otherwise post its
+// only startup message before this module finishes loading.
+frame.src = 'runtime.html?runtime=1'
