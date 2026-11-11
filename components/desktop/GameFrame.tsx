@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { LoadingState } from '@/components/ui/LoadingState'
 import {
   ANALYTICS_GAME_BRIDGE,
   ANALYTICS_GAME_BRIDGE_VERSION,
@@ -36,9 +37,18 @@ function externalLaunchUrl(game: GameManifest) {
 
 export function GameFrame({ game, onExit, launchContext = 'desktop' }: GameFrameProps) {
   const frameRef = useRef<HTMLIFrameElement>(null)
+  const [ready, setReady] = useState(false)
+  const [failed, setFailed] = useState(false)
+  const [attempt, setAttempt] = useState(0)
   const sessionId = useMemo(() => crypto.randomUUID(), [])
   const { completeSession, markExit } = useTrackedGameSession(game, launchContext)
   const src = externalLaunchUrl(game)
+
+  useEffect(() => {
+    if (ready || failed) return
+    const timer = setTimeout(() => setFailed(true), 45_000)
+    return () => clearTimeout(timer)
+  }, [attempt, ready, failed])
 
   useEffect(() => {
     const targetOrigin = game.integration.kind === 'external'
@@ -73,7 +83,7 @@ export function GameFrame({ game, onExit, launchContext = 'desktop' }: GameFrame
         }
       }
       if (!isGameToHostMessage(event.data)) return
-      if (event.data.type === 'game.ready') sendInit()
+      if (event.data.type === 'game.ready') { setReady(true); setFailed(false); sendInit() }
       const completion = gameCompletionFromMessage(event.data)
       if (completion) completeSession(completion)
       if (event.data.type === 'game.exit') {
@@ -108,15 +118,27 @@ export function GameFrame({ game, onExit, launchContext = 'desktop' }: GameFrame
   }
 
   return (
+    <div className="desktop-game-host">
     <iframe
+      key={attempt}
       ref={frameRef}
       className="desktop-game-frame"
+      aria-busy={!ready && !failed}
+      inert={!ready}
       src={src}
       title={game.title}
       sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups"
       allow="autoplay; fullscreen; gamepad; clipboard-write"
       referrerPolicy="no-referrer"
       allowFullScreen
+      onLoad={() => {
+        if (game.integration.kind === 'external' || game.integration.launchPath) { setReady(true); return }
+        // A fast child may mount before the host's message listener hydrates.
+        if (frameRef.current?.contentDocument?.documentElement.dataset.appReady === 'true') setReady(true)
+      }}
+      onError={() => setFailed(true)}
     />
+    {!ready && <div className="app-surface desktop-game-loader">{failed ? <section className="ui-card ui-loading-error" role="alert"><h2>{game.title} could not finish opening</h2><p>Try loading the app again or return to the desktop.</p><button className="ui-primary" onClick={() => { setFailed(false); setReady(false); setAttempt(value => value + 1) }}>Retry app</button><button onClick={onExit}>Back to desktop</button></section> : <LoadingState key={attempt} scope="app" label={`Opening ${game.title}`} detail="Loading the app and its controls." onCancel={onExit} cancelLabel="Close app" />}</div>}
+    </div>
   )
 }

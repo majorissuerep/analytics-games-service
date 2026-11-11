@@ -5,6 +5,7 @@ import { analyseWithReckless, recklessAvailable } from '@/lib/engine/reckless'
 import { presentAnalysis } from '@/lib/engine/reckless-presentation'
 
 import { analyseWithEngine } from '@/lib/engine/uci-runtime'
+import { engineResponse } from '@/lib/engine/progress-response'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -30,16 +31,20 @@ export async function POST(request: Request) {
   if (legalUci.size === 0) return NextResponse.json({ error: 'No legal moves in this position' }, { status: 400 })
   if (parsed.data.revisionId === 'reckless-local' && !recklessAvailable()) return NextResponse.json({ error: 'Reckless engine binary is missing on the server' }, { status: 503 })
   try {
-    const search = {
+    return await engineResponse(request, async onProgress => {
+      const search = {
       fen: chess.fen(),
       multiPv: Math.min(parsed.data.multiPv, legalUci.size),
       moveTimeMs: parsed.data.moveTimeMs,
+      onProgress,
+      signal: request.signal,
     }
     const analysis = parsed.data.revisionId === 'reckless-local' ? await analyseWithReckless(search) : await analyseWithEngine(parsed.data.revisionId, search)
-    return NextResponse.json({
+    return {
       fen: chess.fen(),
       turn: chess.turn(),
       analysis: presentAnalysis(chess.fen(), chess.turn(), analysis, legalUci),
+    }
     })
   } catch (error) {
     return NextResponse.json(

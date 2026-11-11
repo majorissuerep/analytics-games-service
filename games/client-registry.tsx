@@ -1,18 +1,16 @@
 'use client'
 
-import { ChessGame } from './chess/client/ChessGame'
-import { ConsensusRadarGame } from './consensus-radar/client/ConsensusRadarGame'
-import { MinefieldGame } from './minefield/client/MinefieldGame'
-import { PaintboxGame } from './paintbox/client/PaintboxGame'
+import dynamic from 'next/dynamic'
+import { LoadingState } from '@/components/ui/LoadingState'
 
 interface GameClientProps {
   gameId: string
 }
 const CLIENT_GAMES: Record<string, React.ComponentType> = {
-  chess: ChessGame,
-  'consensus-radar': ConsensusRadarGame,
-  minefield: MinefieldGame,
-  paintbox: PaintboxGame,
+  chess: dynamic(() => import('./chess/client/ChessGame').then(module => module.ChessGame), { loading: () => <LoadingState scope="app" label="Opening Chess" /> }),
+  'consensus-radar': dynamic(() => import('./consensus-radar/client/ConsensusRadarGame').then(module => module.ConsensusRadarGame), { loading: () => <LoadingState scope="app" label="Opening Consensus Radar" /> }),
+  minefield: dynamic(() => import('./minefield/client/MinefieldGame').then(module => module.MinefieldGame), { loading: () => <LoadingState scope="app" label="Opening Minefield" /> }),
+  paintbox: dynamic(() => import('./paintbox/client/PaintboxGame').then(module => module.PaintboxGame), { loading: () => <LoadingState scope="app" label="Opening Paintbox" /> }),
 }
 
 export function GameClient({ gameId }: GameClientProps) {

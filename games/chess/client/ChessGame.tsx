@@ -1,5 +1,11 @@
 'use client'
 
+import { useAppReady } from '@/lib/engine/client/use-app-ready'
+import { LoadingState } from '@/components/ui/LoadingState'
+import { fetchWithTimeout } from '@/lib/engine/client/fetch-with-timeout'
+import { requestEngine } from '@/lib/engine/client/request-engine'
+import type { EngineProgress } from '@/lib/engine/engine-progress'
+
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { Chess, type Color, type Square } from 'chess.js'
 import { Chessboard, type PieceDropHandlerArgs, type PieceHandlerArgs, type SquareHandlerArgs } from 'react-chessboard'
@@ -86,6 +92,7 @@ const illegalStyle: CSSProperties = {
 }
 
 export function ChessGame() {
+  useAppReady()
   const [mode, setMode] = useState<Mode>('setup')
   const [setupMode, setSetupMode] = useState<SetupMode>('bot')
   const [onlineAction, setOnlineAction] = useState<OnlineAction>('create')
@@ -121,6 +128,10 @@ export function ChessGame() {
   const [lastMove, setLastMove] = useState<{ from: Square; to: Square } | null>(null)
   const [promotion, setPromotion] = useState<PendingPromotion>(null)
   const [engineThinking, setEngineThinking] = useState(false)
+  const [engineProgress, setEngineProgress] = useState<EngineProgress | null>(null)
+  const [evaluationProgress, setEvaluationProgress] = useState<EngineProgress | null>(null)
+  const engineAbortRef = useRef<AbortController | null>(null)
+  const evaluationAbortRef = useRef<AbortController | null>(null)
   const [engineError, setEngineError] = useState('')
   const [engineRetry, setEngineRetry] = useState(0)
   const [evaluation, setEvaluation] = useState<StockfishEvaluation | null>(null)
@@ -131,6 +142,9 @@ export function ChessGame() {
   const [roomCode, setRoomCode] = useState('')
   const [password, setPassword] = useState('')
   const [notice, setNotice] = useState('')
+  const [modelsLoading, setModelsLoading] = useState(true)
+  const [modelsError, setModelsError] = useState('')
+  const [modelsRetry, setModelsRetry] = useState(0)
   const [timeControlId, setTimeControlId] = useState(DEFAULT_CHESS_TIME_ID)
   const [clockNow, setClockNow] = useState(() => Date.now())
   const roomClient = useGameRoom<ChessGameView>({ gameId: 'chess', playerId, pollMs: 1000 })
@@ -145,10 +159,17 @@ export function ChessGame() {
   }, [])
 
   useEffect(() => {
-    fetch('/api/chess-models').then(response => response.json()).then((body: { models?: ModelOption[] }) => {
-      if (body.models?.length) setRemoteModels(body.models)
-    }).catch(() => undefined)
-  }, [])
+    const controller = new AbortController()
+    fetchWithTimeout('/api/chess-models', { signal: controller.signal }).then(response => {
+      if (!response.ok) throw new Error('Model list unavailable')
+      return response.json()
+    }).then((body: { models?: ModelOption[] }) => {
+      if (!controller.signal.aborted && body.models?.length) setRemoteModels(body.models)
+    }).catch(() => {
+      if (!controller.signal.aborted) setModelsError('Additional models could not be loaded. Built-in engines are available.')
+    }).finally(() => { if (!controller.signal.aborted) setModelsLoading(false) })
+    return () => controller.abort()
+  }, [modelsRetry])
 
   useEffect(() => () => {
     disposeChessSound()
@@ -263,36 +284,34 @@ export function ChessGame() {
     if (mode !== 'bot' || engineControl !== 'auto' || localResult || chess.turn() === humanColor) return
     const epoch = analysisEpochRef.current
     let cancelled = false
+    const controller = new AbortController()
     const run = async () => {
+      engineAbortRef.current = controller
       setEngineThinking(true)
       setEngineError('')
       try {
         const legalMoves = chess.moves({ verbose: true }).map(item => `${item.from}${item.to}${item.promotion ?? ''}`)
         const stockfishId = stockfishEngineIdForRevision(modelRevision)
-        const response = await fetch(`/api/chess-models/${encodeURIComponent(modelRevision)}/move`, {
-          method: 'POST', headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({
+        const result = await requestEngine<{ move?: string; error?: string }>(`/api/chess-models/${encodeURIComponent(modelRevision)}/move`, {
             fen: localFen, legalMoves, history: localHistory,
             repertoireId: activeStyledRepertoireId,
             skill: stockfishId ? stockfishLevel(levelId).skill : 20,
             moveTimeMs: stockfishId ? stockfishLevel(levelId).moveTimeMs : modelRevision === RECKLESS_LOCAL ? rethinkMs : modelMoveTimeMs,
-          }),
-          signal: AbortSignal.timeout(55_000),
-        })
-        const result = await response.json() as { move?: string; error?: string }
-        if (!response.ok || !result.move || !legalMoves.includes(result.move)) throw new Error(result.error || 'Engine returned no legal move')
+        }, { signal: controller.signal, onProgress: progress => { if (!cancelled && analysisEpochRef.current === epoch) setEngineProgress(progress) } })
+        if (!result.move || !legalMoves.includes(result.move)) throw new Error(result.error || 'Engine returned no legal move')
         const move: EngineMove = { from: result.move.slice(0, 2) as Square, to: result.move.slice(2, 4) as Square, promotion: result.move[4] as EngineMove['promotion'] }
         if (cancelled || analysisEpochRef.current !== epoch) return
         applyMove(move)
       } catch (error) {
         if (!cancelled && analysisEpochRef.current === epoch) setEngineError(error instanceof Error ? error.message : 'Chess model failed to move.')
       } finally {
-        if (!cancelled && analysisEpochRef.current === epoch) setEngineThinking(false)
+        if (!cancelled && analysisEpochRef.current === epoch) { setEngineThinking(false); setEngineProgress(null) }
       }
     }
     void run()
     return () => {
       cancelled = true
+      controller.abort()
       setEngineThinking(false)
     }
   }, [activeStyledRepertoireId, applyMove, chess, engineControl, humanColor, levelId, localFen, localHistory, localResult, mode, modelMoveTimeMs, modelRevision, rethinkMs, engineRetry])
@@ -306,19 +325,16 @@ export function ChessGame() {
     if (engineControl === 'pick' && chess.turn() === humanColor) return
     const epoch = analysisEpochRef.current
     let cancelled = false
+    const controller = new AbortController()
     const run = async () => {
+      engineAbortRef.current = controller
       setAnalyzing(true)
       setSuggestions(null)
       setHoverLine(null)
       setEngineError('')
       try {
-        const response = await fetch('/api/chess/analyse', {
-          method: 'POST', headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ revisionId: modelRevision, fen: localFen, multiPv: hintLines, moveTimeMs: rethinkMs }),
-          signal: AbortSignal.timeout(55_000),
-        })
-        const body = await response.json() as { analysis?: { balanceLabel: string; lines: PresentedLine[] }; error?: string }
-        if (!response.ok || !body.analysis) throw new Error(body.error || 'Engine analysis failed')
+        const body = await requestEngine<{ analysis?: { balanceLabel: string; lines: PresentedLine[] }; error?: string }>('/api/chess/analyse', { revisionId: modelRevision, fen: localFen, multiPv: hintLines, moveTimeMs: rethinkMs }, { signal: controller.signal, onProgress: progress => { if (!cancelled && analysisEpochRef.current === epoch) setEngineProgress(progress) } })
+        if (!body.analysis) throw new Error(body.error || 'Engine analysis failed')
         if (cancelled || analysisEpochRef.current !== epoch) return
         setSuggestions(body.analysis.lines)
         setSuggestionBalance(body.analysis.balanceLabel)
@@ -331,12 +347,13 @@ export function ChessGame() {
           setEngineError(error instanceof Error ? error.message : 'Engine analysis failed.')
         }
       } finally {
-        if (!cancelled && analysisEpochRef.current === epoch) setAnalyzing(false)
+        if (!cancelled && analysisEpochRef.current === epoch) { setAnalyzing(false); setEngineProgress(null) }
       }
     }
     void run()
     return () => {
       cancelled = true
+      controller.abort()
       setAnalyzing(false)
     }
   }, [chess, engineControl, hintLines, humanColor, localFen, localResult, mode, modelRevision, rethinkMs, engineRetry])
@@ -347,34 +364,36 @@ export function ChessGame() {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setEvaluation(null)
       setEvaluationError('')
+      setEvaluationProgress(null)
       return
     }
     let cancelled = false
+    const controller = new AbortController()
     setEvaluation(null)
     setEvaluationError('')
     const timer = window.setTimeout(() => {
       const revisionId = modelRevision
-      void fetch('/api/chess/analyse', {
-        method: 'POST', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ revisionId, fen: localFen, multiPv: 1, moveTimeMs: 150 }),
-        signal: AbortSignal.timeout(55_000),
-      }).then(async response => {
-        const body = await response.json() as { analysis?: { lines: PresentedLine[] }; error?: string }
-        if (!response.ok || !body.analysis?.lines.length) throw new Error(body.error || 'Evaluation unavailable')
+      evaluationAbortRef.current = controller
+      void requestEngine<{ analysis?: { lines: PresentedLine[] }; error?: string }>('/api/chess/analyse', { revisionId, fen: localFen, multiPv: 1, moveTimeMs: 150 }, { signal: controller.signal, onProgress: progress => { if (!cancelled) setEvaluationProgress(progress) } }).then(body => {
+        if (!body.analysis?.lines.length) throw new Error(body.error || 'Evaluation unavailable')
         const best = body.analysis.lines[0]
         const sign = chess.turn() === 'w' ? 1 : -1
         if (!cancelled) setEvaluation({ scoreCp: (best.scoreCp ?? (best.mateIn! > 0 ? 100000 : -100000)) * sign, mate: best.mateIn === null ? null : best.mateIn * sign, depth: best.depth })
       }).catch((error: unknown) => {
         if (!cancelled) setEvaluationError(error instanceof Error ? error.message : 'Evaluation unavailable')
-      })
+      }).finally(() => { if (!cancelled) setEvaluationProgress(null) })
     }, 250)
-    return () => { cancelled = true; window.clearTimeout(timer) }
-  }, [chess, engineControl, localFen, localResult, mode, modelRevision])
+    return () => { cancelled = true; controller.abort(); window.clearTimeout(timer) }
+  }, [chess, engineControl, localFen, localResult, mode, modelRevision, engineRetry])
 
   function clearAnalysisState() {
+    engineAbortRef.current?.abort()
+    evaluationAbortRef.current?.abort()
     analysisEpochRef.current += 1
     setAnalyzing(false)
     setEngineThinking(false)
+    setEngineProgress(null)
+    setEvaluationProgress(null)
     setSuggestions(null)
     setSuggestionFen(null)
     setSuggestionBalance('')
@@ -691,8 +710,11 @@ export function ChessGame() {
               <div className="chess-field"><label htmlFor="chess-password">Room password <span>optional</span></label><input id="chess-password" value={password} maxLength={100} onChange={(event) => setPassword(event.target.value)} type="password" placeholder={onlineAction === 'create' ? 'Protect this room' : 'Enter room password'} /></div>
               <button className="chess-primary" onClick={() => void (onlineAction === 'create' ? createOnline() : joinOnline())} disabled={roomClient.pending || !playerId}>{roomClient.pending ? 'Connecting…' : onlineAction === 'create' ? 'Create private room' : 'Join room'}</button>
             </>}
+            {roomClient.activity && <LoadingState label={roomClient.activity} />}
             {(notice || roomClient.error) && <p className="chess-notice" role="alert">{notice || roomClient.error?.message}</p>}
           </div>}
+          {modelsLoading && <LoadingState scope="inline" label="Loading available chess models" />}
+          {modelsError && <p role="alert">{modelsError} <button onClick={() => { setModelsLoading(true); setModelsError(''); setModelsRetry(value => value + 1) }}>Retry models</button></p>}
           <ModelSubmissionPanel />
           <footer className="chess-attribution">Rules: chess.js · Engines: Stockfish 18/19 + Reckless 0.9 · Board: react-chessboard</footer>
         </section>
@@ -729,8 +751,8 @@ export function ChessGame() {
           <aside className="chess-sidebar">
             <div className="chess-status"><span className={`turn-dot ${chess.turn() === 'w' ? 'white' : 'black'}`} /><div><small>{mode === 'bot' ? engineControl === 'auto' ? `You are ${humanColor === 'w' ? 'White' : 'Black'}` : engineControl === 'pick' ? 'Both sides · engine side manual' : 'Both sides · free moves' : mode === 'local' ? 'Pass and play' : onlineColor ? `You are ${onlineColor === 'w' ? 'White' : 'Black'}` : 'Online game'}</small><h2>{status}</h2></div></div>
             {mode === 'bot' && <div className="chess-opponent"><span>{engineControl === 'auto' ? '♞' : engineControl === 'pick' ? '☝' : '⚔'}</span><div><b>{engineControl === 'auto' ? opponentName : opponentName}</b><small>{engineControl === 'auto' ? stockfishEngineIdForRevision(modelRevision) ? `${level.label} · Skill ${level.skill}/20` : modelRevision === RECKLESS_LOCAL ? `Local engine · ${rethinkMs >= 1000 ? `${rethinkMs / 1000}s` : `${rethinkMs}ms`} think` : 'Custom model' : engineControl === 'pick' ? `Pick from ${hintLines} ranked moves` : `Live hints · ${hintLines} lines · ${rethinkMs >= 1000 ? `${rethinkMs / 1000}s` : `${rethinkMs}ms`}`}</small></div></div>}
-            {mode === 'bot' && engineControl === 'auto' && ['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(modelRevision) && <EvaluationBar evaluation={evaluation} error={evaluationError || undefined} engineName={opponentName} />}
-            {mode === 'bot' && engineControl !== 'auto' && analyzing && <div className="chess-suggestions">Engine is evaluating…</div>}
+            {mode === 'bot' && engineControl === 'auto' && ['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(modelRevision) && <EvaluationBar evaluation={evaluation} error={evaluationError || undefined} engineName={opponentName} progress={evaluationProgress} onCancel={() => evaluationAbortRef.current?.abort()} onRetry={() => setEngineRetry(value => value + 1)} />}
+            {mode === 'bot' && (engineThinking || analyzing) && <LoadingState key={`${localFen}:${modelRevision}:${engineRetry}:${rethinkMs}:${hintLines}`} label={`${opponentName}: ${engineProgress?.message ?? 'Connecting to engine'}`} detail={engineProgress?.detail} onCancel={() => engineAbortRef.current?.abort()} />}
             {hintsVisible && suggestions && <div className="chess-suggestions" role="group" aria-label="Engine move suggestions">
               <div className="chess-suggestion-balance"><span>Position balance</span><b>{suggestionBalance}</b></div>
               <div className="chess-quality-heading"><b>Move quality</b><span>Loss vs best · pawns</span></div>
@@ -749,6 +771,7 @@ export function ChessGame() {
               <div className="chess-suggestion-hint">Best = 0.00 and green. Up to −0.10 stays greenish; −0.50 or worse is red. Position balance is separate. Mate changes are labeled, not converted to pawns. {engineControl === 'pick' ? 'Hover to preview; click a row to play.' : 'Play any move or click a hint.'}</div>
             </div>}
             {engineError && <p className="chess-notice" role="alert">{engineError} <button onClick={() => setEngineRetry(value => value + 1)}>Retry</button></p>}
+            {mode === 'online' && roomClient.activity && <LoadingState label={roomClient.activity} />}
             {mode === 'online' && roomClient.room && <div className="chess-room-panel"><small>ROOM CODE</small><div><strong>{roomClient.room.code}</strong><button onClick={() => void navigator.clipboard.writeText(roomClient.room?.code ?? '')}>Copy</button></div><p>{roomClient.room.players.map((player) => player.name).join('  vs  ')}</p>{online?.phase === 'lobby' && roomClient.room.hostId === playerId && <button className="chess-primary" disabled={roomClient.room.players.length !== 2 || roomClient.pending} onClick={() => void roomClient.dispatch({ type: 'chess.start', hostColor: colorChoice, timeControlId })}>{roomClient.room.players.length === 2 ? 'Start match' : 'Waiting for opponent…'}</button>}</div>}
             {mode === 'online' && online?.timeControlId && (
               <div className="chess-clocks" aria-label="Game clock">

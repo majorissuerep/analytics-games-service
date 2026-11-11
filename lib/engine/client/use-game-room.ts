@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { fetchWithTimeout } from './fetch-with-timeout'
 import type { EnginePlayer, RoomSnapshot } from '@/lib/engine/types'
 import { trackAnalyticsEvent } from '@/lib/analytics/client'
 import { multiplayerRoomStartedProperties } from '@/lib/analytics/room-events'
@@ -77,6 +78,7 @@ export function useGameRoom<TGameView>({
 }: UseGameRoomOptions) {
   const [room, setRoom] = useState<RoomSnapshot<TGameView> | null>(null)
   const [pending, setPending] = useState(false)
+  const [activity, setActivity] = useState<string | null>(null)
   const [error, setError] = useState<GameRoomClientError | null>(null)
   const roomRef = useRef<RoomSnapshot<TGameView> | null>(null)
   const tokenRef = useRef('')
@@ -100,9 +102,10 @@ export function useGameRoom<TGameView>({
   }, [gameId])
 
   const create = useCallback(async (host: EnginePlayer, password = '') => {
+    setActivity('Connecting to the room')
     setPending(true)
     try {
-      const response = await fetch('/api/rooms', {
+      const response = await fetchWithTimeout('/api/rooms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ gameId, host, password }),
@@ -128,14 +131,16 @@ export function useGameRoom<TGameView>({
       throw nextError
     } finally {
       setPending(false)
+      setActivity(null)
     }
   }, [acceptRoom, gameId])
 
   const join = useCallback(async (code: string, player: EnginePlayer, password = '') => {
+    setActivity('Connecting to the room')
     setPending(true)
     try {
       const currentToken = readCapability(code, player.id)
-      const response = await fetch(`/api/rooms/${encodeURIComponent(code)}/join`, {
+      const response = await fetchWithTimeout(`/api/rooms/${encodeURIComponent(code)}/join`, {
         method: 'POST',
         headers: requestHeaders(currentToken, true),
         body: JSON.stringify({ player, password }),
@@ -160,6 +165,7 @@ export function useGameRoom<TGameView>({
       throw nextError
     } finally {
       setPending(false)
+      setActivity(null)
     }
   }, [acceptRoom, gameId])
 
@@ -167,7 +173,7 @@ export function useGameRoom<TGameView>({
     if (!code || !playerId || pollingRef.current) return roomRef.current
     pollingRef.current = true
     try {
-      const response = await fetch(
+      const response = await fetchWithTimeout(
         `/api/rooms/${encodeURIComponent(code)}?viewerId=${encodeURIComponent(playerId)}`,
         {
           cache: 'no-store',
@@ -191,9 +197,10 @@ export function useGameRoom<TGameView>({
     const currentRoom = roomRef.current
     if (!currentRoom) throw new GameRoomClientError('Join a room first', 'NO_ROOM', 400)
     if (!playerId) throw new GameRoomClientError('Player identity is not ready', 'NO_PLAYER', 400)
+    setActivity('Saving your room action')
     setPending(true)
     try {
-      const response = await fetch(
+      const response = await fetchWithTimeout(
         `/api/rooms/${encodeURIComponent(currentRoom.code)}/actions`,
         {
           method: 'POST',
@@ -218,6 +225,7 @@ export function useGameRoom<TGameView>({
       throw nextError
     } finally {
       setPending(false)
+      setActivity(null)
     }
   }, [acceptRoom, gameId, playerId])
 
@@ -232,7 +240,7 @@ export function useGameRoom<TGameView>({
   const authorizedFetch = useCallback((input: RequestInfo | URL, init: RequestInit = {}) => {
     const headers = new Headers(init.headers)
     if (tokenRef.current) headers.set('Authorization', `Bearer ${tokenRef.current}`)
-    return fetch(input, { ...init, headers })
+    return fetchWithTimeout(input, { ...init, headers })
   }, [])
 
   const clear = useCallback(() => {
@@ -245,6 +253,7 @@ export function useGameRoom<TGameView>({
   return {
     room,
     pending,
+    activity,
     error,
     create,
     join,

@@ -34,6 +34,8 @@ export interface RecklessAnalyseRequest {
   moveTimeMs: number
   threads?: number
   hashMb?: number
+  onProgress?: import('./engine-progress').ReportEngineProgress
+  signal?: AbortSignal
 }
 
 export function recklessAvailable(): boolean {

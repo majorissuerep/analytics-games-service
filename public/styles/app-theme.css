@@ -158,3 +158,33 @@ html[data-ui-material='solid'] { --ui-glass-fill: #fff; --ui-glass-strong-fill: 
 }
 
 body:has(.embedded-game-surface), body:has(> .minefield-app), body:has(> .paintbox-app) { padding: 0; }
+
+/* Waiting is observable at the scope of the operation. Percentages require real totals. */
+.ui-loading { width: 100%; color: var(--ui-ink); }
+.ui-loading-content { width: 100%; min-width: 0; }
+.ui-loading-section { padding: 14px 16px; border: 1px solid var(--ui-line); border-radius: var(--ui-panel-radius); background: var(--ui-surface); margin-block: 12px; }
+.ui-loading-inline { padding-block: 8px; }
+.ui-loading-page, .ui-loading-app { display: grid; place-items: center; padding: 24px; }
+.ui-loading-page { min-height: 100svh; }
+.ui-loading-app { height: 100%; min-height: 220px; }
+.ui-loading-page .ui-loading-content, .ui-loading-app .ui-loading-content { max-width: 400px; padding: 24px; border: 1px solid var(--ui-line); border-radius: var(--ui-feature-radius); background: var(--ui-glass-strong-fill); box-shadow: var(--ui-shadow); }
+.ui-loading-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+.ui-loading-heading strong { display: block; color: var(--ui-accent-ink); font-size: 13px; font-weight: 650; }
+.ui-loading-detail { display: block; margin-top: 4px; color: var(--ui-muted); font-size: 12px; line-height: 1.45; overflow-wrap: anywhere; }
+.ui-loading-elapsed { flex-shrink: 0; color: var(--ui-muted); font: 12px/1.5 var(--ui-mono); font-variant-numeric: tabular-nums; }
+.ui-loading-meter { height: 7px; overflow: hidden; border-radius: 999px; background: var(--ui-selection); position: relative; }
+.ui-loading-meter > span { display: block; height: 100%; border-radius: inherit; background: var(--ui-accent); }
+.ui-loading-meter:not([data-determinate='true']) > span { width: 35%; animation: ui-progress-travel 1.3s ease-in-out infinite; }
+.ui-loading-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 7px; }
+.ui-loading-footer small { color: var(--ui-muted); font-size: 11px; }
+.app-surface .ui-loading-footer button { min-height: 28px; padding: 3px 10px; font-size: 12px; }
+.ui-loading-screen { width: 100%; min-height: 100svh; display: grid; place-items: center; }
+body:has(.ui-loading-screen) { padding: 0; }
+.ui-loading-error { max-width: 440px; padding: 24px; display: grid; gap: 16px; color: var(--ui-negative); }
+.ui-loading-error h1 { font-size: 24px; }
+.ui-loading-error p { color: var(--ui-muted); }
+@keyframes ui-progress-travel { 0% { transform: translateX(-100%); } 100% { transform: translateX(390%); } }
+@media(prefers-reduced-motion:reduce) { .ui-loading-meter:not([data-determinate='true']) > span { animation: none; width: 40%; margin-left: 30%; } }
+@media(forced-colors:active) { .ui-loading-meter { border: 1px solid ButtonText; background: Canvas; } .ui-loading-meter > span { background: Highlight; forced-color-adjust: none; } }
+
+.ui-loading[hidden], .ui-loading-meter[hidden] { display: none; }

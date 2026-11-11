@@ -1,7 +1,10 @@
 'use client'
 
+import { useAppReady } from '@/lib/engine/client/use-app-ready'
+
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import Link from 'next/link'
+import { LoadingState } from '@/components/ui/LoadingState'
 import { emitGameSessionCompleted } from '@/lib/analytics/game-events'
 import './paintbox.css'
 
@@ -16,6 +19,7 @@ function canvasPoint(canvas: HTMLCanvasElement, event: ReactPointerEvent<HTMLCan
 }
 
 export function PaintboxGame() {
+  useAppReady()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const drawing = useRef(false)
   const history = useRef<ImageData[]>([])
@@ -23,6 +27,7 @@ export function PaintboxGame() {
   const [size, setSize] = useState(8)
   const [eraser, setEraser] = useState(false)
   const [status, setStatus] = useState('Ready')
+  const [saving, setSaving] = useState(false)
   const [hasUndo, setHasUndo] = useState(false)
 
   useEffect(() => {
@@ -98,13 +103,20 @@ export function PaintboxGame() {
 
   const save = () => {
     const canvas = canvasRef.current
-    if (!canvas) return
-    const link = document.createElement('a')
-    link.download = 'paintbox-drawing.png'
-    link.href = canvas.toDataURL('image/png')
-    setStatus('Saved PNG')
-    emitGameSessionCompleted('drawing_saved')
-    link.click()
+    if (!canvas || saving) return
+    setSaving(true)
+    canvas.toBlob(blob => {
+      setSaving(false)
+      if (!blob) { setStatus('PNG export failed. Please try Save PNG again.'); return }
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.download = 'paintbox-drawing.png'
+      link.href = url
+      link.click()
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+      setStatus('Saved PNG')
+      emitGameSessionCompleted('drawing_saved')
+    }, 'image/png')
   }
 
   return (
@@ -116,8 +128,9 @@ export function PaintboxGame() {
       <nav className="paintbox-menu" aria-label="Paintbox menu">
         <button onClick={clear}>New</button>
         <button onClick={undo} disabled={!hasUndo}>Undo</button>
-        <button onClick={save}>Save PNG</button>
+        <button onClick={save} disabled={saving}>Save PNG</button>
       </nav>
+      {saving && <LoadingState scope="inline" label="Preparing your PNG download" detail="You can keep drawing while the image is exported." />}
       <section className="paintbox-workspace">
         <aside className="paintbox-tools" aria-label="Drawing tools">
           <button className={!eraser ? 'selected' : ''} onClick={() => setEraser(false)} aria-pressed={!eraser}>✎<small>Brush</small></button>

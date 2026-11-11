@@ -1,13 +1,14 @@
 import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process'
 import { join } from 'node:path'
 import { collectRecklessLines, type RecklessAnalysis } from './reckless'
+import type { ReportEngineProgress } from './engine-progress'
 
 export const ENGINE_IDLE_MS = 2 * 60 * 60 * 1000
 export const UCI_ENGINE_IDS = ['reckless-local', 'builtin-stockfish-18', 'builtin-stockfish-19'] as const
 export type UciEngineId = typeof UCI_ENGINE_IDS[number]
 export function isUciEngine(id: string): id is UciEngineId { return UCI_ENGINE_IDS.includes(id as UciEngineId) }
 
-export type EngineSearch = { fen: string; multiPv: number; moveTimeMs: number; skill?: number; history?: readonly string[] }
+export type EngineSearch = { fen: string; multiPv: number; moveTimeMs: number; skill?: number; history?: readonly string[]; onProgress?: ReportEngineProgress; signal?: AbortSignal }
 
 /** One serial UCI channel per selected engine. No process is created on import. */
 export class UciRuntime {
@@ -54,7 +55,7 @@ export class UciRuntime {
     return child
   }
 
-  private exchange(commands: string[], end: (line: string) => boolean, timeoutMs: number): Promise<string[]> {
+  private exchange(commands: string[], end: (line: string) => boolean, timeoutMs: number, onLine?: (line: string) => void): Promise<string[]> {
     return new Promise((resolve, reject) => {
       const lines: string[] = []
       const timeout = setTimeout(() => { reject(new Error(`${this.id} timed out; retry to restart it`)); this.dispose() }, timeoutMs)
@@ -66,19 +67,27 @@ export class UciRuntime {
         else resolve(lines)
       }
       this.fail = finish
-      this.listener = line => { lines.push(line); if (end(line)) finish() }
+      this.listener = line => { lines.push(line); onLine?.(line); if (end(line)) finish() }
       this.start().stdin.write(`${commands.join('\n')}\n`)
     })
   }
 
   search(request: EngineSearch): Promise<RecklessAnalysis> {
+    if (request.signal?.aborted) return Promise.reject(new DOMException('Request cancelled', 'AbortError'))
     if (this.queued >= 8) return Promise.reject(new Error('Engine is busy. Please retry shortly.'))
+    if (this.queued) request.onProgress?.({ stage: 'queued', message: 'Waiting for the selected engine', detail: 'Another request is using this engine.' })
     this.queued += 1
     clearTimeout(this.idle)
     const task = this.tail.catch(() => undefined).then(async () => {
+      request.signal?.throwIfAborted()
       // Wall time also expires instances frozen by the serverless platform.
       if (Date.now() - this.lastUsed >= ENGINE_IDLE_MS) this.dispose()
-      if (!this.child) await this.exchange(['uci'], line => line === 'uciok', 25_000)
+      if (!this.child) {
+        request.onProgress?.({ stage: 'starting', message: 'Starting the selected engine', detail: 'Loading its runtime and model files.' })
+        await this.exchange(['uci'], line => line === 'uciok', 25_000)
+      }
+      request.signal?.throwIfAborted()
+      request.onProgress?.({ stage: 'initializing', message: 'Preparing the engine and position' })
       await this.exchange([
         'ucinewgame',
         'setoption name Threads value 1',
@@ -87,9 +96,25 @@ export class UciRuntime {
         `setoption name Skill Level value ${request.skill ?? 20}`,
         'isready',
       ], line => line === 'readyok', 5000)
+      request.signal?.throwIfAborted()
       const position = request.history?.length ? `position startpos moves ${request.history.join(' ')}` : `position fen ${request.fen}`
       const searchStarted = Date.now()
-      const raw = await this.exchange([position, `go movetime ${request.moveTimeMs}`], line => line.startsWith('bestmove '), request.moveTimeMs + 10_000)
+      const stop = () => this.child?.stdin.write('stop\n')
+      request.signal?.addEventListener('abort', stop, { once: true })
+      let raw: string[]
+      let lastReport = 0
+      try {
+        request.onProgress?.({ stage: 'thinking', message: 'Analyzing the position' })
+        request.signal?.throwIfAborted()
+        raw = await this.exchange([position, `go movetime ${request.moveTimeMs}`], line => line.startsWith('bestmove '), request.moveTimeMs + 10_000, line => {
+          const depth = /\bdepth (\d+)/.exec(line)
+          if (!depth || Date.now() - lastReport < 150) return
+          lastReport = Date.now()
+          const nodes = /\bnodes (\d+)/.exec(line)
+          request.onProgress?.({ stage: 'thinking', message: 'Analyzing the position', depth: Number(depth[1]), ...(nodes ? { nodes: Number(nodes[1]) } : {}), detail: `Depth ${depth[1]}${nodes ? ` · ${Number(nodes[1]).toLocaleString('en')} positions searched` : ''}` })
+        })
+        request.signal?.throwIfAborted()
+      } finally { request.signal?.removeEventListener('abort', stop) }
       const bestMove = /^bestmove\s+(\S+)/.exec(raw.at(-1) ?? '')?.[1] ?? ''
       const lines = collectRecklessLines(raw)
       if (!/^[a-h][1-8][a-h][1-8][qrbn]?$/.test(bestMove)) throw new Error(`${this.id} returned no legal best move`)

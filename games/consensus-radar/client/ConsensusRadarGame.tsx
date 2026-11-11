@@ -1,5 +1,9 @@
 'use client'
 
+import { LoadingState } from '@/components/ui/LoadingState'
+import { fetchWithTimeout } from '@/lib/engine/client/fetch-with-timeout'
+import { useAppReady } from '@/lib/engine/client/use-app-ready'
+
 import './consensus-radar.css'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
@@ -238,6 +242,7 @@ function fmt(template: string, vars: Record<string, string | number>): string {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 export function ConsensusRadarGame() {
+  useAppReady()
   const [lang, setLangState]       = useState<Lang>('uk')
   const [screen, setScreen]        = useState<'name' | 'join' | 'lobby' | 'game'>('name')
   const [playerId, setPlayerId]    = useState('')
@@ -265,6 +270,7 @@ export function ConsensusRadarGame() {
 
   // Leaderboard
   const [showLb, setShowLb]        = useState(false)
+  const [lbError, setLbError] = useState('')
   const [lbRows, setLbRows]        = useState<LeaderboardRow[]>([])
   const [lbLoading, setLbLoading]  = useState(false)
   const [scoreSubmitted, setScoreSubmitted] = useState(false)
@@ -488,11 +494,12 @@ export function ConsensusRadarGame() {
 
   // ─── Leaderboard ───────────────────────────────────────────────────────────
   async function openLeaderboard() {
-    setShowLb(true); setLbLoading(true)
+    setShowLb(true); setLbLoading(true); setLbError('')
     try {
-      const res = await fetch('/api/games/consensus-radar/leaderboard')
+      const res = await fetchWithTimeout('/api/games/consensus-radar/leaderboard')
+      if (!res.ok) throw new Error('Leaderboard unavailable. Please retry.')
       setLbRows((await res.json()).rows || [])
-    } catch { setLbRows([]) }
+    } catch { setLbError('Leaderboard unavailable. Please retry.') }
     setLbLoading(false)
   }
 
@@ -505,8 +512,9 @@ export function ConsensusRadarGame() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roomCode, playerId }),
       })
-      if (res.ok) { setScoreSubmitted(true); showToast(t('submitDone')) }
-    } catch { /* ignore */ }
+      if (!res.ok) throw new Error('Score could not be saved. Please retry.')
+      setScoreSubmitted(true); showToast(t('submitDone'))
+    } catch { showToast('Score could not be saved. Please retry.') }
     setSubmitting(false)
   }
 
@@ -616,7 +624,7 @@ export function ConsensusRadarGame() {
   if (screen === 'name') {
     return (
       <div className="app-surface radar-app wrap screen-enter">
-        <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} />
+        <Topbar activity={roomClient.activity} lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} />
         <div className="card">
           <div className="name-screen">
             <div className="logo-big" aria-hidden />
@@ -639,7 +647,7 @@ export function ConsensusRadarGame() {
             </div>
           </div>
         </div>
-        {showLb && <LeaderboardModal rows={lbRows} loading={lbLoading} t={t} onClose={() => setShowLb(false)} />}
+        {showLb && <LeaderboardModal error={lbError} onRetry={openLeaderboard} rows={lbRows} loading={lbLoading} t={t} onClose={() => setShowLb(false)} />}
         {toast && <div className="toast">{toast}</div>}
       </div>
     )
@@ -651,7 +659,7 @@ export function ConsensusRadarGame() {
   if (screen === 'join') {
     return (
       <div className="app-surface radar-app wrap screen-enter">
-        <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
+        <Topbar activity={roomClient.activity} lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
         <div className="card">
           <div className="eyebrow">{t('joinTitle')}</div>
           <h2 style={{ marginBottom: 20 }}>{lang === 'uk' ? `Привіт, ${playerName}` : `Hi, ${playerName}`}</h2>
@@ -676,7 +684,7 @@ export function ConsensusRadarGame() {
           </div>
           <button className="btn ghost" onClick={joinRoom} disabled={roomClient.pending}>{t('joinRoom')}</button>
         </div>
-        {showLb && <LeaderboardModal rows={lbRows} loading={lbLoading} t={t} onClose={() => setShowLb(false)} />}
+        {showLb && <LeaderboardModal error={lbError} onRetry={openLeaderboard} rows={lbRows} loading={lbLoading} t={t} onClose={() => setShowLb(false)} />}
         {toast && <div className="toast">{toast}</div>}
       </div>
     )
@@ -693,7 +701,7 @@ export function ConsensusRadarGame() {
 
     return (
       <div className="app-surface radar-app wrap screen-enter">
-        <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
+        <Topbar activity={roomClient.activity} lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
         <div className="card">
           <div className="eyebrow">{t('lobbyTitle')}</div>
           <RoomCodePill />
@@ -822,7 +830,7 @@ export function ConsensusRadarGame() {
           )}
         </div>
         <div className="footer-note">Consensus Radar · {new Date().getFullYear()}</div>
-        {showLb && <LeaderboardModal rows={lbRows} loading={lbLoading} t={t} onClose={() => setShowLb(false)} />}
+        {showLb && <LeaderboardModal error={lbError} onRetry={openLeaderboard} rows={lbRows} loading={lbLoading} t={t} onClose={() => setShowLb(false)} />}
         {toast && <div className="toast">{toast}</div>}
       </div>
     )
@@ -847,7 +855,7 @@ export function ConsensusRadarGame() {
       if (isCluegiver) {
         return (
           <div className="app-surface radar-app wrap screen-enter">
-            <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
+            <Topbar activity={roomClient.activity} lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
             <div className="card">
               <RoundMeta />
               <div className="stage-meta">
@@ -888,7 +896,7 @@ export function ConsensusRadarGame() {
       // Everyone else waits for the clue
       return (
         <div className="app-surface radar-app wrap screen-enter">
-          <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
+          <Topbar activity={roomClient.activity} lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
           <div className="card center">
             <RoundMeta />
             <ScoreBar activeIdx={round.teamIdx} />
@@ -938,7 +946,7 @@ export function ConsensusRadarGame() {
         const showEditor = editing || !myGuessIn
         return (
           <div className="app-surface radar-app wrap screen-enter">
-            <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
+            <Topbar activity={roomClient.activity} lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
             <div className="card">
               <RoundMeta />
               <div className="stage-meta">
@@ -995,7 +1003,7 @@ export function ConsensusRadarGame() {
       // Everyone else: clue-giver, betting rivals, spectators
       return (
         <div className="app-surface radar-app wrap screen-enter">
-          <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
+          <Topbar activity={roomClient.activity} lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
           <div className="card center">
             <RoundMeta />
             <ScoreBar activeIdx={round.teamIdx} />
@@ -1158,7 +1166,7 @@ export function ConsensusRadarGame() {
       if (rs.phase === 'reveal') {
         return (
           <div className="app-surface radar-app wrap screen-enter">
-            <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
+            <Topbar activity={roomClient.activity} lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
             {revealBody}
             {toast && <div className="toast">{toast}</div>}
           </div>
@@ -1175,7 +1183,7 @@ export function ConsensusRadarGame() {
 
       return (
         <div className="app-surface radar-app wrap screen-enter">
-          <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
+          <Topbar activity={roomClient.activity} lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
           <div className="card center">
             <div className="eyebrow">{t('finalTitle')}</div>
             <h2>{t('finalScores')}</h2>
@@ -1207,10 +1215,11 @@ export function ConsensusRadarGame() {
                 {submitting ? <span className="spinner" /> : scoreSubmitted ? `✓ ${t('submitDone')}` : t('submitScore')}
               </button>
             </div>
+            {submitting && <LoadingState label="Saving your score" />}
             <button className="btn ghost" style={{ marginTop: 10 }} onClick={openLeaderboard}>{t('leaderboardBtn')}</button>
           </div>
           <div className="footer-note">Consensus Radar · {new Date().getFullYear()}</div>
-          {showLb && <LeaderboardModal rows={lbRows} loading={lbLoading} t={t} onClose={() => setShowLb(false)} />}
+          {showLb && <LeaderboardModal error={lbError} onRetry={openLeaderboard} rows={lbRows} loading={lbLoading} t={t} onClose={() => setShowLb(false)} />}
           {toast && <div className="toast">{toast}</div>}
         </div>
       )
@@ -1219,7 +1228,7 @@ export function ConsensusRadarGame() {
     // ── Playing but between rounds (clue/guess with no round yet) ──────────
     return (
       <div className="app-surface radar-app wrap screen-enter">
-        <Topbar lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
+        <Topbar activity={roomClient.activity} lang={lang} toggleLang={() => setLangState(l => l === 'uk' ? 'en' : 'uk')} t={t} onLeaderboard={openLeaderboard} playerName={playerName} />
         <div className="card center">
           <RoundMeta />
           <ScoreBar />
@@ -1234,11 +1243,12 @@ export function ConsensusRadarGame() {
 }
 
 // ─── Topbar ────────────────────────────────────────────────────────────────
-function Topbar({ lang, toggleLang, t, onLeaderboard, playerName }: {
+function Topbar({ lang, toggleLang, t, onLeaderboard, playerName, activity }: {
   lang: Lang; toggleLang: () => void; t: (k: string) => string
-  onLeaderboard: () => void; playerName?: string
+  onLeaderboard: () => void; playerName?: string; activity?: string | null
 }) {
   return (
+    <>
     <header className="topbar">
       <span className="cr-backdrop" aria-hidden />
       <Link className="brand" href="/" aria-label="Back to Analytics Games">
@@ -1264,12 +1274,14 @@ function Topbar({ lang, toggleLang, t, onLeaderboard, playerName }: {
         </div>
       </div>
     </header>
+    {activity && <LoadingState label={activity} detail="Keep this window open until the request finishes." />}
+    </>
   )
 }
 
 // ─── LeaderboardModal ──────────────────────────────────────────────────────
-function LeaderboardModal({ rows, loading, t, onClose }: {
-  rows: LeaderboardRow[]; loading: boolean; t: (k: string) => string; onClose: () => void
+function LeaderboardModal({ rows, loading, t, onClose, error, onRetry }: {
+  error: string; onRetry: () => void; rows: LeaderboardRow[]; loading: boolean; t: (k: string) => string; onClose: () => void
 }) {
   return (
     <div className="modal-backdrop" onClick={e => e.target === e.currentTarget && onClose()}>
@@ -1279,8 +1291,8 @@ function LeaderboardModal({ rows, loading, t, onClose }: {
           <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '32px 0' }}><span className="spinner" /></div>
-        ) : rows.length === 0 ? (
+          <LoadingState label="Loading leaderboard" />
+        ) : error ? <p role="alert">{error} <button onClick={onRetry}>Retry leaderboard</button></p> : rows.length === 0 ? (
           <p className="muted" style={{ textAlign: 'center', padding: '28px 0', fontSize: 14 }}>{t('lbEmpty')}</p>
         ) : rows.map((row, i) => {
           const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''

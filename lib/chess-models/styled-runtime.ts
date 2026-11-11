@@ -9,6 +9,8 @@ export type StyledMoveRequest = {
   repertoireId: StyledRepertoireId
   legalMoves: readonly string[]
   moveTimeMs: number
+  onProgress?: import('@/lib/engine/engine-progress').ReportEngineProgress
+  signal?: AbortSignal
 }
 
 type StyledInferenceResponse = {
@@ -46,6 +48,7 @@ export async function requestStyledMove(input: StyledMoveRequest): Promise<{ mov
     return { move: result.move, revisionId: BUILTIN_STYLED_OPENING, repertoireId: result.repertoireId, durationMs: result.durationMs }
   }
 
+  input.onProgress?.({ stage: 'thinking', message: 'Requesting a move from the selected model' })
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -56,7 +59,7 @@ export async function requestStyledMove(input: StyledMoveRequest): Promise<{ mov
       top_k: 5,
       move_time_ms: input.moveTimeMs,
     }),
-    signal: AbortSignal.timeout(Math.min(input.moveTimeMs + 750, 5750)),
+    signal: input.signal ? AbortSignal.any([input.signal, AbortSignal.timeout(Math.min(input.moveTimeMs + 750, 5750))]) : AbortSignal.timeout(Math.min(input.moveTimeMs + 750, 5750)),
   })
   const body = await response.json().catch(() => null) as StyledInferenceResponse | null
   if (!response.ok) throw new Error(`Styled model returned HTTP ${response.status}`)
