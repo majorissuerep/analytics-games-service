@@ -18,3 +18,5 @@ body.app-surface{--ui-canvas:#e9edf0;--ui-ink:#25313c;--ui-muted:#596977;--ui-li
 @media(forced-colors:active){.pinball-stage{background:Canvas}.pinball-bar button,.pinball-touch-controls button{border-color:ButtonText}#pause-veil{background:Canvas;color:CanvasText}#pause-veil span{color:CanvasText}}
 /* Canvas focus is spatial, rather than a pink frame around empty native pixels. */
 .pinball-stage canvas:focus{outline:none}body[data-keyboard-focus=true] .pinball-stage canvas:focus-visible{outline:3px solid #a7c1d5;outline-offset:-3px}
+
+#feeding{display:inline-flex;align-items:center;gap:6px;font:10px var(--ui-mono)}#feeding[hidden]{display:none}.feed-meter{width:32px;height:3px;border-radius:2px;background:linear-gradient(90deg,#b73777 45%,#d3dce4 45%)}footer:has(#feeding:not([hidden])){display:flex;align-items:center;justify-content:center;gap:10px}

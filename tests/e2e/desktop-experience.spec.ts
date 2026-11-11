@@ -10,6 +10,15 @@ const dimensions = async (element: Locator) => {
 }
 
 async function openGame(page: Page, title: string) {
+  if (await page.locator('[data-window-id]').count()) {
+    const start = page.locator('.start-button')
+    await expectActionReady(start)
+    await start.click()
+    const entry = page.locator('.start-menu-items > button').filter({ has: page.getByText(title, { exact: true }) })
+    await expectActionReady(entry)
+    await entry.click()
+    return
+  }
   const icon = page.locator('.desktop-icon').filter({ hasText: title })
   await expectActionReady(icon)
   await icon.dblclick()
@@ -32,9 +41,13 @@ async function resize(page: Page, element: Locator, width: number, height: numbe
 
 async function move(page: Page, element: Locator, x: number, y: number) {
   const bounds = (await element.boundingBox())!
-  await page.mouse.move(bounds.x + 100, bounds.y + 10)
+  const label = element.locator('.title-bar-text')
+  await expectActionReady(label)
+  const title = (await label.boundingBox())!
+  const pointer = { x: title.x + title.width / 2, y: title.y + title.height / 2 }
+  await page.mouse.move(pointer.x, pointer.y)
   await page.mouse.down()
-  await page.mouse.move(x + 100, y + 10, { steps: 8 })
+  await page.mouse.move(pointer.x + x - bounds.x, pointer.y + y - bounds.y, { steps: 8 })
   await page.mouse.up()
   await expect.poll(async () => { const bounds = (await element.boundingBox())!; return [Math.round(bounds.x), Math.round(bounds.y)] }).toEqual([x, y])
 }
@@ -115,8 +128,8 @@ test('shell-focus: ten real first-action switches keyboard nested canvas drag an
   await move(page, paint, 740, 78)
   const cell = mine.locator('.minefield-cell').first()
   for (let index = 0; index < 10; index++) {
-    await expectActionReady(paint.locator('.title-bar'))
-    await paint.locator('.title-bar').click({ position: { x: 50, y: 10 } })
+    await expectActionReady(paint.locator('.title-bar-text'))
+    await paint.locator('.title-bar-text').click()
     await expectFocusedWindow(page, 'game:paintbox')
     await expectActionReady(cell)
     await cell.click({ button: 'right' })
@@ -124,7 +137,7 @@ test('shell-focus: ten real first-action switches keyboard nested canvas drag an
     await expect(cell).toHaveClass(index % 2 === 0 ? /flagged/ : /^(?!.*flagged)/)
     if ([0, 4, 9].includes(index)) await captureExperience(page, info, 'shell-focus', `first-action-switch-${index + 1}`)
   }
-  await paint.locator('.title-bar').click({ position: { x: 50, y: 10 } })
+  await paint.locator('.title-bar-text').click()
   await mine.getByLabel('Level', { exact: true }).focus()
   await expectFocusedWindow(page, 'game:minefield')
   await page.keyboard.press('Tab')
@@ -134,11 +147,15 @@ test('shell-focus: ten real first-action switches keyboard nested canvas drag an
   // Real drag traverses iframe bodies; capture intermediate positions rather than
   // only checking the final coordinate, which would miss a stalled drag shield.
   const window = outer(page, 'game:minefield'), start = (await window.boundingBox())!
-  await page.mouse.move(start.x + 100, start.y + 10)
+  const label = window.locator('.title-bar-text')
+  await expectActionReady(label)
+  const title = (await label.boundingBox())!
+  const pointer = { x: title.x + title.width / 2, y: title.y + title.height / 2 }
+  await page.mouse.move(pointer.x, pointer.y)
   await page.mouse.down()
   const positions: number[] = []
   for (let step = 1; step <= 6; step++) {
-    await page.mouse.move(start.x + 100 + step * 30, start.y + 10 + step * 20)
+    await page.mouse.move(pointer.x + step * 30, pointer.y + step * 20)
     positions.push((await window.boundingBox())!.x)
   }
   await page.mouse.up()

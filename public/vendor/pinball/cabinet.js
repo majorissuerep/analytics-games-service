@@ -10,6 +10,7 @@ let soundOn = false
 let started = Date.now()
 let timeout
 let timer
+let feedingStarted = 0
 let lastRuntimeError = ''
 try { soundOn = localStorage.getItem(KEY) === 'true' } catch { /* Browser storage is optional. */ }
 
@@ -70,8 +71,16 @@ async function start() {
   begin()
   const module = {
     canvas,
-    onCabinetState(score, remaining, isPaused, message, armed) {
+    onCabinetState(score, remaining, isPaused, message, armed, plungerPull) {
       engineArmed = Boolean(armed)
+      window.Module.cabinetState = { launchReady: engineArmed, plungerPull }
+      const feeding = ready && remaining > 0 && !engineArmed && !isPaused
+      if (feeding && !feedingStarted) feedingStarted = Date.now()
+      if (!feeding) feedingStarted = 0
+      $('feeding').hidden = !feeding
+      if (feeding) $('feed-elapsed').textContent = `${Math.floor((Date.now() - feedingStarted) / 1000)}s`
+      const plunger = document.querySelector('[data-keycode="32"]')
+      if (ready) plunger.disabled = feeding
       $('score').textContent = Math.max(0, score).toLocaleString('en-US')
       $('ball').textContent = remaining > 0 ? `${4 - remaining} / 3` : '—'
       paused = Boolean(isPaused)
@@ -81,6 +90,7 @@ async function start() {
       document.body.dataset.paused = String(paused)
       if (remaining === 0 && ready) announce('Game over · ↻ to play again')
       else if (paused) announce('Paused')
+      else if (feeding) announce('Feeding ball…')
       else if (message && !/Awaiting Deployment/i.test(message)) announce(message.replace(/\n/g, ' · '))
       else announce('Hold Space to launch · ← → flippers')
     },
@@ -146,24 +156,36 @@ for (const button of document.querySelectorAll('[data-key]')) {
   button.addEventListener('blur', release)
   button.addEventListener('pointerup', release); button.addEventListener('pointercancel', release); button.addEventListener('lostpointercapture', release)
 }
+// Let browser buttons receive their native Enter/Space activation, then stop
+// those keys at the button before SDL's global keyboard listener sees them.
+for (const button of document.querySelectorAll('button:not([data-key])')) {
+  for (const type of ['keydown', 'keyup', 'keypress']) button.addEventListener(type, event => {
+    if (['Space', 'Enter'].includes(event.code)) event.stopImmediatePropagation()
+  })
+}
 // Arrow keys belong to the game; vertical arrows have no action and never scroll.
 window.addEventListener('keydown', event => {
+  // Target button listeners preserve browser defaults and isolate these keys.
+  if (['Space', 'Enter'].includes(event.code) && event.target.closest?.('button:not([data-key])')) return
   if (['ArrowUp', 'ArrowDown'].includes(event.code)) { event.preventDefault(); event.stopImmediatePropagation(); return }
   if (!['ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) return
-  if (event.code === 'Space' && event.target.closest?.('button:not([data-key])')) { event.stopImmediatePropagation(); return }
   event.preventDefault()
-  if (event.target !== canvas && !event.target.closest?.('[data-key]')) {
+  if (!event.target.closest?.('[data-key]')) {
     event.stopImmediatePropagation()
-    if (ready) key('keydown', event.key, event.code, event.keyCode)
+    if (ready && !event.repeat && (event.code !== 'Space' || engineArmed)) key('keydown', event.key, event.code, event.keyCode, false)
   }
 }, true)
+// SDL also listens to keypress and cancels Enter's browser click there.
+window.addEventListener('keypress', event => {
+  if (['Space', 'Enter'].includes(event.code) && event.target.closest?.('button:not([data-key])')) event.stopImmediatePropagation()
+}, true)
 window.addEventListener('keyup', event => {
+  if (['Space', 'Enter'].includes(event.code) && event.target.closest?.('button:not([data-key])')) return
   if (!['ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) return
-  if (event.code === 'Space' && event.target.closest?.('button:not([data-key])')) { event.stopImmediatePropagation(); return }
   event.preventDefault()
-  if (event.target !== canvas && !event.target.closest?.('[data-key]')) {
+  if (!event.target.closest?.('[data-key]')) {
     event.stopImmediatePropagation()
-    if (ready) key('keyup', event.key, event.code, event.keyCode)
+    if (ready) key('keyup', event.key, event.code, event.keyCode, false)
   }
 }, true)
 window.addEventListener('blur', () => {

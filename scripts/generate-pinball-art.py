@@ -32,6 +32,9 @@ def generate(source):
     for a,b,n in ramps:
         palette += [tuple(round(a[c]+(b[c]-a[c])*k/(n-1)) for c in range(3)) for k in range(n)]
     palette += [(242,226,209)]*(256-len(palette));palette=palette[:256]
+    # Exact opaque stage color for nonfunctional apron/tail pixels; index zero
+    # retains true transparent semantics and every original zero mask.
+    palette[1]=(17,31,44)
     pim=Image.new('P',(1,1));pim.putpalette([v for rgb in palette for v in rgb])
     previews=[]; count=0
     for g,es in enumerate(groups):
@@ -214,6 +217,13 @@ def generate(source):
                 light=np.clip(.25+.65*z-.2*xx/w-.15*yy/h,0,1)
                 ar=np.stack([70+185*light,76+179*light,84+169*light],axis=2).astype('uint8')
                 ar[(xx-w*.3)**2+(yy-h*.25)**2<(w*.17)**2]=[255,255,248];im=Image.fromarray(ar)
+            if g==107 or 473<=g<=480:
+                # The historical plunger drawing protrudes beyond the physical
+                # board. Match only its nonfunctional tail to the cabinet apron.
+                yy,xx=np.mgrid[:h,:w]
+                art=np.array(im)
+                art[(yy+y-2)>=420]=[17,31,44]
+                im=Image.fromarray(art)
             indexed=np.array(im.quantize(palette=pim,dither=Image.Dither.NONE)); indexed[mask&(indexed==0)]=1;indexed[~mask]=0
             assert np.array_equal(indexed==0,idx==0)
             raw[::-1,:w]=indexed;data[o+14:o+14+length]=raw.tobytes();count+=1

@@ -12,7 +12,7 @@
   selectors; compact requested windows/no micro-overflow; fixed Chess navigation
   and reachable gameplay actions; useful board scaling; legible playable Pinball;
   repeated iframe body focus; executable three-stage acceptance.
-- Current phase: request independently approved; app implementation and targeted checks complete; freeze, production-build evidence, promotion, CI and deployed acceptance pending.
+- Release record: [PR #77](https://github.com/majorissuerep/analytics-games-service/pull/77). Read its current promotion/deployed receipts and retained evidence for the disposition of this source; this context file does not certify acceptance. Request readiness is independently approved.
 - Baseline failures: Minefield 2px board overflow/60px page overflow/default1040×700;
   Chess long sections move nav/actions offscreen (actions around y1677 in731px);
   Pinball poor obstacle/ball hierarchy and missing narrow Ball state; iframe body
@@ -27,3 +27,7 @@
 - Runtime discipline: one coordinator runs browser suites against a stable build.
   App agents may use separate output directories for focused probes; never run
   shared output folders or interpret HMR navigation as frozen-release evidence.
+- First frozen run: 74/83 browser cases passed; promotion was withheld. Corrected
+  occluded test fixtures and hidden Suspense selectors; extended native gameplay
+  exposed early ball readiness and background keyboard Resume issues. These
+  require fresh candidate proof, including a successful first launch.

@@ -60,7 +60,8 @@ export async function expectActionReady(control: Locator) {
 
 /** Native overflow is permitted only in a named, intentionally scrolling pane. */
 export async function overflowIssues(root: Locator, { document = true, allow = [] as string[] } = {}) {
-  return root.evaluate((element, options) => {
+  // Next may retain a hidden streamed copy; only the rendered app owns geometry.
+  return root.filter({ visible: true }).evaluate((element, options) => {
     const failures: string[] = []
     const doc = element.ownerDocument.documentElement
     if (options.document && doc.scrollWidth > doc.clientWidth) failures.push(`document horizontal overflow ${doc.scrollWidth - doc.clientWidth}px`)

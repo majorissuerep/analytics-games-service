@@ -6,7 +6,7 @@
     "license": "MIT",
     "compiler": "Emscripten 3.1.74",
     "patch": "scripts/space-cadet-cabinet.patch",
-    "patchSha256": "3217c15f5610daf7237d8a888ba59a1ee3e52cdfd2233abf1052f5579db5ccb8"
+    "patchSha256": "a98826f07fa731556ec29b0c9fbca9698f31e00013da2f89da1ae1c1c3738a2d"
   },
   "data": {
     "repository": "https://github.com/andrewnakas/open-cadet",
@@ -255,7 +255,7 @@
       }
     ]
   },
-  "localChange": "Original 4x supersampled architectural art with procedural native materials and measured targets/caps. Native renderer composites opaque ASTER-BACKING.BGRA below exact masked table/sprites, skips zero-color writes while preserving native depth writes, and blends native texture above it. Original DAT mask/header/depth/collision/physics records remain exact. Full runtime rebuilt with original backing; no gameplay changes.",
+  "localChange": "Original supersampled architectural backing below exact native masked art. Native renderer retains original depth writes and masks. Cabinet readiness observes actual unboosted plunger contact, not active-ball spawn; subsequent feeding shows scoped elapsed progress. Physical inputs dispatch once per non-repeated keydown to existing native gameplay functions, outside removed ImGui capture. Native physics, collision/depth records and DAT masks unchanged.",
   "artifacts": {
     "LICENSE-engine.txt": {
       "bytes": 1079,
@@ -267,23 +267,23 @@
     },
     "SpaceCadetPinball.data": {
       "bytes": 2118249,
-      "sha256": "9a743bb5f9c50f1ddf7e14475104756f2295739a24a8819b2a1824bab0d5953e"
+      "sha256": "199c5fdcefd62b1965053bf47b0848e08d97830e0fe9e6ba595f8d7006d8782c"
     },
     "NOTICE-data.md": {
       "bytes": 2568,
       "sha256": "6183f3cce3a9d6130480f03caa27cde4fcf6fb5e9e891ff2f864b8eeb67032b8"
     },
     "SpaceCadetPinball.js": {
-      "bytes": 209984,
-      "sha256": "63e4b4c2a6f92699ff7de959293c53f647fe0a6ff6bfcbc6d2e0a7cf2ca83d22"
+      "bytes": 209990,
+      "sha256": "ddff8bf22ebd7c4888cd1cbbbe011c9563cff144f7a0051362f4c5fb5f0ef117"
     },
     "SpaceCadetPinball.wasm": {
-      "bytes": 4789641,
-      "sha256": "e9f52fad36a7ab90ef83ed172c50b68bc0c5515d14182fb3d08a06a51fdb6a72"
+      "bytes": 4789689,
+      "sha256": "48ba94b1de0eb0e97b5db2681da93badf8e8178628465a9f1149ae0f9e2f7ef1"
     },
     "PINBALL.DAT": {
       "bytes": 911260,
-      "sha256": "a07cad50978263b4a0975bdbb3598e4979aea3df8cfc770ab1ca26ecf3f409fd"
+      "sha256": "543c2d207297b9c303f3c9341c40bbbfe06cbf8e58a38f7d03e9abe2ccc1fc00"
     },
     "art/OPEN-CADET-CC0.DAT": {
       "bytes": 911260,

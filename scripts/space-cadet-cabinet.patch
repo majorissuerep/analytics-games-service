@@ -393,8 +393,8 @@ diff --git a/SpaceCadetPinball/winmain.cpp b/SpaceCadetPinball/winmain.cpp
 +    auto table = pb::MainTable;
 +    if (table) {
 +        auto message = pinball::MissTextBox && pinball::MissTextBox->Message1 ? pinball::MissTextBox->Message1->Text : "";
-+        EM_ASM({ if (Module.onCabinetState) Module.onCabinetState($0 + $1 * 1000000000, $2, $3, UTF8ToString($4), $5); },
-+            table->CurScore, table->CurScoreE9, table->BallCount, single_step, message, table->LightShowTimer == 0 && table->BallList->Get(0)->ActiveFlag);
++        EM_ASM({ if (Module.onCabinetState) Module.onCabinetState($0 + $1 * 1000000000, $2, $3, UTF8ToString($4), $5, $6); },
++            table->CurScore, table->CurScoreE9, table->BallCount, single_step, message, table->LightShowTimer == 0 && pb::game_mode == 1 && table->BallList->Get(0)->ActiveFlag && table->Plunger->CabinetBallReady, table->Plunger->Boost);
 +    }
  #endif
 -
@@ -428,7 +428,7 @@ diff --git a/SpaceCadetPinball/winmain.cpp b/SpaceCadetPinball/winmain.cpp
  			if (!single_step)
  				pause();
  			options::keyboard();
-@@ -834,3 +659,21 @@
+@@ -834,3 +659,23 @@
  	UpdateToFrameRatio = static_cast<double>(ups) / fps;
  	TargetFrameTime = DurationMs(1000.0 / ups);
  }
@@ -437,17 +437,19 @@ diff --git a/SpaceCadetPinball/winmain.cpp b/SpaceCadetPinball/winmain.cpp
 +// Touch and cabinet actions use the same native event handler as physical keys.
 +extern "C" EMSCRIPTEN_KEEPALIVE void cabinet_key(int code, int down)
 +{
-+    SDL_Event event{};
-+    event.type = down ? SDL_KEYDOWN : SDL_KEYUP;
++    // The cabinet has no ImGui controls. Route its commands directly to the
++    // same native gameplay functions, outside legacy GUI keyboard capture.
++    if (code == 113) { if (down) winmain::new_game(); return; }
++    if (code == 114) { if (down) winmain::pause(); return; }
++    int nativeKey;
 +    switch (code) {
-+    case 37: event.key.keysym.sym = SDLK_LEFT; break;
-+    case 39: event.key.keysym.sym = SDLK_RIGHT; break;
-+    case 32: event.key.keysym.sym = SDLK_SPACE; break;
-+    case 113: event.key.keysym.sym = SDLK_F2; break;
-+    case 114: event.key.keysym.sym = SDLK_F3; break;
++    case 37: nativeKey = SDLK_LEFT; break;
++    case 39: nativeKey = SDLK_RIGHT; break;
++    case 32: nativeKey = SDLK_SPACE; break;
 +    default: return;
 +    }
-+    winmain::event_handler(&event);
++    if (down) pb::keydown(nativeKey);
++    else pb::keyup(nativeKey);
 +}
 +#endif
 diff --git a/SpaceCadetPinball/zdrv.cpp b/SpaceCadetPinball/zdrv.cpp
@@ -464,3 +466,50 @@ diff --git a/SpaceCadetPinball/zdrv.cpp b/SpaceCadetPinball/zdrv.cpp
  				*dstPtrZ = *srcPtrZ;
  			}
  			++srcPtr;
+diff --git a/SpaceCadetPinball/TPlunger.cpp b/SpaceCadetPinball/TPlunger.cpp
+--- a/SpaceCadetPinball/TPlunger.cpp
++++ b/SpaceCadetPinball/TPlunger.cpp
+@@ -38,6 +38,7 @@
+ {
+ 	if (PinballTable->TiltLockFlag)
+ 		Message(1017, 0.0);
++	if (Boost == 0.0f) CabinetBallReady = true;
+ 	coef = RandFloat() * Boost * 0.1f + Boost;
+ 	maths::basic_collision(ball, nextPosition, direction, Elasticity, Smoothness, Threshold, coef);
+ }
+@@ -79,6 +80,7 @@
+ 		}
+ 	case 1015:
+ 		{
++            CabinetBallReady = false;
+ 			auto ball = PinballTable->BallList->Get(0);
+ 			ball->Message(1024, 0.0);
+ 			ball->Position.X = PinballTable->PlungerPositionX;
+@@ -90,6 +92,7 @@
+ 			return 0;
+ 		}
+ 	case 1016:
++        CabinetBallReady = false;
+ 		if (BallFeedTimer_)
+ 			timer::kill(BallFeedTimer_);
+ 		BallFeedTimer_ = timer::set(0.95999998f, this, BallFeedTimer);
+@@ -103,6 +106,7 @@
+ 		break;
+ 	case 1024:
+ 		{
++            CabinetBallReady = false;
+ 			if (BallFeedTimer_)
+ 				timer::kill(BallFeedTimer_);
+ 			BallFeedTimer_ = 0;
+diff --git a/SpaceCadetPinball/TPlunger.h b/SpaceCadetPinball/TPlunger.h
+--- a/SpaceCadetPinball/TPlunger.h
++++ b/SpaceCadetPinball/TPlunger.h
+@@ -15,6 +15,8 @@
+ 	static void PullbackTimer(int timerId, void* caller);
+ 	static void PlungerReleasedTimer(int timerId, void* caller);
+ 
++	// Cabinet readiness observes an actual resting-head collision, not a timer.
++	bool CabinetBallReady = false;
+ 	int PullbackTimer_;
+ 	int BallFeedTimer_;
+ 	int MaxPullback;

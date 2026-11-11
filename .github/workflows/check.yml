@@ -60,6 +60,9 @@ jobs:
           npm run experience:contracts
           npm run experience:gate -- request --request experience/requests/desktop-refinement.json --review experience/reviews/desktop-refinement.request.json
 
+      - name: Verify native Pinball source and asset provenance
+        run: node scripts/vendor-space-cadet.mjs --verify
+
       - name: Install Playwright video encoder
         run: npx playwright install ffmpeg
 

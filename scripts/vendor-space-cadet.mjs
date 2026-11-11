@@ -12,6 +12,8 @@ async function download(url, expected) {
   return bytes
 }
 if (process.argv.includes('--verify')) {
+  const patch = await readFile(new URL('./space-cadet-cabinet.patch', import.meta.url))
+  if (hash(patch) !== provenance.engine.patchSha256) throw new Error('Native patch changed: rebuild the engine and update its provenance')
   for (const [name, artifact] of Object.entries(provenance.artifacts)) {
     const bytes = await readFile(new URL(name, root))
     if (hash(bytes) !== artifact.sha256 || bytes.length !== artifact.bytes) throw new Error(`Asset changed: ${name}`)

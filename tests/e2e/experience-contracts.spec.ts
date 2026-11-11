@@ -3,7 +3,7 @@ import { actionIssues, captureExperience, expectActionReady, expectFocusedWindow
 
 test.setTimeout(60000)
 
-const desktopWindow = (id: string) => `[data-window-id="${id}"]`
+const desktopWindow = (id: string) => `[data-window-id="${id}"]:visible`
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => localStorage.setItem('analytics-games.analytics-consent.v1', 'denied'))
 })
@@ -23,9 +23,9 @@ test('acceptance guards reject the known2px overflow, clipped action and body-fo
 test('Minefield launches at its requested size with no hidden overflow and grows for Expert', async ({ page }, info) => {
   await page.setViewportSize({ width: 1280, height: 800 })
   await page.goto('/')
-  await page.locator('.desktop-icon').filter({ has: page.getByText('Minefield', {exact: true}) }).dblclick()
-  const window = page.locator(desktopWindow('game:minefield')), game = page.frameLocator('iframe[title="Minefield"]')
-  await expect(page.locator('iframe[title="Minefield"]')).toHaveAttribute('aria-busy', 'false', { timeout: 20000 })
+  await page.locator('.desktop-icon:visible').filter({ has: page.getByText('Minefield', {exact: true}) }).dblclick()
+  const window = page.locator(desktopWindow('game:minefield')), game = page.frameLocator('iframe[title="Minefield"]:visible')
+  await expect(page.locator('iframe[title="Minefield"]:visible')).toHaveAttribute('aria-busy', 'false', { timeout: 20000 })
   const bounds = (await window.locator('..').boundingBox())!
   expect(bounds.width).toBe(480); expect(bounds.height).toBe(600)
   await expect.poll(() => overflowIssues(game.locator('.minefield-app'))).toEqual([])
@@ -51,9 +51,9 @@ test('Minefield launches at its requested size with no hidden overflow and grows
 test('requested windows maximize restore and clamp to actual taskbar workspace', async ({ page }, info) => {
   await page.setViewportSize({ width: 1280, height: 800 })
   await page.goto('/')
-  await page.locator('.desktop-icon').filter({ has: page.getByText('Minefield', {exact: true}) }).dblclick()
+  await page.locator('.desktop-icon:visible').filter({ has: page.getByText('Minefield', {exact: true}) }).dblclick()
   const window = page.locator(desktopWindow('game:minefield')), rnd = window.locator('..')
-  await expect(page.locator('iframe[title="Minefield"]')).toHaveAttribute('aria-busy', 'false', { timeout: 20000 })
+  await expect(page.locator('iframe[title="Minefield"]:visible')).toHaveAttribute('aria-busy', 'false', { timeout: 20000 })
   const requested = (await rnd.boundingBox())!
   await window.getByRole('button', { name: 'Maximize', exact: true }).click()
   const workspace = (await page.locator('.desktop-windows').boundingBox())!
@@ -71,11 +71,11 @@ test('requested windows maximize restore and clamp to actual taskbar workspace',
 test('background iframe controls raise their window and act on the first repeated click', async ({ page }, info) => {
   await page.setViewportSize({ width: 1280, height: 844 })
   await page.goto('/')
-  await page.locator('.desktop-icon').filter({ has: page.getByText('Minefield', {exact: true}) }).dblclick()
-  const mine = page.frameLocator('iframe[title="Minefield"]')
+  await page.locator('.desktop-icon:visible').filter({ has: page.getByText('Minefield', {exact: true}) }).dblclick()
+  const mine = page.frameLocator('iframe[title="Minefield"]:visible')
   await expect(mine.locator('.minefield-app')).toBeVisible()
   await page.getByRole('button', { name: 'Open Paintbox', exact: true }).dblclick()
-  await expect(page.locator('iframe[title="Paintbox"]')).toHaveAttribute('aria-busy', 'false', { timeout: 20000 })
+  await expect(page.locator('iframe[title="Paintbox"]:visible')).toHaveAttribute('aria-busy', 'false', { timeout: 20000 })
   // Move Paintbox right by its title, leaving real Minefield cells exposed.
   const paint = page.locator(desktopWindow('game:paintbox')), title = paint.locator('.title-bar')
   const b = (await title.boundingBox())!
@@ -98,9 +98,9 @@ test('background iframe controls raise their window and act on the first repeate
 test('Chess anchors navigation and actions while its selected pane scrolls', async ({ page }, info) => {
   await page.setViewportSize({ width: 1180, height: 796 })
   await page.goto('/')
-  await page.locator('.desktop-icon').filter({ has: page.getByText('Chess', {exact: true}) }).dblclick()
-  const game = page.frameLocator('iframe[title="Chess"]')
-  await expect(page.locator('iframe[title="Chess"]')).toHaveAttribute('aria-busy', 'false', { timeout: 20000 })
+  await page.locator('.desktop-icon:visible').filter({ has: page.getByText('Chess', {exact: true}) }).dblclick()
+  const game = page.frameLocator('iframe[title="Chess"]:visible')
+  await expect(page.locator('iframe[title="Chess"]:visible')).toHaveAttribute('aria-busy', 'false', { timeout: 20000 })
   await expect(game.locator('.chess-intro')).toHaveCount(0)
   await expectActionReady(game.getByRole('button', { name: 'Play Stockfish 18', exact: true }))
   await expect.poll(() => overflowIssues(game.locator('.chess-app'), { allow: ['chess-setup-details'] })).toEqual([])
@@ -125,9 +125,9 @@ test('Chess anchors navigation and actions while its selected pane scrolls', asy
 test('Chess board grows with both available axes and keeps all actions on constrained screens', async ({ page }, info) => {
   await page.setViewportSize({ width: 1920, height: 1400 })
   await page.goto('/')
-  await page.locator('.desktop-icon').filter({ has: page.getByText('Chess', {exact: true}) }).dblclick()
-  const window = page.locator(desktopWindow('game:chess')), game = page.frameLocator('iframe[title="Chess"]')
-  await expect(page.locator('iframe[title="Chess"]')).toHaveAttribute('aria-busy', 'false', { timeout: 20000 })
+  await page.locator('.desktop-icon:visible').filter({ has: page.getByText('Chess', {exact: true}) }).dblclick()
+  const window = page.locator(desktopWindow('game:chess')), game = page.frameLocator('iframe[title="Chess"]:visible')
+  await expect(page.locator('iframe[title="Chess"]:visible')).toHaveAttribute('aria-busy', 'false', { timeout: 20000 })
   await game.getByRole('button', { name: /^Local/ }).click(); await game.getByRole('button', { name: 'Start pass-and-play' }).click()
   const initial = (await game.locator('.chess-board-wrap').boundingBox())!
   await window.getByRole('button', { name: 'Maximize', exact: true }).click()
@@ -151,21 +151,21 @@ test('reference matrix captures actual requested glossy and solid app windows', 
   await page.setViewportSize({ width: 1280, height: 800 })
   for (const [title, selector] of [['Minefield', '.minefield-app'], ['Chess', '.chess-app'], ['Space Cadet Pinball', 'body']] as const) {
     await page.goto('/')
-    await page.locator(`.desktop-icon[aria-label="Open ${title}"]`).dblclick()
-    const frame = page.frameLocator(`iframe[title="${title}"]`)
-    await expect(page.locator(`iframe[title="${title}"]`)).toHaveAttribute('aria-busy', 'false', { timeout: 20000 })
+    await page.locator(`.desktop-icon:visible[aria-label="Open ${title}"]`).dblclick()
+    const frame = page.frameLocator(`iframe[title="${title}"]:visible`)
+    await expect(page.locator(`iframe[title="${title}"]:visible`)).toHaveAttribute('aria-busy', 'false', { timeout: 20000 })
     await expect(frame.locator(selector)).toBeVisible()
-    if (title === 'Space Cadet Pinball') await expect(frame.frameLocator('iframe[title="Space Cadet runtime"]').locator('#score')).toBeVisible()
+    if (title === 'Space Cadet Pinball') await expect(frame.frameLocator('iframe[title="Space Cadet runtime"]:visible').locator('#score')).toBeVisible()
     await captureExperience(page, info, 'visual-matrix', `${title}-requested`)
-    const window = page.locator(`iframe[title="${title}"]`).locator('xpath=ancestor::article')
+    const window = page.locator(`iframe[title="${title}"]:visible`).locator('xpath=ancestor::article')
     await window.getByRole('button', { name: 'Maximize', exact: true }).click()
     await captureExperience(page, info, 'visual-matrix', `${title}-maximized`, 'maximized')
   }
   await page.evaluate(() => localStorage.setItem('analytics-games.material.v1', 'solid'))
   await page.reload()
-  await page.locator('.desktop-icon[aria-label="Open Chess"]').dblclick()
-  const chess = page.frameLocator('iframe[title="Chess"]')
+  await page.locator('.desktop-icon:visible[aria-label="Open Chess"]').dblclick()
+  const chess = page.frameLocator('iframe[title="Chess"]:visible')
   await expect(chess.locator('html')).toHaveAttribute('data-ui-material', 'solid')
-  await expect(page.locator('iframe[title="Chess"]')).toHaveAttribute('aria-busy', 'false', { timeout: 20000 })
+  await expect(page.locator('iframe[title="Chess"]:visible')).toHaveAttribute('aria-busy', 'false', { timeout: 20000 })
   await captureExperience(page, info, 'visual-matrix', 'chess-solid')
 })

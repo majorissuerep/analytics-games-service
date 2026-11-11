@@ -69,3 +69,24 @@ and the rebuilt loader/WASM/preload package hashes are recorded. The coordinator
 owns integration tests/build/deployment. No Git or server actions were performed.
 
 Final working direction accepted for frozen review after the opaque backing fixed rectangular cap perforations. `tests/e2e/pinball-experience.spec.ts` is the runnable candidate suite using shared capture/hit-test helpers for requested XP geometry, real arrow flippers, Space flight/score, physical pause freeze/resume, natural drain/next flight, narrow held/released controls, resize, no-scroll, and actual WASM failure/Retry recovery. Dev runs were interrupted by shell reloads during concurrent changes; they are not candidate acceptance. Frozen production execution belongs to the coordinator.
+
+
+The frozen first-launch investigation found a real readiness race: one of three
+immediate first holds never charged/launched while the ball was still settling
+in the shooter. This was not classified as a saved drain. The native ready signal
+now observes an actual unboosted plunger collision, with game mode active, instead
+of merely the ball's ActiveFlag. Loading remains “Feeding the first ball” until
+that observed contact. Later native feeds show a scoped footer meter/elapsed time
+and keep Launch disabled until contact. No arbitrary settle delay or first-score
+retry hides readiness. Physical keys use the same direct native input path as
+touch and ignore OS repeat; keyup/blur still release inputs. Native Boost is exposed
+as read-only cabinet state and the browser launch test asserts actual charging.
+
+The background keyboard investigation preserved actual browser button defaults.
+SDL's keypress handler had cancelled Enter, despite correct button focus and
+keydown/keyup handling. Ordinary button keys stop at the button; an early
+keypress guard prevents SDL cancellation. Enter now emits a real browser click
+and native Pause resumes after switching away and refocusing. The exact event
+trace and immediate-launch/repeat observations are retained in the working folder.
+Only genuinely scored native early-drain saves receive bounded real Space
+relaunches in the lifecycle test; first-score assertions have no retry masking.

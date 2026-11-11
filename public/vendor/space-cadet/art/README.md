@@ -21,10 +21,12 @@ The generator verifies every original bitmap header and exact index-zero mask, i
 
 Both flippers (groups 355–370, eight angles each) use smooth rose enamel with a pale chrome rim. Their exact original masks remain unchanged. Individual resting and raised sprite previews are included as `aster-355.png`, `aster-358.png`, `aster-363.png`, and `aster-366.png`.
 
-Current generated DAT SHA256: `a07cad50978263b4a0975bdbb3598e4979aea3df8cfc770ab1ca26ecf3f409fd` (911260 bytes).
+Current generated DAT SHA256: `543c2d207297b9c303f3c9341c40bbbfe06cbf8e58a38f7d03e9abe2ccc1fc00` (911260 bytes).
 
 The floor/rail image is an original architectural drawing rendered at 4× and Lanczos resampled. Source RGB/luminance does not shade physical sprites; they use procedural silhouette bevels, smooth caps and directional light. Seven measured bumper backings fill behind the unchanged native animated masks. Lamp brightness classifies the native off/on states; it does not invent a new game state.
 
 `ASTER-BACKING.BGRA` is the original opaque 365×470 architectural backing (BGRA bytes). The native renderer draws it beneath the masked table texture, preserving data masks and original depth writes while giving physical cap material through internal transparent cutouts. Both DAT and backing are verified by generator `--check`.
 
 Measured rollover switch groups 520–537 have recessed lens beds and procedural faces, preserving their true collision locations and eliminating stray ghost glyphs. Actual native lamp states remain separate and light only when the engine changes them.
+
+The original nonfunctional plunger-tail pixels below table y=420 match the exact opaque stage color. The in-board physical plunger, all eight animation states, masks and depth/collision records are preserved.

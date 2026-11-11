@@ -96,6 +96,7 @@ test('standalone privacy stays outside useful app content on a narrow page', asy
 test('desktop glass renders the backdrop through Chess and solid preference removes it', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto('/')
+  await page.locator('[data-window-id="system:welcome"]').getByRole('button', { name: 'Close', exact: true }).click()
   await page.locator('.desktop-icon[aria-label="Open Chess"]').dblclick()
   const iframe = page.locator('iframe[title="Chess"]')
   const frame = page.frameLocator('iframe[title="Chess"]')
@@ -132,6 +133,7 @@ test('desktop glass renders the backdrop through Chess and solid preference remo
   // Use the real persisted preference script in both documents.
   await page.evaluate(() => localStorage.setItem('analytics-games.material.v1', 'solid'))
   await page.reload()
+  await page.locator('[data-window-id="system:welcome"]').getByRole('button', { name: 'Close', exact: true }).click()
   await page.locator('.desktop-icon[aria-label="Open Chess"]').dblclick()
   await expect(iframe).toHaveAttribute('aria-busy', 'false', {timeout: 20000})
   await expect(frame.locator('html')).toHaveAttribute('data-ui-material', 'solid')

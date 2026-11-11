@@ -1,7 +1,7 @@
 import { expect, test, type FrameLocator, type Page } from '@playwright/test'
 import { captureExperience, expectActionReady, overflowIssues } from './helpers/experience'
 
-const cabinet = (page: Page) => page.frameLocator('iframe[title="Space Cadet Pinball"]').frameLocator('iframe[title="Space Cadet runtime"]')
+const cabinet = (page: Page) => page.frameLocator('iframe[title="Space Cadet Pinball"]:visible').frameLocator('iframe[title="Space Cadet runtime"]')
 const score = async (game: FrameLocator) => Number((await game.locator('#score').innerText()).replaceAll(',', ''))
 async function ready(page: Page) {
   await page.goto('/')
@@ -16,6 +16,7 @@ async function ready(page: Page) {
 async function launch(page: Page, game: FrameLocator) {
   await game.locator('canvas').focus()
   await page.keyboard.down('Space')
+  await expect.poll(() => game.locator('canvas').evaluate(() => (window as unknown as { Module: { cabinetState: { plungerPull: number } } }).Module.cabinetState.plungerPull)).toBeGreaterThan(0)
   await page.waitForTimeout(1200)
   await page.keyboard.up('Space')
 }
@@ -35,7 +36,7 @@ test.beforeEach(async ({ context }) => {
 })
 
 test('pinball-play: real native flight, flippers, physical pause, natural drain and next flight in requested XP window', async ({ page }, info) => {
-  test.setTimeout(120_000)
+  test.setTimeout(180_000)
   await page.setViewportSize({ width: 1280, height: 844 })
   const game = await ready(page)
   const window = page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Space Cadet Pinball"]') })
@@ -72,15 +73,42 @@ test('pinball-play: real native flight, flippers, physical pause, natural drain 
   const frozen = await nativeFrame()
   await page.waitForTimeout(900)
   expect((await nativeFrame()).equals(frozen), 'Actual physical canvas must freeze while paused').toBe(true)
-  await expectActionReady(game.getByRole('button', { name: 'Resume', exact: true }).last())
-  await game.locator('#resume-table').click()
+  await expectActionReady(game.locator('#pause'))
+  await game.locator('#pause').focus()
+  await page.keyboard.press('Enter')
+  await expect(game.locator('body')).toHaveAttribute('data-paused', 'false')
+  await expect(game.locator('#pause')).toHaveAttribute('aria-label', 'Pause')
   await page.waitForTimeout(450)
   expect((await nativeFrame()).equals(frozen), 'Actual physical canvas must move after Resume').toBe(false)
   await captureExperience(page, info, 'pinball-play', 'resumed-moving-ball')
   await expect.poll(() => score(game), { timeout: 20_000 }).toBeGreaterThan(0)
   await captureExperience(page, info, 'pinball-play', 'genuine-native-score')
-  // No game-state injection: let gravity and the real drain finish the ball.
-  await expect(game.locator('#ball')).toHaveText('2 / 3', { timeout: 60_000 })
+  // Native early-drain protection can return the same ball to the shooter.
+  // Observe the real state and use only genuine player inputs: no injected drain,
+  // forced counter, timer change or assumed completion from an elapsed timeout.
+  let previousScore = await score(game)
+  let relaunches = 0
+  for (let observation = 1; observation <= 8; observation++) {
+    for (let second = 0; second < 10; second++) {
+      if ((await game.locator('#ball').innerText()) !== '1 / 3') break
+      await page.waitForTimeout(1000)
+    }
+    const ball = await game.locator('#ball').innerText()
+    const currentScore = await score(game)
+    await captureExperience(page, info, 'pinball-play', `drain-observation-${observation}-ball-${ball.replaceAll(/[^0-9]/g, '')}-score-${currentScore}`)
+    if (ball === '2 / 3') break
+    expect(ball, 'Real ball lifecycle must remain in the first or second ball').toBe('1 / 3')
+    if (currentScore === previousScore && relaunches < 5) {
+      // A saved/replayed ball needs another physical plunger pull. In-flight
+      // Space is harmless; the engine alone decides whether a ball is launchable.
+      await launch(page, game)
+      await page.waitForTimeout(900)
+      relaunches++
+      await captureExperience(page, info, 'pinball-play', `real-space-relaunch-${relaunches}-observation-${observation}`)
+    }
+    previousScore = currentScore
+  }
+  await expect(game.locator('#ball')).toHaveText('2 / 3')
   await captureExperience(page, info, 'pinball-play', 'natural-drain-next-ball-counter')
   // Native feed animation takes several seconds after Ball changes.
   await page.waitForTimeout(6000)
