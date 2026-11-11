@@ -37,3 +37,17 @@ Against the coordinator's running server at `http://127.0.0.1:3131`, Chromium lo
 Real interactions checked: new game, pause → Resume → Pause, focusable flipper Enter down/up and visible solid focus outline. Reduced-motion emulation was exercised. Material fallback is delegated to the shared primitives; coordinator should run the persisted transparency cross-frame regression. Native aspect ratio intentionally leaves vertical space on portrait phones rather than crop table/score content. This is not a mobile engine redesign.
 
 `node --check public/vendor/pinball/cabinet.js` passed. Coordinator owns the complete `space-cadet.spec.ts` recovery/import/audio/boot-race suite and `application-design.spec.ts`; no root build or shared-file changes were made by this app agent.
+
+
+## Ready-to-play revision
+
+The user rejected the inherited asset setup and engine menus. The cabinet now
+opens directly into one-player play, with native live score/ball in its compact
+header, restart/pause/sound actions, and Space + horizontal arrows. Touch devices
+get three controls. No imports, Game/Options/Help menus or vertical-arrow actions
+remain. Python regenerates all 318 bitmap records with original Aster enamel art;
+the exact bitmap masks, dimensions and non-art data are verified unchanged. Native
+source patch, generator, source/output assets and provenance ship in the repo.
+The gameplay table is cropped independently of the old score panel, and the
+renderer includes the entire lower table. Real launch/scoring, pause, audio,
+phone touch, no-scroll, restart and loading/retry are release checks.

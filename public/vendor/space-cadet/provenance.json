@@ -1,10 +1,12 @@
 {
   "engine": {
     "repository": "https://github.com/alula/SpaceCadetPinball",
-    "commit": "a93547299a2ed7bd602630c0be3a43648e25a886",
-    "branch": "gh-pages",
+    "commit": "0bc12d3ca97a30a61e1e325cfde1eeec379bb9b9",
+    "branch": "master",
     "license": "MIT",
-    "originalJavascriptSha256": "7b79176a84fda4463f53d0bf3588aac57596d63715166904ad32dd3978db5610"
+    "compiler": "Emscripten 3.1.74",
+    "patch": "scripts/space-cadet-cabinet.patch",
+    "patchSha256": "6fc0cba075b9c8f12267b783f28ed64dc80afd9e8e1246413f5a2d938f8a0850"
   },
   "data": {
     "repository": "https://github.com/andrewnakas/open-cadet",
@@ -253,7 +255,7 @@
       }
     ]
   },
-  "localChange": "Only the generated preload metadata is replaced to load the CC0 package. The engine WASM is unchanged.",
+  "localChange": "Native cabinet rebuild: no menus; cropped full-height table; native score/ball/pause/mission feedback; fixed arrow/Space controls and direct native touch input. Original procedural Aster artwork replaces bitmap and palette fields; exact masks and all non-art records preserved.",
   "artifacts": {
     "LICENSE-engine.txt": {
       "bytes": 1079,
@@ -264,20 +266,28 @@
       "sha256": "b63ba4bbec694f53045b3c5b09fbdde07731f4456541e3736cd1d0555f9fce89"
     },
     "SpaceCadetPinball.data": {
-      "bytes": 1431942,
-      "sha256": "a26a18eee2ddc07d28a80ac4acb6e8693046733d17fd0dfcea54fcc51001fad8"
+      "bytes": 1432049,
+      "sha256": "c8e664e534d7c7b9ce7bdca83feff90cfbe87a47d22bd520cb73d4ac82330b53"
     },
     "NOTICE-data.md": {
       "bytes": 2568,
       "sha256": "6183f3cce3a9d6130480f03caa27cde4fcf6fb5e9e891ff2f864b8eeb67032b8"
     },
     "SpaceCadetPinball.js": {
-      "bytes": 216811,
-      "sha256": "c63ad1d4d824296b86f749ee782fe9f5cc5d635aeabbd36c82c9d40aab74cba8"
+      "bytes": 208301,
+      "sha256": "83d735bb85add1f677a111186125cbcb97e1ba5e72b88680bcbe6c9367a80be3"
     },
     "SpaceCadetPinball.wasm": {
-      "bytes": 4539452,
-      "sha256": "842e7313bf64f22bf1b0214ced3d143a13e5b0f06113996a3b4a19e6f7c1c857"
+      "bytes": 4694292,
+      "sha256": "dd49e050d714ea8866d81392680c1e3c332f44dab2f350dd70fa8ea2fbbf4174"
+    },
+    "PINBALL.DAT": {
+      "bytes": 911260,
+      "sha256": "1e2fa5236972483157b7cd1ce8e3cac6a6431842cfbda6ce230a6f8ec6c8c41e"
+    },
+    "art/OPEN-CADET-CC0.DAT": {
+      "bytes": 911260,
+      "sha256": "3945713ab0fef7bcc291b800786101226852ea966b80904eea35eb5fc067f38e"
     }
   }
 }

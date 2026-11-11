@@ -1,0 +1,403 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index fca48f3..53cc4ac 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -218,7 +218,7 @@ target_link_libraries(SpaceCadetPinball ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY})
+ if(${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
+         target_link_libraries(SpaceCadetPinball idbfs.js)
+         set_target_properties(SpaceCadetPinball PROPERTIES LINK_FLAGS
+-        "-s ALLOW_MEMORY_GROWTH=1 -s FORCE_FILESYSTEM=1 -s DEMANGLE_SUPPORT=1 \
++        "-s ALLOW_MEMORY_GROWTH=1 -s FORCE_FILESYSTEM=1 -s EXPORTED_RUNTIME_METHODS=FS_unlink,FS_createDataFile \
+         --shell-file ${CMAKE_CURRENT_SOURCE_DIR}/SpaceCadetPinball/emscripten_shell.html \
+         --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/game_resources@game_resources --bind")
+ endif()
+diff --git a/SpaceCadetPinball/fullscrn.cpp b/SpaceCadetPinball/fullscrn.cpp
+index 12e18b7..72bbee2 100644
+--- a/SpaceCadetPinball/fullscrn.cpp
++++ b/SpaceCadetPinball/fullscrn.cpp
+@@ -14,7 +14,7 @@ int fullscrn::display_changed;
+ int fullscrn::resolution = 0;
+ const resolution_info fullscrn::resolution_array[3] =
+ {
+-	{640, 480, 600, 416, 501},
++	{640, 480, 600, 480, 501},
+ 	{800, 600, 752, 520, 502},
+ 	{1024, 768, 960, 666, 503},
+ };
+diff --git a/SpaceCadetPinball/gdrv.cpp b/SpaceCadetPinball/gdrv.cpp
+index 6eb5e6b..8636aaa 100644
+--- a/SpaceCadetPinball/gdrv.cpp
++++ b/SpaceCadetPinball/gdrv.cpp
+@@ -86,43 +86,12 @@ int gdrv::create_bitmap(gdrv_bitmap8& bmp, const dat8BitBmpHeader& header)
+ 
+ int gdrv::display_palette(ColorRgba* plt)
+ {
+-	const uint32_t sysPaletteColors[]
+-	{
+-		0xff000000, // Color 0: transparent
+-		0xff000080,
+-		0xff008000,
+-		0xff008080,
+-		0xff800000,
+-		0xff800080,
+-		0xff808000,
+-		0xffC0C0C0,
+-		0xffC0DCC0,
+-		0xffF0CAA6
+-	};
+-
+-	memcpy(current_palette, sysPaletteColors, sizeof sysPaletteColors);
+-
+-	for (int i = 0; i < 256; i++)
+-	{
+-		current_palette[i].rgba.Alpha = 0;
+-	}
+-
+-	auto pltSrc = &plt[10];
+-	auto pltDst = &current_palette[10];
+-	for (int index = 236; index > 0; --index)
+-	{
+-		if (plt)
+-		{
+-			pltDst->rgba.Blue = pltSrc->rgba.Blue;
+-			pltDst->rgba.Green = pltSrc->rgba.Green;
+-			pltDst->rgba.Red = pltSrc->rgba.Red;
+-		}
+-		pltDst->rgba.Alpha = 0xFF;
+-		pltSrc++;
+-		pltDst++;
+-	}
+-
+-	current_palette[255].Color = 0xffFFFFFF;
++    // The original cabinet art owns the full palette, including the legacy
++    // Windows system-color slots. Index zero remains the transparent mask.
++    for (int i = 0; i < 256; ++i) {
++        current_palette[i] = plt[i];
++        current_palette[i].rgba.Alpha = i == 0 ? 0 : 255;
++    }
+ 
+ 	score::ApplyPalette();
+ 	for (const auto group : pb::record_table->Groups)
+diff --git a/SpaceCadetPinball/options.cpp b/SpaceCadetPinball/options.cpp
+index 99704d2..d303a72 100644
+--- a/SpaceCadetPinball/options.cpp
++++ b/SpaceCadetPinball/options.cpp
+@@ -67,12 +67,12 @@ void options::init()
+ 	Options.Sounds = 1;
+ 	Options.Music = 1;
+ 	Options.FullScreen = 0;
+-	Options.LeftFlipperKeyDft = SDLK_z;
+-	Options.RightFlipperKeyDft = SDLK_SLASH;
++	Options.LeftFlipperKeyDft = SDLK_LEFT;
++	Options.RightFlipperKeyDft = SDLK_RIGHT;
+ 	Options.PlungerKeyDft = SDLK_SPACE;
+ 	Options.LeftTableBumpKeyDft = SDLK_x;
+ 	Options.RightTableBumpKeyDft = SDLK_PERIOD;
+-	Options.BottomTableBumpKeyDft = SDLK_UP;
++	Options.BottomTableBumpKeyDft = SDLK_UNKNOWN;
+ 	/*pinball::get_rc_int(159, &Options.LeftFlipperKeyDft);
+ 	pinball::get_rc_int(160, &Options.RightFlipperKeyDft);
+ 	pinball::get_rc_int(161, &Options.PlungerKeyDft);
+@@ -105,6 +105,12 @@ void options::init()
+ 	Options.UpdatesPerSecond = std::min(MaxUps, std::max(MinUps, get_int("Updates Per Second", DefUps)));
+ 	Options.UpdatesPerSecond = std::max(Options.UpdatesPerSecond, Options.FramesPerSecond);
+ 
++    // Cabinet controls are fixed and cannot inherit legacy desktop bindings.
++    Options.LeftFlipperKey = SDLK_LEFT;
++    Options.RightFlipperKey = SDLK_RIGHT;
++    Options.PlungerKey = SDLK_SPACE;
++    Options.LeftTableBumpKey = Options.RightTableBumpKey = Options.BottomTableBumpKey = SDLK_UNKNOWN;
++    Options.Players = 1;
+ 	winmain::UpdateFrameRate();
+ 
+ 	Sound::Enable(0, 7, Options.Sounds);
+diff --git a/SpaceCadetPinball/render.cpp b/SpaceCadetPinball/render.cpp
+index b5f2e88..991e33c 100644
+--- a/SpaceCadetPinball/render.cpp
++++ b/SpaceCadetPinball/render.cpp
+@@ -639,5 +639,7 @@ void render::BlitVScreen()
+ void render::PresentVScreen()
+ {
+ 	BlitVScreen();
+-	SDL_RenderCopy(winmain::Renderer, vScreenTex, nullptr, &DestinationRect);
++	// The web cabinet owns the scoreboard; render only the physical table.
++    SDL_Rect source{0, 0, pb::MainTable->Width, pb::MainTable->Height};
++    SDL_RenderCopy(winmain::Renderer, vScreenTex, &source, nullptr);
+ }
+diff --git a/SpaceCadetPinball/winmain.cpp b/SpaceCadetPinball/winmain.cpp
+index 4f78055..c12fa72 100644
+--- a/SpaceCadetPinball/winmain.cpp
++++ b/SpaceCadetPinball/winmain.cpp
+@@ -9,6 +9,11 @@
+ #include "pb.h"
+ #include "render.h"
+ #include "Sound.h"
++#include "TPinballTable.h"
++#include "TTextBox.h"
++#include "TPlunger.h"
++#include "TBall.h"
++#include "objlist_class.h"
+ 
+ #include <functional>
+ 
+@@ -109,7 +114,7 @@ int winmain::WinMain(LPCSTR lpCmdLine)
+ 	SDL_Window *window = SDL_CreateWindow(
+ 		pinball::get_rc_string(38, 0),
+ 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+-		600, 440,
++		365, 470,
+ 		SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE);
+ 	MainWindow = window;
+ 	if (!window)
+@@ -249,6 +254,11 @@ int winmain::WinMain(LPCSTR lpCmdLine)
+ 			return;
+ 		}
+ 
++#ifdef __EMSCRIPTEN__
++        // Browser visibility owns simulation lifetime. SDL canvas-focus events
++        // do not cover the cabinet's HTML touch controls or initial loading.
++        has_focus = EM_ASM_INT({ return !document.hidden; });
++#endif
+ 		if (has_focus)
+ 		{
+ 			if (mouse_down)
+@@ -343,201 +353,14 @@ int winmain::WinMain(LPCSTR lpCmdLine)
+ 
+ void winmain::RenderUi()
+ {
+-	// No demo window in release to save space
+-#ifndef NDEBUG
+-	if (ShowImGuiDemo)
+-		ImGui::ShowDemoWindow(&ShowImGuiDemo);
+-#endif
+-
+-	if (ImGui::BeginMainMenuBar())
+-	{
+-		if (ImGui::BeginMenu("Game"))
+-		{
+-			if (ImGui::MenuItem("New Game", "F2"))
+-			{
+-				new_game();
+-			}
+-			if (ImGui::MenuItem("Launch Ball", nullptr, false, LaunchBallEnabled))
+-			{
+-				end_pause();
+-				pb::launch_ball();
+-			}
+-			if (ImGui::MenuItem("Pause/ Resume Game", "F3"))
+-			{
+-				pause();
+-			}
+-			ImGui::Separator();
+-
+-			if (ImGui::MenuItem("High Scores...", nullptr, false, HighScoresEnabled))
+-			{
+-				if (!single_step)
+-					pause();
+-				pb::high_scores();
+-			}
+-			if (ImGui::MenuItem("Demo", nullptr, DemoActive))
+-			{
+-				end_pause();
+-				pb::toggle_demo();
+-			}
+-#ifndef __EMSCRIPTEN__
+-			if (ImGui::MenuItem("Exit"))
+-			{
+-				SDL_Event event{SDL_QUIT};
+-				SDL_PushEvent(&event);
+-			}
+-#endif
+-			ImGui::EndMenu();
+-		}
+-
+-		if (ImGui::BeginMenu("Options"))
+-		{
+-#ifndef __EMSCRIPTEN__
+-			if (ImGui::MenuItem("Full Screen", "F4", options::Options.FullScreen))
+-			{
+-				options::toggle(Menu1::Full_Screen);
+-			}
+-#endif
+-			if (ImGui::BeginMenu("Select Players"))
+-			{
+-				if (ImGui::MenuItem("1 Player", nullptr, options::Options.Players == 1))
+-				{
+-					options::toggle(Menu1::OnePlayer);
+-					new_game();
+-				}
+-				if (ImGui::MenuItem("2 Players", nullptr, options::Options.Players == 2))
+-				{
+-					options::toggle(Menu1::TwoPlayers);
+-					new_game();
+-				}
+-				if (ImGui::MenuItem("3 Players", nullptr, options::Options.Players == 3))
+-				{
+-					options::toggle(Menu1::ThreePlayers);
+-					new_game();
+-				}
+-				if (ImGui::MenuItem("4 Players", nullptr, options::Options.Players == 4))
+-				{
+-					options::toggle(Menu1::FourPlayers);
+-					new_game();
+-				}
+-				ImGui::EndMenu();
+-			}
+-			ImGui::Separator();
+-
+-			if (ImGui::MenuItem("Sound", nullptr, options::Options.Sounds))
+-			{
+-				options::toggle(Menu1::Sounds);
+-			}
+-			if (ImGui::MenuItem("Music", nullptr, options::Options.Music))
+-			{
+-				options::toggle(Menu1::Music);
+-			}
+-			ImGui::Separator();
+-
+-			if (ImGui::MenuItem("Player Controls...", "F8"))
+-			{
+-				if (!single_step)
+-					pause();
+-				options::keyboard();
+-			}
+-			if (ImGui::BeginMenu("Table Resolution"))
+-			{
+-				char buffer[20]{};
+-				auto maxResText = pinball::get_rc_string(fullscrn::GetMaxResolution() + 2030, 0);
+-				if (ImGui::MenuItem(maxResText, nullptr, options::Options.Resolution == -1))
+-				{
+-					options::toggle(Menu1::MaximumResolution);
+-				}
+-				for (auto i = 0; i <= fullscrn::GetMaxResolution(); i++)
+-				{
+-					auto &res = fullscrn::resolution_array[i];
+-					snprintf(buffer, sizeof buffer - 1, "%d x %d", res.ScreenWidth, res.ScreenHeight);
+-					if (ImGui::MenuItem(buffer, nullptr, options::Options.Resolution == i))
+-					{
+-						options::toggle(static_cast<Menu1>(static_cast<int>(Menu1::R640x480) + i));
+-					}
+-				}
+-				ImGui::EndMenu();
+-			}
+-			if (ImGui::BeginMenu("Graphics"))
+-			{
+-				if (ImGui::MenuItem("Uniform Scaling", nullptr, options::Options.UniformScaling))
+-				{
+-					options::toggle(Menu1::WindowUniformScale);
+-				}
+-				if (ImGui::MenuItem("Linear Filtering", nullptr, options::Options.LinearFiltering))
+-				{
+-					options::toggle(Menu1::WindowLinearFilter);
+-				}
+-				ImGui::DragFloat("UI Scale", &ImIO->FontGlobalScale, 0.005f, 0.8f, 5,
+-				                 "%.2f", ImGuiSliderFlags_AlwaysClamp);
+-				ImGui::Separator();
+-
+-				auto changed = false;
+-				if (ImGui::MenuItem("Set Default UPS/FPS"))
+-				{
+-					changed = true;
+-					options::Options.UpdatesPerSecond = options::DefUps;
+-					options::Options.FramesPerSecond = options::DefFps;
+-				}
+-				if (ImGui::DragInt("UPS", &options::Options.UpdatesPerSecond, 1, options::MinUps, options::MaxUps,
+-				                   "%d", ImGuiSliderFlags_AlwaysClamp))
+-				{
+-					changed = true;
+-					options::Options.FramesPerSecond = std::min(options::Options.UpdatesPerSecond,
+-					                                            options::Options.FramesPerSecond);
+-				}
+-				if (ImGui::DragInt("FPS", &options::Options.FramesPerSecond, 1, options::MinFps, options::MaxFps,
+-				                   "%d", ImGuiSliderFlags_AlwaysClamp))
+-				{
+-					changed = true;
+-					options::Options.UpdatesPerSecond = std::max(options::Options.UpdatesPerSecond,
+-					                                             options::Options.FramesPerSecond);
+-				}
+-				if (changed)
+-				{
+-					UpdateFrameRate();
+-				}
+-
+-				ImGui::EndMenu();
+-			}
+-			ImGui::EndMenu();
+-		}
+-
+-		if (ImGui::BeginMenu("Help"))
+-		{
+-#ifndef NDEBUG
+-			if (ImGui::MenuItem("ImGui Demo", nullptr, ShowImGuiDemo))
+-			{
+-				ShowImGuiDemo ^= true;
+-			}
+-
+-			if (ImGui::MenuItem("Sprite Viewer", nullptr, ShowSpriteViewer))
+-			{
+-				if (!ShowSpriteViewer && !single_step)
+-					pause();
+-				ShowSpriteViewer ^= true;
+-			}
+-			ImGui::Separator();
++#ifdef __EMSCRIPTEN__
++    auto table = pb::MainTable;
++    if (table) {
++        auto message = pinball::MissTextBox && pinball::MissTextBox->Message1 ? pinball::MissTextBox->Message1->Text : "";
++        EM_ASM({ if (Module.onCabinetState) Module.onCabinetState($0 + $1 * 1000000000, $2, $3, UTF8ToString($4), $5); },
++            table->CurScore, table->CurScoreE9, table->BallCount, single_step, message, table->LightShowTimer == 0 && table->BallList->Get(0)->ActiveFlag);
++    }
+ #endif
+-
+-			if (ImGui::MenuItem("About Pinball"))
+-			{
+-				if (!single_step)
+-					pause();
+-				ShowAboutDialog = true;
+-			}
+-			ImGui::EndMenu();
+-		}
+-		if (DispFrameRate && !FpsDetails.empty())
+-			if (ImGui::BeginMenu(FpsDetails.c_str()))
+-				ImGui::EndMenu();
+-		ImGui::EndMainMenuBar();
+-	}
+-
+-	a_dialog();
+-	high_score::RenderHighScoreDialog();
+-	if (ShowSpriteViewer)
+-		render::SpriteViewer(&ShowSpriteViewer);
+ }
+ 
+ int winmain::event_handler(const SDL_Event *event)
+@@ -610,6 +433,8 @@ int winmain::event_handler(const SDL_Event *event)
+ 			options::toggle(Menu1::Music);
+ 			break;
+ 		case SDLK_F8:
++            break;
++        case SDLK_UNKNOWN:
+ 			if (!single_step)
+ 				pause();
+ 			options::keyboard();
+@@ -834,3 +659,21 @@ void winmain::UpdateFrameRate()
+ 	UpdateToFrameRatio = static_cast<double>(ups) / fps;
+ 	TargetFrameTime = DurationMs(1000.0 / ups);
+ }
++
++#ifdef __EMSCRIPTEN__
++// Touch and cabinet actions use the same native event handler as physical keys.
++extern "C" EMSCRIPTEN_KEEPALIVE void cabinet_key(int code, int down)
++{
++    SDL_Event event{};
++    event.type = down ? SDL_KEYDOWN : SDL_KEYUP;
++    switch (code) {
++    case 37: event.key.keysym.sym = SDLK_LEFT; break;
++    case 39: event.key.keysym.sym = SDLK_RIGHT; break;
++    case 32: event.key.keysym.sym = SDLK_SPACE; break;
++    case 113: event.key.keysym.sym = SDLK_F2; break;
++    case 114: event.key.keysym.sym = SDLK_F3; break;
++    default: return;
++    }
++    winmain::event_handler(&event);
++}
++#endif

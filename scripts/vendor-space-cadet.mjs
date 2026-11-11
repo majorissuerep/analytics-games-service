@@ -18,28 +18,30 @@ if (process.argv.includes('--verify')) {
   }
   console.log('Space Cadet engine and CC0 data checksums verified.')
 } else {
-  const engineBase = `https://raw.githubusercontent.com/alula/SpaceCadetPinball/${provenance.engine.commit}/`
-  const [engine, wasm, ...data] = await Promise.all([
-    download(engineBase + 'SpaceCadetPinball.js', provenance.engine.originalJavascriptSha256),
-    download(engineBase + 'SpaceCadetPinball.wasm', provenance.artifacts['SpaceCadetPinball.wasm'].sha256),
-    ...provenance.data.files.map(file => download(`https://raw.githubusercontent.com/andrewnakas/open-cadet/${provenance.data.commit}/${file.name === 'PINBALL.DAT' ? file.name : file.name.toLowerCase()}`, file.sha256)),
-  ])
-  const metadata = { files: [], remote_package_size: data.reduce((sum, bytes) => sum + bytes.length, 0), package_uuid: provenance.data.commit }
-  let offset = 0
-  data.forEach((bytes, i) => { metadata.files.push({ filename: `/game_resources/${provenance.data.files[i].name}`, start: offset, end: offset + bytes.length, audio: 0 }); offset += bytes.length })
-  const source = engine.toString('utf8'), start = source.indexOf('loadPackage({') + 'loadPackage('.length
-  let end = start, depth = 0, quoted = false, escaped = false
-  for (; end < source.length; end++) {
-    const c = source[end]
-    if (quoted) { if (escaped) escaped = false; else if (c === '\\') escaped = true; else if (c === '"') quoted = false }
-    else if (c === '"') quoted = true
-    else if (c === '{') depth++
-    else if (c === '}' && --depth === 0) { end++; break }
+  const { spawnSync } = await import('node:child_process')
+  const { mkdtemp, cp, copyFile } = await import('node:fs/promises')
+  const { tmpdir } = await import('node:os')
+  const { join, dirname } = await import('node:path')
+  const { fileURLToPath } = await import('node:url')
+  const repository = dirname(dirname(fileURLToPath(import.meta.url)))
+  const build = await mkdtemp(join(tmpdir(), 'aster-cadet-'))
+  const run = (command, args, cwd = build) => {
+    const result = spawnSync(command, args, { cwd, stdio: 'inherit' })
+    if (result.error || result.status !== 0) throw result.error ?? new Error(`${command} failed`)
   }
-  const javascript = Buffer.from(source.slice(0, start) + JSON.stringify(metadata) + source.slice(end))
-  for (const [name, bytes] of [['SpaceCadetPinball.js', javascript], ['SpaceCadetPinball.wasm', wasm], ['SpaceCadetPinball.data', Buffer.concat(data)]]) {
-    if (hash(bytes) !== provenance.artifacts[name].sha256) throw new Error(`Generated artifact mismatch: ${name}`)
-    await writeFile(new URL(name, root), bytes)
+  run('git', ['init', '-q'])
+  run('git', ['remote', 'add', 'origin', provenance.engine.repository])
+  run('git', ['fetch', '-q', '--depth', '1', 'origin', provenance.engine.commit])
+  run('git', ['checkout', '-q', 'FETCH_HEAD'])
+  run('git', ['apply', join(repository, 'scripts/space-cadet-cabinet.patch')])
+  run('python', [join(repository, 'scripts/generate-pinball-art.py'), '--check'])
+  await cp(join(repository, 'public/vendor/space-cadet/PINBALL.DAT'), join(build, 'game_resources/PINBALL.DAT'))
+  for (const file of provenance.data.files.filter(file => file.name !== 'PINBALL.DAT')) {
+    const bytes = await download(`https://raw.githubusercontent.com/andrewnakas/open-cadet/${provenance.data.commit}/${file.name.toLowerCase()}`, file.sha256)
+    await writeFile(join(build, 'game_resources', file.name.toLowerCase()), bytes)
   }
-  console.log('Regenerated pinned engine + CC0 data; no original Microsoft resources downloaded.')
+  run('emcmake', ['cmake', '-S', '.', '-B', 'build', '-DCMAKE_BUILD_TYPE=Release'])
+  run('cmake', ['--build', 'build', '-j4'])
+  for (const extension of ['js', 'wasm', 'data']) await copyFile(join(build, 'bin', `SpaceCadetPinball.${extension}`), new URL(`SpaceCadetPinball.${extension}`, root))
+  console.log('Built patched native cabinet with Aster art. Verify/review artifact hashes after intentional rebuilds; Emscripten preload UUIDs are not byte deterministic.')
 }

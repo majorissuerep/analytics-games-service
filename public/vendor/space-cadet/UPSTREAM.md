@@ -1,37 +1,39 @@
-# Space Cadet runtime provenance
+# Space Cadet cabinet provenance
 
-Engine: alula/SpaceCadetPinball, gh-pages commit
-`a93547299a2ed7bd602630c0be3a43648e25a886`, MIT. This is the WebAssembly
-port of k4zmu2a/SpaceCadetPinball, the reverse-engineered Space Cadet engine.
-The WASM binary is unchanged. Only the generated JavaScript preload manifest is
-replaced with offsets for our freely licensed data package.
+The native engine is alula/SpaceCadetPinball source commit
+`0bc12d3ca97a30a61e1e325cfde1eeec379bb9b9`, MIT, compiled locally with
+Emscripten 3.1.74. It implements the Space Cadet physics and rules.
+`scripts/space-cadet-cabinet.patch` removes all native menus/dialogs, renders
+only the physical table, sends live native score/ball/pause/mission state to the
+cabinet, fixes the renderer's height for the 470-pixel table, binds horizontal
+arrows to flippers, and disables nudging and obsolete setup shortcuts.
+The artwork owns the full palette, including formerly reserved system slots.
 
-Game data: andrewnakas/open-cadet at
-`4ae332be705f86bfb62f8d8ac1dc1f11918977dd`, CC0-1.0. See LICENSE-data.txt and
-NOTICE-data.md. This is a newly drawn neon-space table and synthesized sounds,
-using the Space Cadet geometry, rules, and file format. It is not Microsoft's
-original artwork. No Microsoft PINBALL.DAT, bitmap, MIDI, WAV, or executable is
-redistributed here. The MIT engine and its SDL/ImGui dependencies are independent
-of that proprietary game-data license; keep the corresponding license notices.
+Aster is original procedural Python artwork dedicated under CC0: warm enamel,
+rose flight markings and flippers, machined fixtures, a spacecraft seal and
+chrome balls. All 318 bitmap records are regenerated. Bitmap masks and bounds,
+depth maps, collision geometry and game rules are preserved. Source and output
+DAT files, previews and notes are in `art/`; generator:
+`scripts/generate-pinball-art.py`. The starting geometry and synthesized sounds
+are from andrewnakas/open-cadet commit
+`4ae332be705f86bfb62f8d8ac1dc1f11918977dd`, CC0-1.0. No Microsoft artwork,
+sounds, executable or MIDI is shipped. Keep LICENSE-engine.txt, LICENSE-data.txt,
+NOTICE-data.md and THIRD_PARTY_NOTICES.md with redistribution.
 
-Original XP appearance: the cabinet can read a player's own PINBALL.DAT and
-sounds in browser memory, then restart only the runtime with those files.
-Those bytes are never uploaded or persisted. Only data filenames are accepted;
-EXE, DLL, script files, paths, and oversized selections are rejected.
+The cabinet is ready to play, with no file picker, import controller or runtime
+settings menu. It starts a single-player game, displays native score and ball
+above the table, and provides restart, pause, sound and responsive touch inputs.
+Keyboard: hold/release Space to launch, left/right arrows for flippers. Vertical
+arrows do nothing and cannot scroll. The outer platform supplies XP window chrome.
 
-Inspect `provenance.json` for source revisions and SHA-256 values. Reproduce
-with `node scripts/vendor-space-cadet.mjs`; verify with the same command and
-`--verify`. This downloads the pinned MIT runtime and CC0 assets, never the
-upstream package containing original Microsoft resources.
+Verify shipped checksums: `node scripts/vendor-space-cadet.mjs --verify`.
+Check deterministic art: `python scripts/generate-pinball-art.py --check`
+(requires Pillow and NumPy). Rebuild runtime: activate Emscripten 3.1.74, install
+CMake, then `node scripts/vendor-space-cadet.mjs`. This fetches the pinned MIT
+source and verified CC0 sounds, applies the checked-in patch, and embeds the
+checked-in artwork. Emscripten's package UUID can vary between builds, so rebuilds
+require artifact hash review; art generation is byte deterministic.
 
-The platform-owned cabinet is in `/vendor/pinball`; its styles, local file
-controller, touch controls, loading/recovery states and exit bridge are separate
-from the vendored engine. Native in-canvas menus are preserved.
-
-References:
-- https://github.com/k4zmu2a/SpaceCadetPinball
-- https://github.com/alula/SpaceCadetPinball
-- https://github.com/andrewnakas/open-cadet
-- https://github.com/libsdl-org/SDL (zlib license)
-- https://github.com/libsdl-org/SDL_mixer (zlib license; codec notices apply)
-- https://github.com/ocornut/imgui (MIT)
+References: https://github.com/alula/SpaceCadetPinball,
+https://github.com/andrewnakas/open-cadet, https://github.com/libsdl-org/SDL,
+https://github.com/libsdl-org/SDL_mixer, https://github.com/ocornut/imgui.

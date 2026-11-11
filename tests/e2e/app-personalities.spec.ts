@@ -6,7 +6,7 @@ test.beforeEach(async ({ context }) => {
 
 test('Paintbox restores actual pixels with undo, redo and keyboard history', async ({ page }) => {
   await page.goto('/games/paintbox')
-  const canvas = page.getByLabel('Drawing canvas')
+  const canvas = page.getByLabel('Drawing canvas').filter({ visible: true })
   const pixel = () => canvas.evaluate(node => Array.from((node as HTMLCanvasElement).getContext('2d')!.getImageData(100, 100, 1, 1).data))
   await expect.poll(pixel).toEqual([255, 255, 255, 255])
   const box = (await canvas.boundingBox())!
@@ -58,17 +58,21 @@ test('desktop Chess keeps its sound and new-game controls reachable inside XP ch
 })
 
 test('a focused Pinball control releases its native key after pointer and keyboard holds', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/vendor/pinball/cabinet.html')
   const game = page.frameLocator('iframe[title="Space Cadet runtime"]')
   const control = game.getByRole('button', { name: 'Left flipper', exact: true })
   await expect(game.getByRole('button', { name: 'New game', exact: true })).toBeEnabled({ timeout: 30_000 })
   const canvas = game.getByLabel('Space Cadet pinball table')
-  await canvas.evaluate(node => {
-    const events: string[] = []
-    Object.assign(window, { cabinetKeys: events })
-    for (const type of ['keydown', 'keyup']) node.addEventListener(type, event => {
-      if ((event as KeyboardEvent).code === 'KeyZ') events.push(type)
-    })
+  await canvas.evaluate(() => {
+    const state = window as unknown as { Module: { _cabinet_key(code: number, down: number): void }, cabinetKeys: string[] }
+    state.Module._cabinet_key(37, 0) // Resolve Emscripten's lazy export before installing the observer.
+    const native = state.Module._cabinet_key
+    state.cabinetKeys = []
+    state.Module._cabinet_key = (code, down) => {
+      if (code === 37) state.cabinetKeys.push(down ? 'keydown' : 'keyup')
+      native(code, down)
+    }
   })
   await control.focus()
   const bounds = (await control.boundingBox())!
