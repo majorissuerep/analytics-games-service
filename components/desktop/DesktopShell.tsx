@@ -308,7 +308,7 @@ function WindowContent({
   if (window.kind === 'game' && window.gameId) {
     const game = games.find((candidate) => candidate.id === window.gameId)
     if (!game) return <p>Game is no longer registered.</p>
-    if (game.status === 'coming-soon') return <ComingSoonGame game={game} />
+    if (game.status === 'coming-soon') return <ComingSoonGame game={game} onExit={close} />
     // Externally hosted games keep playing (audio included) while their iframe
     // is mounted, so an unfocused window is suspended: the iframe unmounts and
     // a paused placeholder takes its place. Internal games stay mounted and
