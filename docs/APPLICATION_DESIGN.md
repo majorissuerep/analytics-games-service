@@ -1,9 +1,10 @@
 # One application language inside the XP desktop
 
 The desktop is an XP shell. Application content uses a restrained functional
-language derived from Minefield: warm neutral surfaces, slate actions, readable
-labels, small corner radii, quiet boundaries, and purposeful color. The window
-frame communicates where an app begins; the content communicates what to do.
+language derived from Minefield: soft blue backgrounds, warm ivory panels, sage
+insets, teal actions, readable labels, small corner radii, quiet boundaries, and
+purposeful color. Keep the palette visibly colored and subdued. The window frame
+communicates where an app begins; the content communicates what to do.
 
 ## Ownership
 
@@ -29,7 +30,7 @@ the application theme.
   remain readable; avoid using tiny text to establish hierarchy.
 - Use the 4 / 8 / 12 / 16 / 24 / 32px spacing scale and 4 / 6px radii. Keep labels
   close to their controls and group related decisions into quiet panels.
-- Use the slate accent for primary actions and selected controls. Selected state
+- Use the teal accent for primary actions and selected controls. Selected state
   also has a border or structural cue. Keyboard focus uses a visible 3px outline.
 - Reserve positive, warning, and negative colors for meaning, with text or shape
   alongside hue. Preserve paint colors, team identities, stable chess evaluation

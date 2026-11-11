@@ -1,26 +1,26 @@
 /* Shared application language. XP desktop and window chrome live outside this scope. */
 :root {
-  --ui-canvas: #e9e8e2;
-  --ui-surface: #f5f4ef;
-  --ui-raised: #fbfaf7;
-  --ui-recessed: #e2e4df;
+  --ui-canvas: #e2eef8;
+  --ui-surface: #fff3dc;
+  --ui-raised: #fffbf2;
+  --ui-recessed: #d3e8e1;
   --ui-ink: #253139;
   --ui-muted: #536169;
-  --ui-line: #b8bfbb;
-  --ui-control-border: #748087;
-  --ui-accent: #354e61;
-  --ui-accent-hover: #293f50;
+  --ui-line: #adc5c2;
+  --ui-control-border: #64868b;
+  --ui-accent: #286b73;
+  --ui-accent-hover: #205761;
   --ui-on-accent: #ffffff;
-  --ui-selection: #dce5e8;
-  --ui-focus: #164d77;
+  --ui-selection: #c3e2d9;
+  --ui-focus: #235d98;
   --ui-positive: #326749;
   --ui-positive-bg: #e4ede5;
   --ui-negative: #9d3b34;
   --ui-negative-bg: #f3e6e2;
   --ui-warning: #795c26;
   --ui-warning-bg: #f3eddf;
-  --ui-board-light: #e7e4d9;
-  --ui-board-dark: #879a99;
+  --ui-board-light: #f2e6c9;
+  --ui-board-dark: #87ad9d;
   --ui-radius: 4px;
   --ui-panel-radius: 6px;
   --ui-shadow: 0 2px 8px rgb(37 49 57 / 8%);
