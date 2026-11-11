@@ -39,7 +39,11 @@ cards, metrics, avatars, room information, selected tools, and status chips.
 Body prose stays dark and readable. Neutral backgrounds are valid. Avoid using
 success/error for decoration or turning every word into a different color.
 
-Chess keeps its fixed quantitative score scale. Teams keep stable identities;
+Chess move quality uses fixed loss-from-best thresholds: best is 0.00/green,
+−0.10 remains greenish, and −0.50 or worse saturates red. The overall position
+balance is separate; color is never stretched to candidate count or worst listed
+move. Mate changes use explicit labels rather than invented pawn equivalents.
+Teams keep stable identities;
 paint swatches keep drawing colors. Minefield states retain distinct contrast,
 shape, and labels. Essential playfield artwork and geometry remain game-owned.
 
