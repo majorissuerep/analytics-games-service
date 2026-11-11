@@ -85,7 +85,12 @@ test('standalone privacy stays outside useful app content on a narrow page', asy
   await page.goto('/games/chess')
   const privacy = page.getByRole('button', { name: 'Privacy', exact: true })
   await expect(privacy).toBeVisible()
-  const app = (await page.locator('.chess-app').boundingBox())!
+  // The provider can mount before the game's lazy module. Measure its visible
+  // content only after it exists and its model-loading row has settled.
+  const appRoot = page.locator('.chess-app').filter({ visible: true })
+  await expect(appRoot).toBeVisible()
+  await expect(page.getByText('Loading available chess models', { exact: true })).toHaveCount(0)
+  const app = (await appRoot.boundingBox())!
   const control = (await privacy.boundingBox())!
   expect(control.y, 'privacy belongs after the app, not over the Play button').toBeGreaterThanOrEqual(app.y + app.height)
   await privacy.scrollIntoViewIfNeeded()
@@ -205,15 +210,16 @@ test('saved material preference reaches another app and the static cabinet and s
   await chess.goto('/games/chess')
   const cabinet = await context.newPage()
   await cabinet.goto('/vendor/pinball/cabinet.html')
-  await expect(chess.locator('.chess-toolbar')).toHaveCSS('backdrop-filter', /blur/)
+  const toolbar = chess.locator('.chess-toolbar').filter({ visible: true })
+  await expect(toolbar).toHaveCSS('backdrop-filter', /blur/)
   await page.getByLabel('Reduce transparency').check()
   for (const app of [page, chess, cabinet]) await expect(app.locator('html')).toHaveAttribute('data-ui-material', 'solid')
-  await expect(chess.locator('.chess-toolbar')).toHaveCSS('backdrop-filter', 'none')
+  await expect(toolbar).toHaveCSS('backdrop-filter', 'none')
   await expect(cabinet.frameLocator('iframe[title="Space Cadet runtime"]').locator('.pinball-bar')).toHaveCSS('backdrop-filter', 'none')
   await page.reload()
   await expect(page.getByLabel('Reduce transparency')).toBeChecked()
   await page.getByLabel('Reduce transparency').uncheck()
-  await expect(chess.locator('.chess-toolbar')).toHaveCSS('backdrop-filter', /blur/)
+  await expect(toolbar).toHaveCSS('backdrop-filter', /blur/)
   await expect(cabinet.frameLocator('iframe[title="Space Cadet runtime"]').locator('.pinball-bar')).toHaveCSS('backdrop-filter', /blur/)
 })
 
