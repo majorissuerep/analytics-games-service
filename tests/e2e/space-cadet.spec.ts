@@ -84,3 +84,16 @@ test('engine download failure replaces progress with retry and can recover', asy
   await game.getByRole('button', { name: 'Retry Pinball' }).click()
   await expect(game.getByRole('button', { name: 'New game', exact: true })).toBeEnabled({ timeout: 30_000 })
 })
+
+test('a delayed cabinet controller starts its child only after its message handler is ready', async ({ page }) => {
+  let release!: () => void
+  const gate = new Promise<void>(resolve => { release = resolve })
+  await page.route('**/vendor/pinball/controller.js', async route => { await gate; await route.continue() })
+  await page.goto('/vendor/pinball/cabinet.html', { waitUntil: 'commit' })
+  await expect(page.locator('iframe[title="Space Cadet runtime"]')).toHaveAttribute('src', 'about:blank')
+  await expect(page.getByRole('progressbar', { name: 'Opening Pinball controls' })).toBeVisible()
+  release()
+  const game = page.frameLocator('iframe[title="Space Cadet runtime"]')
+  await expect(game.getByRole('button', { name: 'New game', exact: true })).toBeEnabled({ timeout: 30_000 })
+  await expect(page.locator('#cabinet-boot')).toHaveCount(0)
+})
