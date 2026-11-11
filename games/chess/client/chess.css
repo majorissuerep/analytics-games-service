@@ -173,21 +173,6 @@
 .chess-hover-card{position:absolute;top:10px;right:10px;z-index:10;display:grid;gap:3px;max-width:240px;padding:9px 12px;border:1px solid var(--ui-line);border-radius:var(--ui-panel-radius);background:var(--ui-surface);box-shadow:none;pointer-events:none}
 .chess-hover-card b{font-size:16px;font-family:Consolas,monospace}
 .chess-hover-card small{color:var(--muted);font:11px/1.4 Consolas,monospace}
-/* Fit the game view inside its window/iframe without inner page scrollbars:
-   the app column is height-capped, the board is capped by viewport height, and
-   the sidebar/setup panel scroll internally instead of the page. */
-/* The global shell pads the body (20/16/60); inside a game window that padding
-   makes the 100svh app overflow forever, which read as an unavoidable inner
-   scrollbar. Drop it on chess pages so the app exactly fits its viewport. */
-body:has(.chess-app){padding:0}
-@media (min-width:761px){
-  body:has(.chess-app){overflow:hidden}
-  .chess-app{display:flex;flex-direction:column;height:100svh;overflow:hidden}
-  .chess-setup{overflow:auto;max-height:calc(100svh - 42px)}
-  .chess-game-layout{flex:1 1 auto;min-height:0;grid-template-rows:minmax(0,1fr);overflow:hidden}
-  .chess-board-wrap{max-width:min(640px,calc(100svh - 170px));margin-inline:auto}
-  .chess-sidebar{min-height:0;overflow:auto}
-}
 .chess-evaluation{display:flex;align-items:stretch;gap:10px;padding:10px;border:1px solid var(--ui-line);border-radius:var(--ui-radius);background:var(--ui-recessed)}
 .chess-evaluation-track{position:relative;width:48px;min-height:148px;overflow:hidden;border:1px solid #28362d;border-radius:4px;background:#26352c;color:#17231c;box-shadow:none}
 .chess-evaluation-white{position:absolute;inset-inline:0;top:0;background:#f8f7f0;transition:height .25s ease}
@@ -218,20 +203,7 @@ body:has(.chess-app){padding:0}
 .chess-end-card.info { background: var(--ui-surface); border-color: var(--ui-line); }
 .chess-hover-card { box-shadow: var(--ui-shadow); }
 
-/* Club analysis desk: paper content, a restrained olive identity, pink intent.
-   Frost belongs to the navigation rail; notation and boards stay opaque. */
-.chess-app {
-  --ui-canvas: #eeeee7; --ui-canvas-image: none;
-  --ui-surface: #fafaf5; --ui-raised: #fffffc; --ui-recessed: #e9eae1;
-  --ui-ink: #252a24; --ui-muted: #5c6358; --ui-line: #d0d4c7;
-  --ui-control-border: #999f90;
-  --ui-violet: #4e6040; --ui-violet-bg: #e7ecdf;
-  --ui-teal: #4e6040; --ui-teal-bg: #e7ecdf;
-  --ui-amber: #4e6040; --ui-amber-bg: #e7ecdf;
-  --ui-board-light: #f2f0de; --ui-board-dark: #839174;
-  --ui-radius: 7px; --ui-panel-radius: 10px; --ui-feature-radius: 14px;
-  background: var(--ui-canvas); background-image: none;
-}
+/* Chess board, notation, replay and compact analysis components. */
 .chess-toolbar { height: 52px; flex-shrink: 0; padding-inline: 20px; border-bottom: 1px solid var(--ui-control-border); background: var(--ui-glass-fill); box-shadow: 0 1px 0 var(--ui-raised); -webkit-backdrop-filter: var(--ui-material-filter); backdrop-filter: var(--ui-material-filter); }
 .chess-toolbar > div:first-child { flex: 1; min-width: 0; }
 .chess-toolbar strong { font-family: Georgia, 'Times New Roman', serif; font-size: 21px; letter-spacing: -.03em; }
@@ -307,7 +279,7 @@ body:has(.chess-app){padding:0}
 .chess-hover-card { background: var(--ui-glass-strong-fill); box-shadow: var(--ui-shadow); -webkit-backdrop-filter: var(--ui-material-filter); backdrop-filter: var(--ui-material-filter); }
 .chess-end-card,.promotion-card { background: var(--ui-glass-strong-fill); -webkit-backdrop-filter: var(--ui-material-filter); backdrop-filter: var(--ui-material-filter); box-shadow: var(--ui-shadow-floating); }
 @media(min-width:761px) {
- .chess-setup { max-height: calc(100svh - 52px); }
+
  .chess-board-wrap { max-width: min(720px,calc(100svh - 100px)); }
 }
 @media(max-width:900px) and (min-width:761px) { .chess-game-layout { grid-template-columns: minmax(0,1fr) 310px; gap: 12px; padding: 12px; } .chess-sidebar { padding: 12px; } }
@@ -348,3 +320,85 @@ body:has(.chess-app){padding:0}
 
 .chess-mode-tabs b,.chess-opponent > span { font-family: Georgia,'Times New Roman',serif; font-variant-emoji: text; }
 .chess-replay-controls button { font-variant-emoji: text; }
+
+/* Glass chess desk. The document owns scrolling, so no setup scrollbar can
+   overlay controls. Domain board and evaluation colors above stay unchanged. */
+body:has(.chess-app) { padding: 0; overflow-y: auto; scrollbar-gutter: stable; }
+.chess-app {
+ --ui-embedded-fill: rgb(255 251 253 / 16%);
+ --ui-board-light: #f2f0de; --ui-board-dark: #839174;
+ --ui-radius: 7px; --ui-panel-radius: 10px; --ui-feature-radius: 14px;
+ --ui-canvas: rgb(248 244 240 / 18%); --ui-canvas-image: none;
+ --ui-surface: #faf7f4; --ui-raised: #fffcfa; --ui-recessed: #eee8e4;
+ --ui-ink: #302a2c; --ui-muted: #685e62; --ui-line: #d8cecf;
+ --ui-control-border: #aa999f;
+ --ui-violet: var(--ui-accent-ink); --ui-violet-bg: var(--ui-selection);
+ --ui-teal: var(--ui-accent-ink); --ui-teal-bg: var(--ui-selection);
+ --ui-amber: var(--ui-accent-ink); --ui-amber-bg: var(--ui-selection);
+ min-height: 100svh; height: auto; overflow: visible;
+ background: var(--ui-canvas); background-image: none;
+}
+.chess-toolbar { height: 48px; padding-inline: 18px; background: var(--ui-glass-sheen), var(--ui-glass-fill); border-bottom-color: var(--ui-glass-edge); box-shadow: inset 0 1px rgb(255 255 255 / 75%),0 3px 12px rgb(60 30 44 / 5%); }
+.chess-toolbar strong { font-size: 20px; }
+.chess-setup { width: min(1000px,calc(100% - 40px)); padding: 20px 0 12px; grid-template-columns: 180px minmax(0,1fr); gap: 14px 20px; max-height: none; overflow: visible; }
+.chess-intro { gap: 14px; margin: 0; padding-bottom: 14px; border-bottom-color: rgb(104 94 98 / 22%); }
+.chess-intro > span { width: 46px; height: 54px; font-size: 34px; border-radius: 6px 6px 14px 14px; border-color: var(--ui-glass-edge); border-bottom-color: var(--ui-accent); background: var(--ui-glass-sheen), var(--ui-glass-fill); color: var(--ui-accent-ink); }
+.chess-intro h1 { font-size: 29px; }
+.chess-intro p:last-child { font-size: 13px; margin-top: 4px; }
+.chess-kicker { color: var(--ui-accent-ink); font-size: 10px; }
+.chess-mode-tabs { padding: 6px; border: 1px solid var(--ui-glass-edge); border-radius: 12px; background: var(--ui-glass-sheen), var(--ui-glass-fill); box-shadow: inset 0 1px rgb(255 255 255 / 80%),0 6px 18px rgb(60 30 44 / 6%); }
+.chess-app .chess-mode-tabs button { padding: 12px 8px; min-height: 62px; background: transparent; border-color: transparent; border-radius: 7px; }
+.chess-mode-tabs b { color: var(--ui-muted); font-size: 24px; }
+.chess-app .chess-mode-tabs button.active { background: var(--ui-selection); border-color: rgb(181 65 115 / 22%); box-shadow: inset 3px 0 var(--ui-accent),inset 0 1px rgb(255 255 255 / 80%); }
+.chess-mode-tabs button.active b { color: var(--ui-accent-ink); }
+.chess-setup-panel,.chess-arena { padding: 18px; background: var(--ui-glass-sheen), var(--ui-glass-fill); border-color: var(--ui-glass-edge); border-radius: 12px; box-shadow: inset 0 1px rgb(255 255 255 / 85%),0 8px 24px rgb(60 30 44 / 7%); }
+.chess-setup-panel { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px 16px; }
+.chess-setup-panel > .chess-choice-row,.chess-setup-panel > .chess-field:first-of-type,.chess-setup-panel > :not(.chess-field) { grid-column: 1/-1; }
+.chess-setup-panel > .chess-choice-row { margin: 0; padding-bottom: 12px; }
+.chess-setup-panel > .chess-field { margin: 0; align-content: start; gap: 5px; }
+.chess-setup-panel > .chess-field:has(.chess-segmented),.chess-setup-panel > .chess-field:has(.chess-time-grid) { grid-column: 1/-1; }
+.chess-field input,.chess-field select { padding: 8px 10px; min-height: 38px; }
+.chess-control-label { margin-bottom: 0; }
+.chess-field small { font-size: 11px; line-height: 1.4; }
+.chess-segmented { background: rgb(233 224 226 / 55%); }
+.chess-app .chess-segmented button.selected { background: var(--ui-raised); }
+.chess-setup-panel > .chess-primary { margin-top: 2px; min-height: 42px; }
+.chess-model-submit { background: var(--ui-glass-sheen), var(--ui-glass-fill); border-color: var(--ui-glass-edge); box-shadow: inset 0 1px rgb(255 255 255 / 80%); }
+.chess-model-toggle { padding: 12px 16px; }
+.chess-model-toggle > span { color: var(--ui-accent-ink); font-size: 24px; }
+.chess-attribution { margin: 0; font-size: 10px; }
+.chess-game-layout { overflow: visible; min-height: 0; }
+.chess-sidebar { min-height: 0; overflow: visible; background: var(--ui-glass-sheen), var(--ui-glass-fill); border-color: var(--ui-glass-edge); box-shadow: inset 0 1px rgb(255 255 255 / 80%); }
+.chess-suggestions { background: var(--ui-surface); padding: 10px; border-radius: 6px; }
+.chess-suggestion-list { max-height: none; overflow: visible; }
+.chess-moves > div,.chess-arena-moves { scrollbar-gutter: stable; }
+@supports (backdrop-filter: blur(1px)) {
+ .chess-mode-tabs,.chess-setup-panel,.chess-arena,.chess-model-submit,.chess-sidebar { -webkit-backdrop-filter: var(--ui-material-filter); backdrop-filter: var(--ui-material-filter); }
+}
+@media(min-width:761px) {
+ .chess-board-wrap { position: sticky; top: 16px; align-self: start; max-width: min(720px,calc(100svh - 88px)); }
+}
+@media(max-width:760px) {
+ .chess-setup { width: calc(100% - 24px); padding-top: 14px; grid-template-columns: minmax(0,1fr); gap: 12px; }
+ .chess-intro h1 { font-size: 26px; }
+ .chess-mode-tabs { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 4px; }
+ .chess-app .chess-mode-tabs button { min-height: 54px; padding: 8px; background: transparent; }
+ .chess-mode-tabs b { display: block; }
+ .chess-setup-panel { padding: 14px; gap: 12px; }
+ .chess-choice-row { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 8px; }
+ .chess-choice-row .chess-segmented { width: auto; flex: 1; }
+ .chess-setup-panel > .chess-field { grid-column: 1/-1; }
+ .chess-sidebar { order: initial; }
+}
+@media(prefers-reduced-transparency:reduce),(prefers-contrast:more) {
+ .chess-app { --ui-canvas: #eee8e4; }
+}
+html[data-ui-material=solid] .chess-app { --ui-canvas: #eee8e4; }
+@media(forced-colors:active) {
+ .chess-app { --ui-canvas: Canvas; --ui-surface: Canvas; --ui-raised: Canvas; --ui-recessed: Canvas; --ui-ink: CanvasText; --ui-muted: CanvasText; --ui-line: ButtonText; --ui-control-border: ButtonText; }
+}
+
+/* Unbacked copy must remain readable over the darkest desktop composite. */
+.chess-intro p,.chess-intro .chess-kicker,.chess-attribution { color: var(--ui-ink); }
+
+.chess-app .chess-toolbar .chess-sound-toggle { width: auto; min-width: 82px; white-space: nowrap; font-size: 12px; }

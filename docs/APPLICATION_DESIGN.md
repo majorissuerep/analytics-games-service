@@ -79,6 +79,19 @@ increased contrast, and the persisted “Reduce transparency” preference resto
 opaque materials. Forced-colors mode uses system colors and preserves focus and
 selection outlines. Same-origin embedded apps share the persisted preference.
 
+Desktop materials must actually composite the wallpaper: the XP frame paints its
+blue edges, the window body owns the desaturated backdrop blur, and embedded
+HTML/body/iframe layers are transparent. Apps select `--ui-embedded-fill`; the
+default is the normal frost backing. Apps using a lighter fill must check their
+unbacked text against the darkest composed wallpaper. System panels use strong
+frost for their existing support copy. Playfields and dense content stay opaque.
+`--ui-glass-sheen` supplies one stationary highlight, removed in solid/contrast
+modes. An alpha token over an opaque document does not count as visible glass.
+
+The default decorative tone aliases share a neutral family; an app must explicitly
+opt into an identity. Mode choices are neutral until selected. Do not assign an
+unrelated hue to every category simply because a token exists.
+
 ## Typography, space, shape, density
 
 - Interface: Segoe UI/system sans; moves/codes/numbers: Consolas/system mono.
@@ -116,7 +129,11 @@ understandable. Dense targets never move under the pointer on hover.
 
 Stack groups below 760px. Headers wrap core actions rather than hide them.
 Verify 1280, 390, and 320px. Large boards use their own scroll/zoom region rather
-than widen the page. XP windows own desktop sizing and dragging.
+than widen the page. XP windows own desktop sizing and dragging. Setup forms should fit the normal
+window with their primary action visible. Long forms use document-edge scrolling,
+not a capped setup panel floating a scrollbar over controls. Explicit data regions
+may scroll independently with reserved scrollbar space. Verify actual embedded
+windows as well as standalone routes.
 
 Target normal text 4.5:1; large text and essential state/control cues 3:1. Evaluate
 material compositing over light and dark backgrounds. Tone inks pair with their

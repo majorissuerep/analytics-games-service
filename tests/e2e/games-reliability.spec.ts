@@ -79,6 +79,8 @@ test('move quality uses zero-based loss, a half-pawn red cutoff, and matching bo
   await expect(rows.nth(2)).toHaveCSS('border-left-color', 'rgb(70, 125, 64)')
   await expect(rows.nth(3)).toHaveCSS('border-left-color', 'rgb(143, 102, 27)')
   for (const index of [4, 5]) await expect(rows.nth(index)).toHaveCSS('border-left-color', 'rgb(181, 48, 44)')
+  await rows.last().scrollIntoViewIfNeeded()
+  await expect(page.locator('.chess-board-wrap'), 'the board stays visible while reading lower candidate moves').toBeInViewport({ ratio: 1 })
   await rows.first().hover()
   await expect(page.locator('.chess-hover-card')).toContainText('0.00 vs best · Eval −0.30')
   await expect(page.locator('#analytics-chess-board-square-e6 > div')).toHaveCSS('box-shadow', /rgb\(29, 118, 65\)/)

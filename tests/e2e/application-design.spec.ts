@@ -53,6 +53,102 @@ test('XP desktop chrome stays distinct from the application controls inside its 
   await page.screenshot({ path: 'test-results/design-xp-boundary.png', fullPage: true })
 })
 
+test('Chess setup fits its window, limits decorative color, and scrolls only at the document edge', async ({ page }) => {
+  for (const size of [{ width: 920, height: 680 }, { width: 1100, height: 800 }]) {
+    await page.setViewportSize(size)
+    await page.goto('/games/chess?embedded=1')
+    await expect(page.getByRole('button', { name: 'Play Stockfish 18', exact: true })).toBeInViewport()
+    await expect(page.getByText('Loading available chess models', { exact: true })).toHaveCount(0)
+    const layout = await page.locator('.chess-setup').evaluate(element => ({
+      overflow: getComputedStyle(element).overflowY,
+      appFits: element.closest('.chess-app')!.getBoundingClientRect().bottom <= innerHeight,
+      inactiveFills: [...element.querySelectorAll('.chess-mode-tabs button:not(.active)')].map(button => getComputedStyle(button).backgroundColor),
+    }))
+    expect(layout.overflow).toBe('visible')
+    expect(layout.appFits).toBe(true)
+    expect(new Set(layout.inactiveFills)).toEqual(new Set(['rgba(0, 0, 0, 0)']))
+    await expect(page.locator('.chess-setup-panel')).toHaveCSS('background-image', /linear-gradient/)
+    await page.screenshot({ path: `test-results/chess-compact-${size.width}.png` })
+  }
+  await page.setViewportSize({ width: 320, height: 640 })
+  await page.getByRole('button', { name: 'Bring your own Chess model' }).click()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await expect(page.locator('.chess-setup')).toHaveCSS('overflow-y', 'visible')
+  const action = page.getByRole('button', { name: 'Play Stockfish 18', exact: true })
+  await action.scrollIntoViewIfNeeded()
+  await expect(action).toBeInViewport()
+  expect(await page.evaluate(() => scrollY)).toBeGreaterThan(0)
+})
+
+test('standalone privacy stays outside useful app content on a narrow page', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 900 })
+  await page.goto('/games/chess')
+  const privacy = page.getByRole('button', { name: 'Privacy', exact: true })
+  await expect(privacy).toBeVisible()
+  // The provider can mount before the game's lazy module. Measure its visible
+  // content only after it exists and its model-loading row has settled.
+  const appRoot = page.locator('.chess-app').filter({ visible: true })
+  await expect(appRoot).toBeVisible()
+  await expect(page.getByText('Loading available chess models', { exact: true })).toHaveCount(0)
+  const app = (await appRoot.boundingBox())!
+  const control = (await privacy.boundingBox())!
+  expect(control.y, 'privacy belongs after the app, not over the Play button').toBeGreaterThanOrEqual(app.y + app.height)
+  await privacy.scrollIntoViewIfNeeded()
+  await privacy.click()
+  await expect(page.getByRole('dialog', { name: 'Analytics privacy settings' })).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(privacy).toBeFocused()
+})
+
+test('desktop glass renders the backdrop through Chess and solid preference removes it', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.goto('/')
+  await page.locator('.desktop-icon[aria-label="Open Chess"]').dblclick()
+  const iframe = page.locator('iframe[title="Chess"]')
+  const frame = page.frameLocator('iframe[title="Chess"]')
+  await expect(iframe).toHaveAttribute('aria-busy', 'false')
+  await expect(frame.getByRole('button', { name: 'Play Stockfish 18', exact: true })).toBeInViewport()
+  await expect(frame.locator('html')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
+  await expect(frame.locator('body')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
+  const windowBody = iframe.locator('xpath=ancestor::*[contains(@class,"desktop-window-body")]')
+  await expect(windowBody).toHaveCSS('backdrop-filter', /blur/)
+  // Sample empty canvas at the left edge, away from controls, text and shadows.
+  // Pixel changes prove the iframe really composites the host backdrop, rather
+  // than merely declaring an alpha color over an opaque document.
+  const bounds = (await iframe.boundingBox())!
+  const clip = { x: bounds.x + 5, y: bounds.y + 140, width: 3, height: 3 }
+  async function sample(backdrop: string) {
+    await page.locator('.desktop-sky').evaluate((element, color) => {
+      Object.assign((element as HTMLElement).style, { backgroundImage: 'none', backgroundColor: color })
+    }, backdrop)
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
+    return page.screenshot({ clip, animations: 'disabled' })
+  }
+  const darkGlass = await sample('black')
+  const lightGlass = await sample('white')
+  expect(darkGlass.equals(lightGlass), 'the desktop must show through the app canvas').toBe(false)
+  const material = await frame.locator('.chess-app').evaluate(element => ({
+    fill: getComputedStyle(element).backgroundColor,
+    copy: [...element.querySelectorAll('.chess-intro p, .chess-attribution')].map(child => getComputedStyle(child).color),
+  }))
+  const windowFill = rgba(await windowBody.evaluate(element => getComputedStyle(element).backgroundColor))
+  const appFill = rgba(material.fill)
+  const darkestCanvas = appFill.slice(0, 3).map((channel, i) => channel * appFill[3] + windowFill[i] * windowFill[3] * (1 - appFill[3]))
+  for (const color of material.copy) expect(contrast(rgba(color), darkestCanvas), 'unbacked copy over dark wallpaper').toBeGreaterThanOrEqual(4.5)
+  await page.screenshot({ path: 'test-results/chess-glass-dark-backdrop.png' })
+  // Use the real persisted preference script in both documents.
+  await page.evaluate(() => localStorage.setItem('analytics-games.material.v1', 'solid'))
+  await page.reload()
+  await page.locator('.desktop-icon[aria-label="Open Chess"]').dblclick()
+  await expect(iframe).toHaveAttribute('aria-busy', 'false')
+  await expect(frame.locator('html')).toHaveAttribute('data-ui-material', 'solid')
+  await expect(windowBody).toHaveCSS('backdrop-filter', 'none')
+  await expect(frame.locator('.chess-setup-panel')).toHaveCSS('background-image', /^none(?:, none)*$/)
+  const darkSolid = await sample('black')
+  const lightSolid = await sample('white')
+  expect(darkSolid.equals(lightSolid), 'solid mode must stop the backdrop showing through').toBe(true)
+})
+
 test('notes, assistant and system panels have individual content while the chat header stays XP', async ({ page }) => {
   await page.goto('/')
   await expect(page.locator('.sticky-note-plugin textarea')).toHaveCSS('font-family', /Segoe UI/)
@@ -114,15 +210,16 @@ test('saved material preference reaches another app and the static cabinet and s
   await chess.goto('/games/chess')
   const cabinet = await context.newPage()
   await cabinet.goto('/vendor/pinball/cabinet.html')
-  await expect(chess.locator('.chess-toolbar')).toHaveCSS('backdrop-filter', /blur/)
+  const toolbar = chess.locator('.chess-toolbar').filter({ visible: true })
+  await expect(toolbar).toHaveCSS('backdrop-filter', /blur/)
   await page.getByLabel('Reduce transparency').check()
   for (const app of [page, chess, cabinet]) await expect(app.locator('html')).toHaveAttribute('data-ui-material', 'solid')
-  await expect(chess.locator('.chess-toolbar')).toHaveCSS('backdrop-filter', 'none')
+  await expect(toolbar).toHaveCSS('backdrop-filter', 'none')
   await expect(cabinet.frameLocator('iframe[title="Space Cadet runtime"]').locator('.pinball-bar')).toHaveCSS('backdrop-filter', 'none')
   await page.reload()
   await expect(page.getByLabel('Reduce transparency')).toBeChecked()
   await page.getByLabel('Reduce transparency').uncheck()
-  await expect(chess.locator('.chess-toolbar')).toHaveCSS('backdrop-filter', /blur/)
+  await expect(toolbar).toHaveCSS('backdrop-filter', /blur/)
   await expect(cabinet.frameLocator('iframe[title="Space Cadet runtime"]').locator('.pinball-bar')).toHaveCSS('backdrop-filter', /blur/)
 })
 

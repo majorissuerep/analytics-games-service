@@ -646,19 +646,19 @@ export function ChessGame() {
             aria-label={soundOn ? 'Mute sounds' : 'Unmute sounds'}
             title={soundOn ? 'Mute sounds' : 'Unmute sounds'}
             onClick={() => { const next = !soundOn; setSoundOn(next); setSoundEnabled(next) }}
-          >{soundOn ? '♪' : '×♪'}</button>
+          >{soundOn ? 'Sound on' : 'Sound off'}</button>
           {mode !== 'setup' && <button onClick={resetToSetup}>New game</button>}
         </div>
       </header>
 
       {mode === 'setup' ? (
         <section className="chess-setup" aria-label="Chess setup">
-          <div className="chess-intro"><span>♞</span><div><p className="chess-kicker">THE CHESS ROOM</p><h1>A place to think.</h1><p>Stockfish opponents, Reckless, both-sides play, pass-and-play, or a protected online room.</p></div></div>
+          <div className="chess-intro"><span>♞</span><div><p className="chess-kicker">THE CHESS ROOM</p><h1>Your next move.</h1><p>Play an engine, study a position, or invite someone to the board.</p></div></div>
           <nav className="chess-mode-tabs" aria-label="Game mode">
-            <button data-tone="violet" aria-pressed={setupMode === 'bot'} className={setupMode === 'bot' ? 'active' : ''} onClick={() => setSetupMode('bot')}><b aria-hidden="true">♟︎</b><span>Computer<small>Versus, pick, or free</small></span></button>
-            <button data-tone="teal" aria-pressed={setupMode === 'online'} className={setupMode === 'online' ? 'active' : ''} onClick={() => setSetupMode('online')}><b aria-hidden="true">♜</b><span>Online<small>Private room</small></span></button>
-            <button data-tone="amber" aria-pressed={setupMode === 'local'} className={setupMode === 'local' ? 'active' : ''} onClick={() => setSetupMode('local')}><b aria-hidden="true">♚</b><span>Local<small>Same device</small></span></button>
-            <button data-tone="pink" aria-pressed={setupMode === 'arena'} className={setupMode === 'arena' ? 'active' : ''} onClick={() => setSetupMode('arena')}><b aria-hidden="true">♘</b><span>Model arena<small>Match + replay</small></span></button>
+            <button aria-pressed={setupMode === 'bot'} className={setupMode === 'bot' ? 'active' : ''} onClick={() => setSetupMode('bot')}><b aria-hidden="true">♟︎</b><span>Computer<small>Versus, pick, or free</small></span></button>
+            <button aria-pressed={setupMode === 'online'} className={setupMode === 'online' ? 'active' : ''} onClick={() => setSetupMode('online')}><b aria-hidden="true">♜</b><span>Online<small>Private room</small></span></button>
+            <button aria-pressed={setupMode === 'local'} className={setupMode === 'local' ? 'active' : ''} onClick={() => setSetupMode('local')}><b aria-hidden="true">♚</b><span>Local<small>Same device</small></span></button>
+            <button aria-pressed={setupMode === 'arena'} className={setupMode === 'arena' ? 'active' : ''} onClick={() => setSetupMode('arena')}><b aria-hidden="true">♘</b><span>Model arena<small>Match + replay</small></span></button>
           </nav>
 
           {setupMode === 'arena' ? <ModelArena models={modelOptions} /> : <div className="chess-setup-panel">
@@ -676,7 +676,7 @@ export function ChessGame() {
               </div>
               <div className="chess-field"><label htmlFor="opponent-model">{engineControl === 'auto' ? 'Opponent model' : 'Analysis engine'}</label><select id="opponent-model" value={modelRevision} onChange={event => setModelRevision(event.target.value)}>{modelOptions.filter(model => engineControl === 'auto' || ['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(model.revisionId)).map(model => <option key={model.revisionId} value={model.revisionId}>{model.displayName}</option>)}</select><small>Loads only the selected engine.</small></div>
               {engineControl === 'auto' && <>
-                {modelRevision !== RECKLESS_LOCAL && <div className="chess-field"><label htmlFor="model-move-time">Custom model move time</label><select id="model-move-time" value={modelMoveTimeMs} onChange={(event) => setModelMoveTimeMs(Number(event.target.value))}>{[250, 500, 1000, 2000, 3000].map((ms) => <option key={ms} value={ms}>{ms >= 1000 ? `${ms / 1000} second per move` : `${ms} ms per move`}</option>)}</select><small>How long a custom model may think on each of its turns.</small></div>}
+                {modelRevision !== RECKLESS_LOCAL && !stockfishEngineIdForRevision(modelRevision) && <div className="chess-field"><label htmlFor="model-move-time">Custom model move time</label><select id="model-move-time" value={modelMoveTimeMs} onChange={(event) => setModelMoveTimeMs(Number(event.target.value))}>{[250, 500, 1000, 2000, 3000].map((ms) => <option key={ms} value={ms}>{ms >= 1000 ? `${ms / 1000} second per move` : `${ms} ms per move`}</option>)}</select><small>How long a custom model may think on each of its turns.</small></div>}
                 {stockfishEngineIdForRevision(modelRevision) && <div className="chess-field"><label htmlFor="stockfish-level">Stockfish difficulty</label><select id="stockfish-level" value={levelId} onChange={(event) => setLevelId(event.target.value as StockfishLevelId)}>{STOCKFISH_LEVELS.map((item) => <option key={item.id} value={item.id}>{item.label} · Skill {item.skill}/20</option>)}</select><small>{level.description}. {opponentName} WASM, {level.moveTimeMs} ms search per move.</small></div>}
                 {modelRevision === BUILTIN_STYLED_OPENING && <div className="chess-field"><label htmlFor="styled-repertoire">Opening repertoire</label><select id="styled-repertoire" value={effectiveStyledRepertoireId} onChange={(event) => setStyledRepertoireId(event.target.value as StyledRepertoireId)}>{styledRepertoireOptions.map((repertoire) => <option key={repertoire.id} value={repertoire.id}>{repertoire.label}</option>)}</select><small>Choose the tuned model&apos;s explicit selector. White repertoires are used when the model plays White; Black repertoires when it plays Black.</small></div>}
               </>}
