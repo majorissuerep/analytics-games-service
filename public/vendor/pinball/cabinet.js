@@ -1,267 +1,160 @@
-/* Classic Pinball cabinet — DOM bootstrap.
- *
- * Wires the pure helpers in cabinet-core.js to the cabinet chrome:
- * letterboxed scaling, branded loader, persistent mute, and the
- * game-bridge exit channel. Loaded as an ES module (see cabinet.html);
- * module scripts execute after the document is parsed, so the DOM is
- * ready without extra waiting.
- *
- * Upstream purity: PinballGame.htm / PinballGame.js are never modified;
- * this script only reaches into the nested frame at runtime (same-origin)
- * to reflect the persisted sound preference onto the upstream globals.
- */
-import {
-  CABINET_SOUND_STORAGE_KEY,
-  UPSTREAM_SOUND_COOKIE_NAME,
-  bridgeExitMessage,
-  computeStageSize,
-  cookieAssignment,
-  muteButtonState,
-  normalizeSoundPreference,
-  readCookie,
-  resolveInitialSound,
-} from './cabinet-core.js'
+// Platform-owned cabinet. The MIT engine runtime is isolated in /vendor/space-cadet.
+const $ = id => document.getElementById(id)
+const canvas = $('canvas')
+const ASSETS = '/vendor/space-cadet/'
+const KEY = 'analytics-games.pinball.sound.v2'
+let ready = false
+let paused = false
+let soundOn = false
+let activeImport = false
+let started = Date.now()
+let timeout
+let timer
+let lastRuntimeError = ''
+try { soundOn = localStorage.getItem(KEY) === 'true' } catch { /* Browser storage is optional. */ }
 
-  var elements = {
-    bar: document.querySelector('[data-pinball-bar]'),
-    stage: document.querySelector('[data-pinball-stage]'),
-    gameFrame: document.querySelector('[data-pinball-game]'),
-    loader: document.querySelector('[data-pinball-loader]'),
-    loaderText: document.querySelector('[data-pinball-loader-text]'),
-    loaderHint: document.querySelector('[data-pinball-loader-hint]'),
-    mute: document.querySelector('[data-pinball-mute]'),
-    muteLabel: document.querySelector('[data-pinball-mute-label]'),
-    muteIcon: document.querySelector('[data-pinball-mute] .pinball-bar-icon'),
-    exit: document.querySelector('[data-pinball-exit]'),
-  }
-
-  var state = {
-    loaded: false,
-    broken: false,
-    soundOn: true,
-    stageWidth: 0,
-    stageHeight: 0,
-    loadTimer: 0,
-    gameBecameVisible: false,
-    audioProbeTimer: 0,
-    audioProbeAttempts: 0,
-    initialSoundApplied: false,
-    syncSound: function () {},
-  }
-
-  function isGameFrameEvent(event) {
-    return event.source === elements.gameFrame.contentWindow
-  }
-
-  /* --- Exit ------------------------------------------------------------ */
-
-  function postExit() {
-    var target = window.parent
-    if (target === window) return
-    target.postMessage(bridgeExitMessage(), window.location.origin)
-  }
-
-  /* --- Loader ---------------------------------------------------------- */
-
-  var startedAt = Date.now()
-  var elapsedTimer = window.setInterval(function () {
-    document.querySelector('[data-load-elapsed]').textContent = Math.floor((Date.now() - startedAt) / 1000) + 's'
-  }, 1000)
-  var readyProbe = window.setInterval(markLoaded, 100)
-  var failureTimer = window.setTimeout(markBroken, 45000)
-  document.querySelector('[data-load-retry]').addEventListener('click', function () { window.location.reload() })
-
-  function stopLoading() {
-    window.clearInterval(readyProbe)
-    window.clearInterval(elapsedTimer)
-    window.clearTimeout(failureTimer)
-  }
-
-  function markLoaded() {
-    if (state.loaded) return
-    // The legacy bridge fires on document load. Verify the actual Phaser
-    // scene as asset loading can continue after that event.
-    var nested = nestedWindow()
-    if (!nested || !nested.game || !nested.game.state || !['Pinball.Splash', 'Pinball.Menu', 'Pinball.Game'].includes(nested.game.state.current)) return
-    state.loaded = true
-    stopLoading()
-    window.clearTimeout(state.loadTimer)
-    elements.loader.classList.add('is-loaded')
-  }
-
-  function markBroken() {
-    if (state.broken) return
-    elements.loader.setAttribute('role', 'alert')
-    state.broken = true
-    stopLoading()
-    elements.loader.querySelector('[role="progressbar"]').hidden = true
-    document.querySelector('[data-load-retry]').hidden = false
-    window.clearTimeout(state.loadTimer)
-    elements.loader.classList.add('is-broken')
-    elements.loaderText.textContent = 'Pinball could not be loaded'
-    if (elements.loaderHint) {
-      elements.loaderHint.hidden = false
-      elements.loaderHint.textContent = 'Retry loading or use Exit to return to the desktop.'
-    }
-  }
-
-  /* --- Sound ----------------------------------------------------------- */
-
-  function desiredSoundOn() {
-    var stored = null
-    try {
-      stored = normalizeSoundPreference(JSON.parse(window.localStorage.getItem(CABINET_SOUND_STORAGE_KEY)))
-    } catch (error) {
-      stored = null
-    }
-    var resolved = resolveInitialSound({
-      storage: stored,
-      cookie: readCookie(document.cookie, UPSTREAM_SOUND_COOKIE_NAME),
-    })
-    return resolved === null ? true : resolved
-  }
-
-  function persistSound(soundOn) {
-    try {
-      window.localStorage.setItem(CABINET_SOUND_STORAGE_KEY, JSON.stringify(soundOn))
-    } catch (error) {
-      /* Private-mode fallback: the cookie write below still applies. */
-    }
-    document.cookie = cookieAssignment(UPSTREAM_SOUND_COOKIE_NAME, String(soundOn))
-  }
-
-  function nestedWindow() {
-    var nested = elements.gameFrame.contentWindow
-    return nested && !nested.closed ? nested : null
-  }
-
-  function applySoundToUpstream(soundOn) {
-    var nested = nestedWindow()
-    if (!nested) return false
-    var applied = false
-    try {
-      /* Reflect the preference onto the upstream globals. The upstream
-       * script checks `GAME_SOUND_ENABLED` before every play call, and
-       * Phaser's global sound manager mutes the whole scene. */
-      nested.GAME_SOUND_ENABLED = soundOn
-      applied = true
-      if (nested.game && nested.game.sound) {
-        nested.game.sound.mute = !soundOn
-      }
-    } catch (error) {
-      applied = false
-    }
-    return applied
-  }
-
-  function applySound(soundOn) {
-    state.soundOn = soundOn
-    var presentation = muteButtonState(soundOn)
-    elements.mute.setAttribute('aria-pressed', presentation.pressed ? 'true' : 'false')
-    elements.mute.setAttribute('aria-label', presentation.announcement)
-    if (elements.muteLabel) elements.muteLabel.textContent = presentation.label
-    if (elements.muteIcon) elements.muteIcon.textContent = presentation.icon
-    applySoundToUpstream(soundOn)
-  }
-
-  function audioProbeTick() {
-    if (state.initialSoundApplied) return
-    if (applySoundToUpstream(state.soundOn)) {
-      state.initialSoundApplied = true
-      return
-    }
-    state.audioProbeAttempts += 1
-    if (state.audioProbeAttempts >= 100) state.initialSoundApplied = true
-  }
-
-  /* --- Scaling ---------------------------------------------------------- */
-
-  function stageViewport() {
-    var rect = elements.stage.getBoundingClientRect()
-    return { width: rect.width, height: rect.height }
-  }
-
-  function resize() {
-    var next = computeStageSize(stageViewport())
-    if (next.width === state.stageWidth && next.height === state.stageHeight) return
-    var firstSizing = state.stageWidth === 0
-    state.stageWidth = next.width
-    state.stageHeight = next.height
-    elements.gameFrame.style.width = next.width + 'px'
-    elements.gameFrame.style.height = next.height + 'px'
-    if (firstSizing) return
-    /* A nested reload keeps the upstream Phaser scale manager in sync when
-     * the viewport it measures (its own window) changes size. The first
-     * sizing happens before the nested document finishes navigating, so
-     * there is nothing to reload yet. */
-    elements.gameFrame.src = 'PinballGame.htm'
-  }
-
-  /* --- Bootstrap -------------------------------------------------------- */
-
-  function init() {
-    state.soundOn = desiredSoundOn()
-
-    elements.mute.addEventListener('click', function () {
-      var next = !state.soundOn
-      persistSound(next)
-      applySound(next)
-    })
-
-    elements.exit.addEventListener('click', postExit)
-
-    window.addEventListener('message', function (event) {
-      if (event.origin !== window.location.origin) return
-      if (!isGameFrameEvent(event)) return
-      /* Loader handoff: PinballGame.htm pings "pinball:menu-ready" from its
-       * boot state once the menu scene is actually visible. */
-      if (event.data === 'pinball:menu-ready') {
-        markLoaded()
-        return
-      }
-      /* The upstream game flips GAME_SOUND_ENABLED and persists the cookie
-       * when its own toggle is used; mirror that into the cabinet state. */
-      if (event.data === true) applySound(true)
-      if (event.data === false) applySound(false)
-    })
-
-    elements.gameFrame.addEventListener('load', function () {
-      if (state.gameBecameVisible) {
-        /* Resize reload: keep the loader hidden and re-sync sound. */
-        applySound(state.soundOn)
-        state.initialSoundApplied = false
-        state.audioProbeAttempts = 0
-        return
-      }
-      state.gameBecameVisible = true
-      applySound(state.soundOn)
-      state.audioProbeTimer = window.setInterval(audioProbeTick, 300)
-      // Wait for the actual menu-ready bridge event; document load alone
-      // does not mean Phaser has finished loading the game assets.
-    })
-
-    /* The nested document can also report a hard failure via the loader. */
-    elements.gameFrame.addEventListener('error', markBroken)
-
-    state.loadTimer = window.setTimeout(function () {
-      if (!state.loaded) {
-        if (elements.loaderHint) elements.loaderHint.hidden = false
-        if (elements.loaderText) elements.loaderText.textContent = 'Still loading Classic Pinball…'
-      }
-    }, 8000)
-
-    applySound(state.soundOn)
-    window.addEventListener('resize', resize)
-    resize()
-    // Cabinet controls are ready independently of the nested game download.
-    document.documentElement.dataset.appReady = 'true'
-    if (window.parent !== window) window.parent.postMessage({ protocol: 'analytics-games.bridge', version: 1, type: 'game.ready' }, window.location.origin)
-  }
-
-  init()
-
-// Exposed for ad-hoc debugging in devtools.
-window.PinballCabinet = {
-  markLoaded: markLoaded,
-  applySound: applySound,
+function announce(message, error = false) { $('notice').textContent = message; $('notice').classList.toggle('error', error) }
+function key(type, key, code, keyCode) {
+  canvas.focus({ preventScroll: true })
+  canvas.dispatchEvent(new KeyboardEvent(type, { key, code, keyCode, which: keyCode, bubbles: true, cancelable: true }))
 }
+function press(name, code, number) { key('keydown', name, code, number); key('keyup', name, code, number) }
+let audioBound = false
+function applySound() {
+  const audio = window.Module?.SDL2?.audioContext
+  if (!audio) return
+  if (!audioBound) { audioBound = true; audio.addEventListener('statechange', () => { if (!soundOn && audio.state === 'running') void audio.suspend() }) }
+  if (soundOn) void audio.resume().catch(() => announce('Your browser needs a click on the table to enable audio.'))
+  else void audio.suspend()
+}
+function toggleSound() { soundOn = !soundOn; applySound(); soundLabel(); try { localStorage.setItem(KEY, String(soundOn)) } catch { /* Optional persistence. */ } }
+function soundLabel() { $('sound').textContent = soundOn ? 'Sound on' : 'Sound off'; $('sound').setAttribute('aria-pressed', String(soundOn)) }
+function fit() {
+  if (!canvas.width || !canvas.height) return
+  const stage = canvas.parentElement
+  const width = Math.min(stage.clientWidth, stage.clientHeight * canvas.width / canvas.height)
+  canvas.style.width = `${width}px`; canvas.style.height = `${width * canvas.height / canvas.width}px`
+}
+new ResizeObserver(fit).observe(canvas.parentElement)
+function stopTimer() { clearInterval(timer); clearTimeout(timeout) }
+function fail(message) {
+  stopTimer(); ready = false
+  $('loader').hidden = false; $('progress').hidden = true; $('retry').hidden = false
+  $('loading-label').textContent = 'Space Cadet could not start'
+  $('loading-detail').textContent = message
+  $('loading-label').parentElement.setAttribute('role', 'alert')
+  for (const id of ['new-game','pause','sound']) $(id).disabled = true
+  for (const button of document.querySelectorAll('[data-key]')) button.disabled = true
+}
+function begin() {
+  started = Date.now(); ready = false
+  canvas.hidden = false; canvas.width = 600; canvas.height = 440; fit()
+  $('loader').hidden = false; $('progress').hidden = false; $('retry').hidden = true
+  timer = setInterval(() => { $('elapsed').textContent = `${Math.floor((Date.now() - started) / 1000)}s` }, 1000)
+  timeout = setTimeout(() => fail('Loading took too long. Retry or choose a different set of local files.'), 45_000)
+}
+function showReady() {
+  if (!canvas.width || !canvas.height) { requestAnimationFrame(showReady); return }
+  if (lastRuntimeError) { fail('The selected files could not be opened. Check PINBALL.DAT and try again.'); return }
+  stopTimer(); ready = true; $('loader').hidden = true; canvas.hidden = false
+  for (const id of ['new-game','pause','sound']) $(id).disabled = false
+  for (const button of document.querySelectorAll('[data-key]')) button.disabled = false
+  fit(); soundLabel()
+  // Suspend the engine's own audio context until the player opts in.
+  applySound()
+  announce(activeImport ? 'Original files loaded locally. F2 starts a game.' : 'Free-play ready · Space Cadet engine with original CC0 replacement art.')
+}
+async function start(originalFiles) {
+  begin()
+  const module = {
+    canvas,
+    arguments: [],
+    locateFile: name => ASSETS + name,
+    setStatus: message => { if (message) $('loading-detail').textContent = /Running/.test(message) ? 'Starting the table and controls…' : 'Loading runtime and table files…' },
+    printErr: message => { console.error('[Space Cadet]', message); if (/missing|Could not|Error/i.test(message)) lastRuntimeError = String(message) },
+    onExit: status => { if (status !== 0) { lastRuntimeError = 'Invalid table data'; fail('The table data could not be loaded. Check the local game files and retry.') } },
+    onAbort: () => fail('The engine could not initialize. Retry, or check the imported game files.'),
+    instantiateWasm(imports, receiveInstance) {
+      $('loading-detail').textContent = 'Downloading the Space Cadet engine…'
+      void fetch(ASSETS + 'SpaceCadetPinball.wasm', { signal: AbortSignal.timeout(30_000) }).then(response => {
+        if (!response.ok) throw new Error('Engine download failed')
+        return response.arrayBuffer()
+      }).then(bytes => {
+        $('loading-detail').textContent = 'Initializing the Space Cadet engine…'
+        return WebAssembly.instantiate(bytes, imports)
+      }).then(result => receiveInstance(result.instance, result.module)).catch(() => fail('The engine download or initialization failed. Check your connection and retry.'))
+      return {}
+    },
+    postRun: [() => requestAnimationFrame(() => requestAnimationFrame(showReady))],
+  }
+  if (originalFiles) {
+    // Override default resources with user-local bytes before main. No network upload.
+    module.onRuntimeInitialized = () => {
+      for (const file of originalFiles) {
+        try { module.FS_unlink('/game_resources/' + file.name) } catch { /* New sound name. */ }
+        module.FS_createDataFile('/game_resources', file.name, file.bytes, true, true)
+      }
+    }
+  }
+  // Fetch the data ourselves so legacy loader errors cannot leave a silent wait.
+  try {
+    const response = await fetch(ASSETS + 'SpaceCadetPinball.data', { signal: AbortSignal.timeout(30_000) })
+    if (!response.ok) throw new Error('Table download failed')
+    const data = await response.arrayBuffer()
+    module.getPreloadedPackage = () => data
+  } catch { fail('The free-play table could not be downloaded. Check your connection and retry.'); return }
+  window.Module = module
+  const script = document.createElement('script'); script.src = ASSETS + 'SpaceCadetPinball.js'
+  script.onerror = () => fail('The engine download failed. Check your connection and retry.')
+  document.head.appendChild(script)
+}
+$('new-game').addEventListener('click', () => { if (ready) { press('F2','F2',113); paused = false; $('pause').textContent = 'Pause'; announce('Game started. Hold Space, then release to launch.'); } })
+$('pause').addEventListener('click', () => { if (ready) { press('F3','F3',114); paused = !paused; $('pause').textContent = paused ? 'Resume' : 'Pause'; } })
+$('sound').addEventListener('click', () => { if (ready) toggleSound() })
+window.addEventListener('keydown', event => { if (event.code === 'F5') { event.preventDefault(); event.stopImmediatePropagation(); if (ready) toggleSound() } }, true)
+$('exit').addEventListener('click', () => {
+  if (window.parent !== window) window.parent.postMessage({ protocol: 'analytics-games.bridge', version: 1, type: 'game.exit', payload: { reason: 'cancel' } }, window.location.origin)
+  else location.assign('/')
+})
+$('retry').addEventListener('click', () => location.reload())
+$('free-play').addEventListener('click', () => window.parent.postMessage({ type: 'space-cadet:free-play' }, location.origin))
+for (const button of document.querySelectorAll('[data-key]')) {
+  let down = false
+  button.addEventListener('pointerdown', event => {
+    if (!ready) return
+    event.preventDefault(); button.setPointerCapture(event.pointerId); down = true
+    key('keydown', button.dataset.key, button.dataset.code, Number(button.dataset.keycode))
+  })
+  const release = () => { if (down) { down = false; key('keyup', button.dataset.key, button.dataset.code, Number(button.dataset.keycode)) } }
+  button.addEventListener('pointerup', release); button.addEventListener('pointercancel', release); button.addEventListener('lostpointercapture', release)
+}
+$('original-files').addEventListener('change', async event => {
+  const files = [...event.target.files]
+  if (!files.length) return
+  if (!files.some(file => file.name.toUpperCase() === 'PINBALL.DAT')) { announce('Choose PINBALL.DAT together with the sound files from your own game folder.', true); return }
+  if (files.length > 100 || files.some(file => !/^(PINBALL\.DAT|FONT\.DAT|SOUND\w*\.WAV|PINBALL\d?\.MID|TABLE\.BMP)$/i.test(file.name) || file.size > 16 * 1024 * 1024) || files.reduce((sum, file) => sum + file.size, 0) > 48 * 1024 * 1024) {
+    announce('Choose only the game data and sounds, up to 48 MB total. Executables are not needed.', true); return
+  }
+  // Engine instances run in their own document. Restart this document with local
+  // file bytes delivered through a same-origin MessageChannel; never persist/upload.
+  const bytes = await Promise.all(files.map(async file => ({ name: file.name.toUpperCase(), bytes: new Uint8Array(await file.arrayBuffer()) })))
+  window.dispatchEvent(new CustomEvent('space-cadet:local-files', { detail: bytes }))
+  announce('Local import is preparing…')
+})
+// The parent document can retain user-selected bytes across a runtime-only frame
+// restart. A direct cabinet launch uses the same small outer import controller.
+window.addEventListener('space-cadet:local-files', event => {
+  window.parent.postMessage({ type: 'space-cadet:import', files: event.detail }, window.location.origin)
+})
+window.addEventListener('message', event => {
+  if (event.origin !== location.origin || event.source !== window.parent || event.data?.type !== 'space-cadet:start') return
+  activeImport = Boolean(event.data.files)
+  $('art-label').textContent = activeImport ? 'Your original XP files · local' : 'Open Cadet art · CC0'
+  $('free-play').hidden = !activeImport
+  void start(event.data.files)
+})
+document.documentElement.dataset.appReady = 'true'
+if (window.parent !== window) window.parent.postMessage({ protocol: 'analytics-games.bridge', version: 1, type: 'game.ready' }, window.location.origin)
+// A same-origin outer controller handles restart without reusing a running WASM instance.
+if (window.parent === window || !new URLSearchParams(location.search).has('runtime')) void start()
+else window.parent.postMessage({ type: 'space-cadet:awaiting-data' }, location.origin)

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { isRetiredGame } from './retired-games'
 import { GAME_BRIDGE_VERSION, type GameManifest } from '@/lib/engine/types'
 
 const instructionSchema = z.object({
@@ -9,7 +10,7 @@ const instructionSchema = z.object({
 export const externalGameManifestSchema = z.object({
   // Anchored, max-80 input; scanner cannot infer Zod's preceding bound.
   // eslint-disable-next-line security/detect-unsafe-regex
-  id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(80),
+  id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(80).refine(id => !isRetiredGame(id), 'This game is retired'),
   version: z.number().int().positive(),
   title: z.string().trim().min(1).max(80),
   eyebrow: z.string().trim().min(1).max(80),

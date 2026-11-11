@@ -9,10 +9,6 @@ type RoomStartedProperties = {
   host_color?: string
 }
 
-function integerProperty(value: unknown) {
-  return Number.isInteger(value) ? value as number : undefined
-}
-
 export function multiplayerRoomStartedProperties(
   gameId: string,
   playerCount: number,
@@ -20,16 +16,6 @@ export function multiplayerRoomStartedProperties(
 ): RoomStartedProperties | null {
   if (!action || typeof action !== 'object') return null
   const candidate = action as RoomAction
-
-  if (candidate.type === 'consensus.game.start') {
-    return {
-      game_id: gameId,
-      player_count: playerCount,
-      team_count: integerProperty(candidate.numTeams),
-      goal: integerProperty(candidate.goal),
-      ...(typeof candidate.betsEnabled === 'boolean' ? { bets_enabled: candidate.betsEnabled } : {}),
-    }
-  }
 
   if (candidate.type === 'chess.start') {
     return {

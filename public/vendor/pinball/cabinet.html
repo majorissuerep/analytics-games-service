@@ -1,50 +1,5 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Classic Pinball</title>
-  <link rel="stylesheet" href="/styles/app-theme.css">
-  <script src="/styles/app-appearance.js" defer></script>
-  <link rel="stylesheet" href="cabinet.css">
-</head>
-<body class="app-surface">
-  <header class="pinball-bar" data-pinball-bar>
-    <span class="pinball-bar-title"><span aria-hidden="true">🪐</span> Classic Pinball</span>
-    <span class="pinball-bar-actions">
-      <button
-        type="button"
-        class="pinball-bar-button"
-        data-pinball-mute
-        aria-pressed="false"
-        aria-label="Mute game audio"
-      ><span class="pinball-bar-icon" aria-hidden="true">🔊</span><span data-pinball-mute-label>SFX on</span></button>
-      <button type="button" class="pinball-bar-button pinball-bar-exit" data-pinball-exit aria-label="Exit game">
-        <span class="pinball-bar-icon" aria-hidden="true">✕</span><span>Exit</span>
-      </button>
-    </span>
-  </header>
-
-  <main class="pinball-stage" data-pinball-stage>
-    <iframe
-      data-pinball-game
-      src="PinballGame.htm"
-      title="Pinball"
-      class="pinball-game-frame"
-      sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups"
-      allow="autoplay; fullscreen; gamepad; clipboard-write"
-      referrerpolicy="no-referrer"
-    ></iframe>
-  </main>
-
-  <div class="pinball-loader" data-pinball-loader role="status" aria-live="polite">
-    <div class="ui-loading-meter" role="progressbar" aria-label="Loading Classic Pinball" aria-valuemin="0" aria-valuemax="100" data-determinate="false" style="width:min(280px,75vw)"><span></span></div>
-    <span role="timer" aria-label="Elapsed time" data-load-elapsed>0s</span>
-    <button type="button" data-load-retry hidden>Retry Pinball</button>
-    <span class="pinball-loader-text" data-pinball-loader-text>Loading Classic Pinball…</span>
-    <span class="pinball-loader-hint" data-pinball-loader-hint hidden>Still loading — the first open downloads roughly 2&nbsp;MB.</span>
-  </div>
-
-  <script type="module" src="cabinet.js"></script>
-</body>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Space Cadet Pinball</title><link rel="stylesheet" href="/styles/app-theme.css"><script src="/styles/app-appearance.js" defer></script><style>html,body{margin:0;padding:0;height:100%;overflow:hidden}iframe{display:block;width:100%;height:100%;border:0}</style></head>
+<body class="app-surface"><iframe title="Space Cadet runtime" src="runtime.html?runtime=1" allow="autoplay; fullscreen" sandbox="allow-scripts allow-same-origin allow-downloads"></iframe><script src="controller.js" type="module"></script></body>
 </html>

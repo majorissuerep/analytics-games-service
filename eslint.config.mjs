@@ -13,16 +13,6 @@ export default defineConfig([
       'security/detect-object-injection': 'off',
     },
   },
-  {
-    files: ['games/consensus-radar/client/ConsensusRadarGame.tsx'],
-    rules: {
-      // Reference game predates React Compiler rules. Keep behavior stable while
-      // new platform and plugin code receives the stricter default checks.
-      'react-hooks/exhaustive-deps': 'off',
-      'react-hooks/set-state-in-effect': 'off',
-      'react-hooks/static-components': 'off',
-    },
-  },
   globalIgnores([
     '.cache/**',
     '.next/**',

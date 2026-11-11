@@ -1,0 +1,72 @@
+{
+  "kind": "calculated planning envelope, not a production benchmark",
+  "assumptions": {
+    "participants": 20,
+    "camera": {
+      "width": 640,
+      "height": 360,
+      "fps": 15,
+      "kbps": 350
+    },
+    "thumbnail": {
+      "width": 320,
+      "height": 180,
+      "fps": 10,
+      "kbps": 80
+    },
+    "microphoneKbps": 24,
+    "transportOverhead": 1.15,
+    "provisionHeadroom": 1.25,
+    "sessionMinutes": 60,
+    "commandsPerMinute": 12,
+    "snapshotBytes": 8192,
+    "reconciliationSeconds": 30
+  },
+  "clientUploadMbps": 0.5221,
+  "sfuIngressMbps": 10.442,
+  "participantMinutes": 1200,
+  "peerMesh": {
+    "connections": 190,
+    "uploadMbpsPerPlayer": 8.171899999999999
+  },
+  "scenarios": [
+    {
+      "name": "desktop: 1 speaker + 18 thumbnails",
+      "remoteVideoTiles": 19,
+      "clientDownloadMbps": 2.5828999999999995,
+      "sfuEgressMbps": 51.657999999999994,
+      "provisionedEgressMbps": 64.57249999999999,
+      "egressGBPerSession": 23.2461
+    },
+    {
+      "name": "mobile: 1 speaker + 5 thumbnails",
+      "remoteVideoTiles": 6,
+      "clientDownloadMbps": 1.3868999999999998,
+      "sfuEgressMbps": 27.737999999999996,
+      "provisionedEgressMbps": 34.67249999999999,
+      "egressGBPerSession": 12.482099999999999
+    },
+    {
+      "name": "all remote videos at 360p: stress ceiling",
+      "remoteVideoTiles": 19,
+      "clientDownloadMbps": 8.171899999999999,
+      "sfuEgressMbps": 163.438,
+      "provisionedEgressMbps": 204.29749999999999,
+      "egressGBPerSession": 73.54709999999999
+    },
+    {
+      "name": "audio only",
+      "remoteVideoTiles": 0,
+      "clientDownloadMbps": 0.5244,
+      "sfuEgressMbps": 10.488,
+      "provisionedEgressMbps": 13.11,
+      "egressGBPerSession": 4.7196
+    }
+  ],
+  "state": {
+    "snapshotRequestsPerMinute": 280,
+    "commandRequestsPerMinute": 12,
+    "requestRatePerSecond": 4.866666666666666,
+    "snapshotPayloadMbps": 0.3058346666666667
+  }
+}

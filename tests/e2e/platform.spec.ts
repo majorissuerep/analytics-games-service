@@ -1,4 +1,4 @@
-import { expect, test, type Browser, type BrowserContext, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 test.beforeEach(async ({ context }, info) => {
   if (!info.title.startsWith('self-hosted analytics')) {
@@ -57,17 +57,17 @@ test('desktop opens and closes a readable game while Pip responds', async ({ pag
   await pip.getByRole('button', { name: 'Surprise me' }).click()
   await expect(pip.locator('p')).not.toHaveText(firstPhrase ?? '')
 
-  await page.locator('.desktop-icon[aria-label="Open Consensus Radar"]').dblclick()
-  const gameFrame = page.frameLocator('iframe[title="Consensus Radar"]')
-  const nameHeading = gameFrame.getByRole('heading', { name: 'Як тебе звати?' })
+  await page.locator('.desktop-icon[aria-label="Open Minefield"]').dblclick()
+  const gameFrame = page.frameLocator('iframe[title="Minefield"]')
+  const nameHeading = gameFrame.getByRole('button', { name: 'New game' })
   await expect(nameHeading).toBeVisible()
-  await expect(nameHeading).toHaveCSS('color', 'rgb(41, 36, 54)')
+  await expect(nameHeading).toBeEnabled()
 
   const gameWindow = page.locator('.desktop-rnd-window').filter({
-    has: page.locator('iframe[title="Consensus Radar"]'),
+    has: page.locator('iframe[title="Minefield"]'),
   })
   await gameWindow.getByRole('button', { name: 'Close' }).click()
-  await expect(page.locator('iframe[title="Consensus Radar"]')).toHaveCount(0)
+  await expect(page.locator('iframe[title="Minefield"]')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Team games live here.' })).toBeVisible()
   expect(errors).toEqual([])
 })
@@ -82,7 +82,7 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   await page.goto('/')
   await expect(page.locator('.desktop-sky')).toHaveCSS('background-image', /millennium-meadow\.webp/)
   await expect(page.getByLabel('Desktop sticky note')).toBeVisible()
-  await expect(page.getByLabel('5 games installed')).toBeVisible()
+  await expect(page.getByLabel('4 games installed')).toBeVisible()
   await page.getByRole('button', { name: 'start' }).click()
   await expect(page.getByRole('button', { name: /Open a random installed game/ })).toBeVisible()
   await page.getByRole('button', { name: 'start' }).click()
@@ -92,9 +92,9 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   await expect(pluginWindow.locator('.plugin-row')).toHaveCount(4)
   const counterToggle = pluginWindow.locator('.plugin-row').filter({ hasText: 'Game Counter' }).getByRole('checkbox')
   await counterToggle.uncheck()
-  await expect(page.getByLabel('5 games installed')).toHaveCount(0)
+  await expect(page.getByLabel('4 games installed')).toHaveCount(0)
   await counterToggle.check()
-  await expect(page.getByLabel('5 games installed')).toBeVisible()
+  await expect(page.getByLabel('4 games installed')).toBeVisible()
   await pluginWindow.getByRole('button', { name: 'Close' }).click()
 
   await page.locator('.desktop-icon[aria-label="Open Minefield"]').dblclick()
@@ -129,17 +129,6 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   await expect(paintbox.getByRole('button', { name: 'Eraser' })).toHaveAttribute('aria-pressed', 'true')
   await page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Paintbox"]') }).getByRole('button', { name: 'Close' }).click()
 
-  await page.locator('.desktop-icon[aria-label="Open Classic Pinball"]').dblclick()
-  const pinball = page.frameLocator('iframe[title="Classic Pinball"]')
-  const pinballCanvas = pinball.frameLocator('iframe[title="Pinball"]').locator('canvas')
-  await expect(pinballCanvas).toBeVisible()
-  await expect(pinballCanvas).toHaveAttribute('width', '320')
-  await expect(pinballCanvas).toHaveAttribute('height', '608')
-  const pinballWindow = page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Classic Pinball"]') })
-  await pinballWindow.getByRole('button', { name: 'Close' }).click()
-  await expect(pinballWindow).toBeHidden()
-
-  await expect(page.getByRole('heading', { name: 'Team games live here.' })).toBeVisible()
   expect(errors).toEqual([])
 })
 
@@ -332,203 +321,4 @@ test('Chess password room synchronizes legal moves', async ({ browser }) => {
     await hostContext.close()
     await guestContext.close()
   }
-})
-
-interface EmulatedPlayer {
-  context: BrowserContext
-  page: Page
-  name: string
-}
-
-async function enterPlayer(browser: Browser, name: string): Promise<EmulatedPlayer> {
-  const context = await browser.newContext()
-  await context.addInitScript(() => localStorage.setItem('analytics-games.analytics-consent.v1', 'denied'))
-  const page = await context.newPage()
-  await page.goto('/games/consensus-radar')
-  await page.getByRole('button', { name: 'EN', exact: true }).click()
-  await page.getByPlaceholder('Your name…').fill(name)
-  await page.getByRole('button', { name: /Continue/ }).click()
-  await expect(page.getByRole('heading', { name: `Hi, ${name}` })).toBeVisible()
-  return { context, page, name }
-}
-
-test('four isolated players complete a full Consensus Radar game', async ({ browser }) => {
-  test.setTimeout(120_000)
-  const players = await Promise.all(
-    ['Ada', 'Ben', 'Cy', 'Dee'].map((name) => enterPlayer(browser, name)),
-  )
-  const [host, teamOneGuesser, teamTwoCluegiver, teamTwoGuesser] = players
-
-  try {
-    await host.page.getByRole('button', { name: 'Create room' }).click()
-    const roomCode = (await host.page.locator('.room-code-val').textContent())?.trim()
-    expect(roomCode).toMatch(/^[A-Z0-9]{6}$/)
-
-    for (const player of players.slice(1)) {
-      await player.page.getByPlaceholder('Room code (6 chars)').fill(roomCode ?? '')
-      await player.page.getByRole('button', { name: 'Join', exact: true }).click()
-      await expect(player.page.getByText('Room code', { exact: true })).toBeVisible()
-    }
-    await expect(host.page.getByText('Players in room (4)', { exact: true })).toBeVisible({ timeout: 15_000 })
-
-    // Host starts on Team 1 automatically; Ben joins them, Cy and Dee form Team 2.
-    await teamOneGuesser.page.getByTitle('Team 1').click()
-    await teamTwoCluegiver.page.getByTitle('Team 2').click()
-    await teamTwoGuesser.page.getByTitle('Team 2').click()
-
-    // The host learns about assignments via polling — wait until every roster
-    // pill is visible before starting, otherwise the lobby validation races.
-    for (const [name, team] of [['Ben', 'Team 1'], ['Cy', 'Team 2'], ['Dee', 'Team 2']] as const) {
-      await expect(
-        host.page.locator('.player-row').filter({ hasText: name }).getByText(team, { exact: true }),
-      ).toBeVisible({ timeout: 15_000 })
-    }
-
-    await host.page.getByRole('button', { name: 'Start game' }).click()
-
-    // ── Round 1: Team 1 plays, host is the clue-giver (join-order rotation) ──
-    await expect(host.page.getByText("You're the clue-giver this round!", { exact: true })).toBeVisible({
-      timeout: 15_000,
-    })
-    await host.page.getByPlaceholder('one word or phrase — no numbers').fill('signal one')
-    await host.page.getByRole('button', { name: 'Send clue' }).click()
-
-    const slider = teamOneGuesser.page.getByRole('slider', { name: 'Position marker' })
-    await expect(slider).toBeVisible({ timeout: 15_000 })
-    const box = await slider.boundingBox()
-    if (!box) throw new Error('Position marker has no bounding box')
-    await teamOneGuesser.page.mouse.click(box.x + box.width * 0.3, box.y + box.height / 2)
-    await teamOneGuesser.page.getByRole('button', { name: 'Lock in' }).click()
-
-    // Rival team places side bets; the last bet auto-reveals the round.
-    await teamTwoCluegiver.page.getByRole('button', { name: /To the right/ }).click()
-    await expect(teamTwoCluegiver.page.getByText(/Bet placed/)).toBeVisible({ timeout: 15_000 })
-    await teamTwoGuesser.page.getByRole('button', { name: /To the right/ }).click()
-
-    for (const player of players) {
-      await expect(player.page.getByText('The reveal', { exact: true })).toBeVisible({ timeout: 15_000 })
-    }
-    await expect(host.page.getByText('Who placed what', { exact: true })).toBeVisible()
-    await expect(host.page.getByText('Side bets', { exact: true })).toBeVisible()
-
-    // ── Round 2: turn rotates to Team 2, its clue-giver is Cy ────────────────
-    await host.page.getByRole('button', { name: 'Next round', exact: true }).click()
-    await expect(teamTwoCluegiver.page.getByText("You're the clue-giver this round!", { exact: true })).toBeVisible({
-      timeout: 15_000,
-    })
-    await teamTwoCluegiver.page.getByPlaceholder('one word or phrase — no numbers').fill('signal two')
-    await teamTwoCluegiver.page.getByRole('button', { name: 'Send clue' }).click()
-
-    const sliderTwo = teamTwoGuesser.page.getByRole('slider', { name: 'Position marker' })
-    await expect(sliderTwo).toBeVisible({ timeout: 15_000 })
-    const boxTwo = await sliderTwo.boundingBox()
-    if (!boxTwo) throw new Error('Position marker has no bounding box')
-    await teamTwoGuesser.page.mouse.click(boxTwo.x + boxTwo.width * 0.7, boxTwo.y + boxTwo.height / 2)
-    await teamTwoGuesser.page.getByRole('button', { name: 'Lock in' }).click()
-
-    await host.page.getByRole('button', { name: /To the left/ }).click()
-    await teamOneGuesser.page.getByRole('button', { name: /To the left/ }).click()
-
-    for (const player of players) {
-      await expect(player.page.getByText('The reveal', { exact: true })).toBeVisible({ timeout: 15_000 })
-    }
-
-    // ── Host ends the game; everyone lands on the final scoreboard ───────────
-    await host.page.getByRole('button', { name: 'End the game', exact: true }).click()
-    for (const player of players) {
-      await expect(player.page.getByText('Game over', { exact: true })).toBeVisible({ timeout: 15_000 })
-      await expect(player.page.getByRole('heading', { name: 'Final scores' })).toBeVisible()
-    }
-  } finally {
-    await Promise.all(players.map((player) => player.context.close()))
-  }
-})
-
-test('Classic Pinball cabinet scales the table, persists mute, and exits through the bridge', async ({ page }) => {
-  const errors: string[] = []
-  page.on('pageerror', (error) => errors.push(error.message))
-
-  await page.setViewportSize({ width: 1280, height: 800 })
-
-  // Hold the 1.8MB upstream bundle back so the slow-first-open loader is
-  // observable deterministically, then release it.
-  let releaseUpstream: (() => void) | null = null
-  const upstreamGate = new Promise<void>((resolve) => { releaseUpstream = resolve })
-  await page.route('**/vendor/pinball/PinballGame.js', async (route) => {
-    await upstreamGate
-    await route.continue()
-  })
-
-  await page.goto('/games/orbit-pinball', { waitUntil: 'domcontentloaded' })
-
-  const cabinet = page.frameLocator('iframe[title="Classic Pinball"]')
-  const cabinetFrame = page.locator('iframe[title="Classic Pinball"]')
-
-  // Branded loader shows while the bundle is held back…
-  const loader = cabinet.locator('[data-pinball-loader]')
-  await expect(cabinet.locator('[data-pinball-loader-text]')).toContainText('Loading Classic Pinball')
-  await expect(loader).toBeVisible()
-  // …and hides once the cabinet marks the game ready.
-  releaseUpstream!()
-  await expect(loader).toHaveClass(/is-loaded/, { timeout: 30_000 })
-
-  // Upstream game canvas keeps its untouched 320x608 backing store inside the nested frame.
-  const upstream = cabinet.frameLocator('iframe[title="Pinball"]')
-  const canvas = upstream.locator('canvas')
-  await expect(canvas).toBeVisible()
-  await expect(canvas).toHaveAttribute('width', '320')
-  await expect(canvas).toHaveAttribute('height', '608')
-
-  // The nested frame is letterboxed to the upstream aspect ratio inside the stage.
-  const geometry = await cabinetFrame.evaluate((outerFrame) => {
-    const doc = (outerFrame as HTMLIFrameElement).contentDocument
-    const stage = doc?.querySelector('[data-pinball-stage]')
-    const game = doc?.querySelector('iframe[title="Pinball"]')
-    if (!stage || !game) return null
-    const box = game.getBoundingClientRect()
-    return {
-      stageWidth: stage.clientWidth,
-      stageHeight: stage.clientHeight,
-      frameWidth: box.width,
-      frameHeight: box.height,
-    }
-  })
-  expect(geometry).not.toBeNull()
-  const ratio = geometry!.frameWidth / geometry!.frameHeight
-  expect(Math.abs(ratio - 320 / 608)).toBeLessThan(0.02)
-  expect(geometry!.frameHeight).toBeLessThanOrEqual(geometry!.stageHeight + 1)
-
-  // Mute toggle persists across reloads via localStorage + the upstream cookie.
-  const muteButton = cabinet.locator('[data-pinball-mute]')
-  await expect(muteButton).toHaveAttribute('aria-pressed', 'false')
-  await muteButton.click()
-  await expect(muteButton).toHaveAttribute('aria-pressed', 'true')
-  await expect(cabinet.locator('[data-pinball-mute-label]')).toHaveText('Muted')
-  await expect.poll(() => page.evaluate(() => window.localStorage.getItem('analytics-games.pinball.sound.v1'))).toBe('false')
-
-  await page.reload()
-  const reloadedCabinet = page.frameLocator('iframe[title="Classic Pinball"]')
-  const reloadedMute = reloadedCabinet.locator('[data-pinball-mute]')
-  await expect(reloadedMute).toHaveAttribute('aria-pressed', 'true')
-
-  // Sound governance: the nested upstream game reflects the muted preference.
-  const reloadedCabinetFrame = page.locator('iframe[title="Classic Pinball"]')
-  await expect.poll(() => reloadedCabinetFrame.evaluate((outerFrame) => {
-    const cabinetDoc = (outerFrame as HTMLIFrameElement).contentDocument
-    const nested = cabinetDoc?.querySelector('iframe[title="Pinball"]') as HTMLIFrameElement | null
-    const nestedWindow = nested?.contentWindow as { GAME_SOUND_ENABLED?: boolean } | null
-    return nestedWindow?.GAME_SOUND_ENABLED
-  })).toBe(false)
-
-  await page.screenshot({ path: '/tmp/pinball-cabinet-muted.png', fullPage: false })
-
-  // Unmute for the exit leg so the desktop relaunch starts audible next time.
-  await reloadedMute.click()
-  await expect(reloadedMute).toHaveAttribute('aria-pressed', 'false')
-
-  // Exit posts the bridge game.exit message; the host returns to the desktop.
-  await reloadedCabinet.locator('[data-pinball-exit]').click()
-  await expect(page.getByRole('heading', { name: 'Team games live here.' })).toBeVisible()
-
-  expect(errors).toEqual([])
 })

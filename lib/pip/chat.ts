@@ -36,12 +36,12 @@ const PLATFORM_OVERVIEW = `Platform overview (repository source of truth):
 
 const KNOWLEDGE: readonly KnowledgeEntry[] = [
   {
-    keywords: ['chess', 'checkmate', 'bot', 'castle', 'room', 'pass'],
-    content: `Chess (games/chess) supports pass-and-play, Stockfish 18 WASM opponents at five difficulties, and two-player online rooms with optional passwords. Players can choose White, Black, or Random. The polished board supports click or drag moves, legal-square highlights, explicit promotion choice, move history, and responsive layouts. Rules use chess.js and online moves are server-authoritative.`,
+    keywords: ['mafia', 'video', 'coming soon'],
+    content: `Mafia Online is coming soon: a manifest and architecture/capacity plan for up to 20 participants, including the host. No game, rooms, camera access, or video service is enabled yet. Plans live in docs/MAFIA_ONLINE_ARCHITECTURE.md.`,
   },
   {
-    keywords: ['consensus', 'radar', 'clue', 'team', 'room', 'multiplayer'],
-    content: `Consensus Radar (games/consensus-radar): 4–20 players, about 15–25 minutes. A clue-giver sees a secret target on a two-sided spectrum and gives one clue without numbers or directions. Teammates place markers; closeness to the target earns points. Create or join a six-character room, split into two teams, assign exactly one clue-giver per team, then alternate turns. Server rules are in games/consensus-radar/server.ts and client UI is in games/consensus-radar/client/ConsensusRadarGame.tsx.`,
+    keywords: ['chess', 'checkmate', 'bot', 'castle', 'room', 'pass'],
+    content: `Chess (games/chess) supports pass-and-play, Stockfish 18 WASM opponents at five difficulties, and two-player online rooms with optional passwords. Players can choose White, Black, or Random. The polished board supports click or drag moves, legal-square highlights, explicit promotion choice, move history, and responsive layouts. Rules use chess.js and online moves are server-authoritative.`,
   },
   {
     keywords: ['minefield', 'mine', 'minesweeper', 'flag', 'logic'],
@@ -49,7 +49,7 @@ const KNOWLEDGE: readonly KnowledgeEntry[] = [
   },
   {
     keywords: ['pinball', 'flipper', 'ball', 'arcade'],
-    content: `Neon Forge Pinball (games/orbit-pinball) is an original reactor-themed table. Planck.js provides fixed-step collision detection, CCD, and flipper joints; the table geometry, rules, rendering, synthesized opt-in audio, and visual design are repository-authored. Hold Space to charge and release the plunger. Use Left/Z and Right/Slash for flippers. Complete F·O·R·G·E to light lock, lock two balls for three-ball multiball, and shoot the core for escalating jackpots. N·E·O·N lanes raise the playfield multiplier, the turbine builds a ramp cashout, and the scoop starts Reactor Rush. Nudge with N, but three quick nudges tilt. Physics integration is in games/orbit-pinball/lib/physics.ts, table geometry in table.ts, rules in model.ts, and rendering/UI in client/.`,
+    content: `Space Cadet Pinball uses the faithful MIT-licensed WebAssembly engine port with CC0 Open Cadet artwork by default. Original XP artwork/sounds can be loaded from the player's own local files without uploading them. F2 starts a game, F3 pauses, Z and / operate flippers, Space launches, and F5 toggles sound. The cabinet offers touch controls and exit.`,
   },
   {
     keywords: ['paintbox', 'paint', 'draw', 'canvas', 'brush', 'png', 'eraser'],

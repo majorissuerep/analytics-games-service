@@ -9,6 +9,8 @@ import type { GameManifest } from '@/lib/engine/types'
 import { DESKTOP_PLUGINS } from '@/plugins/registry'
 import { useAnalytics } from '@/components/analytics/AnalyticsProvider'
 import { trackAnalyticsEventOnce } from '@/lib/analytics/client'
+import { GameIcon } from '@/components/games/GameIcon'
+import { ComingSoonGame } from '@/components/games/ComingSoonGame'
 import { GameFrame } from './GameFrame'
 import { useDesktopStore, type DesktopWindowState } from './store'
 import 'xp.css/dist/XP.css'
@@ -65,15 +67,16 @@ export function DesktopShell({ games }: DesktopShellProps) {
     focusWindow,
     setStartOpen,
   } = useDesktopStore()
+  const playableGames = games.filter(game => game.status !== 'coming-soon')
   const gamesById = useMemo(() => new Map(games.map((game) => [game.id, game])), [games])
 
   useEffect(() => {
     if (consent !== 'granted') return
     trackAnalyticsEventOnce('platform_viewed', 'platform_viewed', {
-      games_available: games.length,
+      games_available: playableGames.length,
       path: '/',
     })
-  }, [consent, games.length])
+  }, [consent, playableGames.length])
 
   useEffect(() => {
     const update = () => setClock(new Intl.DateTimeFormat(undefined, {
@@ -113,8 +116,8 @@ export function DesktopShell({ games }: DesktopShellProps) {
   }, [])
 
   const pluginContext: DesktopPluginContext = {
-    gamesCount: games.length,
-    games: games.map(({ id, title, icon }) => ({ id, title, icon })),
+    gamesCount: playableGames.length,
+    games: playableGames.map(({ id, title, icon }) => ({ id, title, icon })),
     openGame: (gameId) => {
       const game = gamesById.get(gameId)
       if (game) openGame(game.id, game.title)
@@ -139,10 +142,11 @@ export function DesktopShell({ games }: DesktopShellProps) {
                 openGame(game.id, game.title)
               }
             }}
-            aria-label={`Open ${game.title}`}
+            aria-label={game.status === 'coming-soon' ? `${game.title} — Coming soon` : `Open ${game.title}`}
           >
-            <span className="desktop-icon-art" style={{ background: game.accentSoft }}>{game.icon ?? '🎮'}</span>
+            <span className="desktop-icon-art" style={{ background: game.accentSoft }}><GameIcon icon={game.icon} /></span>
             <span>{game.title}</span>
+            {game.status === 'coming-soon' && <small className="desktop-coming-soon">Coming soon</small>}
             {game.integration.kind === 'external' && <small>web link</small>}
           </button>
         ))}
@@ -239,7 +243,7 @@ export function DesktopShell({ games }: DesktopShellProps) {
           <div className="start-menu-items">
             {games.map((game) => (
               <button key={game.id} onClick={() => openGame(game.id, game.title)}>
-                <span>{game.icon ?? '🎮'}</span><div><strong>{game.title}</strong><small>{game.description}</small></div>
+                <span><GameIcon icon={game.icon} size={28} /></span><div><strong>{game.title}</strong><small>{game.status === 'coming-soon' ? 'Coming soon · ' : ''}{game.description}</small></div>
               </button>
             ))}
             <PluginSlot slot="start-menu" enabled={enabledPlugins} context={pluginContext} />
@@ -304,6 +308,7 @@ function WindowContent({
   if (window.kind === 'game' && window.gameId) {
     const game = games.find((candidate) => candidate.id === window.gameId)
     if (!game) return <p>Game is no longer registered.</p>
+    if (game.status === 'coming-soon') return <ComingSoonGame game={game} />
     // Externally hosted games keep playing (audio included) while their iframe
     // is mounted, so an unfocused window is suspended: the iframe unmounts and
     // a paused placeholder takes its place. Internal games stay mounted and
@@ -364,7 +369,7 @@ function WindowContent({
         <h1>Team games live here.</h1>
         <p>Double-click a game icon. Local modules and independently hosted games launch through the same desktop.</p>
         <div className="welcome-actions">
-          {games.slice(0, 3).map((game) => <button data-tone={game.id === 'chess' ? 'pink' : game.id === 'consensus-radar' ? 'violet' : 'teal'} key={game.id} onClick={() => openGame(game)}>Open {game.title}</button>)}
+          {games.filter(game => game.status !== 'coming-soon').slice(0, 3).map((game) => <button data-tone={game.id === 'chess' ? 'pink' : 'teal'} key={game.id} onClick={() => openGame(game)}>Open {game.title}</button>)}
           <Link href="/develop">Developer guide</Link>
           <Link href="/design-system">Design system</Link>
         </div>

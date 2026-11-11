@@ -1,0 +1,10 @@
+.coming-soon-game { min-height: 100%; padding: 24px; display: grid; place-items: center; }
+.coming-soon-card { max-width: 620px; width: 100%; padding: 28px; display: grid; justify-items: start; gap: 14px; }
+.coming-soon-card h1 { margin: 0; font-size: 28px; color: var(--ui-accent-ink); }
+.coming-soon-card p { margin: 0; line-height: 1.6; }
+.coming-soon-facts { display: flex; flex-wrap: wrap; gap: 8px; }
+.coming-soon-card ol { margin: 0; padding-left: 22px; display: grid; gap: 12px; }
+.coming-soon-card li strong { color: var(--ui-violet); }
+.coming-soon-card li span { display: block; color: var(--ui-muted); font-size: 13px; }
+.coming-soon-note { padding: 12px; background: var(--ui-pink-bg); border-radius: var(--ui-radius); color: var(--ui-accent-ink); font-size: 13px; }
+@media(max-width:480px) { .coming-soon-game { padding: 12px; } .coming-soon-card { padding: 20px; } }

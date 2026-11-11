@@ -1,6 +1,6 @@
 # Analytics Games
 
-Desktop-shaped web platform for games built across analytics teams. Consensus Radar remains the multiplayer engine reference; three isolated browser-local classics demonstrate lightweight games without server state. Independently hosted HTTPS games integrate through bridge v1.
+Desktop-shaped web platform for games built across analytics teams. Chess is the multiplayer engine reference; three isolated browser-local classics demonstrate lightweight games without server state. Independently hosted HTTPS games integrate through bridge v1.
 
 ## Why this exists
 
@@ -110,4 +110,4 @@ db/migrations/               PostgreSQL schema
 docs/                        architecture + author guide
 ```
 
-Built-ins: Chess, Consensus Radar, Minefield, Neon Forge Pinball, and Paintbox. Desktop plugins: Pip Assistant, Sticky Note, Game Shuffle, and Game Counter.
+Built-ins: Chess, Minefield, Space Cadet Pinball, and Paintbox; Mafia Online is coming soon. Desktop plugins: Pip Assistant, Sticky Note, Game Shuffle, and Game Counter.

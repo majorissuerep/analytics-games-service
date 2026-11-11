@@ -17,10 +17,10 @@ describe('internal analytics relay', () => {
         team_count: 2,
         room_code: 'PRIVATE',
       },
-    }, 'consensus-radar')).toEqual({
+    }, 'chess')).toEqual({
       event: 'multiplayer_room_started',
       properties: {
-        game_id: 'consensus-radar',
+        game_id: 'chess',
         player_count: 3,
         team_count: 2,
       },

@@ -25,11 +25,11 @@ Use when a game benefits from shared multiplayer infrastructure:
 - server-owned state, random choices, scoring, and role-specific projections;
 - per-game leaderboards.
 
-Internal modules live in isolated `games/*` workspaces. Consensus Radar is the reference.
+Internal modules live in isolated `games/*` workspaces. Chess is the reference.
 
 ### Browser-local game
 
-Use for classics and experiments that do not need shared persistence. Game owns its React/canvas state and pure rule modules inside one workspace; portal only discovers, launches, and closes it. Minefield and Paintbox exercise DOM and canvas drawing without adding server coupling. Neon Forge is a browser-local game with original table/rule/rendering modules and a narrow Planck.js adapter for fixed-step collisions and flipper joints inside `games/orbit-pinball/`.
+Use for classics and experiments that do not need shared persistence. Game owns its React/canvas state and pure rule modules inside one workspace; portal only discovers, launches, and closes it. Minefield and Paintbox exercise DOM and canvas drawing without adding server coupling. Space Cadet is a separately vendored MIT WebAssembly runtime with CC0 replacement data and a platform-owned cabinet; its manifest remains in `games/orbit-pinball/`. See `public/vendor/space-cadet/UPSTREAM.md`.
 
 Vendored copyleft applications stay separate from the launcher and carry their own licence, provenance, corresponding source, and build records. The Powder Toy integration follows the accepted [GPLv3 WebAssembly component decision](decisions/powder-toy-wasm-gpl-component.md).
 

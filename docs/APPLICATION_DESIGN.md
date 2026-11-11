@@ -117,7 +117,7 @@ Apply `app-surface` to content roots; compose `ui-glass`, `ui-card`, `ui-tone`,
 `ui-badge`, `ui-icon`, `ui-metric`, `ui-primary`, and `ui-selected`. Never attach
 the theme to XP wrappers or apply form sizing to chess piece buttons.
 
-Coverage: Chess/arena, Radar phases, Minefield, Paintbox, Pinball cabinet, Cosmic
+Coverage: Chess/arena, Mafia preview, Minefield, Paintbox, Pinball cabinet, Cosmic
 Forge workbench, Welcome/Help/Plugins, Sticky Note/Pip, privacy, developer guide.
 Cross-origin authors opt in through public assets documented on `/develop`.
 

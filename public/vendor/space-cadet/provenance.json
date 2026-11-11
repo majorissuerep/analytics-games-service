@@ -1,0 +1,283 @@
+{
+  "engine": {
+    "repository": "https://github.com/alula/SpaceCadetPinball",
+    "commit": "a93547299a2ed7bd602630c0be3a43648e25a886",
+    "branch": "gh-pages",
+    "license": "MIT",
+    "originalJavascriptSha256": "7b79176a84fda4463f53d0bf3588aac57596d63715166904ad32dd3978db5610"
+  },
+  "data": {
+    "repository": "https://github.com/andrewnakas/open-cadet",
+    "commit": "4ae332be705f86bfb62f8d8ac1dc1f11918977dd",
+    "license": "CC0-1.0",
+    "files": [
+      {
+        "name": "PINBALL.DAT",
+        "bytes": 911260,
+        "sha256": "3945713ab0fef7bcc291b800786101226852ea966b80904eea35eb5fc067f38e"
+      },
+      {
+        "name": "SOUND1.WAV",
+        "bytes": 17684,
+        "sha256": "be937ddcb43acdf1d2422bac060523fb2fbbfa52048da69a1af1d97c52ed3076"
+      },
+      {
+        "name": "SOUND104.WAV",
+        "bytes": 5336,
+        "sha256": "bcae79112170dde26cd26cf3cb187bf0a1c1caa7fcd7b67abf085febea4b3a36"
+      },
+      {
+        "name": "SOUND105.WAV",
+        "bytes": 4454,
+        "sha256": "cb9a79b9256182aaa3754d1d9e5f1414639145b1db1d14e10a1804d8512481ed"
+      },
+      {
+        "name": "SOUND108.WAV",
+        "bytes": 17684,
+        "sha256": "be937ddcb43acdf1d2422bac060523fb2fbbfa52048da69a1af1d97c52ed3076"
+      },
+      {
+        "name": "SOUND111.WAV",
+        "bytes": 4454,
+        "sha256": "35a57698292280392a6ea98ad2f374c608c7fb8bb521f7b7a7e88f993aaf3d89"
+      },
+      {
+        "name": "SOUND12.WAV",
+        "bytes": 9746,
+        "sha256": "1b5612a7bdc5bd0d405bf1aa811a80e45864053d6b59b4310df073810f08ab1c"
+      },
+      {
+        "name": "SOUND131.WAV",
+        "bytes": 7100,
+        "sha256": "52e7a9ed76c417ad004cb464911f4abde9c9494e695333f7633bf15b99718e13"
+      },
+      {
+        "name": "SOUND14.WAV",
+        "bytes": 12392,
+        "sha256": "5e94138cd7ea2a29a848d48f6f34c2ed4d7a61438bef847b211c37f8422dfa5f"
+      },
+      {
+        "name": "SOUND16.WAV",
+        "bytes": 5336,
+        "sha256": "3e0483b3d627f5810cfdc12ca68532276df6d0e794a530719a38e99b0915a7dd"
+      },
+      {
+        "name": "SOUND17.WAV",
+        "bytes": 12392,
+        "sha256": "fd30f77b41ce487683702bb0e7312de7b3ee7bfe3668f3500edf2bb34edb6ba4"
+      },
+      {
+        "name": "SOUND18.WAV",
+        "bytes": 7100,
+        "sha256": "0690439159d3249a0f911e49f897c9c8eb4043232a54938921817085c6508ce3"
+      },
+      {
+        "name": "SOUND19.WAV",
+        "bytes": 12392,
+        "sha256": "57c71be24dc26827e8da87f4765fc3b793f46217936595502c2bee65931360e8"
+      },
+      {
+        "name": "SOUND2.WAV",
+        "bytes": 17684,
+        "sha256": "be937ddcb43acdf1d2422bac060523fb2fbbfa52048da69a1af1d97c52ed3076"
+      },
+      {
+        "name": "SOUND20.WAV",
+        "bytes": 12392,
+        "sha256": "960377060d090612abf7548ebef62bc8c3792e63f72f92f943fc278ccd18a57a"
+      },
+      {
+        "name": "SOUND21.WAV",
+        "bytes": 12392,
+        "sha256": "54710b1cd6b5cd80fe30dbde752956b9349ff1948b1a63eae348952b803244f2"
+      },
+      {
+        "name": "SOUND22.WAV",
+        "bytes": 8864,
+        "sha256": "d95c92eada29fdb30ba3f463bf0edde1d839085e0575b77bbb2bc766e0d23a92"
+      },
+      {
+        "name": "SOUND24.WAV",
+        "bytes": 12392,
+        "sha256": "2e66dad6b216e9124bf367517104df5a64399019e3d1d99790e85bc144972538"
+      },
+      {
+        "name": "SOUND25.WAV",
+        "bytes": 7982,
+        "sha256": "931ccd1bd079bd8bbf6418a4f245e7a10efa37aa2942ed2c3817920acda973b1"
+      },
+      {
+        "name": "SOUND26.WAV",
+        "bytes": 7982,
+        "sha256": "931ccd1bd079bd8bbf6418a4f245e7a10efa37aa2942ed2c3817920acda973b1"
+      },
+      {
+        "name": "SOUND27.WAV",
+        "bytes": 12392,
+        "sha256": "e94e13dd2a8764ca5b85764fad2e294c83cea720dcd5a53e88839c410df82c1e"
+      },
+      {
+        "name": "SOUND28.WAV",
+        "bytes": 12392,
+        "sha256": "5f17cab285440f9463364c26abb833fe810eabf4ebd0ff89dd9289d65aa5522b"
+      },
+      {
+        "name": "SOUND29.WAV",
+        "bytes": 12392,
+        "sha256": "d077b89d415a4d04b433c860dae86264fc40fc051b1b9bfc83776d93bbdd9cbe"
+      },
+      {
+        "name": "SOUND3.WAV",
+        "bytes": 12392,
+        "sha256": "22347f4124f6001c04f5846b5248b5344d5af5d593a68c6c7ccad1fef79533d0"
+      },
+      {
+        "name": "SOUND30.WAV",
+        "bytes": 12392,
+        "sha256": "57c71be24dc26827e8da87f4765fc3b793f46217936595502c2bee65931360e8"
+      },
+      {
+        "name": "SOUND34.WAV",
+        "bytes": 5336,
+        "sha256": "3e0483b3d627f5810cfdc12ca68532276df6d0e794a530719a38e99b0915a7dd"
+      },
+      {
+        "name": "SOUND35.WAV",
+        "bytes": 12392,
+        "sha256": "b80bd1c9bfe72d4cc743157b16f03bbc202979aa8659bd3d6f1fff912296a0b7"
+      },
+      {
+        "name": "SOUND36.WAV",
+        "bytes": 12392,
+        "sha256": "78836ca89f9cc71050f724004fdb2119588d610380da635bacaeb32e32dc4251"
+      },
+      {
+        "name": "SOUND37.WAV",
+        "bytes": 12392,
+        "sha256": "2e66dad6b216e9124bf367517104df5a64399019e3d1d99790e85bc144972538"
+      },
+      {
+        "name": "SOUND38.WAV",
+        "bytes": 12392,
+        "sha256": "af0c4eaec1f631cdda528999fffa5ce5395ece41b5dbe12974e371af4092b0f1"
+      },
+      {
+        "name": "SOUND39.WAV",
+        "bytes": 12392,
+        "sha256": "0895ac838aa1eca81642e34b17f51f173110be1c6fb7fe566b4bc522ed14aaf3"
+      },
+      {
+        "name": "SOUND4.WAV",
+        "bytes": 15478,
+        "sha256": "d523d5b82bcf4c53364765209f56b644c6c83fb3adbe2e0161d48575a8f53b43"
+      },
+      {
+        "name": "SOUND43.WAV",
+        "bytes": 13274,
+        "sha256": "51ce59feeabd207c61e867a383fd29c0fda894769f9eb3455e7497441a8d9b3c"
+      },
+      {
+        "name": "SOUND44.WAV",
+        "bytes": 12392,
+        "sha256": "d077b89d415a4d04b433c860dae86264fc40fc051b1b9bfc83776d93bbdd9cbe"
+      },
+      {
+        "name": "SOUND45.WAV",
+        "bytes": 12392,
+        "sha256": "fd30f77b41ce487683702bb0e7312de7b3ee7bfe3668f3500edf2bb34edb6ba4"
+      },
+      {
+        "name": "SOUND49.WAV",
+        "bytes": 12392,
+        "sha256": "65a823d967e5f6354aaa8c4eb36bc50eb667be16846e3fd2468ad437a5bef4b6"
+      },
+      {
+        "name": "SOUND49D.WAV",
+        "bytes": 12392,
+        "sha256": "b80bd1c9bfe72d4cc743157b16f03bbc202979aa8659bd3d6f1fff912296a0b7"
+      },
+      {
+        "name": "SOUND5.WAV",
+        "bytes": 12392,
+        "sha256": "54710b1cd6b5cd80fe30dbde752956b9349ff1948b1a63eae348952b803244f2"
+      },
+      {
+        "name": "SOUND50.WAV",
+        "bytes": 7100,
+        "sha256": "0690439159d3249a0f911e49f897c9c8eb4043232a54938921817085c6508ce3"
+      },
+      {
+        "name": "SOUND52.WAV",
+        "bytes": 12392,
+        "sha256": "cf2ed8b43ada12fef846ae825d51b3b55c5eb557ff4ea0dd2e9652aa01fb2ab1"
+      },
+      {
+        "name": "SOUND54.WAV",
+        "bytes": 12392,
+        "sha256": "af0c4eaec1f631cdda528999fffa5ce5395ece41b5dbe12974e371af4092b0f1"
+      },
+      {
+        "name": "SOUND55.WAV",
+        "bytes": 7982,
+        "sha256": "931ccd1bd079bd8bbf6418a4f245e7a10efa37aa2942ed2c3817920acda973b1"
+      },
+      {
+        "name": "SOUND57.WAV",
+        "bytes": 11068,
+        "sha256": "57f7c6672fd90d219052ea793134c68ffee5c2ca39e9a0882785324387a46d6b"
+      },
+      {
+        "name": "SOUND59.WAV",
+        "bytes": 12392,
+        "sha256": "5f17cab285440f9463364c26abb833fe810eabf4ebd0ff89dd9289d65aa5522b"
+      },
+      {
+        "name": "SOUND62.WAV",
+        "bytes": 8864,
+        "sha256": "d95c92eada29fdb30ba3f463bf0edde1d839085e0575b77bbb2bc766e0d23a92"
+      },
+      {
+        "name": "SOUND7.WAV",
+        "bytes": 12392,
+        "sha256": "5e94138cd7ea2a29a848d48f6f34c2ed4d7a61438bef847b211c37f8422dfa5f"
+      },
+      {
+        "name": "SOUND8.WAV",
+        "bytes": 7982,
+        "sha256": "931ccd1bd079bd8bbf6418a4f245e7a10efa37aa2942ed2c3817920acda973b1"
+      },
+      {
+        "name": "SOUND9.WAV",
+        "bytes": 12392,
+        "sha256": "fd30f77b41ce487683702bb0e7312de7b3ee7bfe3668f3500edf2bb34edb6ba4"
+      }
+    ]
+  },
+  "localChange": "Only the generated preload metadata is replaced to load the CC0 package. The engine WASM is unchanged.",
+  "artifacts": {
+    "LICENSE-engine.txt": {
+      "bytes": 1079,
+      "sha256": "db6fc129469da7e295ddcd27bb4b7cc05b35d1bb89c460a33250e23bf004dc96"
+    },
+    "LICENSE-data.txt": {
+      "bytes": 755,
+      "sha256": "b63ba4bbec694f53045b3c5b09fbdde07731f4456541e3736cd1d0555f9fce89"
+    },
+    "SpaceCadetPinball.data": {
+      "bytes": 1431942,
+      "sha256": "a26a18eee2ddc07d28a80ac4acb6e8693046733d17fd0dfcea54fcc51001fad8"
+    },
+    "NOTICE-data.md": {
+      "bytes": 2568,
+      "sha256": "6183f3cce3a9d6130480f03caa27cde4fcf6fb5e9e891ff2f864b8eeb67032b8"
+    },
+    "SpaceCadetPinball.js": {
+      "bytes": 216811,
+      "sha256": "c63ad1d4d824296b86f749ee782fe9f5cc5d635aeabbd36c82c9d40aab74cba8"
+    },
+    "SpaceCadetPinball.wasm": {
+      "bytes": 4539452,
+      "sha256": "842e7313bf64f22bf1b0214ced3d143a13e5b0f06113996a3b4a19e6f7c1c857"
+    }
+  }
+}

@@ -64,10 +64,9 @@ All events also receive `platform: "web"` from the analytics controller.
 ### Supported completion signals
 
 - Chess: terminal checkmate/draw/resignation and completed model match.
-- Consensus Radar: final phase reached.
 - Minefield: won or lost.
 - Paintbox: PNG save.
-- Pinball: game over when all balls drain.
+- Space Cadet: launch/end tracking; native game-over completion awaits an explicit engine callback. Do not infer completion from time or button presses.
 
 ### Governance and verification
 
