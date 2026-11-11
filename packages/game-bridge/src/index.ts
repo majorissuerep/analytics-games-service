@@ -35,7 +35,25 @@ export interface GameTelemetryMessage {
   payload: { name: string; value?: string | number | boolean }
 }
 
-export type GameToHostMessage = GameReadyMessage | GameExitMessage | GameTelemetryMessage
+export interface GameResizeMessage {
+  protocol: typeof ANALYTICS_GAME_BRIDGE
+  version: typeof ANALYTICS_GAME_BRIDGE_VERSION
+  type: 'game.resize'
+  payload: { width: number; height: number }
+}
+
+export function isWindowSize(value: unknown): value is GameResizeMessage['payload'] {
+  if (!value || typeof value !== 'object') return false
+  const size = value as Record<string, unknown>
+  return typeof size.width === 'number' && Number.isFinite(size.width) && size.width > 0 && size.width <= 4096 &&
+    typeof size.height === 'number' && Number.isFinite(size.height) && size.height > 0 && size.height <= 4096
+}
+
+export function resizeMessage(width: number, height: number): GameResizeMessage {
+  return { protocol: ANALYTICS_GAME_BRIDGE, version: ANALYTICS_GAME_BRIDGE_VERSION, type: 'game.resize', payload: { width, height } }
+}
+
+export type GameToHostMessage = GameReadyMessage | GameExitMessage | GameTelemetryMessage | GameResizeMessage
 export type HostToGameMessage = HostInitMessage
 
 export function isGameToHostMessage(value: unknown): value is GameToHostMessage {
@@ -46,7 +64,8 @@ export function isGameToHostMessage(value: unknown): value is GameToHostMessage 
     message.version === ANALYTICS_GAME_BRIDGE_VERSION &&
     (message.type === 'game.ready' ||
       message.type === 'game.exit' ||
-      message.type === 'game.telemetry')
+      message.type === 'game.telemetry' ||
+      (message.type === 'game.resize' && isWindowSize(message.payload)))
   )
 }
 

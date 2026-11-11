@@ -8,17 +8,18 @@
 </head>
 <body class="app-surface">
   <header class="pinball-bar ui-glass">
-    <strong class="pinball-identity">Space Cadet</strong>
+    <div class="pinball-identity"><strong>Space Cadet</strong><span>ASTER · FLIGHT 01</span></div>
     <div class="pinball-score"><span>SCORE</span><output id="score" aria-label="Score">0</output></div>
     <div class="pinball-ball"><span>BALL</span><output id="ball" aria-label="Ball">1 / 3</output></div>
     <div class="pinball-actions">
-      <button id="new-game" title="Restart game" aria-label="New game" disabled>↻</button>
-      <button id="pause" title="Pause" aria-label="Pause" disabled>Ⅱ</button>
-      <button id="sound" title="Sound" aria-label="Sound off" disabled aria-pressed="false">♪</button>
+      <button id="new-game" title="Restart game" aria-label="New game" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8a8 8 0 1 1-1 8M5 3v6h6"/></svg></button>
+      <button id="pause" title="Pause" aria-label="Pause" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path class="pause-symbol" d="M8 5v14M16 5v14"/></svg></button>
+      <button id="sound" title="Sound" aria-label="Sound off" disabled aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM17 8q5 4 0 8"/></svg></button>
     </div>
   </header>
   <main class="pinball-stage" aria-label="Space Cadet game">
     <canvas id="canvas" tabindex="0" aria-label="Space Cadet pinball table" hidden></canvas>
+    <div id="pause-veil" hidden><strong>Paused</strong><span>Press Resume to return to the table</span><button id="resume-table">Resume</button></div>
     <section class="ui-loading ui-loading-app" id="loader">
       <div class="ui-loading-content">
         <div class="ui-loading-heading"><div role="status" aria-live="polite"><strong id="loading-label">Loading Space Cadet</strong><span class="ui-loading-detail" id="loading-detail">Preparing the engine and free-play table.</span></div><span class="ui-loading-elapsed" role="timer" aria-label="Elapsed time" id="elapsed">0s</span></div>
@@ -28,9 +29,9 @@
     </section>
   </main>
   <div class="pinball-touch-controls" role="group" aria-label="Touch controls">
-    <button disabled data-key="ArrowLeft" data-code="ArrowLeft" data-keycode="37" aria-label="Left flipper">←</button>
-    <button disabled data-key=" " data-code="Space" data-keycode="32" aria-label="Hold to launch">Launch</button>
-    <button disabled data-key="ArrowRight" data-code="ArrowRight" data-keycode="39" aria-label="Right flipper">→</button>
+    <button disabled data-key="ArrowLeft" data-code="ArrowLeft" data-keycode="37" aria-label="Left flipper"><span>←</span><small>Left flipper</small></button>
+    <button disabled data-key=" " data-code="Space" data-keycode="32" aria-label="Hold to launch"><span>Launch</span><small>Hold · release</small></button>
+    <button disabled data-key="ArrowRight" data-code="ArrowRight" data-keycode="39" aria-label="Right flipper"><span>→</span><small>Right flipper</small></button>
   </div>
   <footer><span id="notice" role="status">Hold Space to launch · ← → flippers</span></footer>
   <script type="module" src="cabinet.js"></script>

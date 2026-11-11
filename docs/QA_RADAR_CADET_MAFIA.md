@@ -1,3 +1,6 @@
+> Historical verification record. This is not acceptance evidence for the current
+> release. Current contracts and gates: [experience/WORKFLOW.md](experience/WORKFLOW.md).
+
 # Radar retirement, Space Cadet replacement, and Mafia planning QA
 
 11 November 2026.

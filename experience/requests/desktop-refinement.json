@@ -1,0 +1,494 @@
+{
+  "schemaVersion": 1,
+  "id": "desktop-refinement",
+  "title": "Reference-led desktop games and enforceable experience acceptance",
+  "source": {
+    "date": "2026-11-11",
+    "requestor": "user",
+    "summary": "Refine Minefield/Chess/Pinball/window behavior and first build a working request\u2192PR\u2192deployment review system.",
+    "attachment": "User Minefield screenshot: beginner shows both scrollbars and oversized shell."
+  },
+  "baseline": {
+    "commit": "da4a0e4a134fa36977eb2903360dbb5d61c4ed77",
+    "url": "https://analytics-games-service.vercel.app"
+  },
+  "scope": [
+    "desktop",
+    "minefield",
+    "chess",
+    "pinball",
+    "process"
+  ],
+  "outOfScope": [
+    "Replace XP chrome",
+    "Change mine solver or chess evaluation semantics",
+    "Implement Mafia",
+    "Enable analytics or change infrastructure",
+    "Require Microsoft proprietary pinball assets"
+  ],
+  "references": [
+    {
+      "url": "https://docs.elementary.io/hig",
+      "adopt": "Task-focused anchored navigation, direct useful content, grouped action controls",
+      "reject": "Generic marketing hero or copying OS chrome"
+    },
+    {
+      "url": "https://elementary.io",
+      "adopt": "Actual Code/AppCenter viewport hierarchy, precise bounded rounded surfaces",
+      "reject": "Copying artwork or replacing game personality"
+    },
+    {
+      "url": "https://zorin.com/os/",
+      "adopt": "Soft silver controls, rounded restrained glass and clear surface hierarchy",
+      "reject": "Whole OS reskin or decorative color proliferation"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "REF-01",
+      "app": "all",
+      "title": "Reference-led material and task hierarchy",
+      "expected": "Use elementary/Zorin reference decisions, restrained pink intent, glossy rounded groups, original app character and readable gameplay; remove opening slogans.",
+      "proof": "visual",
+      "severity": "major",
+      "scenarios": [
+        "visual-matrix"
+      ]
+    },
+    {
+      "id": "MINE-01",
+      "app": "minefield",
+      "title": "Remove manual layout and marking modes",
+      "expected": "No Cell size or Flag mode controls; auto-fit; right-click/F and cancellable touch hold still mark safely.",
+      "proof": "interaction",
+      "severity": "major",
+      "scenarios": [
+        "mine-start",
+        "mine-input"
+      ]
+    },
+    {
+      "id": "MINE-02",
+      "app": "minefield",
+      "title": "Correct fitted playfield",
+      "expected": "Beginner starts without either scrollbar; eliminate exact2px board overflow; larger difficulties request larger host size; expert desktop fits, constrained intermediate/expert preserves24px cells in declared board pan area.",
+      "proof": "geometry",
+      "severity": "major",
+      "scenarios": [
+        "mine-start",
+        "mine-expert",
+        "mine-narrow"
+      ]
+    },
+    {
+      "id": "CHESS-01",
+      "app": "chess",
+      "title": "Anchored task navigation",
+      "expected": "No opening phrase; high-level navigation stays fixed; only selected setup/arena/model details scroll; no app document scroll.",
+      "proof": "interaction",
+      "severity": "major",
+      "scenarios": [
+        "chess-sections"
+      ]
+    },
+    {
+      "id": "CHESS-02",
+      "app": "chess",
+      "title": "Reachable gameplay actions and scaling",
+      "expected": "Every active-game action remains reachable at initial/constrained window without widening; utility detail alone scrolls; square board fills min(available width,height) without720px/1200px cap.",
+      "proof": "geometry",
+      "severity": "major",
+      "scenarios": [
+        "chess-play",
+        "chess-resize"
+      ]
+    },
+    {
+      "id": "PIN-01",
+      "app": "pinball",
+      "title": "Visibly playable native cabinet",
+      "expected": "Original readable art distinguishes physical fixtures/ball; live score and ball always visible; coherent controls, clear pause, no import/menu/scroll regressions; Space and horizontal arrows work.",
+      "proof": "dynamic",
+      "severity": "major",
+      "scenarios": [
+        "pinball-play",
+        "pinball-narrow"
+      ]
+    },
+    {
+      "id": "SHELL-01",
+      "app": "desktop",
+      "title": "Requested and available geometry",
+      "expected": "Launch uses min(app requested outer dimensions, measured workspace) per axis; taskbar subtracted once; maximize/restore/viewport shrink work and no560px minimum on390px display. Installed apps and system windows have explicit requests; external third-party integrations use the documented default when no request is supplied.",
+      "proof": "geometry",
+      "severity": "major",
+      "scenarios": [
+        "shell-sizing"
+      ]
+    },
+    {
+      "id": "SHELL-02",
+      "app": "desktop",
+      "title": "Repeated body activation",
+      "expected": "First body click both raises and activates background window, including nested Pinball; repeat switches and keyboard focus; no click-eating overlay or unboundedz churn.",
+      "proof": "interaction",
+      "severity": "major",
+      "scenarios": [
+        "shell-focus"
+      ]
+    },
+    {
+      "id": "GATE-01",
+      "app": "process",
+      "title": "Executable acceptance at three stages",
+      "expected": "Request completeness, promotion provenance+independent visual evidence, and deployed accept/hotfix/rollback are machine checked with demonstrated negative fixtures.",
+      "proof": "process",
+      "severity": "major",
+      "scenarios": [
+        "gate-negative"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "visual-matrix",
+      "app": "all",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested then maximized",
+      "initialState": "Fresh clean browser; analytics denied; materialglass",
+      "actions": [
+        "Open Minefield, Chess, Pinball",
+        "Compare actual viewport captures with adopted references; inspect solid and constrained states"
+      ],
+      "expected": [
+        "Clear task-first hierarchy, coherent constrained palette, visible rounded gloss, readable functional content",
+        "No decorative slogan or content-obscuring chrome"
+      ],
+      "artifacts": [
+        "viewport",
+        "sequence"
+      ],
+      "critical": true
+    },
+    {
+      "id": "mine-start",
+      "app": "minefield",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested480x600",
+      "initialState": "Fresh beginner9x9",
+      "actions": [
+        "Open from XP desktop",
+        "Inspect full board, toolbar and status before interaction"
+      ],
+      "expected": [
+        "Outer480x600; neither iframe document nor board overflows",
+        "Required New game/Level/board visible and hit-testable; removed selectors absent"
+      ],
+      "artifacts": [
+        "viewport"
+      ],
+      "critical": true
+    },
+    {
+      "id": "mine-input",
+      "app": "minefield",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped request",
+      "initialState": "Beginner ready; use mouse, keyboard and touch contexts",
+      "actions": [
+        "Reveal, right-click flag, F toggle, chord",
+        "Hold covered square; move/cancel hold; start new game during pending generation",
+        "Induce one worker startup/generation failure in the test fixture, restore the worker, then use Retry to generate and play"
+      ],
+      "expected": [
+        "Marking does not accidentally reveal; cancelled hold does not mark",
+        "Loading/cancel/error/retry preserve responsiveness"
+      ],
+      "artifacts": [
+        "sequence"
+      ],
+      "critical": true
+    },
+    {
+      "id": "mine-expert",
+      "app": "minefield",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "window": "requested expert1120x760",
+      "initialState": "Expert30x16/99 mines",
+      "actions": [
+        "Change Beginner\u2192Expert to request larger window",
+        "Use public-clue solver to reveal70%+; inspect dense state",
+        "Finish board without guessing"
+      ],
+      "expected": [
+        "No accidental overflow on desktop; clues/states are legible and distinct",
+        "Generation no-guess guarantee and terminal reset preserved"
+      ],
+      "artifacts": [
+        "viewport",
+        "sequence"
+      ],
+      "critical": true
+    },
+    {
+      "id": "mine-narrow",
+      "app": "minefield",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "workspace clamped",
+      "initialState": "Intermediate then Expert; readable24px minimum cells",
+      "actions": [
+        "Switch through intermediate and expert on a320px viewport",
+        "Explore bounded board pan area by touch and focused keyboard cells",
+        "Flag and reveal at distant edge"
+      ],
+      "expected": [
+        "No page horizontal scroll; board is sole declared spatial pan exception",
+        "Cells remain readable; pan is discoverable and keyboard reaches all cells"
+      ],
+      "artifacts": [
+        "viewport",
+        "sequence"
+      ],
+      "critical": true
+    },
+    {
+      "id": "chess-sections",
+      "app": "chess",
+      "viewport": {
+        "width": 1180,
+        "height": 796
+      },
+      "window": "requested1000x760",
+      "initialState": "Setup; enough archive/model details to overflow pane",
+      "actions": [
+        "Select every top section and scroll its details",
+        "Open model submission and arena archive",
+        "Resize to390x844 and1280x576"
+      ],
+      "expected": [
+        "Navigation remains visible, no slogans and no document scrolling",
+        "Every section and primary action usable without widening"
+      ],
+      "artifacts": [
+        "viewport",
+        "sequence"
+      ],
+      "critical": true
+    },
+    {
+      "id": "chess-play",
+      "app": "chess",
+      "viewport": {
+        "width": 1180,
+        "height": 796
+      },
+      "window": "requested1000x760",
+      "initialState": "Human/Stockfish then free hints with long lines",
+      "actions": [
+        "Play e2-e4 and wait for genuine response",
+        "Scroll analysis/history; activate Undo/Leave/New game",
+        "Check selected hint, fixed loss coloring and engine progress"
+      ],
+      "expected": [
+        "All essential actions visible and hit-testable before auto-scroll",
+        "Only declared detail pane scrolls; move/hint semantics preserved"
+      ],
+      "artifacts": [
+        "viewport",
+        "sequence"
+      ],
+      "critical": true
+    },
+    {
+      "id": "chess-resize",
+      "app": "chess",
+      "viewport": {
+        "width": 1920,
+        "height": 1400
+      },
+      "window": "requested\u2192resized\u2192maximized",
+      "initialState": "Local game then hints",
+      "actions": [
+        "Resize through960x900,1200x1100,1600x1300",
+        "Shrink to390x844 and short desktop"
+      ],
+      "expected": [
+        "Board remains square and fills its available stage; grows beyond legacy720px when both axes permit",
+        "No hidden controls or unintended document overflow at any size"
+      ],
+      "artifacts": [
+        "viewport",
+        "sequence"
+      ],
+      "critical": true
+    },
+    {
+      "id": "pinball-play",
+      "app": "pinball",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested920x740",
+      "initialState": "Fresh ready cabinet, native engine, original assets",
+      "actions": [
+        "Inspect ready viewport; hold Space and play flippers through genuine score change",
+        "Pause/resume; inspect ball/fixture distinction in flight sequence",
+        "Press up/down and verify no scrolling",
+        "Observe an actual drain and transition to the next ball; pause while a ball is in flight, verify motion freezes, resume and observe motion resumes",
+        "Induce one runtime asset load failure, remove the failure, activate Retry and reach a ready playable cabinet"
+      ],
+      "expected": [
+        "Ball, obstacles and flippers visually distinguishable at normal size; no fake obstacle artwork",
+        "Live score/ball obvious; pause visually explicit; no import/engine menus",
+        "Drain updates Ball; paused state freezes physical motion and resumed state moves again",
+        "Failure replaces loading with actionable retry and returns to a playable state"
+      ],
+      "artifacts": [
+        "viewport",
+        "sequence"
+      ],
+      "critical": true
+    },
+    {
+      "id": "pinball-narrow",
+      "app": "pinball",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "workspace clamped",
+      "initialState": "Ready then live and paused",
+      "actions": [
+        "Use touch launch and both flippers; resize while playing"
+      ],
+      "expected": [
+        "Score and ball count both remain visible; controls show held/released state",
+        "Whole board fits without distortion, clipped controls or page scrolling"
+      ],
+      "artifacts": [
+        "viewport",
+        "sequence"
+      ],
+      "critical": true
+    },
+    {
+      "id": "shell-sizing",
+      "app": "desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested\u2192max\u2192restore",
+      "initialState": "New Minefield, Chess, Pinball, Paintbox and Welcome/Help/Plugins system windows",
+      "actions": [
+        "Measure each installed app and system window request against actual workspace dimensions",
+        "Resize/maximize/restore; shrink to1280x576 then390x844"
+      ],
+      "expected": [
+        "Per-axis request clamp correct; no doubled taskbar margin or560px phone minimum",
+        "User restored dimensions retained and windows stay reachable"
+      ],
+      "artifacts": [
+        "viewport",
+        "sequence"
+      ],
+      "critical": true
+    },
+    {
+      "id": "shell-focus",
+      "app": "desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "three overlapping windows",
+      "initialState": "Minefield, Chess/Paintbox and nested Pinball behind one another",
+      "actions": [
+        "Click exposed real body control and verify action+raise on first click",
+        "Repeat ten switches including keyboard and nested canvas",
+        "Drag across frames and activate already-focused window100 times"
+      ],
+      "expected": [
+        "Every switch raises correct window without swallowing input",
+        "No runawayz/re-render; drag remains continuous"
+      ],
+      "artifacts": [
+        "sequence"
+      ],
+      "critical": true
+    },
+    {
+      "id": "gate-negative",
+      "app": "process",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "fixture",
+      "initialState": "Known-bad request/review/evidence and browser geometry fixtures",
+      "actions": [
+        "Run validator negative tests",
+        "Inject2px overflow, clipped action and failed focus into browser fixtures"
+      ],
+      "expected": [
+        "Each known-bad artifact or behavior is rejected by the same acceptance helpers",
+        "Valid complete fixtures accepted; stale tree/deployed mismatch cannot promote"
+      ],
+      "artifacts": [
+        "log"
+      ],
+      "critical": true
+    }
+  ],
+  "risks": [
+    {
+      "risk": "Readable intermediate16-column and expert30-column grids cannot both fit320px width",
+      "resolution": "Larger difficulties request larger outer windows. When the24px grid cannot fit either usable dimension, preserve24px cells in a bounded discoverable board pan area; no page overflow. Beginner launch at supported viewport classes never requires pan."
+    },
+    {
+      "risk": "Square board stops growing when available height is exhausted",
+      "resolution": "Compare against min(stage width,stage height), not width alone; remove arbitrary pixel caps."
+    },
+    {
+      "risk": "Visual review can be falsely asserted",
+      "resolution": "Independent agent actually views named captures and plays defined journeys; machine gate checks provenance/coverage but does not invent aesthetic scores."
+    },
+    {
+      "risk": "Native Pinball art changes can break collision correspondence",
+      "resolution": "Preserve original masks/depth/collision records; verify generator invariants and inspect real flight, flippers and scores."
+    }
+  ],
+  "rollout": {
+    "target": "Vercel",
+    "requiredGates": [
+      "request",
+      "promotion",
+      "deployed"
+    ],
+    "rollbackCommit": "da4a0e4a134fa36977eb2903360dbb5d61c4ed77",
+    "rollbackTriggers": [
+      "Primary play unavailable",
+      "Widespread inaccessible controls or broken focus",
+      "Native assets fail to load or meaningful state unreadable"
+    ],
+    "hotfixPolicy": "Isolated recoverable major issue blocks acceptance; linked hotfix repeats affected scenarios.",
+    "acceptanceOwner": "root",
+    "reviewer": "experience_gate_review"
+  }
+}

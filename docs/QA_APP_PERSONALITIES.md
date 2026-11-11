@@ -1,3 +1,6 @@
+> Historical verification record. This is not acceptance evidence for the current
+> release. Current contracts and gates: [experience/WORKFLOW.md](experience/WORKFLOW.md).
+
 # Prism app personalities: release verification
 
 11 November 2026. [App inventory and research dossiers](app-personalities/README.md).

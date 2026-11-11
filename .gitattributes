@@ -1,2 +1,9 @@
 # Preserve pinned third-party runtime byte-for-byte; upstream minified bundle contains whitespace.
 public/vendor/pinball/PinballGame.js whitespace=-trailing-space
+
+# Native packages and original pixel assets are binary, regardless of their prefix.
+public/vendor/space-cadet/*.data binary
+public/vendor/space-cadet/*.DAT binary
+public/vendor/space-cadet/*.BGRA binary
+# Patch context preserves the exact pinned upstream whitespace.
+scripts/space-cadet-cabinet.patch -whitespace

@@ -24,6 +24,8 @@ interface GameFrameProps {
   game: GameManifest
   onExit(): void
   launchContext?: GameLaunchContext
+  onActivate?(): void
+  onRequestSize?(width: number, height: number): void
 }
 
 function externalLaunchUrl(game: GameManifest) {
@@ -35,8 +37,11 @@ function externalLaunchUrl(game: GameManifest) {
   return url.toString()
 }
 
-export function GameFrame({ game, onExit, launchContext = 'desktop' }: GameFrameProps) {
+export function GameFrame({ game, onExit, onActivate, onRequestSize, launchContext = 'desktop' }: GameFrameProps) {
   const frameRef = useRef<HTMLIFrameElement>(null)
+  const activateRef = useRef(onActivate)
+  const sizeRef = useRef(onRequestSize)
+  useEffect(() => { activateRef.current = onActivate; sizeRef.current = onRequestSize }, [onActivate, onRequestSize])
   const [ready, setReady] = useState(false)
   const [failed, setFailed] = useState(false)
   const [attempt, setAttempt] = useState(0)
@@ -83,6 +88,7 @@ export function GameFrame({ game, onExit, launchContext = 'desktop' }: GameFrame
         }
       }
       if (!isGameToHostMessage(event.data)) return
+      if (game.integration.kind === 'internal' && event.data.type === 'game.resize') sizeRef.current?.(event.data.payload.width, event.data.payload.height)
       if (event.data.type === 'game.ready') { setReady(true); setFailed(false); sendInit() }
       const completion = gameCompletionFromMessage(event.data)
       if (completion) completeSession(completion)
@@ -101,6 +107,62 @@ export function GameFrame({ game, onExit, launchContext = 'desktop' }: GameFrame
     if (frame && frame.getAttribute('src') !== src) frame.src = src
     return () => window.removeEventListener('message', receive)
   }, [attempt, completeSession, game, markExit, onExit, sessionId, src])
+
+  useEffect(() => {
+    const frame = frameRef.current
+    if (!frame) return
+    const activate = () => activateRef.current?.()
+    const attachFrame = (child: HTMLIFrameElement): (() => void) => {
+      let detachDocument = () => {}
+      const loaded = () => {
+        detachDocument()
+        detachDocument = () => {}
+        try {
+          if (child.contentDocument) detachDocument = attachDocument(child.contentDocument)
+        } catch { /* Cross-origin documents retain their native iframe focus path. */ }
+      }
+      child.addEventListener('load', loaded)
+      child.addEventListener('focus', activate)
+      loaded()
+      return () => {
+        detachDocument()
+        child.removeEventListener('load', loaded)
+        child.removeEventListener('focus', activate)
+      }
+    }
+    const attachDocument = (document: Document): (() => void) => {
+      const descendants = new Map<HTMLIFrameElement, () => void>()
+      document.addEventListener('pointerdown', activate, true)
+      document.addEventListener('focusin', activate, true)
+      const scan = (root: ParentNode) => root.querySelectorAll('iframe').forEach(child => {
+        if (!descendants.has(child)) descendants.set(child, attachFrame(child))
+      })
+      scan(document)
+      const observer = new MutationObserver(records => {
+        for (const record of records) for (const node of record.addedNodes) {
+          if (node.nodeType !== 1) continue
+          const element = node as Element
+          if (element.tagName === 'IFRAME' && !descendants.has(element as HTMLIFrameElement)) {
+            const child = element as HTMLIFrameElement
+            descendants.set(child, attachFrame(child))
+          }
+          scan(element)
+        }
+        for (const [child, detach] of descendants) if (!document.contains(child)) {
+          detach()
+          descendants.delete(child)
+        }
+      })
+      observer.observe(document, { childList: true, subtree: true })
+      return () => {
+        observer.disconnect()
+        descendants.forEach(detach => detach())
+        document.removeEventListener('pointerdown', activate, true)
+        document.removeEventListener('focusin', activate, true)
+      }
+    }
+    return attachFrame(frame)
+  }, [attempt])
 
   if (game.integration.kind === 'external' && game.integration.openMode === 'redirect') {
     const integration = game.integration

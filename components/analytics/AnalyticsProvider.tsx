@@ -9,6 +9,7 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from 'react'
+import { createPortal } from 'react-dom'
 import {
   getAnalyticsConsent,
   initializeAnalytics,
@@ -31,6 +32,12 @@ const AnalyticsContext = createContext<AnalyticsContextValue>({
 const subscribeToWindowPosition = (onStoreChange: () => void) => {
   const frame = window.requestAnimationFrame(onStoreChange)
   return () => window.cancelAnimationFrame(frame)
+}
+
+const subscribeToPrivacyMount = (onStoreChange: () => void) => {
+  const observer = new MutationObserver(onStoreChange)
+  observer.observe(document.body, { childList: true, subtree: true })
+  return () => observer.disconnect()
 }
 
 export function AnalyticsProvider({ enabled, children }: { enabled: boolean; children: ReactNode }) {
@@ -57,6 +64,16 @@ export function AnalyticsProvider({ enabled, children }: { enabled: boolean; chi
   useEffect(() => {
     if (enabled && isTopLevel) initializeAnalytics(enabled)
   }, [enabled, isTopLevel])
+
+  const desktopPrivacyMount = useSyncExternalStore(
+    subscribeToPrivacyMount,
+    () => document.getElementById('desktop-privacy-launcher'),
+    () => null,
+  )
+  const privacyEntry = <button ref={privacyButton} className="app-surface analytics-settings-button" type="button" onClick={() => {
+    setSettingsOpen(true)
+    window.requestAnimationFrame(() => closeButton.current?.focus())
+  }}>Privacy</button>
 
   const showDialog = Boolean(enabled && isTopLevel && ((consent === 'unknown' && !dismissed) || settingsOpen))
 
@@ -112,12 +129,7 @@ export function AnalyticsProvider({ enabled, children }: { enabled: boolean; chi
           <p className="analytics-consent-note">Your choice is saved on this device. Change it anytime in Privacy.</p>
         </section>
       ) : enabled && isTopLevel ? (
-        <button ref={privacyButton} className="app-surface analytics-settings-button" type="button" onClick={() => {
-          setSettingsOpen(true)
-          window.requestAnimationFrame(() => closeButton.current?.focus())
-        }}>
-          Privacy
-        </button>
+        desktopPrivacyMount ? createPortal(privacyEntry, desktopPrivacyMount) : privacyEntry
       ) : null}
     </AnalyticsContext.Provider>
   )

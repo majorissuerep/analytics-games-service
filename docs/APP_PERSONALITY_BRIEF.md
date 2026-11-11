@@ -6,6 +6,13 @@ Start menu, window chrome and native controls remain XP. App content is personal
 
 ## Shared engine, individual expression
 
+Current normative direction: [experience/VISION.md](experience/VISION.md).
+Use elementary OS and Zorin OS as forced references for task hierarchy and rounded
+material care, while preserving XP chrome. Read the current request and app contract
+before implementation. Historical app dossiers are evidence of prior decisions,
+not acceptance of the current release. An independent agent reviews actual viewport
+captures and interactions through the three gates in the experience workflow.
+
 The shared engine owns contrast, typography roles, spacing rhythm, keyboard and
 pointer behavior, focus, semantic states, scoped loading, recovery, reduced
 motion/transparency and responsive containment. Apps own composition, density,

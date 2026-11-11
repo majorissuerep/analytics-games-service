@@ -8,9 +8,31 @@
 
 ## Application design
 
+- Start experience work with [docs/experience/VISION.md](docs/experience/VISION.md),
+  [WORKFLOW.md](docs/experience/WORKFLOW.md) and [CURRENT.md](docs/experience/CURRENT.md).
+  The current request and `experience/apps/*.json` are acceptance contracts. They
+  supersede conflicting historical design/QA notes. The user remains authoritative.
+- Gate request readiness before app implementation, candidate promotion before
+  merge, and actual deployed acceptance after rollout. Use `experience:gate` and
+  an independent agent review of the exact candidate evidence. A green test count,
+  CSS token or screenshot file alone is never visual approval. Blocking findings
+  stop promotion; deployed failures produce an explicit hotfix/rollback decision.
+- Use actual elementary OS and Zorin OS references for current app content; inspect
+  real screenshots and translate their task hierarchy/material into original app
+  decisions. Preserve XP outer chrome. No opening slogans or ornamental editorial
+  copy. Use useful glossy rounded controls with a limited palette.
+- Test real requested XP windows, constrained sizes, resize/maximize/restore and
+  long/dynamic states. Check named scroll owners and action hit-testing before any
+  automatic scrolling. Capture viewport images plus dynamic sequences. Never use
+  full-page screenshots to certify visible controls. Bind evidence/reviews to the
+  source tree and actual build; retain CI artifacts and review verdicts with the PR.
+- Cost control: one owner per affected app, shared behavior owned once, independent
+  reviewer can reject; focused local deltas then required CI on a frozen candidate.
+  Only coordinator starts/builds servers. Reuse current context and contract IDs.
+
 - All application content uses Prism in `public/styles/app-theme.css` and an `app-surface` root. Read [docs/APPLICATION_DESIGN.md](docs/APPLICATION_DESIGN.md) and its research before changing presentation; `/design-system` is the live component reference.
 - Keep the XP desktop, Start menu, taskbar, outer window borders, title bars, and window controls styled by `xp.css` and the shell. Application content does not inherit XP bevels or title-bar styling.
-- Read [docs/APP_PERSONALITY_BRIEF.md](docs/APP_PERSONALITY_BRIEF.md). The shared engine defines interaction, typography roles, spacing, focus, feedback and accessibility; every app owns its composition, material character and scoped token palette. At most two decorative chromatic families per app plus a small neutral ramp; semantic domain colors are explicit exceptions. No permanent glow/animation. Research and record each app in `docs/app-personalities/`.
+- Read [docs/APP_PERSONALITY_BRIEF.md](docs/APP_PERSONALITY_BRIEF.md). The shared engine defines interaction, geometry, scroll ownership, typography roles, spacing, focus, feedback and accessibility; every app owns its composition, material character and scoped token palette. At most two decorative chromatic families per app plus a small neutral ramp; semantic domain colors are explicit exceptions. No permanent glow/animation. Research and record each app in `docs/app-personalities/`.
 - Shared patterns are reusable, not a mandatory uniform appearance. For app-specific design work, use a separate GPT-6.1 Sol agent per app when available, with the research/alternatives/implementation brief above. Preserve cross-app accessibility and regression checks.
 - Pink anchors primary intent and selection. Put useful category/value/status color in content; backgrounds may be whitish or greyish. Use material, typography, shape, spacing, and explicit interaction states together; a background recolor is insufficient.
 - Use bounded frosted layers for controls/floating surfaces, stable backing for dense content, and opaque playfields. Honor reduced transparency/contrast/motion and the persisted material preference across frames; never reduce entire-component opacity to create glass.

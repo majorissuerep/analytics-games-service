@@ -32,8 +32,8 @@ function soundLabel() { $('sound').setAttribute('aria-label', soundOn ? 'Sound o
 function fit() {
   if (!canvas.width || !canvas.height) return
   const stage = canvas.parentElement
-  const width = Math.min(stage.clientWidth, stage.clientHeight * canvas.width / canvas.height)
-  canvas.style.width = `${width}px`; canvas.style.height = `${width * canvas.height / canvas.width}px`
+  const width = Math.min(stage.clientWidth, stage.clientHeight * 365 / 470)
+  canvas.style.width = `${width}px`; canvas.style.height = `${width * 470 / 365}px`
 }
 new ResizeObserver(fit).observe(canvas.parentElement)
 function stopTimer() { clearInterval(timer); clearTimeout(timeout) }
@@ -75,7 +75,8 @@ async function start() {
       $('score').textContent = Math.max(0, score).toLocaleString('en-US')
       $('ball').textContent = remaining > 0 ? `${4 - remaining} / 3` : '—'
       paused = Boolean(isPaused)
-      $('pause').textContent = paused ? '▶' : 'Ⅱ'
+      $('pause').querySelector('path').setAttribute('d', paused ? 'M8 5l11 7-11 7z' : 'M8 5v14M16 5v14')
+      $('pause-veil').hidden = !paused
       $('pause').setAttribute('aria-label', paused ? 'Resume' : 'Pause')
       document.body.dataset.paused = String(paused)
       if (remaining === 0 && ready) announce('Game over · ↻ to play again')
@@ -88,7 +89,7 @@ async function start() {
     setStatus: message => { if (message) $('loading-detail').textContent = /Running/.test(message) ? 'Starting the table and controls…' : 'Loading runtime and table files…' },
     printErr: message => { console.error('[Space Cadet]', message); if (/missing|Could not|Error/i.test(message)) lastRuntimeError = String(message) },
     onExit: status => { if (status !== 0) { lastRuntimeError = 'Invalid table data'; fail('The table data could not be loaded. Check the local game files and retry.') } },
-    onAbort: () => fail('The engine could not initialize. Retry, or check the imported game files.'),
+    onAbort: () => fail('The engine could not initialize. Retry to reload the table.'),
     instantiateWasm(imports, receiveInstance) {
       $('loading-detail').textContent = 'Downloading the Space Cadet engine…'
       void fetch(ASSETS + 'SpaceCadetPinball.wasm', { signal: AbortSignal.timeout(30_000) }).then(response => {
@@ -114,8 +115,10 @@ async function start() {
   script.onerror = () => fail('The engine download failed. Check your connection and retry.')
   document.head.appendChild(script)
 }
-$('new-game').addEventListener('click', () => { if (ready) { press('F2','F2',113); paused = false; $('pause').textContent = 'Ⅱ'; announce('Game started. Hold Space, then release to launch.'); } })
-$('pause').addEventListener('click', () => { if (ready) { press('F3','F3',114); paused = !paused; $('pause').textContent = paused ? '▶' : 'Ⅱ'; } })
+$('new-game').addEventListener('click', () => { if (ready) { press('F2','F2',113); paused = false; $('pause').querySelector('path').setAttribute('d', 'M8 5v14M16 5v14'); announce('Game started. Hold Space, then release to launch.'); } })
+$('pause').addEventListener('click', () => { if (ready) { press('F3','F3',114); paused = !paused; $('pause').querySelector('path').setAttribute('d', paused ? 'M8 5l11 7-11 7z' : 'M8 5v14M16 5v14')
+      $('pause-veil').hidden = !paused; } })
+$('resume-table').addEventListener('click', () => { if (ready && paused) press('F3','F3',114) })
 $('sound').addEventListener('click', () => { if (ready) toggleSound() })
 window.addEventListener('keydown', event => { if (event.code === 'F5') { event.preventDefault(); event.stopImmediatePropagation(); if (ready) toggleSound() } }, true)
 $('retry').addEventListener('click', () => location.reload())
@@ -128,13 +131,14 @@ for (const button of document.querySelectorAll('[data-key]')) {
     // before starting the pointer hold, so blur cannot clear the new key state.
     canvas.focus({ preventScroll: true })
     down = true
+    button.dataset.held = 'true'
     key('keydown', button.dataset.key, button.dataset.code, Number(button.dataset.keycode), false)
   })
-  const release = () => { if (down) { down = false; key('keyup', button.dataset.key, button.dataset.code, Number(button.dataset.keycode), false) } }
+  const release = () => { if (down) { down = false; button.dataset.held = 'false'; key('keyup', button.dataset.key, button.dataset.code, Number(button.dataset.keycode), false) } }
   button.addEventListener('keydown', event => {
     if (!ready || !['Space', 'Enter'].includes(event.code)) return
     event.preventDefault()
-    if (!down) { down = true; key('keydown', button.dataset.key, button.dataset.code, Number(button.dataset.keycode), false) }
+    if (!down) { down = true; button.dataset.held = 'true'; key('keydown', button.dataset.key, button.dataset.code, Number(button.dataset.keycode), false) }
   })
   button.addEventListener('keyup', event => {
     if (['Space', 'Enter'].includes(event.code)) { event.preventDefault(); release() }
@@ -146,6 +150,7 @@ for (const button of document.querySelectorAll('[data-key]')) {
 window.addEventListener('keydown', event => {
   if (['ArrowUp', 'ArrowDown'].includes(event.code)) { event.preventDefault(); event.stopImmediatePropagation(); return }
   if (!['ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) return
+  if (event.code === 'Space' && event.target.closest?.('button:not([data-key])')) { event.stopImmediatePropagation(); return }
   event.preventDefault()
   if (event.target !== canvas && !event.target.closest?.('[data-key]')) {
     event.stopImmediatePropagation()
@@ -154,6 +159,7 @@ window.addEventListener('keydown', event => {
 }, true)
 window.addEventListener('keyup', event => {
   if (!['ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) return
+  if (event.code === 'Space' && event.target.closest?.('button:not([data-key])')) { event.stopImmediatePropagation(); return }
   event.preventDefault()
   if (event.target !== canvas && !event.target.closest?.('[data-key]')) {
     event.stopImmediatePropagation()
@@ -163,6 +169,8 @@ window.addEventListener('keyup', event => {
 window.addEventListener('blur', () => {
   for (const [name, code, number] of [['ArrowLeft','ArrowLeft',37],['ArrowRight','ArrowRight',39],[' ','Space',32]]) key('keyup', name, code, number, false)
 })
+window.addEventListener('keydown', event => { if (event.code === 'Tab') document.body.dataset.keyboardFocus = 'true' }, true)
+window.addEventListener('pointerdown', () => { document.body.dataset.keyboardFocus = 'false' }, true)
 document.documentElement.dataset.appReady = 'true'
 if (window.parent !== window) window.parent.postMessage({ protocol: 'analytics-games.bridge', version: 1, type: 'game.ready' }, location.origin)
 void start()

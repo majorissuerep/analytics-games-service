@@ -9,6 +9,7 @@ node_modules
 .turbo/
 playwright-report/
 test-results/
+experience-evidence/
 *.tsbuildinfo
 .env*.local
 .DS_Store

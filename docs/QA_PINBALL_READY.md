@@ -1,3 +1,6 @@
+> Historical verification record. This is not acceptance evidence for the current
+> release. Current contracts and gates: [experience/WORKFLOW.md](experience/WORKFLOW.md).
+
 # Ready-to-play Pinball release verification
 
 11 November 2026. This revision supersedes the earlier optional-original-files

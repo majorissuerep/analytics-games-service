@@ -9,9 +9,9 @@ cabinet, fixes the renderer's height for the 470-pixel table, binds horizontal
 arrows to flippers, and disables nudging and obsolete setup shortcuts.
 The artwork owns the full palette, including formerly reserved system slots.
 
-Aster is original procedural Python artwork dedicated under CC0: warm enamel,
-rose flight markings and flippers, machined fixtures, a spacecraft seal and
-chrome balls. All 318 bitmap records are regenerated. Bitmap masks and bounds,
+Aster is original procedural Python artwork dedicated under CC0: navy enamel,
+restrained flight markings, rose flippers, cyan native lamp/bumper states,
+blue steel fixtures and white chrome balls. All 318 bitmap records are regenerated. Bitmap masks and bounds,
 depth maps, collision geometry and game rules are preserved. Source and output
 DAT files, previews and notes are in `art/`; generator:
 `scripts/generate-pinball-art.py`. The starting geometry and synthesized sounds
@@ -37,3 +37,10 @@ require artifact hash review; art generation is byte deterministic.
 References: https://github.com/alula/SpaceCadetPinball,
 https://github.com/andrewnakas/open-cadet, https://github.com/libsdl-org/SDL,
 https://github.com/libsdl-org/SDL_mixer, https://github.com/ocornut/imgui.
+
+11 November 2026 visual revision: the renderer draws original
+`ASTER-BACKING.BGRA` below the native masked table texture. Index zero remains
+exactly zero; zero sprite color retains the backing while its native depth write
+remains unchanged. Texture alpha blending composes this background material.
+No native physics, collision/depth records or DAT sprite masks changed. The
+full JS/WASM/preload package was rebuilt to include the new original backing.

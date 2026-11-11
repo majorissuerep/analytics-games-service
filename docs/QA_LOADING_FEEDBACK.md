@@ -1,3 +1,6 @@
+> Historical verification record. This is not acceptance evidence for the current
+> release. Current contracts and gates: [experience/WORKFLOW.md](experience/WORKFLOW.md).
+
 # Scoped loading feedback QA
 
 11 November 2026. Related contract: [Application design](APPLICATION_DESIGN.md#waiting-progress-and-recovery).

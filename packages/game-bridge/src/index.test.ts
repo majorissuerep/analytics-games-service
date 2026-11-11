@@ -5,6 +5,7 @@ import {
   exitMessage,
   isGameToHostMessage,
   readyMessage,
+  resizeMessage,
 } from './index'
 
 describe('external game bridge contract', () => {
@@ -24,5 +25,17 @@ describe('external game bridge contract', () => {
       version: ANALYTICS_GAME_BRIDGE_VERSION,
       type: 'host.init',
     })).toBe(false)
+  })
+})
+
+
+describe('desktop size requests', () => {
+  it('accepts requested dimensions and rejects malformed or unbounded dimensions', () => {
+    expect(isGameToHostMessage(resizeMessage(480, 600))).toBe(true)
+    for (const value of [0, -1, NaN, Infinity, 4097, '480', null, undefined]) {
+      expect(isGameToHostMessage({ ...resizeMessage(480, 600), payload: { width: value, height: 600 } })).toBe(false)
+      expect(isGameToHostMessage({ ...resizeMessage(480, 600), payload: { width: 480, height: value } })).toBe(false)
+    }
+    expect(isGameToHostMessage({ ...resizeMessage(480, 600), payload: null })).toBe(false)
   })
 })

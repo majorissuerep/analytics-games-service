@@ -1,60 +1,49 @@
-/* Field notes: warm paper, slate instruments, pink intent. The board is opaque. */
+/* A compact puzzle instrument: bounded silver frost, slate field, pink intent. */
 .minefield-app {
-  --ui-focus: var(--ui-accent-ink);
-  --field-ink: #344b54;
-  --field-soft: #e6edef;
-  --ui-teal: #344b54;
-  --ui-teal-bg: #e6edef;
-  --ui-violet: #344b54;
-  --ui-violet-bg: #e6edef;
-  width: 100%; min-width: 0; min-height: 100svh; align-self: stretch;
-  padding: 24px; overflow: auto; color: var(--ui-ink);
-  background: var(--ui-canvas); background-image: none;
-  font: 14px/1.5 var(--ui-font);
+  --ui-canvas: #f0f2f3; --ui-ink: #26343d; --ui-muted: #52616c;
+  --ui-line: #c5cdd2; --ui-focus: #a12063; --ui-embedded-fill: rgb(240 244 246 / 72%);
+  --field-ink: #354d5c; --field-soft: #dfe7eb;
+  width: 100%; height: var(--ui-app-height, 100svh); min-height: 0; min-width: 0; padding: 12px;
+  display: flex; flex-direction: column; gap: 10px; overflow: hidden;
+  color: var(--ui-ink); background: var(--ui-canvas); font: 14px/1.5 var(--ui-font);
 }
-.minefield-header, .minefield-toolbar { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-.minefield-header { padding-bottom: 20px; border-bottom: 1px solid var(--ui-line); }
-.minefield-heading { display: grid; gap: 4px; }
-.minefield-eyebrow, .minefield-field-label { font: 600 10px/1.5 var(--ui-mono); text-transform: uppercase; letter-spacing: .09em; color: var(--field-ink); }
-.minefield-header a { color: var(--ui-ink); font-size: 28px; line-height: 1.2; text-decoration: none; }
-.minefield-embedded-title { display: none; font-size: 28px; line-height: 1.2; }
-.embedded-game-surface .minefield-heading > a { display: none; }
-.embedded-game-surface .minefield-embedded-title { display: block; }
-.minefield-heading p { margin: 0; color: var(--ui-muted); font-size: 12px; }
-.minefield-app label { display: flex; align-items: center; gap: 8px; }
-.minefield-app select, .minefield-toolbar button { font: inherit; }
-.minefield-toolbar { padding: 16px 0; font-size: 12px; }
-.minefield-assurance { margin-right: auto; color: var(--field-ink); font-weight: 650; }
-.minefield-assurance > span { display: block; color: var(--ui-muted); font-size: 11px; font-weight: 400; }
-.minefield-toolbar button[aria-pressed='true'] { background: var(--ui-accent); color: white; border-color: var(--ui-accent); box-shadow: inset 0 -3px rgb(0 0 0 / 18%); }
-.minefield-machine { width: calc(var(--field-width) + 38px); min-width: min(100%, 300px); max-width: 100%; margin: 0 auto; padding: 16px; border: 1px solid #b9c5c8; border-top: 3px solid var(--field-ink); border-radius: 4px 4px 12px 12px; background: #fffefa; box-shadow: 0 4px 14px rgb(26 43 48 / 6%); }
-.minefield-field-label { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding-bottom: 12px; }
-.minefield-scoreboard { min-width: 245px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.minefield-scoreboard > div { display: grid; padding: 0; background: none; border: 0; border-radius: 0; }
+.minefield-header { flex: none; display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid rgb(255 255 255 / 85%); border-radius: 14px; background: linear-gradient(180deg,rgb(255 255 255 / 85%),rgb(231 237 241 / 78%)); box-shadow: 0 2px 6px rgb(35 51 62 / 10%), inset 0 1px white; }
+.minefield-title { color: var(--ui-ink); font-size: 18px; font-weight: 700; text-decoration: none; margin-right: auto; }
+.embedded-game-surface .minefield-title { display: none; }
+.minefield-header label { display: flex; align-items: center; gap: 8px; flex: 1; font-size: 12px; }
+.minefield-header select { width: 100%; min-width: 0; font: inherit; }
+.minefield-header button { flex: none; white-space: nowrap; }
+.minefield-app :is(button,select) { border-radius: 9px; }
+.minefield-machine { min-height: 0; min-width: 0; flex: 1; display: flex; flex-direction: column; padding: 10px; border-radius: 16px; border: 1px solid #c2ccd2; background: #fafbfc; box-shadow: 0 3px 8px rgb(35 51 62 / 8%), inset 0 1px white; }
+.minefield-scoreboard { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 0 4px 8px; }
+.minefield-scoreboard > div { display: grid; }
 .minefield-scoreboard > div:last-child { text-align: right; }
-.minefield-scoreboard small { color: var(--ui-muted); font-size: 11px; }
-.minefield-scoreboard output { color: var(--field-ink); font: 600 26px/1.2 var(--ui-mono); font-variant-numeric: tabular-nums; }
-.minefield-scoreboard button { color: white; background: var(--ui-accent); border-color: var(--ui-accent); }
-.minefield-board-scroll { max-width: 100%; overflow: auto; overscroll-behavior: contain; padding: 2px; background: #f4f4ee; border: 1px solid #9baeb5; border-radius: 2px; }
-.minefield-grid { display: grid; width: max-content; background: #f4f4ee; }
-.minefield-app .minefield-cell { width: var(--cell-size); min-width: var(--cell-size); height: var(--cell-size); min-height: var(--cell-size); padding: 0; border: 1px solid #718b95; border-radius: 0; color: #263d47; background: #aebfc5; box-shadow: inset 1px 1px 0 #dfe7e9; font: 700 calc(var(--cell-size) * .54)/1 var(--ui-mono); cursor: pointer; touch-action: manipulation; transition: none; }
-.minefield-app .minefield-cell:hover:not(.revealed) { background: #c5d2d6; border-color: #344b54; }
-.minefield-app .minefield-cell.revealed { border: 1px solid #e1e3dc; background: #fffefa; box-shadow: none; cursor: default; color: #263d47; }
-.minefield-app .minefield-cell.flagged, .minefield-app .minefield-cell.flagged:hover { color: white; background: #344b54; border-color: #263d47; box-shadow: none; }
+.minefield-scoreboard small,.minefield-dimensions small { display: block; color: var(--ui-muted); font-size: 11px; font-weight: 400; }
+.minefield-scoreboard output { font: 600 24px/1.2 var(--ui-mono); color: var(--field-ink); font-variant-numeric: tabular-nums; }
+.minefield-dimensions { text-align: center; color: var(--field-ink); font: 600 13px/1.4 var(--ui-mono); }
+.minefield-stage { flex: 1; min-width: 0; min-height: 0; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+.minefield-board-scroll { flex: none; width: calc(var(--field-width) + 10px); height: calc(var(--field-height) + 10px); max-width: 100%; max-height: 100%; overflow: auto; overscroll-behavior: contain; padding: 4px; border: 1px solid #8297a3; border-radius: 5px; background: #dce5ea; scrollbar-width: thin; }
+.minefield-grid { display: grid; width: max-content; background: #edf1f3; }
+.minefield-app .minefield-cell { width: var(--cell-size); min-width: var(--cell-size); height: var(--cell-size); min-height: var(--cell-size); padding: 0; border: 1px solid #8297a3; border-radius: 0; color: #253d4b; background: #b4c5d0; box-shadow: inset 1px 1px 0 #e6eef3; font: 700 calc(var(--cell-size) * .53)/1 var(--ui-mono); cursor: pointer; touch-action: pan-x pan-y; user-select: none; -webkit-touch-callout: none; transition: none; }
+.minefield-app .minefield-cell:hover:not(.revealed) { background: #c7d5df; border-color: #354d5c; }
+.minefield-app .minefield-cell.revealed { border: 1px solid #dce4e9; background: #fff; box-shadow: none; cursor: default; color: #253d4b; }
+.minefield-app .minefield-cell.flagged,.minefield-app .minefield-cell.flagged:hover { color: #fff; background: #354d5c; border-color: #253d4b; box-shadow: none; }
 .minefield-app .minefield-cell.mine { color: #8d1d35; background: #ffe0e5; border-color: #c54c66; }
-.minefield-app .minefield-cell:focus-visible, .minefield-board-scroll:focus-visible { outline: 3px solid var(--ui-focus); outline-offset: -3px; z-index: 1; }
+.minefield-app .minefield-cell:focus-visible,.minefield-board-scroll:focus-visible { outline: 3px solid var(--ui-focus); outline-offset: -3px; z-index: 1; }
 .minefield-app .minefield-cell:disabled { opacity: 1; cursor: wait; }
-.minefield-progress { display: flex; align-items: center; gap: 12px; margin-top: 14px; color: var(--field-ink); font: 11px/1.5 var(--ui-mono); }
-.minefield-progress label { white-space: nowrap; }
-.minefield-progress progress { flex: 1; width: 48px; min-width: 24px; height: 5px; accent-color: var(--field-ink); border: 0; border-radius: 0; background: var(--field-soft); }
+.minefield-progress { flex: none; display: flex; align-items: center; gap: 8px; margin-top: 8px; color: var(--field-ink); font: 11px/1.5 var(--ui-mono); }
+.minefield-progress :is(label,span) { white-space: nowrap; }
+.minefield-progress progress { flex: 1; width: 48px; min-width: 16px; height: 5px; accent-color: var(--field-ink); border: 0; background: var(--field-soft); }
+.minefield-mode-help { margin: 8px 0 0; color: var(--field-ink); font-size: 11px; }
+.minefield-status,.minefield-pan-help { flex: none; margin: 3px 0 0; color: var(--ui-muted); font-size: 11px; line-height: 1.4; }
+.minefield-pan-help:empty { display: none; }
+.minefield-retry { margin-top: 4px; align-self: flex-start; }
+@media (max-width: 640px) { .minefield-app { padding: 8px; gap: 8px; } .minefield-title { display: none; } .minefield-machine { padding: 8px; } }
+@media (max-width: 350px) { .minefield-header { gap: 6px; padding: 6px; } .minefield-header label { gap: 4px; } .minefield-header button { padding-inline: 8px; } }
+@media (prefers-reduced-motion: reduce) { .minefield-app * { animation: none; transition: none; scroll-behavior: auto; } }
+html[data-ui-material='solid'] .minefield-header { background: #e9eef1; box-shadow: none; }
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) { .minefield-header { background: #e9eef1; box-shadow: none; } }
+@media (forced-colors: active) { .minefield-app .minefield-cell { border: 1px solid ButtonText; background: ButtonFace; color: ButtonText; } .minefield-app .minefield-cell.revealed { background: Canvas; border-color: GrayText; color: CanvasText; } .minefield-app .minefield-cell.flagged { background: Highlight; color: HighlightText; } }
 .minefield-progress progress::-webkit-progress-bar { background: var(--field-soft); }
 .minefield-progress progress::-webkit-progress-value { background: var(--field-ink); }
 .minefield-progress progress::-moz-progress-bar { background: var(--field-ink); }
-.minefield-progress > span { white-space: nowrap; }
-.minefield-mode-help { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--ui-line); color: var(--field-ink); font-size: 12px; max-width: 850px; }
-.minefield-status { max-width: 850px; margin: 4px 0 0; color: var(--ui-muted); font-size: 11px; }
-@media (max-width: 640px) { .minefield-app { padding: 12px; } .minefield-header { gap: 12px; padding-bottom: 14px; } .minefield-header a { font-size: 24px; } .minefield-machine { padding: 10px; } .minefield-toolbar { gap: 10px; padding: 12px 0; } .minefield-assurance { flex-basis: 100%; } .minefield-scoreboard { gap: 8px; } }
-@media (max-width: 350px) { .minefield-app { padding: 8px; } .minefield-header { align-items: flex-start; } .minefield-heading p { max-width: 160px; } .minefield-toolbar label { gap: 4px; } }
-@media (max-width: 640px) { .minefield-embedded-title { font-size: 24px; } }
-@media (prefers-reduced-motion: reduce) { .minefield-app * { animation: none; transition: none; scroll-behavior: auto; } }
-@media (forced-colors: active) { .minefield-app .minefield-cell { border: 1px solid ButtonText; background: ButtonFace; color: ButtonText; } .minefield-app .minefield-cell.revealed { background: Canvas; border-color: GrayText; color: CanvasText; } .minefield-app .minefield-cell.flagged { background: Highlight; color: HighlightText; } }

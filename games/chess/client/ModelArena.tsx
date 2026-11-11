@@ -27,6 +27,7 @@ const BUILTIN = 'builtin-stockfish-18'
 const TURN_BUDGET_OPTIONS = [1000, 2000, 3000, 5000, 10000]
 
 export function ModelArena({ models }: { models: ModelOption[] }) {
+  const [arenaSection, setArenaSection] = useState<'configure' | 'replay' | 'archive'>('configure')
   const [whiteRevisionId, setWhiteRevisionId] = useState(BUILTIN)
   const [blackRevisionId, setBlackRevisionId] = useState(BUILTIN)
   const [turnBudgetMs, setTurnBudgetMs] = useState(3000)
@@ -139,6 +140,7 @@ export function ModelArena({ models }: { models: ModelOption[] }) {
     setControlToken(body.match.controlToken)
     setMatch(next)
     setReplayPly(0)
+    setArenaSection('replay')
     void refreshArchive()
     } catch (error) { setError(error instanceof Error ? error.message : 'Could not create match') }
     finally { setControlPending(null) }
@@ -163,13 +165,16 @@ export function ModelArena({ models }: { models: ModelOption[] }) {
 
   function openReplay(item: MatchRecord) {
     setMatch(item)
+    setArenaSection('replay')
     setControlToken(localStorage.getItem(`chess-model-match:${item.id}`) ?? '')
     setReplayPly(item.state.moves.length)
     setReplayPlaying(false)
   }
 
   return <section className="chess-arena" aria-label="Model arena">
-    <h2>Model arena</h2><p>Two approved models play with a configurable turn budget. Every position is saved for replay.</p>
+    <nav className="chess-utility-tabs" aria-label="Arena sections"><button aria-pressed={arenaSection === 'configure'} onClick={() => setArenaSection('configure')}>New match</button><button disabled={!match} aria-pressed={arenaSection === 'replay'} onClick={() => setArenaSection('replay')}>Replay</button><button aria-pressed={arenaSection === 'archive'} onClick={() => setArenaSection('archive')}>Saved matches</button></nav>
+    <div className="chess-arena-config" hidden={arenaSection !== 'configure'} data-scroll-owner="chess-arena-configuration">
+    <h2>New model match</h2>
     <div className="chess-model-grid">
       <label>White model<select aria-label="White model" value={whiteRevisionId} onChange={event => setWhiteRevisionId(event.target.value)}>{models.map(model => <option key={model.revisionId} value={model.revisionId}>{model.displayName}</option>)}</select></label>
       <label>Black model<select aria-label="Black model" value={blackRevisionId} onChange={event => setBlackRevisionId(event.target.value)}>{models.map(model => <option key={model.revisionId} value={model.revisionId}>{model.displayName}</option>)}</select></label>
@@ -178,15 +183,16 @@ export function ModelArena({ models }: { models: ModelOption[] }) {
     <button className="chess-primary" disabled={Boolean(controlPending)} onClick={() => void createMatch()}>{controlPending === 'create' ? 'Creating match…' : 'Start model match'}</button>
     {controlPending && <LoadingState label={controlPending === 'create' ? 'Creating the model match' : 'Updating match controls'} />}
     {error && <p className="chess-notice" role="alert">{error} {match && <button onClick={() => setRetry(value => value + 1)}>Retry move</button>}</p>}
-    {match && <div className="chess-arena-live">
-      <div><Chessboard options={{ id: 'model-arena-board', position: replayFen, allowDragging: false, animationDurationInMs: 180, lightSquareStyle: { backgroundColor: 'var(--ui-board-light)' }, darkSquareStyle: { backgroundColor: 'var(--ui-board-dark)' } }} /></div>
+    </div>
+    {match && <div className="chess-arena-live" hidden={arenaSection !== 'replay'}>
+      <div className="chess-arena-stage"><div><Chessboard options={{ id: 'model-arena-board', position: replayFen, allowDragging: false, animationDurationInMs: 180, lightSquareStyle: { backgroundColor: 'var(--ui-board-light)' }, darkSquareStyle: { backgroundColor: 'var(--ui-board-dark)' } }} /></div></div>
       <aside><h3>{match.white_model_name} vs {match.black_model_name}</h3><p>{match.state.status}{thinking ? ' · thinking' : ''} · {match.state.moves.length} plies · {match.state.turnBudgetMs / 1000}s/turn</p>
-        {thinking && <LoadingState key={`${match.id}:${match.state.moves.length}:${retry}`} label={`${new Chess(match.state.fen).turn() === 'w' ? match.white_model_name : match.black_model_name}: ${progress?.message ?? 'Connecting to engine'}`} detail={progress?.detail} />}
+
         {controlToken && match.state.status !== 'completed' && <button disabled={Boolean(controlPending)} onClick={() => void togglePause()}>{match.state.status === 'paused' ? 'Resume match' : 'Pause match'}</button>}
         <div className="chess-replay-controls"><button aria-label="First position" disabled={replayPly === 0} onClick={() => setReplayPly(0)}>│‹</button><button aria-label="Previous position" disabled={replayPly === 0} onClick={() => setReplayPly(value => Math.max(0, value - 1))}>‹</button><button aria-pressed={replayPlaying} disabled={!match.state.moves.length} onClick={() => { if (!replayPlaying && replayPly >= match.state.moves.length) setReplayPly(0); setReplayPlaying(value => !value) }}>{replayPlaying ? 'Pause replay' : 'Play replay'}</button><button aria-label="Next position" disabled={replayPly === match.state.moves.length} onClick={() => setReplayPly(value => Math.min(match.state.moves.length, value + 1))}>›</button><button aria-label="Latest position" disabled={replayPly === match.state.moves.length} onClick={() => setReplayPly(match.state.moves.length)}>›│</button></div>
-        <p>Replay position {replayPly}/{match.state.moves.length}</p><div className="chess-arena-moves">{match.state.moves.map(move => <button key={move.ply} aria-current={replayPly === move.ply ? 'step' : undefined} onClick={() => setReplayPly(move.ply)}>{move.ply}. {move.san}</button>)}</div>
+        <p>Replay position {replayPly}/{match.state.moves.length}</p><div className="chess-arena-moves" data-scroll-owner="chess-arena-moves">{thinking && <LoadingState key={`${match.id}:${match.state.moves.length}:${retry}`} label={`${new Chess(match.state.fen).turn() === 'w' ? match.white_model_name : match.black_model_name}: ${progress?.message ?? 'Connecting to engine'}`} detail={progress?.detail} />}{error && <p className="chess-notice" role="alert">{error} <button onClick={() => setRetry(value => value + 1)}>Retry move</button></p>}{match.state.moves.map(move => <button key={move.ply} aria-current={replayPly === move.ply ? 'step' : undefined} onClick={() => setReplayPly(move.ply)}>{move.ply}. {move.san}</button>)}</div>
       </aside>
     </div>}
-    <div className="chess-match-archive"><h3>Saved matches</h3>{archiveLoading && <LoadingState scope="inline" label="Loading saved matches" />}{archiveError && <p role="alert">{archiveError} <button onClick={() => void refreshArchive()}>Retry saved matches</button></p>}{matches.length ? matches.map(item => <button key={item.id} aria-pressed={match?.id === item.id} onClick={() => openReplay(item)}><b>{item.white_model_name} vs {item.black_model_name}</b><span>{item.status} · {item.state.moves.length} plies {item.result}</span></button>) : !archiveLoading && !archiveError && <p>No saved matches yet. Start a model match above to build your replay library.</p>}</div>
+    <div className="chess-match-archive" hidden={arenaSection !== 'archive'} data-scroll-owner="chess-arena-archive"><h3>Saved matches</h3>{archiveLoading && <LoadingState scope="inline" label="Loading saved matches" />}{archiveError && <p role="alert">{archiveError} <button onClick={() => void refreshArchive()}>Retry saved matches</button></p>}{matches.length ? matches.map(item => <button key={item.id} aria-pressed={match?.id === item.id} onClick={() => openReplay(item)}><b>{item.white_model_name} vs {item.black_model_name}</b><span>{item.status} · {item.state.moves.length} plies {item.result}</span></button>) : !archiveLoading && !archiveError && <p>No saved matches yet. Start a model match above to build your replay library.</p>}</div>
   </section>
 }

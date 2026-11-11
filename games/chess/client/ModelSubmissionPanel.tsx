@@ -8,8 +8,8 @@ import { fetchWithTimeout } from '@/lib/engine/client/fetch-with-timeout'
 type Source = 'huggingface' | 'direct'
 type RegistryModel = { slug: string; displayName: string; state: string; runtimeId: string }
 
-export function ModelSubmissionPanel() {
-  const [open, setOpen] = useState(false)
+export function ModelSubmissionPanel({ initiallyOpen = false }: { initiallyOpen?: boolean }) {
+  const [open, setOpen] = useState(initiallyOpen)
   const [source, setSource] = useState<Source>('huggingface')
   const [name, setName] = useState('')
   const [displayName, setDisplayName] = useState('')

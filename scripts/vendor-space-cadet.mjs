@@ -36,6 +36,7 @@ if (process.argv.includes('--verify')) {
   run('git', ['apply', join(repository, 'scripts/space-cadet-cabinet.patch')])
   run('python', [join(repository, 'scripts/generate-pinball-art.py'), '--check'])
   await cp(join(repository, 'public/vendor/space-cadet/PINBALL.DAT'), join(build, 'game_resources/PINBALL.DAT'))
+  await cp(join(repository, 'public/vendor/space-cadet/ASTER-BACKING.BGRA'), join(build, 'game_resources/ASTER-BACKING.BGRA'))
   for (const file of provenance.data.files.filter(file => file.name !== 'PINBALL.DAT')) {
     const bytes = await download(`https://raw.githubusercontent.com/andrewnakas/open-cadet/${provenance.data.commit}/${file.name.toLowerCase()}`, file.sha256)
     await writeFile(join(build, 'game_resources', file.name.toLowerCase()), bytes)

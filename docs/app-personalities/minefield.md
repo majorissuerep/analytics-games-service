@@ -1,126 +1,119 @@
-# Minefield — field notes
+# Minefield — compact puzzle window
 
-11 November 2026. Scope: Minefield client composition, CSS and interaction details.
-Generation, solver, telemetry and board configurations remain unchanged.
+11 November 2026. Current authority: `docs/experience/VISION.md`,
+`experience/requests/desktop-refinement.json`, and `experience/apps/minefield.json`.
+This replaces the earlier “field notes” direction, manual cell sizing and flag mode.
+Generation, deduction solver, configurations and telemetry remain unchanged.
 
-## Task and friction
+## Task and observed friction
 
-The task is to scan a partly opened field, reconcile neighboring clues and flags,
-and open a justified square. First opening verifies a deduction-only board.
-The shipped expert field is **30 × 16 with 99 mines**, not 99 × 99.
+Read neighboring clues, mark justified dangers, open justified squares. Beginner
+is 9×9/10, intermediate16×16/40, expert30×16/99. The inspected production baseline
+opened a beginner in1040×700, with a1032×671 iframe whose document needed731px.
+The270px grid also lived in a board viewport with client272/scroll274: exactly2px
+of accidental horizontal overflow. Detached editorial headings and controls took
+more space than the task justified. Touch marking depended on a global mode.
 
-Three consequential problems in the previous interface:
+## Direct references inspected
 
-1. Three rounded frosted containers and separate colorful counters competed with
-   the field. Controls, configuration and game state had similar visual weight.
-2. Flag mode changed only its fill. Its effect on the next tap was not stated,
-   particularly consequential when switching between mouse and touch.
-3. Horizontal arrow navigation wrapped from one row to another; long instruction
-   text could also dictate the board container width. Both weaken spatial mapping.
+- [elementary HIG, Concision](https://docs.elementary.io/hig/design-philosophy/concision.md):
+  main purpose immediately apparent; avoid feature/configuration burden.
+- [Accessible Configuration](https://docs.elementary.io/hig/design-philosophy/accessible-configuration.md):
+  sane defaults rather than asking users to make layout engineering choices.
+- [Creating Layouts](https://docs.elementary.io/hig/widgets/creating-layouts.md):
+  common tools first, related controls grouped. Read the text and visually inspected
+  linked toolbar and Files artwork; those are historical screenshots, not evidence
+  of the latest OS appearance.
+- [Official elementary screenshots](https://elementary.io): directly downloaded and
+  visually inspected `images/screenshots/appcenter.png` and `code.png`. Adopt clear
+  toolbar/content boundaries, compact attached controls, quiet stable work area,
+  rounded bounded surfaces. Reject AppCenter's promotional hero for a game and
+  Code's sidebar, which would steal board width.
+- [Official Zorin OS overview](https://zorin.com/os/): rendered the page and visually
+  inspected its desktop/application presentations. Adopt soft silver material,
+  modest rounding and careful hierarchy; reject marketing composition, OS branding
+  and a whole shell reskin. XP chrome remains owned by the shell.
+- [Simon Tatham Mines manual](https://www.chiark.greenend.org.uk/~sgtatham/puzzles/doc/mines.html),
+  [GNOME Mines flags](https://help.gnome.org/users/gnome-mines/stable/flags.html.en)
+  and [Hexcells publisher screenshots](https://store.steampowered.com/app/265890/Hexcells/)
+  were directly read/visually inspected in the prior pass. Their retained useful
+  patterns are protected flags, deduction-first generation, contiguous field and
+  peripheral counters; no copied artwork or changed puzzle rules.
 
-Preserve: numbered clues, visible flags/mines, protected flagged squares, chording,
-roving keyboard focus, right-click/F marking, selectable cell size, internal scroll,
-worker verification/cancellation/error recovery, elapsed timing and terminal events.
+These references inform design decisions; they do not establish measured usability
+or medical benefits for this implementation.
 
-## Direct references and limits
+## Alternatives and chosen personality
 
-- [Simon Tatham, Mines manual](https://www.chiark.greenend.org.uk/~sgtatham/puzzles/doc/mines.html),
-  directly read current 20260923 manual: deduction-only generation, protected marked
-  cells, click-to-clear surrounding squares and cursor navigation. Adopt explicit
-  first-opening verification and terse contextual controls. Do not import undo,
-  alternate tilings, solve commands or different Space-key behavior into this game.
-- [GNOME Mines flags](https://help.gnome.org/users/gnome-mines/stable/flags.html.en)
-  and [board sizing](https://help.gnome.org/users/gnome-mines/stable/board-size.html.en),
-  directly read: flags protect covered tiles; difficulty is selected separately.
-  Adopt clear marking feedback and field dimensions beside the field. Do not add
-  GNOME's question flags, theme menus or change the existing beginner dimensions.
-- [Hexcells publisher Steam page](https://store.steampowered.com/app/265890/Hexcells/),
-  directly read and visually inspected its first 1920×1080 publisher screenshot:
-  contiguous puzzle grouping, strong covered/clue distinction, peripheral counters,
-  sparse neutral surround. Adopt spatial priority and a bounded numeric instrument
-  strip. Do not copy hex geometry, blue/orange artwork, diagonal menu or mistake
-  allowance. The developer-site URL returned HTTP 403; the publisher listing and
-  screenshot provided the inspected evidence.
-- [W3C, Use of Color](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html),
-  directly read: meaning needs a visible non-color cue. Flags retain their glyph;
-  clues retain numbers; flag mode uses text and pressed state; clearing has a
-  labeled measured progress element. Not a whole-product conformance claim.
-- [Putkonen et al., visual search in GUIs](https://research.aalto.fi/en/publications/understanding-visual-search-in-graphical-user-interfaces/),
-  DOI 10.1016/j.ijhcs.2025.103483: the repository's shared research records
-  guess–scan–confirm behavior and the influence of GUI/cue/target type. The direct
-  page returned HTTP 403 in this pass, so no newly inspected experimental results
-  are claimed. Used as a caution to preserve predictable positions and labels,
-  not as evidence that this palette improves speed or health.
+1. **Compact puzzle instrument, chosen:** one bounded silver frosted toolbar,
+   attached counters, opaque board fitted to both axes, concise input guidance.
+   Uses the beginner window efficiently and expands for harder fields.
+2. **Full-window cabinet:** large permanent surround with prominent instruments.
+   Rejected because it recreates the disproportionate beginner window.
+3. **Side-control workbench:** fixed control rail and broad board stage. Rejected
+   because it sacrifices expert columns and complicates phone composition.
 
-## Three considered directions
+Character: patient, precise puzzle tool. Decorative budget: pink intent plus one
+slate-blue identity; short silver neutral ramp. Failure red is semantic. Clues use
+opaque dark digits on white, flags use white glyphs on dark slate, covered squares
+use slate-blue fill; each state has shape/text as well as color. No animated garnish.
+Toolbar gloss is bounded; individual cells have no blur. Solid preference restores
+opaque controls; forced colors use system colors.
 
-1. **Survey sheet — chosen.** An editorial heading, slim configuration line and
-   one paper field with an instrument strip. Slate covered squares become the
-   strongest visual mass; opened space becomes quiet paper. Scales to expert.
-2. **Instrument panel.** Dark fixed side rail, large time/mine instruments and a
-   framed board. Strong technical identity, but side rail steals horizontal space
-   from wide expert boards and requires major rearrangement on phones.
-3. **Puzzle folio.** Centered small board, large whitespace, expandable help and a
-   footer action dock. Appropriate for a casual small field, but excessive empty
-   space and detached controls make late-game expert scanning less direct.
+## Implementation and interaction contract
 
-The survey sheet sacrifices ornamental glass and large metric cards to keep the
-field, its remaining mine count and next action in one stable spatial group.
+Manifest requests outer480×600. Explicit Level changes request480×600,
+720×660 or1120×760 through the shared `requestWindowSize(width,height)` helper.
+A ResizeObserver sizes cells from min(stage width/columns,stage height/rows),
+using integer pixels and a24px readable minimum. The board's box accounts for
+its own padding and border; no artificial2px rounding tolerance.
 
-## Personality contract and implementation
+Only `.minefield-board-scroll[data-scroll-owner="minefield-board"]` can pan;
+`data-panning="true"` identifies a physically constrained field and reveals a
+short pan/keyboard hint. The document stays contained. This fallback is necessary
+for expert720px minimum field width on a320px screen. Intermediate has the same
+physical constraint below384px usable width and uses the same bounded fallback.
+No Cell size selector or Flag mode exists. Click/Enter opens; right-click/F marks;
+a450ms touch/pen hold marks. Movement over8px, pointercancel, reset and unmount
+cancel pending marking. Completed/cancelled holds suppress the subsequent reveal.
+Roving arrow focus follows the grid and scrolls offscreen cells into view; row
+edges do not wrap. Existing clue click chording is unchanged.
 
-Character: precise, patient field notebook. Palette budget: pink intent/selection
-plus one desaturated blue-slate identity, supported by warm opaque paper and the
-shared neutral canvas. Mine-triggered red is semantic failure, not decoration.
-Numbers use a consistent dark slate; their digits carry clue meaning. No animation,
-cell shadows beyond a static covered-edge highlight, or repeating glass panels.
+Worker startup exceptions and runtime errors produce a readable status plus
+“Retry verification”; retry uses the intended opening. New game/Level remain
+available during verification; epoch checks reject stale results and workers stop.
 
-Hierarchy: identity/configuration → actual field dimensions → mines/reset/time →
-field → measured clearance → immediate input mode → keyboard/chord guidance.
-The measured progress is safe cells revealed / safe cells total, not a generation
-percentage. Worker verification continues using its scoped indeterminate loader.
+## Working verification and limits
 
-Changes: explicit flag-mode on/off label and next-tap explanation; compact field
-metadata; tabular instruments; warm stable playfield; clear covered/open/flag/mine
-states; board width derives from actual cell geometry; responsive wrapped controls;
-arrows stop at field edges while preserving row/column. Standard controls inherit shared focus,
-hover, target sizing and disabled behavior; board cells keep their essential
-geometry. Forced colors receives system-defined state surfaces. This app uses
-opaque material throughout, so reduced transparency and persisted solid preference
-have the same stable backing by construction. No new infrastructure or art.
+Working evidence: `/workspace/scratch/experience-working/minefield/`.
+This is scoped implementation evidence, not final independent promotion acceptance.
 
-## Verification
+- ESLint passed for changed TS/TSX. Existing model/solver suite:2 files,9 tests
+  passed, including deduction proofs for all difficulties/openings.
+- Actual XP beginner: outer480×600; iframe/app/document472×571; no scroll overflow.
+  Board viewport341×341, scroll341×341, grid333×333 (37px cells). On one subsequent
+  hot-reloading dev run a transient initial24px board was captured before fitting;
+  a later stable repeat again fitted37px with exact341px viewport/scroll width.
+  Clean-build initial-ready/no-overflow remains a coordinator check.
+- Actual Expert Level change: outer1120×760; iframe/app/document1112×731;
+  grid900×480 (30px cells, height constrained), no board/document overflow.
+- Real right-click then F toggled a flag off. Real reveal generated a board.
+  A public-visible-clue-only browser solver reached won (“Cleared in14 seconds!”);
+  screenshots include dense96%-cleared state with364/381 safe cells. The script
+  used DOM click/contextmenu dispatch for rapid solving, without hidden board data.
+- At320×640, shell clamped outer320×598; app/document312×569 without overflow.
+  Sole board pan contained720×384 at24px.29 real ArrowRight keypresses focused
+  row1/column30 and panned it into view.
+- Touch via Chromium CDP:550ms actual touch held one flag with zero revealed cells;
+  moved touch cancelled with zero flags/reveals. A fixture threw the first Worker
+  constructor: explicit failure rendered, Retry generated33 revealed cells.
+- Forced colors/reduced motion and persisted solid material rendered and captured;
+  `html[data-ui-material=solid]` observed. Visually inspected start, narrow, dense
+  late expert and forced-colors captures. Full production composited contrast and
+  all cross-app regressions remain coordinator checks.
+- Narrow viewport screenshot includes shell Pip/Privacy overlays over the footer;
+  app geometry itself fits. This external shell obstruction was reported separately.
 
-Scoped ESLint passed. Browser checks and limitations are recorded below after
-rendered review; coordinator owns the final shared suite and production build.
-
-- Chromium rendered review at 1280px and real 390/320px layouts completed against
-  `http://localhost:3131/games/minefield`. Both narrow widths had document width
-  exactly equal to viewport, including 44px expert cells and horizontal board scroll.
-- Real pointer interaction verified mode toggling, marking/unmarking and reset;
-  real keyboard interaction verified F mark/unmark, Enter opening, visible 3px
-  focus, and right/up edge navigation without wrap or column jumps.
-- Persisted `analytics-games.material.v1=solid` applied `data-ui-material=solid`;
-  board material remained opaque with no backdrop filter. Reduced-motion and
-  forced-colors emulation completed. No motion-dependent meaning exists.
-- Public-clue-only solver from the existing expert test completed the 99-mine
-  field via dispatched DOM click/contextmenu events, reaching “Cleared in 5
-  seconds!”. No hidden state was read and no solver/generator code changed.
-- The unmodified expert Playwright regression was attempted. On the shared dev
-  server it reached ordinary late-solving interactions but exhausted its 90s
-  timeout during a right-click; no deduction assertion failed. This is a reported
-  test limitation, not a claimed passing full regression. Coordinator should rerun
-  the exact test with final shared-server/build conditions.
-- Initial `127.0.0.1` checks hit a development hydration/origin issue (SSR-only
-  controls); localhost resolved it. Results above use the functioning origin.
-- Screenshots: `/tmp/minefield-personality/clean-{1280,390,320}.png`,
-  `expert-320.png`, `expert-complete.png` and late-game captures. Inspected actual
-  rendered screenshots, including a measured 73%-cleared field and the dense 96%-cleared field. The original
-  fixture's “70percent” filename may show a later post-action reveal percentage;
-  do not infer the percentage from that filename.
-
-A separate measured **73% cleared** screenshot was captured and visually inspected
-at `/tmp/minefield-personality/expert-70actual.png`. Numbers, flags, covered
-frontier and quiet revealed areas remain distinct without per-clue color noise.
-Repeated development-frame navigations interrupted subsequent capture runs, so
-the passing complete-solver observation above refers to the earlier stable run.
+The root consumes `--ui-app-height` with100svh fallback, allowing the shared
+top-level Privacy footer to reserve space without shrinking embedded frames.
+No build, server start, git mutation or shared-file/test edit was performed here.

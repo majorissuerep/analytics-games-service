@@ -17,7 +17,7 @@ export const chessManifest = {
     { title: 'Pick a color', detail: 'Choose White, Black, or Random before the game starts.' },
     { title: 'Move', detail: 'Select a piece, then a highlighted legal destination. Checkmate wins; running out of time loses.' },
   ],
-  preferredWindow: { width: 980, height: 760 },
+  preferredWindow: { width: 1000, height: 760 },
   status: 'live',
   integration: { kind: 'internal' },
   icon: '♟️',

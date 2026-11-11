@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import Image from 'next/image'
+import { createPortal } from 'react-dom'
 import './pip.css'
 import { LoadingState } from '@/components/ui/LoadingState'
 import type { DesktopPluginDefinition, DesktopPluginProps } from '@analytics-games/plugin-sdk'
@@ -102,6 +103,12 @@ async function readSseStream(
 function PaperclipAssistant({ context }: DesktopPluginProps) {
   const reducedMotion = useReducedMotion()
   const [visible, setVisible] = useState(true)
+  const [launcherHost, setLauncherHost] = useState<HTMLElement | null>(null)
+  useEffect(() => {
+    // The shell owns the taskbar mount; find it only after hydration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLauncherHost(document.getElementById('desktop-assistant-launcher'))
+  }, [])
   const [tipIndex, setTipIndex] = useState(0)
   const [chatOpen, setChatOpen] = useState(false)
   const [draft, setDraft] = useState('')
@@ -122,11 +129,17 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const messagesRef = useRef<HTMLDivElement>(null)
   const talkRef = useRef<HTMLButtonElement>(null)
+  const taskbarRef = useRef<HTMLButtonElement>(null)
+  const returnFocusRef = useRef<HTMLButtonElement | null>(null)
   const followMessagesRef = useRef(true)
 
   const closeChat = () => {
     setChatOpen(false)
-    requestAnimationFrame(() => talkRef.current?.focus())
+    requestAnimationFrame(() => {
+      const origin = returnFocusRef.current
+      const target = origin?.getClientRects().length ? origin : taskbarRef.current
+      target?.focus()
+    })
   }
 
   const resolveUserKey = () => {
@@ -241,11 +254,17 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
   }
 
   return (
+    <>
+      {launcherHost && createPortal(
+        <button ref={taskbarRef} className="pip-taskbar-launcher" aria-label="Talk to Pip" aria-expanded={chatOpen} onClick={() => { returnFocusRef.current = taskbarRef.current; setVisible(true); setChatOpen(true) }}>📎 Pip</button>,
+        launcherHost,
+      )}
     <AnimatePresence>
       {visible && (
         <motion.aside
           className="paperclip-assistant"
           data-chat-open={chatOpen}
+          data-application-active={!!context.applicationActive}
           style={{ filter: 'none' }}
           initial={reducedMotion ? false : { opacity: 0, y: 28, scale: 0.85 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -261,7 +280,7 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
             <strong>Pip, at your service</strong>
             <p>{tips[tipIndex]}</p>
             <div>
-              <button ref={talkRef} className="pip-talk-button" onClick={() => setChatOpen(true)}>Talk to me</button>
+              <button ref={talkRef} className="pip-talk-button" onClick={() => { returnFocusRef.current = talkRef.current; setChatOpen(true) }}>Talk to me</button>
               <button onClick={() => setTipIndex((current) => randomTipAfter(current))}>Surprise me</button>
               <button onClick={context.openHelp}>Help</button>
             </div>
@@ -350,6 +369,7 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
         </motion.aside>
       )}
     </AnimatePresence>
+    </>
   )
 }
 
