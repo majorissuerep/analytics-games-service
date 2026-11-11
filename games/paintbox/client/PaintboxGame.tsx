@@ -108,7 +108,7 @@ export function PaintboxGame() {
   }
 
   return (
-    <main className="paintbox-app">
+    <main className="app-surface paintbox-app">
       <header className="paintbox-titlebar">
         <Link href="/" aria-label="Back to desktop">🎨 <strong>Paintbox</strong></Link>
         <span>untitled.png</span>

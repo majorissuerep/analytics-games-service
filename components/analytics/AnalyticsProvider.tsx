@@ -55,7 +55,7 @@ export function AnalyticsProvider({ enabled, children }: { enabled: boolean; chi
     <AnalyticsContext.Provider value={{ consent, configured: enabled }}>
       {children}
       {showDialog ? (
-        <section className="analytics-consent" role="dialog" aria-label="Analytics privacy settings" aria-live="polite">
+        <section className="app-surface analytics-consent" role="dialog" aria-label="Analytics privacy settings" aria-live="polite">
           <div>
             <strong>Help improve Analytics Games</strong>
             <p>Allow privacy-safe self-hosted analytics so we can understand game launches, completions, multiplayer starts, and return visits. We never send names, room codes, or message content.</p>

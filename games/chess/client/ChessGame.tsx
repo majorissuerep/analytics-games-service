@@ -616,7 +616,7 @@ export function ChessGame() {
     : []
 
   return (
-    <main className="chess-app">
+    <main className="app-surface chess-app">
       <header className="chess-toolbar">
         <div><span className="chess-mark">♞</span><strong>Chess</strong><span className="chess-engine-name">{mode === 'bot' && (engineControl === 'auto' ? opponentName : engineControl === 'pick' ? `${opponentName} · your pick` : `${opponentName} · hints`)}</span></div>
         <div>
@@ -720,9 +720,9 @@ export function ChessGame() {
               canDragPiece: ({ square }) => Boolean(square && canControl(square as Square)),
               squareStyles,
               arrows: hoverArrow,
-              lightSquareStyle: { backgroundColor: '#e8d7b7' },
-              darkSquareStyle: { backgroundColor: '#66866f' },
-              boardStyle: { borderRadius: 4, boxShadow: '0 10px 28px rgba(17,31,24,.28)' },
+              lightSquareStyle: { backgroundColor: 'var(--ui-board-light)' },
+              darkSquareStyle: { backgroundColor: 'var(--ui-board-dark)' },
+              boardStyle: { borderRadius: 4, boxShadow: 'none' },
               animationDurationInMs: 180,
             }} />
           </div>

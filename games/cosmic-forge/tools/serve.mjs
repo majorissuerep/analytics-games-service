@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process'
 import { createReadStream, existsSync, statSync, watch } from 'node:fs'
 import { createServer } from 'node:http'
 import { extname, join, resolve, sep } from 'node:path'
-import { buildRoot, gameRoot, runtimeOutputRoot } from './content-lib.mjs'
+import { buildRoot, gameRoot, repoRoot, runtimeOutputRoot } from './content-lib.mjs'
 
 const assembleCommand = resolve(gameRoot, 'tools/assemble-runtime.mjs')
 function assemble() {
@@ -18,6 +18,7 @@ if (!existsSync(resolve(buildRoot, 'powder.js')) || !existsSync(resolve(buildRoo
 
 const types = new Map([
   ['.html', 'text/html; charset=utf-8'],
+  ['.css', 'text/css; charset=utf-8'],
   ['.js', 'text/javascript; charset=utf-8'],
   ['.json', 'application/json; charset=utf-8'],
   ['.lua', 'text/plain; charset=utf-8'],
@@ -70,7 +71,7 @@ server.listen(port, '127.0.0.1', () => {
 })
 
 let assembleTimer
-for (const sourceRoot of [join(gameRoot, 'content'), join(gameRoot, 'runtime')]) {
+for (const sourceRoot of [join(gameRoot, 'content'), join(gameRoot, 'runtime'), join(repoRoot, 'public/styles')]) {
   watch(sourceRoot, { recursive: true }, () => {
     clearTimeout(assembleTimer)
     assembleTimer = setTimeout(() => {

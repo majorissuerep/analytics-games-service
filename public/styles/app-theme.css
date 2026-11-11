@@ -1,0 +1,107 @@
+/* Shared application language. XP desktop and window chrome live outside this scope. */
+:root {
+  --ui-canvas: #e9e8e2;
+  --ui-surface: #f5f4ef;
+  --ui-raised: #fbfaf7;
+  --ui-recessed: #e2e4df;
+  --ui-ink: #253139;
+  --ui-muted: #536169;
+  --ui-line: #b8bfbb;
+  --ui-control-border: #748087;
+  --ui-accent: #354e61;
+  --ui-accent-hover: #293f50;
+  --ui-on-accent: #ffffff;
+  --ui-selection: #dce5e8;
+  --ui-focus: #164d77;
+  --ui-positive: #326749;
+  --ui-positive-bg: #e4ede5;
+  --ui-negative: #9d3b34;
+  --ui-negative-bg: #f3e6e2;
+  --ui-warning: #795c26;
+  --ui-warning-bg: #f3eddf;
+  --ui-board-light: #e7e4d9;
+  --ui-board-dark: #879a99;
+  --ui-radius: 4px;
+  --ui-panel-radius: 6px;
+  --ui-shadow: 0 2px 8px rgb(37 49 57 / 8%);
+  --ui-font: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --ui-mono: Consolas, 'Liberation Mono', ui-monospace, monospace;
+  --ui-space-1: 4px;
+  --ui-space-2: 8px;
+  --ui-space-3: 12px;
+  --ui-space-4: 16px;
+  --ui-space-6: 24px;
+  --ui-space-8: 32px;
+  /* Compatibility aliases for room/game components. Keep all palette ownership here. */
+  --bg: var(--ui-canvas);
+  --panel: var(--ui-surface);
+  --panel-2: var(--ui-raised);
+  --panel-3: var(--ui-recessed);
+  --ink: var(--ui-ink);
+  --ink-dim: var(--ui-muted);
+  --ink-muted: var(--ui-muted);
+  --line: var(--ui-line);
+  --sweep: var(--ui-accent);
+  --sweep-dim: var(--ui-control-border);
+  --sweep-bg: var(--ui-selection);
+  --hot: var(--ui-negative);
+  --warm: var(--ui-warning);
+  --cold: var(--ui-focus);
+  --gold: var(--ui-warning);
+  --shadow: var(--ui-shadow);
+  --shadow-sm: var(--ui-shadow);
+  --radius: var(--ui-panel-radius);
+  --radius-sm: var(--ui-radius);
+}
+
+.app-surface {
+  color-scheme: light;
+  color: var(--ui-ink);
+  background: var(--ui-canvas);
+  font: 14px/1.5 var(--ui-font);
+  letter-spacing: normal;
+  text-shadow: none;
+  accent-color: var(--ui-accent);
+}
+.app-surface *, .app-surface *::before, .app-surface *::after { box-sizing: border-box; }
+.app-surface :where(h1, h2, h3, p) { color: inherit; }
+.app-surface :where(h1, h2, h3) { font-family: var(--ui-font); font-weight: 650; line-height: 1.25; letter-spacing: -.015em; }
+.app-surface :where(p) { line-height: 1.55; }
+.app-surface :where(a) { color: var(--ui-accent); text-underline-offset: 3px; }
+.app-surface :where(button, input, select, textarea) { font: inherit; letter-spacing: normal; }
+.app-surface :where(button):not(:where(.chess-board-wrap button, .chess-arena-live > div button)) {
+  min-height: 34px;
+  padding: 6px 12px;
+  border: 1px solid var(--ui-control-border);
+  border-radius: var(--ui-radius);
+  background: var(--ui-raised);
+  color: var(--ui-ink);
+  box-shadow: none;
+  text-shadow: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+.app-surface :where(button:hover:not(:disabled)):not(:where(.chess-board-wrap button, .chess-arena-live > div button)) { background-color: var(--ui-selection); }
+.app-surface :where(button:disabled):not(:where(.chess-board-wrap button, .chess-arena-live > div button)) { cursor: not-allowed; opacity: .55; }
+.app-surface :where(input:not([type='range']):not([type='checkbox']):not([type='radio']), select, textarea) {
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 1px solid var(--ui-control-border);
+  border-radius: var(--ui-radius);
+  background: var(--ui-raised);
+  color: var(--ui-ink);
+  box-shadow: none;
+}
+.app-surface :where(input::placeholder, textarea::placeholder) { color: var(--ui-muted); opacity: 1; }
+.app-surface :where(button, a, input, select, textarea, [tabindex]):focus-visible { outline: 3px solid var(--ui-focus); outline-offset: 2px; }
+.app-surface :where(output, code, pre) { font-family: var(--ui-mono); font-variant-numeric: tabular-nums; }
+.app-surface .ui-primary { color: var(--ui-on-accent); background: var(--ui-accent); border-color: var(--ui-accent); }
+.app-surface .ui-primary:hover:not(:disabled) { background: var(--ui-accent-hover); }
+.app-surface .ui-selected { background: var(--ui-selection); border-color: var(--ui-accent); color: var(--ui-ink); }
+
+/* Motion communicates progress; decoration never runs continuously. */
+@media (prefers-reduced-motion: reduce) {
+  .app-surface *, .app-surface *::before, .app-surface *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+
+body:has(.embedded-game-surface), body:has(> .minefield-app), body:has(> .paintbox-app) { padding: 0; }

@@ -108,7 +108,7 @@ export function MinefieldGame() {
   const progress = Math.round(100 * board.cells.filter(cell => cell.revealed && !cell.mine).length / (board.cells.length - board.mineCount))
 
   return (
-    <main className="minefield-app">
+    <main className="app-surface minefield-app">
       <header className="minefield-header">
         <Link href="/" aria-label="Back to desktop"><strong>Minefield</strong></Link>
         <label>

@@ -6,6 +6,15 @@
 - Internal games run in same-origin iframes; external games use `@analytics-games/game-bridge`.
 - Tests use Vitest and Playwright. Production deploys to Vercel.
 
+## Application design
+
+- All application content uses the shared calm visual language in `public/styles/app-theme.css` and an `app-surface` root. Read [docs/APPLICATION_DESIGN.md](docs/APPLICATION_DESIGN.md) before adding a new screen or changing presentation.
+- Keep the XP desktop, Start menu, taskbar, outer window borders, title bars, and window controls styled by `xp.css` and the shell. Application content does not inherit XP bevels or title-bar styling.
+- Define shared palette, typography, spacing, focus, and control primitives once in the theme. Use those tokens in game-specific layout CSS; do not introduce independent decorative palettes or permanent glow/animation.
+- Preserve semantic gameplay color (paint swatches, team identities, chess score colors) and essential playfield artwork. Do not style chess piece buttons as application form controls.
+- The standalone pinball cabinet links the shared stylesheet; the Cosmic Forge workbench assembly copies it. External games can opt in using the stylesheet documented on `/develop`.
+- Verify `tests/e2e/application-design.spec.ts` together with relevant gameplay regressions before release.
+
 ## Analytics (Mixpanel)
 
 ### SDK and configuration

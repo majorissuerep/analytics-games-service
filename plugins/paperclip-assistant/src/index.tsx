@@ -239,7 +239,7 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
           >
             <Image src="/pip-assistant.webp" width={100} height={140} alt="" unoptimized />
           </motion.div>
-          <div className="paperclip-bubble">
+          <div className="app-surface paperclip-bubble">
             <strong>Pip says:</strong>
             <p>{tips[tipIndex]}</p>
             <div>
@@ -251,7 +251,7 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
           <AnimatePresence>
             {chatOpen && (
               <motion.section
-                className="pip-chat-window"
+                className="app-surface pip-chat-window"
                 role="dialog"
                 aria-modal="false"
                 aria-label="Talk to Pip"
