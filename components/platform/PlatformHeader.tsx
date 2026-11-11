@@ -17,6 +17,7 @@ export function PlatformHeader() {
       <nav className="platform-nav" aria-label="Main navigation">
         <Link href="/#games">Games</Link>
         <Link href="/develop">Build a game</Link>
+        <Link href="/design-system">Design system</Link>
       </nav>
     </header>
   )

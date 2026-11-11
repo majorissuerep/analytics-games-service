@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { MaterialPreference } from '@/components/platform/MaterialPreference'
 import { Rnd } from 'react-rnd'
 import type { DesktopPluginContext, DesktopPluginSlot } from '@analytics-games/plugin-sdk'
 import type { GameManifest } from '@/lib/engine/types'
@@ -323,7 +324,7 @@ function WindowContent({
       <div className="app-surface system-panel plugin-manager">
         <header><h2>Installed desktop plugins</h2><p>Build-time packages with typed, explicit desktop slots.</p></header>
         {DESKTOP_PLUGINS.map((plugin) => (
-          <label className="plugin-row" key={plugin.manifest.id}>
+          <label className="plugin-row" data-tone={plugin.manifest.id.includes('sticky') ? 'amber' : plugin.manifest.id.includes('meter') ? 'teal' : 'pink'} key={plugin.manifest.id}>
             <input
               type="checkbox"
               checked={Boolean(plugins[plugin.manifest.id])}
@@ -348,7 +349,9 @@ function WindowContent({
           <li>Desktop handles discovery, window, entry, focus, and exit.</li>
         </ol>
         <p>Internal games can additionally use shared rooms, actions, projections, and leaderboards.</p>
+        <section className="help-appearance"><h3>Appearance</h3><MaterialPreference /></section>
         <Link href="/develop">Open full developer guide →</Link>
+        <p><Link href="/design-system">Explore the Prism design system →</Link></p>
       </div>
     )
   }
@@ -361,8 +364,9 @@ function WindowContent({
         <h1>Team games live here.</h1>
         <p>Double-click a game icon. Local modules and independently hosted games launch through the same desktop.</p>
         <div className="welcome-actions">
-          {games.slice(0, 3).map((game) => <button key={game.id} onClick={() => openGame(game)}>Open {game.title}</button>)}
+          {games.slice(0, 3).map((game) => <button data-tone={game.id === 'chess' ? 'pink' : game.id === 'consensus-radar' ? 'violet' : 'teal'} key={game.id} onClick={() => openGame(game)}>Open {game.title}</button>)}
           <Link href="/develop">Developer guide</Link>
+          <Link href="/design-system">Design system</Link>
         </div>
       </div>
     </div>

@@ -883,3 +883,24 @@ input[type="text"]:focus {
   .radar-app .topbar-actions { width: 100%; flex-wrap: wrap; justify-content: flex-end; }
   .radar-app .player-pill { max-width: 100%; overflow-wrap: anywhere; }
 }
+
+/* Prism: high-opacity content cards, frosted navigation, named content color. */
+.radar-app .topbar { padding: 12px 16px; border: 1px solid var(--ui-glass-edge); border-radius: 18px; background: var(--ui-glass-fill); backdrop-filter: var(--ui-material-filter); box-shadow: var(--ui-shadow); }
+.radar-app .card { border-color: var(--ui-glass-edge); border-radius: var(--ui-feature-radius); background: var(--ui-glass-strong-fill); backdrop-filter: var(--ui-material-filter); box-shadow: var(--ui-shadow); }
+.radar-app .logo, .radar-app .logo-big { background: var(--ui-pink-bg); border-color: var(--ui-accent); }
+.radar-app .brand h1 { letter-spacing: -.035em; }
+.radar-app .big { color: var(--ui-accent); }
+.radar-app .room-code-box { background: var(--ui-violet-bg); color: var(--ui-violet); border-color: color-mix(in srgb, var(--ui-violet) 20%, transparent); }
+.radar-app .room-code-val { color: var(--ui-violet); }
+.radar-app .cluebox { background: var(--ui-pink-bg); color: var(--ui-accent); padding: 16px; border-color: color-mix(in srgb, var(--ui-accent) 20%, transparent); }
+.radar-app .score-card { border-radius: 14px; }
+.radar-app .score-card.active { background: var(--ui-pink-bg); }
+.radar-app .player-row { border-radius: 12px; }
+.radar-app .gauge { border-radius: 14px; background: var(--ui-surface); }
+.radar-app .gauge-fill { background: linear-gradient(90deg, #d5ede7, #f6ddec); }
+.radar-app .zone-3 { background: #efd6ee; }
+.radar-app .zone-5 { background: #c889b8; }
+.radar-app .modal-backdrop { background: rgb(35 24 43 / 38%); backdrop-filter: blur(4px); }
+.radar-app .modal { border-radius: var(--ui-feature-radius); background: var(--ui-glass-strong-fill); backdrop-filter: var(--ui-material-filter); box-shadow: var(--ui-shadow-floating); }
+.radar-app .toast { border-radius: 14px; background: var(--ui-glass-strong-fill); backdrop-filter: var(--ui-material-filter); box-shadow: var(--ui-shadow-floating); }
+@media (max-width:600px) { .radar-app .topbar { padding: 12px; } }

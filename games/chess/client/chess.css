@@ -65,7 +65,7 @@
 .promotion-card h2{margin:0;font-family:var(--ui-font)}
 .promotion-card p{color:var(--muted)}
 .promotion-card>div{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:13px 0}
-.promotion-card button{border:1px solid #bdc8bf;border-radius:6px;background:#f5f7f4;padding:11px}
+.promotion-card button{border:1px solid var(--ui-control-border);border-radius:var(--ui-radius);background:var(--ui-raised);padding:11px}
 .promotion-card>button{width:100%}
 @media(max-width:760px){.chess-setup{width:min(100% - 20px,620px);padding-top:14px}
 .chess-intro>span{width:56px;height:56px;font-size:35px}
@@ -88,7 +88,7 @@
 .chess-model-submit form{display:grid;gap:12px;padding:16px;border-top:1px solid var(--ui-line);background:var(--ui-raised)}
 .chess-model-submit form>p{margin:0;color:var(--muted)}
 .chess-model-submit label{display:grid;gap:5px;font-size:12px;font-weight:700}
-.chess-model-submit input,.chess-model-submit select,.chess-model-submit textarea{width:100%;border:1px solid #bdc8bf;border-radius:5px;padding:9px;background:var(--ui-raised);color:var(--ink)}
+.chess-model-submit input,.chess-model-submit select,.chess-model-submit textarea{width:100%;border:1px solid var(--ui-control-border);border-radius:var(--ui-radius);padding:9px;background:var(--ui-raised);color:var(--ink)}
 .chess-model-submit textarea{min-height:72px;resize:vertical}
 .chess-model-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .chess-model-submit>form>small{color:var(--muted);line-height:1.4}
@@ -208,3 +208,33 @@ body:has(.chess-app){padding:0}
 .chess-end-card.draw { background: var(--ui-warning-bg); border-color: var(--ui-warning); }
 .chess-end-card.info { background: var(--ui-surface); border-color: var(--ui-line); }
 .chess-hover-card { box-shadow: var(--ui-shadow); }
+
+/* Prism: layered controls, colored tasks, stable analytical content. */
+.chess-app { background-image: var(--ui-canvas-image); }
+.chess-app :is(.chess-toolbar, .chess-setup-panel, .chess-arena, .chess-sidebar) { background: var(--ui-glass-fill); border-color: var(--ui-glass-edge); box-shadow: var(--ui-shadow); -webkit-backdrop-filter: var(--ui-material-filter); backdrop-filter: var(--ui-material-filter); }
+.chess-toolbar { height: 56px; flex-shrink: 0; padding-inline: 16px; }
+.chess-intro > span { border-radius: 18px; background: var(--ui-pink-bg); color: var(--ui-accent); }
+.chess-intro h1 { font-size: 32px; letter-spacing: -.035em; }
+.chess-app .chess-mode-tabs button { background: var(--ui-tone-bg); color: var(--ui-tone-ink); border-color: color-mix(in srgb, var(--ui-tone-ink) 24%, white); border-radius: 14px; padding: 14px 12px; }
+.chess-app .chess-mode-tabs button b { color: var(--ui-tone-ink); }
+.chess-app .chess-mode-tabs button.active { border-color: var(--ui-accent); box-shadow: inset 0 -3px var(--ui-accent); }
+.chess-mode-tabs small { color: var(--ui-muted); }
+.chess-segmented { padding: 4px; gap: 2px; border-radius: 12px; }
+.chess-app .chess-segmented button.selected { background: var(--ui-selection); color: var(--ui-accent); box-shadow: inset 0 0 0 1px var(--ui-accent); }
+.chess-app .chess-primary { border-radius: var(--ui-radius); color: white; box-shadow: 0 4px 10px rgb(177 45 117 / 14%); }
+.chess-app .chess-primary:hover:not(:disabled) { background: var(--ui-accent-hover); filter: none; }
+.chess-opponent { background: var(--ui-violet-bg); border: 1px solid color-mix(in srgb, var(--ui-violet) 18%, transparent); }
+.chess-opponent > span, .chess-opponent strong { color: var(--ui-violet); }
+.chess-room-panel { background: var(--ui-teal-bg); color: var(--ui-teal); }
+.chess-model-registry em { background: var(--ui-teal-bg); color: var(--ui-teal); }
+.chess-suggestions, .chess-evaluation { background: var(--ui-surface); border-radius: 14px; }
+.chess-suggestion-balance b { color: var(--ui-violet); }
+.chess-suggestion { border-radius: 10px; }
+.chess-suggestion-move { color: var(--ui-ink); }
+.chess-suggestion-delta { background: var(--ui-violet-bg); color: var(--ui-violet); }
+.chess-end-card, .promotion-card { background: var(--ui-glass-strong-fill); backdrop-filter: var(--ui-material-filter); border-radius: var(--ui-feature-radius); box-shadow: var(--ui-shadow-floating); }
+@media (min-width:761px) { .chess-setup { max-height: calc(100svh - 56px); } }
+@media (max-width:760px) { .chess-intro h1 { font-size: 27px; } .chess-app .chess-mode-tabs button { padding: 11px 5px; } }
+.chess-toolbar > div:first-child { flex: 1; min-width: 0; }
+.chess-engine-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media(max-width:440px) { .chess-mode-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

@@ -1,70 +1,124 @@
-# One application language inside the XP desktop
+# Prism application design system
 
-The desktop is an XP shell. Application content uses a restrained functional
-language derived from Minefield: soft blue backgrounds, warm ivory panels, sage
-insets, teal actions, readable labels, small corner radii, quiet boundaries, and
-purposeful color. Keep the palette visibly colored and subdued. The window frame
-communicates where an app begins; the content communicates what to do.
+Version 1, 11 November 2026. [Research and source assessment](DESIGN_SYSTEM_RESEARCH.md).
+Live reference: `/design-system`.
 
-## Ownership
+Prism combines luminous neutral foundations, frosted control layers, expressive
+colored content, and a pink signature. Foundations include materials, type,
+spacing, shape, elevation, color roles, components, states, and responsive rules.
 
-`public/styles/app-theme.css` owns the shared tokens and `app-surface` primitives.
-Next.js imports it through `app/globals.css`. Static pinball links the same asset.
-The Cosmic Forge workbench assembler copies it from the same source, and its
-server serves CSS with the correct MIME type. The developer guide includes an
-integration example for independently hosted games.
+## Boundary and ownership
 
-Apply `app-surface` to application content, not to the entire desktop or window
-wrapper. The desktop wallpaper, icons, Start menu, taskbar, title bars, close /
-minimize / maximize buttons, and outer window borders retain XP styling. Pip's
-chat header remains an XP-style boundary; its conversation and controls share
-the application theme.
+Preserve the XP wallpaper, icons, Start menu, taskbar, outer window borders,
+title bars, and window controls. Content inside those boundaries uses Prism.
+Pip's outer chat header remains XP; its conversation and controls use Prism.
 
-## Visual rules
+`public/styles/app-theme.css` owns reference values, semantic tokens, and shared
+primitives. App CSS maps game components to these roles and owns game geometry.
+Next.js imports the theme globally; Pinball links it; Cosmic Forge copies it at
+workbench assembly. A shared script applies persisted material preferences.
 
-- Use `--ui-canvas`, `--ui-surface`, `--ui-raised`, and `--ui-recessed` for visual
-  hierarchy. Flat fills and one-pixel boundaries replace glass, bevels, neon,
-  decorative gradients, and large shadows.
-- Use `--ui-font` for interface text and `--ui-mono` for numbers, codes, and move
-  history. Default body text is 14px with a 1.5 line height. Supporting text should
-  remain readable; avoid using tiny text to establish hierarchy.
-- Use the 4 / 8 / 12 / 16 / 24 / 32px spacing scale and 4 / 6px radii. Keep labels
-  close to their controls and group related decisions into quiet panels.
-- Use the teal accent for primary actions and selected controls. Selected state
-  also has a border or structural cue. Keyboard focus uses a visible 3px outline.
-- Reserve positive, warning, and negative colors for meaning, with text or shape
-  alongside hue. Preserve paint colors, team identities, stable chess evaluation
-  colors, and essential playfield graphics; a shared UI is not a monochrome game.
-- Chess piece buttons and board geometry are excluded from generic application
-  control sizing and disabled opacity. Minefield cells and paint swatches keep
-  their own geometry and use explicit focus/selection treatment.
-- Avoid continuous decorative motion. Progress indicators may move while work
-  is pending; reduced-motion preferences suppress that movement.
+## Color roles
 
-## Coverage
-
-| Surface | Shared treatment |
+| Role | Foreground meaning |
 | --- | --- |
-| Chess and model arena | Neutral setup panels, common controls and fonts, quiet board surrounds, shared board palette |
-| Consensus Radar | Neutral room/lobby/leaderboard panels, readable team colors, subdued gauge, static identity mark |
-| Minefield | Shared surface/type/focus tokens; distinct covered, revealed, and flagged states |
-| Paintbox | Flat tool rail, common actions, neutral canvas surround, labeled tools, original drawing colors |
-| Pinball | Shared cabinet controls, stage surround, and loading state; playable table artwork retained |
-| Cosmic Forge workbench | Shared header, status, page surface, and error treatment; simulation rendering retained |
-| Welcome, Help, Plugins | Shared content typography, surfaces, and controls inside XP windows |
-| Sticky Note and Pip | Readable note/conversation surfaces and common controls |
-| Privacy and developer guide | Shared forms, surfaces, documentation hierarchy and focus |
+| Pink: `--ui-accent`, `--ui-accent-ink`, `--ui-pink-bg` | Primary fill, darker text ink, selection and key value |
+| Violet: `--ui-violet`, `--ui-violet-bg` | Analysis, second category, timer |
+| Teal: `--ui-teal`, `--ui-teal-bg` | Collaboration, creation, shared session |
+| Amber: `--ui-amber`, `--ui-amber-bg` | Time budget and attention category |
+| Positive / warning / negative / info | Actual state feedback, distinct from category identity |
+| Canvas / surface / raised / recessed | Whitish foundation, content, input, grouping |
 
-Third-party cross-origin content cannot be restyled by the host. `/develop`
-provides the same public stylesheet and `app-surface` contract so authors can
-adopt the language in their own deployment. No bridge protocol changes are needed.
+Use `ui-tone` with `data-tone="pink|violet|teal|amber"` for meaningful content
+groups. Compose `ui-badge`, `ui-metric`, and `ui-icon` for colored content accents.
+`ui-primary` is the pink action; `ui-selected` adds a structural selected cue.
+Category identity remains stable by role, never randomized by current ranking.
 
-## Validation
+Most useful groups should show category, value, identity, or state color: mode
+cards, metrics, avatars, room information, selected tools, and status chips.
+Body prose stays dark and readable. Neutral backgrounds are valid. Avoid using
+success/error for decoration or turning every word into a different color.
 
-`tests/e2e/application-design.spec.ts` checks all built-in app roots at 1280px and
-390px, confirms the XP/app boundary, checks notes/chat/system panels, and verifies
-visible keyboard focus and the primary action treatment. The gameplay suite
-continues to cover four-player rooms, chess human/arena/free modes, full expert
-Minefield deduction, drawing/export, and pinball sound/exit controls. Screenshots
-are captured for visual review; color contrast and state cues are reviewed on the
-rendered pages rather than inferred solely from token names.
+Chess keeps its fixed quantitative score scale. Teams keep stable identities;
+paint swatches keep drawing colors. Minefield states retain distinct contrast,
+shape, and labels. Essential playfield artwork and geometry remain game-owned.
+
+## Material and elevation roles
+
+| Material / primitive | Definition | Use |
+| --- | --- | --- |
+| Canvas | Near-white with soft stationary pink/violet light | Foundation, never the only colored area |
+| Solid / `ui-card` | Opaque backing, quiet edge | Dense content, code, metrics, playfields |
+| Frost / `ui-glass` | White at 76% alpha, 18px blur, highlight edge, short soft shadow | Control bars, app navigation, floating groups |
+| Strong frost | White at 90% alpha, bounded blur | Text-rich floating/overlay panels |
+| Recessed | Solid pale neutral or named category fill | Grouped controls and data |
+| Overlay | Floating shadow plus separate scrim | Modal or floating assistant |
+
+Background alpha never reduces text opacity. Prefer a single material boundary
+around a group; avoid nested blur and per-cell filters. No distortion, moving
+light, or shadow on every data row. Fine highlights communicate a material edge.
+
+Solid is the baseline; `@supports` enables backdrop blur. Reduced transparency,
+increased contrast, and the persisted “Reduce transparency” preference restore
+opaque materials. Forced-colors mode uses system colors and preserves focus and
+selection outlines. Same-origin embedded apps share the persisted preference.
+
+## Typography, space, shape, density
+
+- Interface: Segoe UI/system sans; moves/codes/numbers: Consolas/system mono.
+  Use tabular numerals for changing values; no remote font dependency.
+- Body 14px/1.5; support 12px/1.45; titles 20–28px/1.2; display 32–48px/1.1.
+  Establish hierarchy with weight and space. Paragraphs target 65 characters.
+- Space 4/8/12/16/24/32/48px. Labels within 8px of controls; groups separated
+  by 16–24px. Dense data remains compact, aligned, and independently scrollable.
+- Radius: 10px controls, 16px panels, 24px feature/overlay. Pills are reserved
+  for badges, identity marks, and segmented containers. Board cells stay square.
+- Elevation: default edge; raised short shadow; floating deeper shadow; overlay
+  scrim plus floating surface. Elevation communicates actual hierarchy.
+- Standard controls target 40px height; coarse pointers 44px. Palettes/boards
+  retain functional geometry, visible focus, and their own zoom/scroll controls.
+
+## Components and states
+
+| Component | Appearance and behavior |
+| --- | --- |
+| Primary action | Pink fill/white label; darker hover/pressed; 3px focus; explicit disabled state |
+| Secondary action | Light backing/readable edge; pink hover; no moving target or layout shift |
+| Category/mode card | Named colored icon and tint; selected edge/inset cue, label, and weight |
+| Input/select/textarea | Stable backing/visible boundary; external focus; invalid state with explanatory text |
+| Metric/status | Colored value, explicit label/unit, fixed meaning, tabular number |
+| Segmented control | Quiet group; selected pink segment plus structural cue; keyboard focus visible |
+| Modal/popover | Strong material over scrim; text legible; game-owned interaction behavior preserved |
+| Dense data row | Stable backing; hover edge/selection; continuation fits; internal scroll without clipping |
+
+Feedback uses 140–200ms color/edge/shadow transitions. No continuous decorative
+motion. Reduced-motion mode suppresses transitions/entrances. Progress remains
+understandable. Dense targets never move under the pointer on hover.
+
+## Responsive and accessible behavior
+
+Stack groups below 760px. Headers wrap core actions rather than hide them.
+Verify 1280, 390, and 320px. Large boards use their own scroll/zoom region rather
+than widen the page. XP windows own desktop sizing and dragging.
+
+Target normal text 4.5:1; large text and essential state/control cues 3:1. Evaluate
+material compositing over light and dark backgrounds. Tone inks pair with their
+own fills. Keep visible labels/numbers alongside identity and score color. Focus
+is a 3px high-contrast outline. This is not a whole-product certification or a
+medical eye-safety claim.
+
+## Adoption and acceptance
+
+Apply `app-surface` to content roots; compose `ui-glass`, `ui-card`, `ui-tone`,
+`ui-badge`, `ui-icon`, `ui-metric`, `ui-primary`, and `ui-selected`. Never attach
+the theme to XP wrappers or apply form sizing to chess piece buttons.
+
+Coverage: Chess/arena, Radar phases, Minefield, Paintbox, Pinball cabinet, Cosmic
+Forge workbench, Welcome/Help/Plugins, Sticky Note/Pip, privacy, developer guide.
+Cross-origin authors opt in through public assets documented on `/develop`.
+
+Review `/design-system` and real gameplay screenshots. Run design browser checks
+and relevant regressions. Verify material preference across frames, motion and
+transparency fallbacks, forced colors, contrast, focus, phone overflow, hint-row
+clipping, and late-game Minefield density. A background/palette-only change is
+insufficient; meaningful colored content and material hierarchy must be visible.

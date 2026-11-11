@@ -636,10 +636,10 @@ export function ChessGame() {
         <section className="chess-setup" aria-label="Chess setup">
           <div className="chess-intro"><span>♞</span><div><p className="chess-kicker">CLASSIC BOARD GAME</p><h1>Play chess your way</h1><p>Stockfish opponents, Reckless, both-sides play, pass-and-play, or a protected online room.</p></div></div>
           <nav className="chess-mode-tabs" aria-label="Game mode">
-            <button className={setupMode === 'bot' ? 'active' : ''} onClick={() => setSetupMode('bot')}><b>♟</b><span>Computer<small>Versus, pick, or free</small></span></button>
-            <button className={setupMode === 'online' ? 'active' : ''} onClick={() => setSetupMode('online')}><b>♜</b><span>Online<small>Private room</small></span></button>
-            <button className={setupMode === 'local' ? 'active' : ''} onClick={() => setSetupMode('local')}><b>♚</b><span>Local<small>Same device</small></span></button>
-            <button className={setupMode === 'arena' ? 'active' : ''} onClick={() => setSetupMode('arena')}><b>⚔</b><span>Model arena<small>3s turns + replay</small></span></button>
+            <button data-tone="violet" aria-pressed={setupMode === 'bot'} className={setupMode === 'bot' ? 'active' : ''} onClick={() => setSetupMode('bot')}><b>♟</b><span>Computer<small>Versus, pick, or free</small></span></button>
+            <button data-tone="teal" aria-pressed={setupMode === 'online'} className={setupMode === 'online' ? 'active' : ''} onClick={() => setSetupMode('online')}><b>♜</b><span>Online<small>Private room</small></span></button>
+            <button data-tone="amber" aria-pressed={setupMode === 'local'} className={setupMode === 'local' ? 'active' : ''} onClick={() => setSetupMode('local')}><b>♚</b><span>Local<small>Same device</small></span></button>
+            <button data-tone="pink" aria-pressed={setupMode === 'arena'} className={setupMode === 'arena' ? 'active' : ''} onClick={() => setSetupMode('arena')}><b>⚔</b><span>Model arena<small>3s turns + replay</small></span></button>
           </nav>
 
           {setupMode === 'arena' ? <ModelArena models={modelOptions} /> : <div className="chess-setup-panel">

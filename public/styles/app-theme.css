@@ -1,29 +1,46 @@
-/* Shared application language. XP desktop and window chrome live outside this scope. */
+/* Prism foundations. XP desktop and window chrome remain outside this scope. */
 :root {
-  --ui-canvas: #e2eef8;
-  --ui-surface: #fff3dc;
-  --ui-raised: #fffbf2;
-  --ui-recessed: #d3e8e1;
-  --ui-ink: #253139;
-  --ui-muted: #536169;
-  --ui-line: #adc5c2;
-  --ui-control-border: #64868b;
-  --ui-accent: #286b73;
-  --ui-accent-hover: #205761;
+  --ui-canvas: #f6f4f8;
+  --ui-surface: #ffffff;
+  --ui-raised: #fcfbfe;
+  --ui-recessed: #eeebf2;
+  --ui-ink: #292436;
+  --ui-muted: #54475f;
+  --ui-line: #ddd5e4;
+  --ui-control-border: #74617e;
+  --ui-accent: #b12d75;
+  --ui-accent-ink: #90205e;
+  --ui-accent-hover: #91215e;
   --ui-on-accent: #ffffff;
-  --ui-selection: #c3e2d9;
-  --ui-focus: #235d98;
-  --ui-positive: #326749;
-  --ui-positive-bg: #e4ede5;
-  --ui-negative: #9d3b34;
-  --ui-negative-bg: #f3e6e2;
-  --ui-warning: #795c26;
-  --ui-warning-bg: #f3eddf;
-  --ui-board-light: #f2e6c9;
-  --ui-board-dark: #87ad9d;
-  --ui-radius: 4px;
-  --ui-panel-radius: 6px;
-  --ui-shadow: 0 2px 8px rgb(37 49 57 / 8%);
+  --ui-selection: #fce1ee;
+  --ui-pink-bg: #fff0f7;
+  --ui-violet: #6045b2;
+  --ui-violet-bg: #eee8fb;
+  --ui-teal: #126d68;
+  --ui-teal-bg: #e0f3ed;
+  --ui-amber: #8f5715;
+  --ui-amber-bg: #fff0d8;
+  --ui-focus: #713285;
+  --ui-positive: #256640;
+  --ui-positive-bg: #e3f3e9;
+  --ui-negative: #b33539;
+  --ui-negative-bg: #fde8e6;
+  --ui-warning: #8f5715;
+  --ui-warning-bg: #fff0d8;
+  --ui-info: #4253a5;
+  --ui-info-bg: #e8edfc;
+  --ui-board-light: #f4edf1;
+  --ui-board-dark: #8ea8a4;
+  --ui-radius: 10px;
+  --ui-panel-radius: 16px;
+  --ui-feature-radius: 24px;
+  --ui-shadow: 0 8px 24px rgb(48 27 64 / 6%), 0 1px 3px rgb(48 27 64 / 5%);
+  --ui-shadow-floating: 0 20px 56px rgb(48 27 64 / 16%), 0 2px 8px rgb(48 27 64 / 7%);
+  --ui-glass-fill: #ffffff;
+  --ui-glass-strong-fill: #ffffff;
+  --ui-glass-edge: rgb(255 255 255 / 85%);
+  --ui-material-filter: none;
+  --ui-canvas-image: radial-gradient(ellipse at 5% 0%, rgb(244 114 182 / 10%), transparent 52%), radial-gradient(ellipse at 95% 60%, rgb(139 92 246 / 7%), transparent 50%);
   --ui-font: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --ui-mono: Consolas, 'Liberation Mono', ui-monospace, monospace;
   --ui-space-1: 4px;
@@ -32,6 +49,7 @@
   --ui-space-4: 16px;
   --ui-space-6: 24px;
   --ui-space-8: 32px;
+  --ui-space-12: 48px;
   /* Compatibility aliases for room/game components. Keep all palette ownership here. */
   --bg: var(--ui-canvas);
   --panel: var(--ui-surface);
@@ -58,6 +76,7 @@
   color-scheme: light;
   color: var(--ui-ink);
   background: var(--ui-canvas);
+  background-image: var(--ui-canvas-image);
   font: 14px/1.5 var(--ui-font);
   letter-spacing: normal;
   text-shadow: none;
@@ -67,10 +86,10 @@
 .app-surface :where(h1, h2, h3, p) { color: inherit; }
 .app-surface :where(h1, h2, h3) { font-family: var(--ui-font); font-weight: 650; line-height: 1.25; letter-spacing: -.015em; }
 .app-surface :where(p) { line-height: 1.55; }
-.app-surface :where(a) { color: var(--ui-accent); text-underline-offset: 3px; }
+.app-surface :where(a) { color: var(--ui-accent-ink); text-underline-offset: 3px; }
 .app-surface :where(button, input, select, textarea) { font: inherit; letter-spacing: normal; }
 .app-surface :where(button):not(:where(.chess-board-wrap button, .chess-arena-live > div button)) {
-  min-height: 34px;
+  min-height: 40px;
   padding: 6px 12px;
   border: 1px solid var(--ui-control-border);
   border-radius: var(--ui-radius);
@@ -80,11 +99,12 @@
   text-shadow: none;
   font-weight: 600;
   cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 .app-surface :where(button:hover:not(:disabled)):not(:where(.chess-board-wrap button, .chess-arena-live > div button)) { background-color: var(--ui-selection); }
 .app-surface :where(button:disabled):not(:where(.chess-board-wrap button, .chess-arena-live > div button)) { cursor: not-allowed; opacity: .55; }
 .app-surface :where(input:not([type='range']):not([type='checkbox']):not([type='radio']), select, textarea) {
-  min-height: 36px;
+  min-height: 40px;
   padding: 8px 10px;
   border: 1px solid var(--ui-control-border);
   border-radius: var(--ui-radius);
@@ -98,6 +118,39 @@
 .app-surface .ui-primary { color: var(--ui-on-accent); background: var(--ui-accent); border-color: var(--ui-accent); }
 .app-surface .ui-primary:hover:not(:disabled) { background: var(--ui-accent-hover); }
 .app-surface .ui-selected { background: var(--ui-selection); border-color: var(--ui-accent); color: var(--ui-ink); }
+
+/* Role primitives: color belongs to useful content, independently of material. */
+.ui-tone, [data-tone] { --ui-tone-ink: var(--ui-accent-ink); --ui-tone-bg: var(--ui-pink-bg); }
+[data-tone='violet'] { --ui-tone-ink: var(--ui-violet); --ui-tone-bg: var(--ui-violet-bg); }
+[data-tone='teal'] { --ui-tone-ink: var(--ui-teal); --ui-tone-bg: var(--ui-teal-bg); }
+[data-tone='amber'] { --ui-tone-ink: var(--ui-amber); --ui-tone-bg: var(--ui-amber-bg); }
+.ui-tone { color: var(--ui-tone-ink); background: var(--ui-tone-bg); border: 1px solid color-mix(in srgb, var(--ui-tone-ink) 25%, transparent); border-radius: var(--ui-panel-radius); }
+.ui-card { background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: var(--ui-panel-radius); }
+.ui-glass { background: var(--ui-glass-fill); border: 1px solid var(--ui-glass-edge); border-radius: var(--ui-panel-radius); box-shadow: var(--ui-shadow); -webkit-backdrop-filter: var(--ui-material-filter); backdrop-filter: var(--ui-material-filter); }
+.ui-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 650; line-height: 1.4; color: var(--ui-tone-ink, var(--ui-accent-ink)); background: var(--ui-tone-bg, var(--ui-pink-bg)); }
+.ui-icon { display: inline-grid; place-items: center; width: 44px; height: 44px; flex: 0 0 auto; border-radius: 14px; color: var(--ui-tone-ink, var(--ui-accent-ink)); background: var(--ui-tone-bg, var(--ui-pink-bg)); font-size: 24px; }
+.ui-metric { display: grid; gap: 6px; padding: 20px; }
+.ui-metric > strong, .ui-metric > output { color: var(--ui-tone-ink, var(--ui-accent)); font: 700 30px/1.15 var(--ui-mono); letter-spacing: -.04em; }
+.ui-metric > small { color: var(--ui-muted); font-size: 12px; }
+.ui-material-setting { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.ui-material-setting input { width: 18px; height: 18px; accent-color: var(--ui-accent); }
+.app-surface .ui-primary:active:not(:disabled) { background: var(--ui-accent-hover); box-shadow: inset 0 2px 4px rgb(0 0 0 / 15%); }
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root { --ui-glass-fill: rgb(255 255 255 / 76%); --ui-glass-strong-fill: rgb(255 255 255 / 90%); --ui-material-filter: blur(18px) saturate(135%); }
+}
+html[data-ui-material='solid'] { --ui-glass-fill: #fff; --ui-glass-strong-fill: #fff; --ui-material-filter: none; }
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  :root { --ui-glass-fill: #fff; --ui-glass-strong-fill: #fff; --ui-material-filter: none; }
+}
+@media (pointer: coarse) {
+  .app-surface :where(button, select, input:not([type='checkbox']):not([type='radio']), textarea):not(:where(.chess-board-wrap button, .chess-arena-live > div button, .minefield-cell, .paintbox-palette button, .sticky-note-plugin button, .pip-chat-window > header button, .team-dot-btn, .lang-toggle button)) { min-height: 44px; }
+}
+@media (forced-colors: active) {
+  .app-surface { --ui-canvas: Canvas; --ui-surface: Canvas; --ui-raised: Canvas; --ui-recessed: Canvas; --ui-glass-fill: Canvas; --ui-glass-strong-fill: Canvas; --ui-ink: CanvasText; --ui-muted: CanvasText; --ui-accent: LinkText; --ui-focus: Highlight; --ui-control-border: ButtonText; --ui-line: ButtonText; --ui-glass-edge: ButtonText; --ui-material-filter: none; --ui-canvas-image: none; }
+  .app-surface :is(.ui-tone, .ui-badge, .ui-icon) { color: CanvasText; background: Canvas; border: 1px solid ButtonText; }
+  .app-surface :is(button[aria-pressed='true'], .ui-selected) { outline: 2px solid Highlight; }
+}
 
 /* Motion communicates progress; decoration never runs continuously. */
 @media (prefers-reduced-motion: reduce) {

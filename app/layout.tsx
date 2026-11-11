@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider'
 import { eventTrackingConfigured } from '@/lib/analytics/server-config'
 import './globals.css'
@@ -18,8 +19,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
+        <Script src="/styles/app-appearance.js" strategy="beforeInteractive" />
         <AnalyticsProvider enabled={eventTrackingConfigured()}>
           {children}
         </AnalyticsProvider>
