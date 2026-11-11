@@ -1,9 +1,11 @@
+'use client'
+
 import Link from 'next/link'
 import type { GameManifest } from '@/lib/engine/types'
 import { GameIcon } from './GameIcon'
 import './coming-soon.css'
 
-export function ComingSoonGame({ game }: { game: GameManifest }) {
+export function ComingSoonGame({ game, onExit }: { game: GameManifest; onExit?: () => void }) {
   return <main className="app-surface coming-soon-game">
     <div className="ui-glass coming-soon-card">
       <GameIcon icon={game.icon} size={88} />
@@ -13,7 +15,7 @@ export function ComingSoonGame({ game }: { game: GameManifest }) {
       <div className="coming-soon-facts"><span className="ui-badge" data-tone="violet">Up to {game.maxPlayers} people</span><span className="ui-badge" data-tone="teal">Private rooms planned</span><span className="ui-badge">Camera optional</span></div>
       <ol>{game.instructions.map(item => <li key={item.title}><strong>{item.title}</strong><span>{item.detail.replace('Planned: ', '')}</span></li>)}</ol>
       <p className="coming-soon-note">In planning. Gameplay, rooms, and video are not available yet.</p>
-      <Link href="/">Back to desktop</Link>
+      <div>{onExit ? <button onClick={onExit}>Back to desktop</button> : <Link href="/">Back to desktop</Link>}</div>
     </div>
   </main>
 }
