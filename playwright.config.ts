@@ -11,6 +11,7 @@ export default defineConfig({
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
     ...devices['Desktop Chrome'],
+    channel: process.env.PLAYWRIGHT_CHANNEL || undefined,
     baseURL,
     extraHTTPHeaders: bypass ? { 'x-vercel-protection-bypass': bypass } : undefined,
     screenshot: 'only-on-failure',
