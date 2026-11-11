@@ -37,6 +37,9 @@
   ],
   "exclude": [
     "node_modules",
-    "vendor"
+    "vendor",
+    "experience-evidence",
+    "playwright-report",
+    "test-results"
   ]
 }
