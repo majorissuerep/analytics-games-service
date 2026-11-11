@@ -94,15 +94,28 @@
   font: 24px/1 var(--ui-font);
 }
 .analytics-consent .analytics-consent-note { margin: 12px 0 0; color: var(--ui-muted); font-size: 12px; }
+/* Document/game pages own their layout: this entry follows their content. */
 .analytics-settings-button {
+  position: static;
+  flex: 0 0 auto;
+  align-self: flex-end;
+  margin: 8px 12px 12px;
+  min-height: 32px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  background: var(--ui-glass-strong-fill);
+  backdrop-filter: var(--ui-material-filter);
+  font-size: 12px;
+}
+
+/* The XP desktop owns the viewport and retains its floating utility entry. */
+body:has(.millennium-desktop) .analytics-settings-button,
+body:has(.standalone-game-shell) .analytics-settings-button {
   position: fixed;
   z-index: 99999;
   right: 10px;
   bottom: 48px;
-  min-height: 32px;
-  padding: 5px 12px;
-  border-radius: 8px;
-  font-size: 12px;
+  margin: 0;
 }
 
 @media (max-width: 480px) {

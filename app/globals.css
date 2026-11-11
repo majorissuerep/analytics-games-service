@@ -31,3 +31,5 @@ button { font-family: inherit; }
 
 
 body:has(.embedded-game-surface), body:has(> .minefield-app), body:has(> .paintbox-app), body:has(> .chess-app) { padding: 0; }
+
+html:has(.embedded-game-surface), body:has(.embedded-game-surface) { background: transparent; }

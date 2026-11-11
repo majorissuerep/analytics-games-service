@@ -63,7 +63,7 @@
 .desktop-window .title-bar { flex: 0 0 auto; cursor: default; }
 .desktop-window .title-bar-text { display: flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .desktop-window-body { flex: 1 1 auto; min-height: 0; overflow: hidden; background: #f7f7f1; border: 1px solid #7f9db9; }
-.desktop-game-frame { display: block; width: 100%; height: 100%; border: 0; background: #070b12; }
+.desktop-game-frame { display: block; width: 100%; height: 100%; border: 0; background: transparent; }
 .desktop-game-host { position: relative; width: 100%; height: 100%; min-height: 0; }
 .desktop-game-loader { position: absolute; inset: 0; z-index: 10; display: grid; place-items: center; overflow: auto; }
 .embedded-game-surface { width: 100%; min-height: 100svh; }
@@ -223,3 +223,26 @@
 
 /* Keep the standalone cabinet's touch controls clear of the privacy launcher. */
 body:has(.standalone-game-shell iframe[title="Space Cadet Pinball"]) .analytics-settings-button { bottom: 6px; }
+
+/* XP chrome surrounds a real transparent interior. Four edge strips preserve
+   its blue frame without putting an opaque fill behind the application. */
+.millennium-desktop .desktop-window {
+  background: linear-gradient(#0053ee, #0053ee) top / 100% 3px no-repeat,
+    linear-gradient(#0053ee, #0053ee) bottom / 100% 3px no-repeat,
+    linear-gradient(#0053ee, #0053ee) left / 3px 100% no-repeat,
+    linear-gradient(#0053ee, #0053ee) right / 3px 100% no-repeat;
+}
+.millennium-desktop .desktop-window-body {
+  background: var(--ui-window-fill);
+  -webkit-backdrop-filter: var(--ui-window-filter);
+  backdrop-filter: var(--ui-window-filter);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 80%);
+}
+.millennium-desktop .desktop-window-body > .system-panel.app-surface {
+  background: var(--ui-glass-sheen), var(--ui-glass-strong-fill);
+  scrollbar-gutter: stable;
+}
+html[data-ui-material='solid'] .millennium-desktop .desktop-window-body > .system-panel.app-surface { background: var(--ui-canvas); }
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more), (forced-colors: active) {
+  .millennium-desktop .desktop-window-body > .system-panel.app-surface { background: var(--ui-canvas); }
+}
