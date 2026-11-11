@@ -1,8 +1,23 @@
 const status = document.querySelector('#status')
 const canvas = document.querySelector('#canvas')
+const loading = document.querySelector('#workbench-loading')
+const label = document.querySelector('#loading-label')
+const started = Date.now()
+const clock = setInterval(() => { document.querySelector('#loading-elapsed').textContent = Math.floor((Date.now() - started) / 1000) + 's' }, 1000)
+const timeout = setTimeout(() => fail(new Error('The workbench took too long to open. Please retry.')), 60000)
+document.querySelector('#retry').addEventListener('click', () => location.reload())
+function fail(error) {
+  clearInterval(clock); clearTimeout(timeout)
+  loading.setAttribute('aria-busy', 'false')
+  loading.querySelector('[role="progressbar"]').hidden = true
+  document.querySelector('#retry').hidden = false
+  label.setAttribute('role', 'alert')
+  setStatus(error.message || 'The workbench could not open. Please retry.', true)
+}
 
 function setStatus(message, isError = false) {
   status.textContent = message
+  label.textContent = message
   status.classList.toggle('error', isError)
 }
 
@@ -33,16 +48,20 @@ async function boot() {
     return response.text()
   })
 
+  setStatus('Loading the simulation runtime…')
   await loadScript('/tpt/powder.js')
   if (typeof window.create_powder !== 'function') {
     throw new Error('Powder Toy factory did not load')
   }
 
   window.mark_presentable = () => {
+    clearInterval(clock); clearTimeout(timeout)
+    loading.hidden = true
     canvas.classList.add('ready')
     setStatus(`${evaluation.name} — ${evaluation.scale.metersPerCell} m/cell — paused for inspection`)
   }
 
+  setStatus('Initializing the simulation and scene…')
   const powderModule = await window.create_powder({
     canvas,
     arguments: ['ddir:/workspace', 'disable-network'],
@@ -64,5 +83,5 @@ async function boot() {
 
 boot().catch(error => {
   console.error(error)
-  setStatus(error.stack ?? String(error), true)
+  fail(error)
 })

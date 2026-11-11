@@ -16,6 +16,7 @@
 - Preserve semantic gameplay color (paint swatches, team identities, chess score colors) and essential playfield artwork. Do not style chess piece buttons as application form controls.
 - Chess move-quality color measures loss from the best move: 0 green, −0.10 pawns greenish, −0.50 and worse saturated red. Show position balance separately; never color candidates by absolute position score or stretch colors across the listed candidates.
 - The standalone pinball cabinet links the shared stylesheet; the Cosmic Forge workbench assembly copies it. External games can opt in using the stylesheet documented on `/develop`.
+- All user-visible waits use scoped progress with stage and elapsed time. Unknown work stays indeterminate; percentages require measured work and a known total. Keep unrelated controls responsive, abort stale work, bound network waits, and offer recovery on failure. See the waiting contract in `docs/APPLICATION_DESIGN.md`.
 - Verify `tests/e2e/application-design.spec.ts` together with relevant gameplay regressions before release.
 
 ## Analytics (Mixpanel)

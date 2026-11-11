@@ -5,6 +5,7 @@ import { defaultStyledRepertoireForModelColor, BUILTIN_STYLED_OPENING } from '@/
 import { requestStyledMove } from '@/lib/chess-models/styled-runtime'
 
 import { analyseWithEngine, isUciEngine } from '@/lib/engine/uci-runtime'
+import { engineResponse } from '@/lib/engine/progress-response'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -29,25 +30,31 @@ export async function POST(request: Request, context: { params: Promise<{ revisi
       if (replay.fen() !== chess.fen()) return NextResponse.json({ error: 'History does not match FEN' }, { status: 400 })
     }
     if (isUciEngine(revisionId)) {
-      const result = await analyseWithEngine(revisionId, {
+      return await engineResponse(request, async onProgress => {
+        const result = await analyseWithEngine(revisionId, {
         fen: chess.fen(), multiPv: 1, moveTimeMs: parsed.data.moveTimeMs,
         skill: parsed.data.skill, history: parsed.data.history,
+        onProgress, signal: request.signal,
       })
       if (!supplied.includes(result.bestMove)) throw new Error('Engine returned an illegal move')
-      return NextResponse.json({ move: result.bestMove, revisionId, durationMs: result.durationMs })
+        return { move: result.bestMove, revisionId, durationMs: result.durationMs }
+      })
     }
 
     if (revisionId === BUILTIN_STYLED_OPENING) {
       const turn = parsed.data.fen.split(' ')[1]
       const repertoireId = parsed.data.repertoireId ?? defaultStyledRepertoireForModelColor(turn === 'w' ? 'w' : 'b')
-      const result = await requestStyledMove({
+      return await engineResponse(request, async onProgress => {
+        const result = await requestStyledMove({
         fen: parsed.data.fen,
         history: parsed.data.history,
         repertoireId,
         legalMoves: supplied,
         moveTimeMs: parsed.data.moveTimeMs,
+        onProgress, signal: request.signal,
       })
-      return NextResponse.json({ move: result.move, revisionId, repertoireId, durationMs: result.durationMs })
+        return { move: result.move, revisionId, repertoireId, durationMs: result.durationMs }
+      })
     }
 
     return NextResponse.json({ error: 'This model has no Vercel runtime. Cluster hosting is retired.' }, { status: 503 })

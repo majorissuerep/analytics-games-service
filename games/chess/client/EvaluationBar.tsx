@@ -1,4 +1,6 @@
 import type { StockfishEvaluation } from './stockfish'
+import { LoadingState } from '@/components/ui/LoadingState'
+import type { EngineProgress } from '@/lib/engine/engine-progress'
 
 export function evaluationWhitePercent(evaluation: StockfishEvaluation | null) {
   if (!evaluation) return 50
@@ -14,7 +16,7 @@ export function formatEvaluation(evaluation: StockfishEvaluation | null) {
   return `${pawns >= 0 ? '+' : ''}${pawns.toFixed(1)}`
 }
 
-export function EvaluationBar({ evaluation, error, engineName = 'Stockfish 19' }: { evaluation: StockfishEvaluation | null; error?: string; engineName?: string }) {
+export function EvaluationBar({ evaluation, error, engineName = 'Stockfish 19', progress, onCancel, onRetry }: { evaluation: StockfishEvaluation | null; error?: string; engineName?: string; progress?: EngineProgress | null; onCancel?: () => void; onRetry?: () => void }) {
   const whitePercent = evaluationWhitePercent(evaluation)
   const score = formatEvaluation(evaluation)
   const detail = evaluation?.depth ? `Depth ${evaluation.depth}` : error || 'Evaluating…'
@@ -39,6 +41,8 @@ export function EvaluationBar({ evaluation, error, engineName = 'Stockfish 19' }
       <div className="chess-evaluation-meta">
         <b>{engineName}</b>
         <small>{detail}</small>
+        {!evaluation && !error && <LoadingState scope="inline" label={progress?.message ?? 'Preparing evaluation'} detail={progress?.detail} onCancel={onCancel} />}
+        {error && onRetry && <button onClick={onRetry}>Retry evaluation</button>}
       </div>
     </section>
   )

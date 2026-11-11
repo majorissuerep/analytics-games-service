@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import Image from 'next/image'
+import { LoadingState } from '@/components/ui/LoadingState'
 import type { DesktopPluginDefinition, DesktopPluginProps } from '@analytics-games/plugin-sdk'
 
 const tips = [
@@ -112,6 +113,8 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
   const [statusLine, setStatusLine] = useState('')
   const [toolCards, setToolCards] = useState<ToolCard[]>([])
   const [modelChip, setModelChip] = useState('')
+  const requestRef = useRef<AbortController | null>(null)
+  useEffect(() => () => requestRef.current?.abort(), [])
   const reasoningRef = useRef('')
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const messagesRef = useRef<HTMLDivElement>(null)
@@ -143,9 +146,12 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
     reasoningRef.current = ''
     setToolCards([])
     setStatusLine('Pip is rummaging through the repo…')
+    const controller = new AbortController()
+    requestRef.current = controller
     try {
       const response = await fetch('/api/pip/chat', {
         method: 'POST',
+        signal: AbortSignal.any([controller.signal, AbortSignal.timeout(60_000)]),
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userKey: resolveUserKey(), message: content }),
       })
@@ -203,7 +209,7 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
       })
       if (!finished) throw new Error('Pip lost the line to the model office. Try again!')
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : 'Pip could not answer')
+      setError(controller.signal.aborted ? 'Response stopped. Send another message when ready.' : requestError instanceof Error ? requestError.message : 'Pip could not answer')
     } finally {
       setSending(false)
       setStreamingText(null)
@@ -294,9 +300,7 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
                       <p>{streamingText}<b className="pip-cursor" aria-hidden>▌</b></p>
                     </div>
                   )}
-                  {sending && streamingText === null && (
-                    <div className="pip-chat-thinking" role="status"><i /><i /><i /> {statusLine || 'Pip is rummaging through the repo…'}</div>
-                  )}
+                  {sending && <LoadingState scope="inline" label={streamingText === null ? statusLine || 'Pip is preparing a response' : 'Receiving Pip’s response'} onCancel={() => requestRef.current?.abort()} cancelLabel="Stop response" />}
                 </div>
                 <div className="pip-chat-suggestions" aria-label="Suggested questions">
                   {['How do I play Minefield?', 'Explain Consensus Radar', 'Where do games live in the repo?'].map((question) => (

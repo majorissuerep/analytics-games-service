@@ -38,7 +38,9 @@
   </main>
 
   <div class="pinball-loader" data-pinball-loader role="status" aria-live="polite">
-    <span class="pinball-loader-spinner" aria-hidden="true"></span>
+    <div class="ui-loading-meter" role="progressbar" aria-label="Loading Classic Pinball" aria-valuemin="0" aria-valuemax="100" data-determinate="false" style="width:min(280px,75vw)"><span></span></div>
+    <span role="timer" aria-label="Elapsed time" data-load-elapsed>0s</span>
+    <button type="button" data-load-retry hidden>Retry Pinball</button>
     <span class="pinball-loader-text" data-pinball-loader-text>Loading Classic Pinball…</span>
     <span class="pinball-loader-hint" data-pinball-loader-hint hidden>Still loading — the first open downloads roughly 2&nbsp;MB.</span>
   </div>

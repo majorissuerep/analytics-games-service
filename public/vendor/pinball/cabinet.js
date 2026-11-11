@@ -63,22 +63,45 @@ import {
 
   /* --- Loader ---------------------------------------------------------- */
 
+  var startedAt = Date.now()
+  var elapsedTimer = window.setInterval(function () {
+    document.querySelector('[data-load-elapsed]').textContent = Math.floor((Date.now() - startedAt) / 1000) + 's'
+  }, 1000)
+  var readyProbe = window.setInterval(markLoaded, 100)
+  var failureTimer = window.setTimeout(markBroken, 45000)
+  document.querySelector('[data-load-retry]').addEventListener('click', function () { window.location.reload() })
+
+  function stopLoading() {
+    window.clearInterval(readyProbe)
+    window.clearInterval(elapsedTimer)
+    window.clearTimeout(failureTimer)
+  }
+
   function markLoaded() {
     if (state.loaded) return
+    // The legacy bridge fires on document load. Verify the actual Phaser
+    // scene as asset loading can continue after that event.
+    var nested = nestedWindow()
+    if (!nested || !nested.game || !nested.game.state || !['Pinball.Splash', 'Pinball.Menu', 'Pinball.Game'].includes(nested.game.state.current)) return
     state.loaded = true
+    stopLoading()
     window.clearTimeout(state.loadTimer)
     elements.loader.classList.add('is-loaded')
   }
 
   function markBroken() {
     if (state.broken) return
+    elements.loader.setAttribute('role', 'alert')
     state.broken = true
+    stopLoading()
+    elements.loader.querySelector('[role="progressbar"]').hidden = true
+    document.querySelector('[data-load-retry]').hidden = false
     window.clearTimeout(state.loadTimer)
     elements.loader.classList.add('is-broken')
     elements.loaderText.textContent = 'Pinball could not be loaded'
     if (elements.loaderHint) {
       elements.loaderHint.hidden = false
-      elements.loaderHint.textContent = 'Try reopening the game window.'
+      elements.loaderHint.textContent = 'Retry loading or use Exit to return to the desktop.'
     }
   }
 
@@ -213,7 +236,8 @@ import {
       state.gameBecameVisible = true
       applySound(state.soundOn)
       state.audioProbeTimer = window.setInterval(audioProbeTick, 300)
-      window.setTimeout(markLoaded, 250)
+      // Wait for the actual menu-ready bridge event; document load alone
+      // does not mean Phaser has finished loading the game assets.
     })
 
     /* The nested document can also report a hard failure via the loader. */
@@ -229,6 +253,9 @@ import {
     applySound(state.soundOn)
     window.addEventListener('resize', resize)
     resize()
+    // Cabinet controls are ready independently of the nested game download.
+    document.documentElement.dataset.appReady = 'true'
+    if (window.parent !== window) window.parent.postMessage({ protocol: 'analytics-games.bridge', version: 1, type: 'game.ready' }, window.location.origin)
   }
 
   init()

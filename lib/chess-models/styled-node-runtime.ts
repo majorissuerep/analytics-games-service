@@ -4,6 +4,7 @@ import { pathToFileURL } from 'node:url'
 import { Chess, type Color, type PieceSymbol, type Square } from 'chess.js'
 import * as ort from 'onnxruntime-web'
 import type { StyledMoveRequest } from './styled-runtime'
+import type { EngineProgress, ReportEngineProgress } from '@/lib/engine/engine-progress'
 
 const HISTORY_K = 20
 const MODEL_DIR = join(process.cwd(), 'public', 'models')
@@ -36,6 +37,12 @@ type RuntimeResources = {
 }
 
 let resourcesPromise: Promise<RuntimeResources> | undefined
+let resourcePhase: EngineProgress = { stage: 'starting', message: 'Loading the selected model files' }
+const progressListeners = new Set<ReportEngineProgress>()
+function reportResources(progress: EngineProgress) {
+  resourcePhase = progress
+  for (const report of progressListeners) report(progress)
+}
 const IDLE_MS = 2 * 60 * 60 * 1000
 let lastUsed = Date.now()
 let activeRequests = 0
@@ -45,6 +52,7 @@ async function releaseIdleResources() {
   if (activeRequests || !resourcesPromise) return
   const previous = resourcesPromise
   resourcesPromise = undefined
+  resourcePhase = { stage: 'starting', message: 'Loading the selected model files' }
   const loaded = await previous.catch(() => undefined)
   await loaded?.session.release()
 }
@@ -73,6 +81,7 @@ async function loadResources(): Promise<RuntimeResources> {
     mjs: pathToFileURL(configuredPath('STYLED_CHESS_WASM_MODULE_PATH', 'ort-wasm-simd-threaded.mjs')).href,
     wasm: pathToFileURL(configuredPath('STYLED_CHESS_WASM_PATH', 'ort-wasm-simd-threaded.wasm')).href,
   }
+  reportResources({ stage: 'initializing', message: 'Preparing the selected model runtime' })
   const session = await ort.InferenceSession.create(model, {
     executionProviders: ['wasm'],
     executionMode: 'sequential',
@@ -89,9 +98,11 @@ async function loadResources(): Promise<RuntimeResources> {
   }
 }
 
-async function resources() {
-  resourcesPromise ??= loadResources().catch(error => { resourcesPromise = undefined; throw error })
-  return resourcesPromise
+async function resources(report?: ReportEngineProgress) {
+  report?.(resourcePhase)
+  if (report) progressListeners.add(report)
+  resourcesPromise ??= loadResources().catch(error => { resourcesPromise = undefined; resourcePhase = { stage: 'starting', message: 'Loading the selected model files' }; throw error })
+  try { return await resourcesPromise } finally { if (report) progressListeners.delete(report) }
 }
 
 function mirrorSquare(square: string) {
@@ -228,11 +239,15 @@ function policyMove(input: StyledMoveRequest, output: ort.Tensor, turn: Color, v
 }
 
 export async function predictStyledMove(input: StyledMoveRequest) {
+  input.signal?.throwIfAborted()
   clearTimeout(idleTimer)
   if (!activeRequests && Date.now() - lastUsed >= IDLE_MS) await releaseIdleResources()
   activeRequests += 1
   try {
-    const loaded = await resources()
+    const loaded = await resources(input.onProgress)
+    resourcePhase = { stage: 'initializing', message: 'Preparing the position with the ready model' }
+    input.signal?.throwIfAborted()
+    input.onProgress?.({ stage: 'thinking', message: 'Choosing a move with the selected model' })
     const computeStarted = Date.now()
     const parsedFen = parseFen(input.fen)
     const opening = bookMove(input, loaded.openingBook)
@@ -240,6 +255,7 @@ export async function predictStyledMove(input: StyledMoveRequest) {
 
     const output = await loaded.session.run(inputFeeds(input, loaded.vocabulary))
     try {
+      input.signal?.throwIfAborted()
       const move = policyMove(input, output.policy_logits, parsedFen.turn, loaded.vocabulary)
       return { move, mode: 'policy' as const, repertoireId: input.repertoireId, durationMs: Date.now() - computeStarted }
     } finally { Object.values(output).forEach(tensor => tensor.dispose()) }

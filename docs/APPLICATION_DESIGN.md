@@ -126,3 +126,31 @@ and relevant regressions. Verify material preference across frames, motion and
 transparency fallbacks, forced colors, contrast, focus, phone overflow, hint-row
 clipping, and late-game Minefield density. A background/palette-only change is
 insufficient; meaningful colored content and material hierarchy must be visible.
+
+## Waiting, progress, and recovery
+
+Every user-visible asynchronous operation shows feedback immediately in the
+smallest affected region. Use `components/ui/LoadingState.tsx`: page for route
+entry, app for opening an iframe or game module, section for model inference,
+room actions or board generation, and inline for compact auxiliary work. Keep
+unaffected navigation and controls usable; never cover the desktop for a model
+request inside Chess. Routine background polling does not flash loaders.
+
+Show the current stage, elapsed time, and an accessible progress bar. Unknown
+work stays indeterminate with no `aria-valuenow`; never infer completion from
+time or search depth. Only measured quantities with a known total (for example,
+uploaded bytes) get percentages. Engine startup reports actual runtime stages;
+search depth and generation attempts are activity details, not completion.
+Pink identifies active work. Green means completion, amber attention, and red
+failure, with explicit text as well as color. Numeric game scales remain
+domain-specific; the chess loss thresholds do not define unrelated apps.
+
+Abort stale requests on selection changes and unmount. Offer cancellation for
+long local work, bound network waits, and replace failed loaders with an
+explanation and retry or a useful next action. Preserve user input on failure.
+Use polite stage announcements, a non-announcing elapsed timer, visible focus,
+reduced-motion static progress, and system colors under forced colors.
+
+Next route loading boundaries cover page/game navigation; desktop frames wait
+for actual app readiness. Static runtimes use the shared meter styles and real
+readiness callbacks. Error boundaries provide recovery when a page cannot open.

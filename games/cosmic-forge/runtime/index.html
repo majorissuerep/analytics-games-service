@@ -23,7 +23,14 @@
     <strong>Cosmic Forge evaluation workbench</strong>
     <span id="status">Loading content index…</span>
   </header>
-  <main><canvas id="canvas" tabindex="-1" oncontextmenu="event.preventDefault()"></canvas></main>
+  <main>
+    <section class="ui-loading ui-loading-app" id="workbench-loading">
+      <div class="ui-loading-content">
+        <div class="ui-loading-heading"><strong id="loading-label" role="status">Loading content index…</strong><span id="loading-elapsed" role="timer" aria-label="Elapsed time">0s</span></div>
+        <div class="ui-loading-meter" role="progressbar" aria-busy="true" aria-label="Opening Cosmic Forge" data-determinate="false"><span></span></div>
+        <button id="retry" hidden>Retry workbench</button>
+      </div>
+    </section><canvas id="canvas" tabindex="-1" oncontextmenu="event.preventDefault()"></canvas></main>
   <script src="runtime.js" type="module"></script>
 </body>
 </html>

@@ -60,9 +60,10 @@ export function solveMinefield(board: MinefieldBoard, opening: number): { solved
 }
 
 /** Rejection sampling: never return an uncertified board or relocate live mines. */
-export function generateSolvableMinefield(width: number, height: number, mines: number, opening: number, maxAttempts = 3000): MinefieldBoard {
+export function generateSolvableMinefield(width: number, height: number, mines: number, opening: number, maxAttempts = 3000, onAttempt?: (attempt: number) => void): MinefieldBoard {
   const empty = createMinefield(width, height, mines)
   for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    onAttempt?.(attempt + 1)
     const board = armMinefield(empty, opening)
     if (solveMinefield(board, opening).solved) return board
   }

@@ -1,7 +1,10 @@
 'use client'
 
+import { useAppReady } from '@/lib/engine/client/use-app-ready'
+
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import Link from 'next/link'
+import { LoadingState } from '@/components/ui/LoadingState'
 import { emitGameSessionCompleted } from '@/lib/analytics/game-events'
 import {
   chordMinefieldCell,
@@ -36,11 +39,13 @@ function cellLabel(board: MinefieldBoard, index: number) {
 }
 
 export function MinefieldGame() {
+  useAppReady()
   const [difficulty, setDifficulty] = useState<Difficulty>('beginner')
   const [board, setBoard] = useState(() => freshBoard('beginner'))
   const [elapsed, setElapsed] = useState(0)
   const [generating, setGenerating] = useState(false)
   const [generationError, setGenerationError] = useState('')
+  const [generationAttempt, setGenerationAttempt] = useState(0)
   const [cellSize, setCellSize] = useState(30)
   const [focusedCell, setFocusedCell] = useState(0)
   const [flagMode, setFlagMode] = useState(false)
@@ -78,6 +83,7 @@ export function MinefieldGame() {
     if (!board.armed) {
       const epoch = ++generationEpoch.current
       setGenerating(true)
+      setGenerationAttempt(0)
       setGenerationError('')
       const worker = new Worker(new URL('./generator.worker.ts', import.meta.url))
       workerRef.current = worker
@@ -88,8 +94,9 @@ export function MinefieldGame() {
         setGenerating(false)
         setGenerationError(message)
       }
-      worker.onmessage = (event: MessageEvent<{ board?: MinefieldBoard; error?: string }>) => {
+      worker.onmessage = (event: MessageEvent<{ board?: MinefieldBoard; error?: string; attempt?: number }>) => {
         if (epoch !== generationEpoch.current) return
+        if (event.data.attempt !== undefined) { setGenerationAttempt(event.data.attempt); return }
         if (!event.data.board) { fail(event.data.error || 'Generation failed. Try again.'); return }
         const generated = event.data.board
         setBoard(current => revealMinefieldCell({ ...generated, cells: generated.cells.map((cell, i) => ({ ...cell, flagged: current.cells[i]?.flagged ?? false })) }, index))
@@ -140,6 +147,7 @@ export function MinefieldGame() {
           <button onClick={() => reset()} aria-label="New game">New game</button>
           <div className="ui-tone" data-tone="violet"><small>Seconds</small><output aria-label="Elapsed seconds">{String(elapsed).padStart(3, '0')}</output></div>
         </div>
+        {generating && <LoadingState label="Verifying a deduction-only board" detail={generationAttempt ? `Checking candidate ${generationAttempt}. Only a fully solvable board will open.` : 'Starting board verification'} onCancel={() => reset()} />}
         <div className="minefield-board-scroll" tabIndex={0} aria-label="Scrollable minefield">
         <div
           className="minefield-grid"
