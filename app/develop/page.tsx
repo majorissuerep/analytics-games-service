@@ -65,7 +65,7 @@ parent.postMessage(exitMessage('complete'), PLATFORM_ORIGIN)`}</code></pre>
 
       <section className="developer-theme" aria-label="Shared application design">
         <h2>One application language</h2>
-        <p>Use quiet neutral surfaces, slate controls, clear labels, and color for information. The desktop supplies the XP window frame.</p>
+        <p>Use soft blue backgrounds, warm ivory panels, sage insets, teal controls, and clear labels. Keep colors subdued and preserve gameplay colors. The desktop supplies the XP window frame.</p>
         <pre><code>{`<link rel="stylesheet" href="https://analytics-games-service.vercel.app/styles/app-theme.css">
 <main class="app-surface">
   <h1>Your game</h1>

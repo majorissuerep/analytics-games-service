@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test'
 
-const canvas = 'rgb(233, 232, 226)'
-const surface = 'rgb(245, 244, 239)'
-const accent = 'rgb(53, 78, 97)'
+const canvas = 'rgb(226, 238, 248)'
+const surface = 'rgb(255, 243, 220)'
+const accent = 'rgb(40, 107, 115)'
 
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => localStorage.setItem('analytics-games.analytics-consent.v1', 'denied'))
