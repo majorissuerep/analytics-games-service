@@ -53,7 +53,8 @@ export const adminDecisionSchema = z.object({
 export const chessModelMoveRequestSchema = z.object({
   fen: z.string().min(10).max(120),
   legalMoves: z.array(z.string().regex(/^[a-h][1-8][a-h][1-8][qrbn]?$/)).min(1).max(256),
-  moveTimeMs: z.number().int().min(50).max(5000),
+  moveTimeMs: z.number().int().min(50).max(10000),
+  skill: z.number().int().min(0).max(20).optional(),
   history: z.array(z.string().regex(/^[a-h][1-8][a-h][1-8][qrbn]?$/)).max(1000).default([]),
   repertoireId: z.enum(STYLED_REPERTOIRE_IDS).optional(),
 }).strict()
@@ -90,7 +91,7 @@ export const BUILTIN_STOCKFISH: PublicChessModel = {
   id: 'builtin-stockfish-18',
   slug: 'stockfish-18',
   displayName: 'Stockfish 18',
-  description: 'Built-in Stockfish 18 lite WASM engine with five difficulty levels.',
+  description: 'Stockfish 18, loaded on demand in the shared Vercel runtime.',
   runtimeId: 'builtin-stockfish-18',
   revisionId: 'builtin-stockfish-18',
   sourceType: 'builtin',
@@ -102,7 +103,7 @@ export const BUILTIN_STOCKFISH_19: PublicChessModel = {
   id: 'builtin-stockfish-19',
   slug: 'stockfish-19',
   displayName: 'Stockfish 19',
-  description: 'Built-in Stockfish 19 smallnet WASM engine with five difficulty levels.',
+  description: 'Stockfish 19, loaded on demand in the shared Vercel runtime.',
   runtimeId: 'builtin-stockfish-19',
   revisionId: 'builtin-stockfish-19',
   sourceType: 'builtin',
@@ -121,3 +122,12 @@ export const BUILTIN_STYLED: PublicChessModel = {
   license: 'local-research-checkpoint',
   status: 'ready',
 }
+
+
+export const BUILTIN_RECKLESS: PublicChessModel = {
+  id: 'reckless-local', slug: 'reckless', displayName: 'Reckless 0.9',
+  description: 'Reckless UCI engine, loaded on demand in the shared Vercel runtime.',
+  runtimeId: 'reckless-local', revisionId: 'reckless-local', sourceType: 'builtin',
+  license: 'GPL-3.0', status: 'ready',
+}
+export const VERCEL_CHESS_MODELS = [BUILTIN_STOCKFISH, BUILTIN_STOCKFISH_19, BUILTIN_RECKLESS, BUILTIN_STYLED]

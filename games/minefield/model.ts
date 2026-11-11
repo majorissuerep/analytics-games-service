@@ -17,7 +17,7 @@ export interface MinefieldBoard {
 }
 
 export function createMinefield(width: number, height: number, mineCount: number): MinefieldBoard {
-  if (width < 2 || height < 2 || mineCount < 1 || mineCount >= width * height) {
+  if (![width, height, mineCount].every(Number.isInteger) || width < 2 || height < 2 || width > 100 || height > 100 || mineCount < 1 || mineCount >= width * height) {
     throw new Error('Invalid minefield dimensions')
   }
   return {
@@ -35,7 +35,7 @@ export function createMinefield(width: number, height: number, mineCount: number
   }
 }
 
-function neighbors(board: MinefieldBoard, index: number) {
+export function neighbors(board: MinefieldBoard, index: number) {
   const x = index % board.width
   const y = Math.floor(index / board.width)
   const result: number[] = []
@@ -62,11 +62,12 @@ function randomMineIndexes(candidates: number[], count: number) {
 
 export function armMinefield(board: MinefieldBoard, safeIndex: number, mines?: readonly number[]): MinefieldBoard {
   if (board.armed) return board
+  if (!Number.isInteger(safeIndex) || !board.cells[safeIndex]) throw new Error('Invalid opening cell')
   const forbidden = new Set([safeIndex, ...neighbors(board, safeIndex)])
   const candidates = board.cells.map((_, index) => index).filter((index) => !forbidden.has(index))
   if (board.mineCount > candidates.length) throw new Error('Mine count leaves no safe opening')
   const mineIndexes = mines ? [...mines] : randomMineIndexes(candidates, board.mineCount)
-  if (mineIndexes.length !== board.mineCount || mineIndexes.some((index) => forbidden.has(index))) {
+  if (mineIndexes.length !== board.mineCount || new Set(mineIndexes).size !== board.mineCount || mineIndexes.some((index) => !Number.isInteger(index) || !board.cells[index] || forbidden.has(index))) {
     throw new Error('Invalid mine placement')
   }
   const mineSet = new Set(mineIndexes)
@@ -82,7 +83,7 @@ export function armMinefield(board: MinefieldBoard, safeIndex: number, mines?: r
 }
 
 export function revealMinefieldCell(board: MinefieldBoard, index: number): MinefieldBoard {
-  if (!board.armed || board.status !== 'playing' || board.cells[index]?.flagged || board.cells[index]?.revealed) {
+  if (!board.armed || board.status !== 'playing' || !board.cells[index] || board.cells[index].flagged || board.cells[index].revealed) {
     return board
   }
   const cells = board.cells.map((cell) => ({ ...cell }))
@@ -93,8 +94,8 @@ export function revealMinefieldCell(board: MinefieldBoard, index: number): Minef
 
   const queue = [index]
   const visited = new Set<number>()
-  while (queue.length > 0) {
-    const current = queue.shift()
+  for (let cursor = 0; cursor < queue.length; cursor += 1) {
+    const current = queue[cursor]
     if (current === undefined || visited.has(current)) continue
     visited.add(current)
     const cell = cells[current]
@@ -106,6 +107,15 @@ export function revealMinefieldCell(board: MinefieldBoard, index: number): Minef
   const won = cells.every((cell) => cell.mine || cell.revealed)
   if (won) cells.forEach((cell) => { if (cell.mine) cell.flagged = true })
   return { ...board, status: won ? 'won' : 'playing', cells }
+}
+
+/** Standard chord: incorrect flags can still trigger a mine. */
+export function chordMinefieldCell(board: MinefieldBoard, index: number): MinefieldBoard {
+  const cell = board.cells[index]
+  if (!cell?.revealed || cell.mine || !cell.adjacent || board.status !== 'playing') return board
+  const around = neighbors(board, index)
+  if (around.filter(i => board.cells[i].flagged).length !== cell.adjacent) return board
+  return around.reduce((current, i) => revealMinefieldCell(current, i), board)
 }
 
 export function toggleMinefieldFlag(board: MinefieldBoard, index: number): MinefieldBoard {

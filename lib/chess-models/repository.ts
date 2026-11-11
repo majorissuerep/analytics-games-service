@@ -1,6 +1,6 @@
 import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto'
 import { pool } from '@/lib/db/index'
-import { BUILTIN_STOCKFISH, BUILTIN_STOCKFISH_19, BUILTIN_STYLED, type ChessModelSubmission, type PublicChessModel } from './contracts'
+import { VERCEL_CHESS_MODELS, type ChessModelSubmission, type PublicChessModel } from './contracts'
 
 function hashReceipt(receipt: string) {
   return createHash('sha256').update(receipt).digest('hex')
@@ -16,26 +16,8 @@ export function isAdminRequest(request: Request) {
 }
 
 export async function listPublicModels(): Promise<PublicChessModel[]> {
-  const result = await pool.query<{
-    id: string; slug: string; display_name: string; description: string; runtime_id: string
-    revision_id: string; source_type: string; license: string
-  }>(`SELECT m.id, m.slug, m.display_name, m.description, r.runtime_id,
-      r.id AS revision_id, r.source_type, r.license
-    FROM chess_models m
-    JOIN chess_model_revisions r ON r.id = m.current_ready_revision
-    WHERE m.visibility = 'public' AND m.disabled = FALSE AND m.archived = FALSE AND r.state = 'ready'
-    ORDER BY m.display_name ASC`)
-  return [BUILTIN_STOCKFISH, BUILTIN_STOCKFISH_19, BUILTIN_STYLED, ...result.rows.map(row => ({
-    id: row.id,
-    slug: row.slug,
-    displayName: row.display_name,
-    description: row.description,
-    runtimeId: row.runtime_id,
-    revisionId: row.revision_id,
-    sourceType: row.source_type,
-    license: row.license,
-    status: 'ready' as const,
-  }))]
+  // Cluster-hosted revisions remain in the audit registry, but are no longer executable.
+  return [...VERCEL_CHESS_MODELS]
 }
 
 export async function listAdminModels() {

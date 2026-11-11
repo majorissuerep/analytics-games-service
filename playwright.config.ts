@@ -17,5 +17,11 @@ export default defineConfig({
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
   },
+  webServer: process.env.PLAYWRIGHT_START_SERVER ? {
+    command: 'npm run start -- --port 3130',
+    url: baseURL,
+    reuseExistingServer: !process.env.CI,
+    timeout: 60_000,
+  } : undefined,
   outputDir: 'test-results',
 })

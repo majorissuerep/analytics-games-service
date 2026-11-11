@@ -1,3 +1,7 @@
+> Historical cluster design: cluster chess hosting was retired on 2026-11-11.
+> The active implementation is the [shared Vercel runtime](../docs/GAME_RELIABILITY.md).
+> Preserve submission/audit data; do not deploy the old KServe resources.
+
 # SPEC: Safe custom Chess model registry and runtime
 
 ## Status: Implemented and locally validated

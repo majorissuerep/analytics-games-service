@@ -39,31 +39,32 @@ export function formatScore(line: RecklessAnalysisLine): string {
 }
 
 const HEAT_STOPS: Array<{ at: number; rgb: [number, number, number] }> = [
-  { at: 0, rgb: [46, 158, 79] },
-  { at: 0.45, rgb: [226, 194, 60] },
-  { at: 0.75, rgb: [224, 118, 44] },
-  { at: 1, rgb: [198, 56, 46] },
+  { at: -300, rgb: [181, 60, 52] },
+  { at: -100, rgb: [177, 119, 58] },
+  { at: 0, rgb: [112, 123, 132] },
+  { at: 100, rgb: [78, 142, 100] },
+  { at: 300, rgb: [34, 132, 77] },
 ]
 
-/**
- * Board heat color for a candidate ranked `rank` of `total` (0-based):
- * green for the engine's best line, through yellow/orange, to red for the
- * weakest listed candidate. `alpha` below 1 returns an `rgba()` string for
- * translucent fills.
+/** Fixed absolute centipawn scale, always from the mover's perspective.
+ * Rank and candidate count never affect color. Mate scores saturate the scale.
  */
-export function heatColor(rank: number, total: number, alpha = 1): string {
-  const clampedTotal = Math.max(total, 1)
-  const t = clampedTotal <= 1 ? 0 : Math.min(Math.max(rank / (clampedTotal - 1), 0), 1)
-  let upper = 1
-  for (let i = 0; i < HEAT_STOPS.length; i += 1) {
-    if (HEAT_STOPS[i].at >= t) { upper = i; break }
-  }
+export function heatColor(scoreCp: number | null, mateIn: number | null = null, alpha = 1): string {
+  const score = mateIn !== null ? (mateIn > 0 ? 300 : -300) : scoreCp ?? 0
+  const t = Math.max(-300, Math.min(300, score))
+  let upper = HEAT_STOPS.findIndex(stop => stop.at >= t)
+  if (upper < 0) upper = HEAT_STOPS.length - 1
   const lower = Math.max(upper - 1, 0)
   const span = HEAT_STOPS[upper].at - HEAT_STOPS[lower].at || 1
   const f = (t - HEAT_STOPS[lower].at) / span
   const mix = (a: number, b: number) => Math.round(a + (b - a) * f)
-  const [r, g, b] = [0, 1, 2].map((channel) => mix(HEAT_STOPS[lower].rgb[channel], HEAT_STOPS[upper].rgb[channel]))
+  const [r, g, b] = [0, 1, 2].map(channel => mix(HEAT_STOPS[lower].rgb[channel], HEAT_STOPS[upper].rgb[channel]))
   return alpha >= 1 ? `rgb(${r}, ${g}, ${b})` : `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
+/** Mate outranks any finite score; prefer faster wins and slower losses. */
+function scoreValue(line: RecklessAnalysisLine) {
+  return line.mateIn === null ? line.scoreCp ?? 0 : line.mateIn > 0 ? 100000 - line.mateIn : -100000 - line.mateIn
 }
 
 /** Apply one UCI move to a FEN, returning the next FEN or null when illegal. */
@@ -89,10 +90,13 @@ export function presentAnalysis(
   analysis: RecklessAnalysis,
   legalMoves: ReadonlySet<string>,
 ): PresentedAnalysis {
-  const legal = analysis.lines.filter((line) => legalMoves.has(line.uci))
+  const seen = new Set<string>()
+  const legal = analysis.lines.filter(line => legalMoves.has(line.uci))
+    .sort((a, b) => Number(a.bounded) - Number(b.bounded) || scoreValue(b) - scoreValue(a) || b.depth - a.depth || a.uci.localeCompare(b.uci))
+    .filter(line => { if (seen.has(line.uci)) return false; seen.add(line.uci); return true })
   const best = legal[0]
-  const lines = legal.map((line) => {
-    const comparable = best !== undefined && line.scoreCp !== null && best.scoreCp !== null
+  const lines = legal.map((line, index) => {
+    const comparable = best !== undefined && !line.bounded && !best.bounded && line.scoreCp !== null && best.scoreCp !== null
     const pvSan: string[] = []
     let cursor = fen
     let complete = true
@@ -109,7 +113,7 @@ export function presentAnalysis(
       cursor = probe.fen()
     }
     return {
-      multipv: line.multipv,
+      multipv: index + 1,
       uci: line.uci,
       san: toSan(fen, line.uci),
       scoreCp: line.scoreCp,
@@ -117,7 +121,7 @@ export function presentAnalysis(
       bounded: line.bounded,
       depth: line.depth,
       deltaCp: comparable && line !== best ? best.scoreCp! - line.scoreCp! : line === best ? 0 : null,
-      scoreLabel: formatScore(line),
+      scoreLabel: `${line.bounded ? '≈' : ''}${formatScore(line)}`,
       pvSan,
       pvComplete: complete,
     }
@@ -127,7 +131,7 @@ export function presentAnalysis(
   const balanceLabel = !best
     ? 'No evaluation'
     : best.mateIn !== null
-      ? `${turn === 'w' ? 'White' : 'Black'} mates in ${Math.abs(best.mateIn)}`
+      ? `${(best.mateIn > 0 ? turn === 'w' : turn !== 'w') ? 'White' : 'Black'} mates in ${Math.abs(best.mateIn)}`
       : `${balanceSide}${balanceCp === 0 ? '' : ` ${formatCp(Math.abs(balanceCp!))}`}`
   return { balanceCp, balanceLabel, lines }
 }

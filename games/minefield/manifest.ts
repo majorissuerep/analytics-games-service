@@ -15,7 +15,7 @@ export const minefieldManifest = {
   instructions: [
     { title: 'Reveal', detail: 'Click a covered square to reveal it.' },
     { title: 'Read', detail: 'Numbers show how many mines touch that square.' },
-    { title: 'Mark', detail: 'Right-click or long-press a square to place a flag.' },
+    { title: 'Mark', detail: 'Right-click, press F, or enable Flag mode to mark a covered square.' },
   ],
   status: 'live',
   integration: { kind: 'internal' },

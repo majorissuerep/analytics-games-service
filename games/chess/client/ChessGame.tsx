@@ -9,7 +9,6 @@ import { emitGameSessionCompleted } from '@/lib/analytics/game-events'
 import type { ChessColorChoice, ChessGameView } from '../model'
 import {
   STOCKFISH_LEVELS,
-  StockfishBrowserEngine,
   stockfishEngineIdForRevision,
   stockfishLevel,
   type StockfishLevelId,
@@ -104,7 +103,7 @@ export function ChessGame() {
     { revisionId: 'builtin-stockfish-19', displayName: 'Stockfish 19', runtimeId: 'builtin-stockfish-19' },
     { revisionId: RECKLESS_LOCAL, displayName: 'Reckless 0.9 (local)', runtimeId: RECKLESS_LOCAL },
     { revisionId: BUILTIN_STYLED_OPENING_MODEL.revisionId, displayName: BUILTIN_STYLED_OPENING_MODEL.displayName, runtimeId: BUILTIN_STYLED_OPENING_MODEL.runtimeId },
-    ...remoteModels.filter((model) => model.revisionId !== RECKLESS_LOCAL),
+    ...remoteModels.filter(model => !['builtin-stockfish-18', 'builtin-stockfish-19', BUILTIN_STYLED_OPENING, RECKLESS_LOCAL].includes(model.revisionId)),
   ], [remoteModels])
   const [suggestions, setSuggestions] = useState<PresentedLine[] | null>(null)
   const [suggestionBalance, setSuggestionBalance] = useState('')
@@ -123,11 +122,10 @@ export function ChessGame() {
   const [promotion, setPromotion] = useState<PendingPromotion>(null)
   const [engineThinking, setEngineThinking] = useState(false)
   const [engineError, setEngineError] = useState('')
+  const [engineRetry, setEngineRetry] = useState(0)
   const [evaluation, setEvaluation] = useState<StockfishEvaluation | null>(null)
   const [evaluationError, setEvaluationError] = useState('')
   const [soundOn, setSoundOn] = useState(() => isSoundEnabled())
-  const engineRef = useRef<StockfishBrowserEngine | null>(null)
-  const evaluationEngineRef = useRef<StockfishBrowserEngine | null>(null)
   const [playerId, setPlayerId] = useState('')
   const [name, setName] = useState('')
   const [roomCode, setRoomCode] = useState('')
@@ -153,8 +151,6 @@ export function ChessGame() {
   }, [])
 
   useEffect(() => () => {
-    engineRef.current?.destroy()
-    evaluationEngineRef.current?.destroy()
     disposeChessSound()
     window.clearTimeout(illegalTimerRef.current)
   }, [])
@@ -220,13 +216,14 @@ export function ChessGame() {
 
   /** Commit a real move onto the local board, keeping an undo snapshot first. */
   const applyMove = useCallback((move: EngineMove, painter = 'q') => {
-    const next = new Chess(localFen)
+    const next = new Chess()
+    for (const uci of localHistory) next.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] })
     let applied
     try { applied = next.move({ from: move.from, to: move.to, promotion: move.promotion ?? painter }) } catch { return false }
     const moveUci = `${applied.from}${applied.to}${applied.promotion ?? ''}`
     setUndoStack((stack) => [...stack, { fen: localFen, pgn: localPgn, history: localHistory }])
     setLocalFen(next.fen())
-    setLocalPgn(next.pgn())
+    setLocalPgn(next.pgn().replace(/^\[[^\n]*\]\s*/gm, '').trim())
     setLocalHistory((history) => [...history, moveUci])
     setLocalResult(resultFor(next))
     setLastMove({ from: move.from, to: move.to })
@@ -260,7 +257,7 @@ export function ChessGame() {
   const outcome: GameOverInfo | null = finishedResult ? outcomeInfo(finishedResult, perspective) : null
 
   // Bot mode, engine control "auto": the configured opponent answers on its
-  // turn — Stockfish WASM (18/19), the styled-opening model, or local Reckless.
+  // turn — the selected server runtime.
   // In-flight results are discarded when the position moved on (epoch guard).
   useEffect(() => {
     if (mode !== 'bot' || engineControl !== 'auto' || localResult || chess.turn() === humanColor) return
@@ -270,43 +267,21 @@ export function ChessGame() {
       setEngineThinking(true)
       setEngineError('')
       try {
-        let move: EngineMove
-        if (modelRevision === RECKLESS_LOCAL) {
-          const response = await fetch('/api/chess/analyse', {
-            method: 'POST', headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ fen: localFen, multiPv: 1, moveTimeMs: rethinkMs }),
-          })
-          const body = await response.json() as { analysis?: { lines: PresentedLine[] }; error?: string }
-          if (!response.ok || !body.analysis?.lines.length) throw new Error(body.error || 'Reckless failed to move')
-          const best = body.analysis.lines[0]
-          move = { from: best.uci.slice(0, 2) as Square, to: best.uci.slice(2, 4) as Square, promotion: best.uci[4] as 'q' | 'r' | 'b' | 'n' | undefined }
-        } else {
-          const stockfishId = stockfishEngineIdForRevision(modelRevision)
-          if (stockfishId) {
-            let opponentEngine = engineRef.current
-            if (!opponentEngine || opponentEngine.engineId !== stockfishId) {
-              opponentEngine?.destroy()
-              opponentEngine = new StockfishBrowserEngine({ engineId: stockfishId })
-              engineRef.current = opponentEngine
-            }
-            move = await opponentEngine.findBestMove(localFen, levelId)
-          } else {
-            const legalMoves = chess.moves({ verbose: true }).map(item => `${item.from}${item.to}${item.promotion ?? ''}`)
-            const response = await fetch(`/api/chess-models/${encodeURIComponent(modelRevision)}/move`, {
-              method: 'POST', headers: { 'content-type': 'application/json' },
-              body: JSON.stringify({
-                fen: localFen,
-                legalMoves,
-                history: localHistory,
-                repertoireId: activeStyledRepertoireId,
-                moveTimeMs: modelRevision === BUILTIN_STYLED_OPENING ? 2800 : modelMoveTimeMs,
-              }),
-            })
-            const result = await response.json() as { move?: string; error?: string }
-            if (!response.ok || !result.move) throw new Error(result.error || 'Custom model failed to move')
-            move = { from: result.move.slice(0, 2) as Square, to: result.move.slice(2, 4) as Square, promotion: result.move[4] as 'q' | 'r' | 'b' | 'n' | undefined }
-          }
-        }
+        const legalMoves = chess.moves({ verbose: true }).map(item => `${item.from}${item.to}${item.promotion ?? ''}`)
+        const stockfishId = stockfishEngineIdForRevision(modelRevision)
+        const response = await fetch(`/api/chess-models/${encodeURIComponent(modelRevision)}/move`, {
+          method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            fen: localFen, legalMoves, history: localHistory,
+            repertoireId: activeStyledRepertoireId,
+            skill: stockfishId ? stockfishLevel(levelId).skill : 20,
+            moveTimeMs: stockfishId ? stockfishLevel(levelId).moveTimeMs : modelRevision === RECKLESS_LOCAL ? rethinkMs : modelMoveTimeMs,
+          }),
+          signal: AbortSignal.timeout(55_000),
+        })
+        const result = await response.json() as { move?: string; error?: string }
+        if (!response.ok || !result.move || !legalMoves.includes(result.move)) throw new Error(result.error || 'Engine returned no legal move')
+        const move: EngineMove = { from: result.move.slice(0, 2) as Square, to: result.move.slice(2, 4) as Square, promotion: result.move[4] as EngineMove['promotion'] }
         if (cancelled || analysisEpochRef.current !== epoch) return
         applyMove(move)
       } catch (error) {
@@ -320,9 +295,9 @@ export function ChessGame() {
       cancelled = true
       setEngineThinking(false)
     }
-  }, [activeStyledRepertoireId, applyMove, chess, engineControl, humanColor, levelId, localFen, localHistory, localResult, mode, modelMoveTimeMs, modelRevision, rethinkMs])
+  }, [activeStyledRepertoireId, applyMove, chess, engineControl, humanColor, levelId, localFen, localHistory, localResult, mode, modelMoveTimeMs, modelRevision, rethinkMs, engineRetry])
 
-  // Bot mode, "pick" and "free" controls: Reckless analyses the position and
+  // Bot mode, "pick" and "free": the selected engine analyses the position and
   // the ranked lines are shown as the live hint rail. In pick mode this runs
   // only on the engine side's turn; in free mode it follows whichever side is
   // to move. Stale results are dropped via the epoch guard.
@@ -339,10 +314,11 @@ export function ChessGame() {
       try {
         const response = await fetch('/api/chess/analyse', {
           method: 'POST', headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ fen: localFen, multiPv: hintLines, moveTimeMs: rethinkMs }),
+          body: JSON.stringify({ revisionId: modelRevision, fen: localFen, multiPv: hintLines, moveTimeMs: rethinkMs }),
+          signal: AbortSignal.timeout(55_000),
         })
         const body = await response.json() as { analysis?: { balanceLabel: string; lines: PresentedLine[] }; error?: string }
-        if (!response.ok || !body.analysis) throw new Error(body.error || 'Reckless analysis failed')
+        if (!response.ok || !body.analysis) throw new Error(body.error || 'Engine analysis failed')
         if (cancelled || analysisEpochRef.current !== epoch) return
         setSuggestions(body.analysis.lines)
         setSuggestionBalance(body.analysis.balanceLabel)
@@ -352,7 +328,7 @@ export function ChessGame() {
           setSuggestions(null)
           setSuggestionFen(null)
           setSuggestionBalance('')
-          setEngineError(error instanceof Error ? error.message : 'Reckless analysis failed.')
+          setEngineError(error instanceof Error ? error.message : 'Engine analysis failed.')
         }
       } finally {
         if (!cancelled && analysisEpochRef.current === epoch) setAnalyzing(false)
@@ -363,32 +339,37 @@ export function ChessGame() {
       cancelled = true
       setAnalyzing(false)
     }
-  }, [chess, engineControl, hintLines, humanColor, localFen, localResult, mode, rethinkMs])
+  }, [chess, engineControl, hintLines, humanColor, localFen, localResult, mode, modelRevision, rethinkMs, engineRetry])
 
-  // Stockfish 19 evaluation bar (origin feature), only meaningful in auto mode.
+  // Evaluate with the selected engine; do not start a second engine implicitly.
   useEffect(() => {
-    if (mode !== 'bot' || engineControl !== 'auto' || localResult) {
+    if (mode !== 'bot' || engineControl !== 'auto' || localResult || !['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(modelRevision)) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setEvaluation(null)
       setEvaluationError('')
       return
     }
     let cancelled = false
-    const evaluator = evaluationEngineRef.current ?? (evaluationEngineRef.current = new StockfishBrowserEngine({ engineId: 'stockfish-19' }))
     setEvaluation(null)
     setEvaluationError('')
     const timer = window.setTimeout(() => {
-      void evaluator.evaluate(localFen).then((nextEvaluation) => {
-        if (!cancelled && nextEvaluation) setEvaluation(nextEvaluation)
+      const revisionId = modelRevision
+      void fetch('/api/chess/analyse', {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ revisionId, fen: localFen, multiPv: 1, moveTimeMs: 150 }),
+        signal: AbortSignal.timeout(55_000),
+      }).then(async response => {
+        const body = await response.json() as { analysis?: { lines: PresentedLine[] }; error?: string }
+        if (!response.ok || !body.analysis?.lines.length) throw new Error(body.error || 'Evaluation unavailable')
+        const best = body.analysis.lines[0]
+        const sign = chess.turn() === 'w' ? 1 : -1
+        if (!cancelled) setEvaluation({ scoreCp: (best.scoreCp ?? (best.mateIn! > 0 ? 100000 : -100000)) * sign, mate: best.mateIn === null ? null : best.mateIn * sign, depth: best.depth })
       }).catch((error: unknown) => {
-        if (!cancelled) setEvaluationError(error instanceof Error ? error.message : 'Stockfish 19 evaluation failed.')
+        if (!cancelled) setEvaluationError(error instanceof Error ? error.message : 'Evaluation unavailable')
       })
-    }, 180)
-    return () => {
-      cancelled = true
-      window.clearTimeout(timer)
-    }
-  }, [chess, engineControl, localFen, localResult, mode])
+    }, 250)
+    return () => { cancelled = true; window.clearTimeout(timer) }
+  }, [chess, engineControl, localFen, localResult, mode, modelRevision])
 
   function clearAnalysisState() {
     analysisEpochRef.current += 1
@@ -401,10 +382,6 @@ export function ChessGame() {
   }
 
   function resetToSetup() {
-    engineRef.current?.destroy()
-    engineRef.current = null
-    evaluationEngineRef.current?.destroy()
-    evaluationEngineRef.current = null
     roomClient.clear()
     clearAnalysisState()
     setUndoStack([])
@@ -599,7 +576,7 @@ export function ChessGame() {
   const status = isMultiplayer && online
     ? online.phase === 'lobby' ? `Waiting for opponent · ${roomClient.room?.players.length ?? 0}/2` : online.result || `${chess.turn() === 'w' ? 'White' : 'Black'} to move`
     : mode === 'bot' && engineControl === 'pick'
-      ? localResult || (analyzing ? 'Reckless is thinking…' : chess.turn() === humanColor ? `${humanColor === 'w' ? 'White' : 'Black'} (you) to move` : `Pick a move for ${chess.turn() === 'w' ? 'White' : 'Black'}`)
+      ? localResult || (analyzing ? 'Engine is thinking…' : chess.turn() === humanColor ? `${humanColor === 'w' ? 'White' : 'Black'} (you) to move` : `Pick a move for ${chess.turn() === 'w' ? 'White' : 'Black'}`)
       : localResult || (engineThinking ? `${opponentName} is thinking…` : `${chess.turn() === 'w' ? 'White' : 'Black'} to move${chess.inCheck() ? ' · Check' : ''}`)
   const level = stockfishLevel(levelId)
 
@@ -611,25 +588,21 @@ export function ChessGame() {
     suggestions.forEach((line, index) => {
       const target = line.uci.slice(2, 4) as Square
       if (!heatBySquare.has(target)) heatBySquare.set(target, {
-        color: heatColor(index, suggestions.length),
-        colorFill: heatColor(index, suggestions.length, 0.32),
+        color: heatColor(line.scoreCp, line.mateIn),
+        colorFill: heatColor(line.scoreCp, line.mateIn, 0.24),
         rank: index,
         line,
       })
     })
   }
 
-  const suggestionIndexOf = (line: PresentedLine) => {
-    const index = suggestions?.indexOf(line) ?? 0
-    return index < 0 ? 0 : index
-  }
 
   const squareStyles: Record<string, CSSProperties> = Object.fromEntries([
     ...[...heatBySquare.entries()].map(([square, heat]) => [square, {
       backgroundColor: heat.colorFill,
       boxShadow: `inset 0 0 0 4px ${heat.color}`,
     }] as const),
-    ...(hoverLine ? [[hoverLine.uci.slice(0, 2) as Square, { boxShadow: `inset 0 0 0 6px ${heatColor(suggestionIndexOf(hoverLine), Math.max(suggestions?.length ?? 1, 1))}` } as CSSProperties]] : []),
+    ...(hoverLine ? [[hoverLine.uci.slice(0, 2) as Square, { boxShadow: `inset 0 0 0 6px ${heatColor(hoverLine.scoreCp, hoverLine.mateIn)}` } as CSSProperties]] : []),
     ...(displayLastMove ? [[displayLastMove.from, lastMoveStyle], [displayLastMove.to, lastMoveStyle]] : []),
     ...(checkSquare ? [[checkSquare, checkStyle]] : []),
     ...[...pinned].map((square) => [square, pinStyle] as const),
@@ -639,13 +612,13 @@ export function ChessGame() {
   ]) as Record<string, CSSProperties>
 
   const hoverArrow = hoverLine
-    ? [{ startSquare: hoverLine.uci.slice(0, 2), endSquare: hoverLine.uci.slice(2, 4), color: heatColor(suggestionIndexOf(hoverLine), Math.max(suggestions?.length ?? 1, 1)) }]
+    ? [{ startSquare: hoverLine.uci.slice(0, 2), endSquare: hoverLine.uci.slice(2, 4), color: heatColor(hoverLine.scoreCp, hoverLine.mateIn) }]
     : []
 
   return (
     <main className="chess-app">
       <header className="chess-toolbar">
-        <div><span className="chess-mark">♞</span><strong>Chess</strong><span className="chess-engine-name">{mode === 'bot' && (engineControl === 'auto' ? opponentName : engineControl === 'pick' ? 'Reckless 0.9 · your pick' : 'Reckless 0.9 · hints')}</span></div>
+        <div><span className="chess-mark">♞</span><strong>Chess</strong><span className="chess-engine-name">{mode === 'bot' && (engineControl === 'auto' ? opponentName : engineControl === 'pick' ? `${opponentName} · your pick` : `${opponentName} · hints`)}</span></div>
         <div>
           <button
             type="button"
@@ -661,7 +634,7 @@ export function ChessGame() {
 
       {mode === 'setup' ? (
         <section className="chess-setup" aria-label="Chess setup">
-          <div className="chess-intro"><span>♞</span><div><p className="chess-kicker">CLASSIC BOARD GAME</p><h1>Play chess your way</h1><p>Stockfish opponents, local Reckless, both-sides play, pass-and-play, or a protected online room.</p></div></div>
+          <div className="chess-intro"><span>♞</span><div><p className="chess-kicker">CLASSIC BOARD GAME</p><h1>Play chess your way</h1><p>Stockfish opponents, Reckless, both-sides play, pass-and-play, or a protected online room.</p></div></div>
           <nav className="chess-mode-tabs" aria-label="Game mode">
             <button className={setupMode === 'bot' ? 'active' : ''} onClick={() => setSetupMode('bot')}><b>♟</b><span>Computer<small>Versus, pick, or free</small></span></button>
             <button className={setupMode === 'online' ? 'active' : ''} onClick={() => setSetupMode('online')}><b>♜</b><span>Online<small>Private room</small></span></button>
@@ -677,20 +650,20 @@ export function ChessGame() {
                 <span className="chess-control-label">Engine control</span>
                 <div className="chess-segmented">
                   <button className={engineControl === 'auto' ? 'selected' : ''} onClick={() => setEngineControl('auto')}>Opponent plays</button>
-                  <button className={engineControl === 'pick' ? 'selected' : ''} onClick={() => setEngineControl('pick')}>I pick opponent moves</button>
-                  <button className={engineControl === 'free' ? 'selected' : ''} onClick={() => setEngineControl('free')}>Free both sides</button>
+                  <button className={engineControl === 'pick' ? 'selected' : ''} onClick={() => { setEngineControl('pick'); if (!['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(modelRevision)) setModelRevision(RECKLESS_LOCAL) }}>I pick opponent moves</button>
+                  <button className={engineControl === 'free' ? 'selected' : ''} onClick={() => { setEngineControl('free'); if (!['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(modelRevision)) setModelRevision(RECKLESS_LOCAL) }}>Free both sides</button>
                 </div>
-                <small>{engineControl === 'auto' ? 'The chosen opponent answers on its turn.' : engineControl === 'pick' ? 'Reckless ranks every position; you play the opponent side by choosing from its top moves.' : 'Move both sides freely — the ranked Reckless list is a live hint, not a limit.'}</small>
+                <small>{engineControl === 'auto' ? 'The chosen opponent answers on its turn.' : engineControl === 'pick' ? 'The selected engine ranks every position; you play the opponent side by choosing from its top moves.' : 'Move both sides freely — the ranked engine list is a live hint, not a limit.'}</small>
               </div>
+              <div className="chess-field"><label htmlFor="opponent-model">{engineControl === 'auto' ? 'Opponent model' : 'Analysis engine'}</label><select id="opponent-model" value={modelRevision} onChange={event => setModelRevision(event.target.value)}>{modelOptions.filter(model => engineControl === 'auto' || ['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(model.revisionId)).map(model => <option key={model.revisionId} value={model.revisionId}>{model.displayName}</option>)}</select><small>Loads only the selected engine.</small></div>
               {engineControl === 'auto' && <>
-                <div className="chess-field"><label htmlFor="opponent-model">Opponent model</label><select id="opponent-model" value={modelRevision} onChange={(event) => setModelRevision(event.target.value)}>{modelOptions.map((model) => <option key={model.revisionId} value={model.revisionId}>{model.displayName}</option>)}</select><small>Stockfish runs in your browser; Reckless 0.9 runs on the local server.</small></div>
                 {modelRevision !== RECKLESS_LOCAL && <div className="chess-field"><label htmlFor="model-move-time">Custom model move time</label><select id="model-move-time" value={modelMoveTimeMs} onChange={(event) => setModelMoveTimeMs(Number(event.target.value))}>{[250, 500, 1000, 2000, 3000].map((ms) => <option key={ms} value={ms}>{ms >= 1000 ? `${ms / 1000} second per move` : `${ms} ms per move`}</option>)}</select><small>How long a custom model may think on each of its turns.</small></div>}
                 {stockfishEngineIdForRevision(modelRevision) && <div className="chess-field"><label htmlFor="stockfish-level">Stockfish difficulty</label><select id="stockfish-level" value={levelId} onChange={(event) => setLevelId(event.target.value as StockfishLevelId)}>{STOCKFISH_LEVELS.map((item) => <option key={item.id} value={item.id}>{item.label} · Skill {item.skill}/20</option>)}</select><small>{level.description}. {opponentName} WASM, {level.moveTimeMs} ms search per move.</small></div>}
                 {modelRevision === BUILTIN_STYLED_OPENING && <div className="chess-field"><label htmlFor="styled-repertoire">Opening repertoire</label><select id="styled-repertoire" value={effectiveStyledRepertoireId} onChange={(event) => setStyledRepertoireId(event.target.value as StyledRepertoireId)}>{styledRepertoireOptions.map((repertoire) => <option key={repertoire.id} value={repertoire.id}>{repertoire.label}</option>)}</select><small>Choose the tuned model&apos;s explicit selector. White repertoires are used when the model plays White; Black repertoires when it plays Black.</small></div>}
               </>}
               {engineControl !== 'auto' && <>
-                <div className="chess-field"><label htmlFor="rethink-ms">Reckless think time</label><select id="rethink-ms" value={rethinkMs} onChange={(event) => setRethinkMs(Number(event.target.value))}>{[200, 400, 600, 1000, 2000, 3000].map((ms) => <option key={ms} value={ms}>{ms >= 1000 ? `${ms / 1000} second per move` : `${ms} ms per move`}</option>)}</select><small>How long Reckless searches before presenting its lines. Short times keep the hints instant.</small></div>
-                {engineControl === 'pick' && <div className="chess-field"><label htmlFor="hint-lines">Candidate moves</label><select id="hint-lines" value={hintLines} onChange={(event) => setHintLines(Number(event.target.value))}>{[5, 10, 15, 20].map((count) => <option key={count} value={count}>{count} lines</option>)}</select><small>How many ranked candidates Reckless shows for the engine side.</small></div>}
+                <div className="chess-field"><label htmlFor="rethink-ms">Engine think time</label><select id="rethink-ms" value={rethinkMs} onChange={(event) => setRethinkMs(Number(event.target.value))}>{[200, 400, 600, 1000, 2000, 3000].map((ms) => <option key={ms} value={ms}>{ms >= 1000 ? `${ms / 1000} second per move` : `${ms} ms per move`}</option>)}</select><small>How long the engine searches before presenting its lines. Short times keep the hints instant.</small></div>
+                {engineControl === 'pick' && <div className="chess-field"><label htmlFor="hint-lines">Candidate moves</label><select id="hint-lines" value={hintLines} onChange={(event) => setHintLines(Number(event.target.value))}>{[5, 10, 15, 20].map((count) => <option key={count} value={count}>{count} lines</option>)}</select><small>How many ranked candidates the engine shows for the engine side.</small></div>}
               </>}
               <button className="chess-primary" onClick={() => startLocal('bot')}>{engineControl === 'auto' ? `Play ${opponentName}` : engineControl === 'pick' ? 'Play both sides · pick engine moves' : 'Play both sides · free moves'}</button>
             </>}
@@ -721,7 +694,7 @@ export function ChessGame() {
             {(notice || roomClient.error) && <p className="chess-notice" role="alert">{notice || roomClient.error?.message}</p>}
           </div>}
           <ModelSubmissionPanel />
-          <footer className="chess-attribution">Rules: chess.js · Engines: Stockfish 18/19 WASM + Reckless 0.9 · Board: react-chessboard</footer>
+          <footer className="chess-attribution">Rules: chess.js · Engines: Stockfish 18/19 + Reckless 0.9 · Board: react-chessboard</footer>
         </section>
       ) : (
         <section className="chess-game-layout">
@@ -733,7 +706,7 @@ export function ChessGame() {
             setHoverLine(heat ? heat.line : null)
           }} onMouseLeave={() => setHoverLine(null)}>
             {hintsVisible && hoverLine && suggestions && <div className="chess-hover-card">
-              <b>{hoverLine.san} <span style={{ color: heatColor(suggestionIndexOf(hoverLine), suggestions.length) }}>●</span></b>
+              <b>{hoverLine.san} <span style={{ color: heatColor(hoverLine.scoreCp, hoverLine.mateIn) }}>●</span></b>
               <small>{hoverLine.scoreLabel}{hoverLine.deltaCp ? ` · −${(hoverLine.deltaCp / 100).toFixed(2)} vs best` : ' · engine pick'} · depth {hoverLine.depth}</small>
               <small>{hoverLine.pvSan.slice(0, 10).join(' ')}</small>
             </div>}
@@ -755,24 +728,24 @@ export function ChessGame() {
           </div>
           <aside className="chess-sidebar">
             <div className="chess-status"><span className={`turn-dot ${chess.turn() === 'w' ? 'white' : 'black'}`} /><div><small>{mode === 'bot' ? engineControl === 'auto' ? `You are ${humanColor === 'w' ? 'White' : 'Black'}` : engineControl === 'pick' ? 'Both sides · engine side manual' : 'Both sides · free moves' : mode === 'local' ? 'Pass and play' : onlineColor ? `You are ${onlineColor === 'w' ? 'White' : 'Black'}` : 'Online game'}</small><h2>{status}</h2></div></div>
-            {mode === 'bot' && <div className="chess-opponent"><span>{engineControl === 'auto' ? '♞' : engineControl === 'pick' ? '☝' : '⚔'}</span><div><b>{engineControl === 'auto' ? opponentName : 'Reckless 0.9'}</b><small>{engineControl === 'auto' ? stockfishEngineIdForRevision(modelRevision) ? `${level.label} · Skill ${level.skill}/20` : modelRevision === RECKLESS_LOCAL ? `Local engine · ${rethinkMs >= 1000 ? `${rethinkMs / 1000}s` : `${rethinkMs}ms`} think` : 'Custom model' : engineControl === 'pick' ? `Pick from ${hintLines} ranked moves` : `Live hints · ${hintLines} lines · ${rethinkMs >= 1000 ? `${rethinkMs / 1000}s` : `${rethinkMs}ms`}`}</small></div></div>}
-            {mode === 'bot' && engineControl === 'auto' && stockfishEngineIdForRevision(modelRevision) && <EvaluationBar evaluation={evaluation} error={evaluationError || undefined} />}
-            {mode === 'bot' && engineControl !== 'auto' && analyzing && <div className="chess-suggestions">Reckless is evaluating…</div>}
+            {mode === 'bot' && <div className="chess-opponent"><span>{engineControl === 'auto' ? '♞' : engineControl === 'pick' ? '☝' : '⚔'}</span><div><b>{engineControl === 'auto' ? opponentName : opponentName}</b><small>{engineControl === 'auto' ? stockfishEngineIdForRevision(modelRevision) ? `${level.label} · Skill ${level.skill}/20` : modelRevision === RECKLESS_LOCAL ? `Local engine · ${rethinkMs >= 1000 ? `${rethinkMs / 1000}s` : `${rethinkMs}ms`} think` : 'Custom model' : engineControl === 'pick' ? `Pick from ${hintLines} ranked moves` : `Live hints · ${hintLines} lines · ${rethinkMs >= 1000 ? `${rethinkMs / 1000}s` : `${rethinkMs}ms`}`}</small></div></div>}
+            {mode === 'bot' && engineControl === 'auto' && ['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(modelRevision) && <EvaluationBar evaluation={evaluation} error={evaluationError || undefined} engineName={opponentName} />}
+            {mode === 'bot' && engineControl !== 'auto' && analyzing && <div className="chess-suggestions">Engine is evaluating…</div>}
             {hintsVisible && suggestions && <div className="chess-suggestions" role="group" aria-label="Engine move suggestions">
               <div className="chess-suggestion-balance"><span>Balance</span><b>{suggestionBalance}</b></div>
-              <div className="chess-scale" aria-hidden="true"><div className="chess-scale-gradient" /><div className="chess-scale-labels"><span>best</span><span>weak</span></div></div>
+              <div className="chess-scale" aria-hidden="true"><div className="chess-scale-gradient" /><div className="chess-scale-labels"><span>−3.00</span><span>0.00</span><span>+3.00</span></div></div>
               <div className="chess-suggestion-list">
-                {suggestions.map((line, index) => <button key={`${line.uci}-${index}`} className={`chess-suggestion${hoverLine === line ? ' hovered' : ''}`} style={{ borderLeftColor: heatColor(index, suggestions.length) }} onClick={() => playPickMove(line)} onMouseEnter={() => setHoverLine(line)} onMouseLeave={() => setHoverLine((current) => (current === line ? null : current))}>
-                  <span className="chess-suggestion-rank" style={{ background: heatColor(index, suggestions.length) }}>{index + 1}</span>
+                {suggestions.map((line, index) => <button key={`${line.uci}-${index}`} className={`chess-suggestion${hoverLine === line ? ' hovered' : ''}`} style={{ borderLeftColor: heatColor(line.scoreCp, line.mateIn) }} onClick={() => playPickMove(line)} onMouseEnter={() => setHoverLine(line)} onMouseLeave={() => setHoverLine((current) => (current === line ? null : current))}>
+                  <span className="chess-suggestion-rank" style={{ background: heatColor(line.scoreCp, line.mateIn) }}>{index + 1}</span>
                   <b className="chess-suggestion-move">{line.san}</b>
                   <span className="chess-suggestion-score">{line.scoreLabel}</span>
-                  <span className={`chess-suggestion-delta ${line.deltaCp ? line.deltaCp > 30 ? 'bad' : line.deltaCp > 10 ? 'mild' : 'fine' : 'fine'}`}>{index === 0 ? 'engine pick' : line.deltaCp === null ? '' : `−${(line.deltaCp / 100).toFixed(2)}`}</span>
+                  <span className="chess-suggestion-delta">{index === 0 ? 'engine pick' : line.deltaCp === null ? 'mate' : line.deltaCp === 0 ? 'equal best' : `−${(line.deltaCp / 100).toFixed(2)}`}</span>
                   <small className="chess-suggestion-pv">{line.pvSan.slice(0, 8).join(' ')}</small>
                 </button>)}
               </div>
-              <div className="chess-suggestion-hint">{engineControl === 'pick' ? 'Green board squares are the engine favourites. Hover a square or row to preview, click to play.' : 'Hints only — move any piece however you like. Click a row to play that move instantly.'}</div>
+              <div className="chess-suggestion-hint">{engineControl === 'pick' ? 'Colors show fixed scores for the side to move: green ahead, grey equal, red behind. Hover a square or row to preview, click to play.' : 'Hints only — move any piece however you like. Click a row to play that move instantly.'}</div>
             </div>}
-            {engineError && <p className="chess-notice" role="alert">{engineError}</p>}
+            {engineError && <p className="chess-notice" role="alert">{engineError} <button onClick={() => setEngineRetry(value => value + 1)}>Retry</button></p>}
             {mode === 'online' && roomClient.room && <div className="chess-room-panel"><small>ROOM CODE</small><div><strong>{roomClient.room.code}</strong><button onClick={() => void navigator.clipboard.writeText(roomClient.room?.code ?? '')}>Copy</button></div><p>{roomClient.room.players.map((player) => player.name).join('  vs  ')}</p>{online?.phase === 'lobby' && roomClient.room.hostId === playerId && <button className="chess-primary" disabled={roomClient.room.players.length !== 2 || roomClient.pending} onClick={() => void roomClient.dispatch({ type: 'chess.start', hostColor: colorChoice, timeControlId })}>{roomClient.room.players.length === 2 ? 'Start match' : 'Waiting for opponent…'}</button>}</div>}
             {mode === 'online' && online?.timeControlId && (
               <div className="chess-clocks" aria-label="Game clock">

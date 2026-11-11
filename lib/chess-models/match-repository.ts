@@ -1,6 +1,7 @@
 import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto'
 import { pool } from '@/lib/db/index'
 import { BUILTIN_STOCKFISH_19, BUILTIN_STYLED } from './contracts'
+import { ensureChessModelSchema } from './ensure-schema'
 import { applyMatchMove, createModelMatchState, setMatchPaused, type ModelMatchState } from './model-match'
 
 function hashToken(token: string) {
@@ -8,18 +9,15 @@ function hashToken(token: string) {
 }
 
 async function resolveModel(revisionId: string) {
+  if (revisionId === 'reckless-local') return { revisionId, displayName: 'Reckless 0.9' }
   if (revisionId === 'builtin-stockfish-18') return { revisionId, displayName: 'Stockfish 18' }
   if (revisionId === BUILTIN_STOCKFISH_19.revisionId) return { revisionId, displayName: BUILTIN_STOCKFISH_19.displayName }
   if (revisionId === BUILTIN_STYLED.revisionId) return { revisionId, displayName: BUILTIN_STYLED.displayName }
-  const result = await pool.query<{ revision_id: string; display_name: string }>(
-    `SELECT r.id AS revision_id, m.display_name FROM chess_models m
-     JOIN chess_model_revisions r ON r.id = m.current_ready_revision
-     JOIN chess_model_deployments d ON d.revision_id = r.id AND d.state = 'ready'
-     WHERE r.id = $1 AND r.state = 'ready' AND m.disabled = FALSE AND m.archived = FALSE`, [revisionId])
-  return result.rows[0] ? { revisionId: result.rows[0].revision_id, displayName: result.rows[0].display_name } : null
+  return null
 }
 
 export async function createPersistedModelMatch(whiteRevisionId: string, blackRevisionId: string, sourceIpHash?: string, turnBudgetMs = 3000) {
+  await ensureChessModelSchema()
   if (process.env.NODE_ENV === 'production' && !sourceIpHash) throw new Error('Match abuse protection is not configured')
   if (sourceIpHash) {
     const recent = await pool.query<{ count: string }>(`SELECT COUNT(*)::text AS count FROM chess_model_matches
@@ -53,12 +51,14 @@ export type ModelMatchRecord = {
 }
 
 export async function getModelMatch(id: string) {
+  await ensureChessModelSchema()
   const result = await pool.query<ModelMatchRecord>(`SELECT id, white_revision_id, black_revision_id, white_model_name,
     black_model_name, state, status, result, version, created_at, updated_at FROM chess_model_matches WHERE id = $1`, [id])
   return result.rows[0] ?? null
 }
 
 export async function listModelMatches(limit = 30) {
+  await ensureChessModelSchema()
   const result = await pool.query<ModelMatchRecord>(`SELECT id, white_revision_id, black_revision_id, white_model_name,
     black_model_name, state, status, result, version, created_at, updated_at FROM chess_model_matches
     ORDER BY created_at DESC LIMIT $1`, [Math.min(Math.max(limit, 1), 100)])
@@ -66,6 +66,7 @@ export async function listModelMatches(limit = 30) {
 }
 
 async function requireControl(id: string, token: string) {
+  await ensureChessModelSchema()
   const result = await pool.query<ModelMatchRecord & { control_token_hash: string }>(`SELECT * FROM chess_model_matches WHERE id = $1`, [id])
   const row = result.rows[0]
   if (!row) throw new Error('Match not found')

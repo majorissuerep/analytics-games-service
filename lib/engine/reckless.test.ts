@@ -54,3 +54,13 @@ describe('collectRecklessLines', () => {
     expect(lines[1]).toMatchObject({ multipv: 2, bounded: false, depth: 19 })
   })
 })
+
+
+it('keeps a complete MultiPV depth when the next iteration is partial', () => {
+  const lines = collectRecklessLines([
+    'info depth 8 multipv 1 score cp 30 pv e2e4',
+    'info depth 8 multipv 2 score cp 25 pv d2d4',
+    'info depth 9 multipv 1 score cp 10 pv e2e4',
+  ])
+  expect(lines.map(line => [line.depth, line.scoreCp])).toEqual([[8, 30], [8, 25]])
+})

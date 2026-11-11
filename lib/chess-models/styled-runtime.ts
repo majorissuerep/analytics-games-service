@@ -36,12 +36,12 @@ function configuredStyledInferenceUrl() {
   return new URL('/predict', base)
 }
 
-export async function requestStyledMove(input: StyledMoveRequest) {
+export async function requestStyledMove(input: StyledMoveRequest): Promise<{ move: string; revisionId: string; repertoireId: StyledRepertoireId; durationMs?: number }> {
   const endpoint = configuredStyledInferenceUrl()
   if (!endpoint) {
     const { predictStyledMove } = await import('./styled-node-runtime')
     const result = await predictStyledMove(input)
-    return { move: result.move, revisionId: BUILTIN_STYLED_OPENING, repertoireId: result.repertoireId }
+    return { move: result.move, revisionId: BUILTIN_STYLED_OPENING, repertoireId: result.repertoireId, durationMs: result.durationMs }
   }
 
   const response = await fetch(endpoint, {

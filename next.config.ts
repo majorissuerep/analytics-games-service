@@ -2,8 +2,8 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
-    '/api/chess-models/[revisionId]/move': ['./public/models/**/*'],
-    '/api/chess/analyse': ['./vendor/native/reckless/**'],
+    '/api/chess-models/[revisionId]/move': ['./public/models/**/*', './public/vendor/stockfish/**/*', './scripts/chess/*.mjs', './vendor/native/reckless/**'],
+    '/api/chess/analyse': ['./vendor/native/reckless/**', './public/vendor/stockfish/**/*', './scripts/chess/*.mjs'],
   },
   async headers() {
     return [{
