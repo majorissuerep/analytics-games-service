@@ -41,6 +41,7 @@ function stopTimer() { clearInterval(timer); clearTimeout(timeout) }
 function fail(message) {
   stopTimer(); ready = false
   $('loader').hidden = false; $('progress').hidden = true; $('retry').hidden = false
+  $('progress-value').textContent = 'Ready to retry'
   $('loading-label').textContent = 'Space Cadet could not start'
   $('loading-detail').textContent = message
   $('loading-label').parentElement.setAttribute('role', 'alert')

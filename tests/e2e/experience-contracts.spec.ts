@@ -130,6 +130,24 @@ test('Chess board grows with both available axes and keeps all actions on constr
   await expect(page.locator('iframe[title="Chess"]:visible')).toHaveAttribute('aria-busy', 'false', { timeout: 20000 })
   await game.getByRole('button', { name: /^Local/ }).click(); await game.getByRole('button', { name: 'Start pass-and-play' }).click()
   const initial = (await game.locator('.chess-board-wrap').boundingBox())!
+  let previous = 0
+  for (const [width, height] of [[960, 900], [1200, 1100], [1600, 1300]]) {
+    const outer = window.locator('..'), before = (await outer.boundingBox())!
+    await page.mouse.move(before.x + before.width - 2, before.y + before.height - 2)
+    await page.mouse.down()
+    await page.mouse.move(before.x + width - 2, before.y + height - 2, { steps: 8 })
+    await page.mouse.up()
+    await expect.poll(async () => { const b = (await outer.boundingBox())!; return [Math.round(b.width), Math.round(b.height)] }).toEqual([width, height])
+    const board = (await game.locator('.chess-board-wrap').boundingBox())!
+    const stage = (await game.locator('.chess-board-stage').boundingBox())!
+    expect(Math.abs(board.width - board.height)).toBeLessThanOrEqual(1)
+    expect(Math.abs(board.width - Math.min(stage.width, stage.height))).toBeLessThanOrEqual(1)
+    expect(board.width).toBeGreaterThan(previous)
+    previous = board.width
+    await expectActionReady(game.getByRole('button', { name: 'Leave game' }))
+    await expectActionReady(game.getByRole('button', { name: 'New game', exact: true }))
+    await captureExperience(page, info, 'chess-resize', `outer-${width}-${height}`, 'resized')
+  }
   await window.getByRole('button', { name: 'Maximize', exact: true }).click()
   await expect.poll(async () => (await game.locator('.chess-board-wrap').boundingBox())!.width).toBeGreaterThan(720)
   const expanded = (await game.locator('.chess-board-wrap').boundingBox())!
@@ -155,7 +173,12 @@ test('reference matrix captures actual requested glossy and solid app windows', 
     const frame = page.frameLocator(`iframe[title="${title}"]:visible`)
     await expect(page.locator(`iframe[title="${title}"]:visible`)).toHaveAttribute('aria-busy', 'false', { timeout: 20000 })
     await expect(frame.locator(selector)).toBeVisible()
-    if (title === 'Space Cadet Pinball') await expect(frame.frameLocator('iframe[title="Space Cadet runtime"]:visible').locator('#score')).toBeVisible()
+    if (title === 'Space Cadet Pinball') {
+      const native = frame.frameLocator('iframe[title="Space Cadet runtime"]:visible')
+      await expect(native.getByRole('button', { name: 'New game', exact: true })).toBeEnabled({ timeout: 30000 })
+      await expect(native.locator('#loader')).toBeHidden()
+      await expect(native.locator('canvas')).toBeVisible()
+    }
     await captureExperience(page, info, 'visual-matrix', `${title}-requested`)
     const window = page.locator(`iframe[title="${title}"]:visible`).locator('xpath=ancestor::article')
     await window.getByRole('button', { name: 'Maximize', exact: true }).click()

@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useLayoutEffect,
   useState,
   useRef,
   useSyncExternalStore,
@@ -50,10 +51,11 @@ export function AnalyticsProvider({ enabled, children }: { enabled: boolean; chi
   const [dismissed, setDismissed] = useState(false)
   const privacyButton = useRef<HTMLButtonElement>(null)
   const closeButton = useRef<HTMLButtonElement>(null)
+  const returnFocusToPrivacy = useRef(false)
   const closeSettings = () => {
+    returnFocusToPrivacy.current = true
     setDismissed(true)
     setSettingsOpen(false)
-    window.requestAnimationFrame(() => privacyButton.current?.focus())
   }
   const isTopLevel = useSyncExternalStore(
     subscribeToWindowPosition,
@@ -72,10 +74,20 @@ export function AnalyticsProvider({ enabled, children }: { enabled: boolean; chi
   )
   const privacyEntry = <button ref={privacyButton} className="app-surface analytics-settings-button" type="button" onClick={() => {
     setSettingsOpen(true)
-    window.requestAnimationFrame(() => closeButton.current?.focus())
   }}>Privacy</button>
 
   const showDialog = Boolean(enabled && isTopLevel && ((consent === 'unknown' && !dismissed) || settingsOpen))
+
+  // Focus the committed surface, including a launcher mounted through a portal.
+  // The unsolicited consent card must leave the player's current focus alone.
+  useLayoutEffect(() => {
+    if (showDialog && settingsOpen) {
+      closeButton.current?.focus()
+    } else if (!showDialog && returnFocusToPrivacy.current && privacyButton.current) {
+      privacyButton.current.focus()
+      returnFocusToPrivacy.current = false
+    }
+  }, [showDialog, settingsOpen, desktopPrivacyMount])
 
   return (
     <AnalyticsContext.Provider value={{ consent, configured: enabled }}>
@@ -96,7 +108,7 @@ export function AnalyticsProvider({ enabled, children }: { enabled: boolean; chi
           <header className="analytics-consent-heading">
             <div>
               <span className="analytics-consent-eyebrow">Your privacy · {consent === 'granted' ? 'Analytics on' : consent === 'denied' ? 'Analytics off' : 'No choice saved'}</span>
-              <h2>Share a little. Help us improve.</h2>
+              <h2>Usage analytics</h2>
             </div>
             <button ref={closeButton} className="analytics-consent-close" type="button" aria-label="Close privacy settings" onClick={closeSettings}>×</button>
           </header>

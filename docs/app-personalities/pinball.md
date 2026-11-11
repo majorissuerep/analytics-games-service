@@ -90,3 +90,13 @@ and native Pause resumes after switching away and refocusing. The exact event
 trace and immediate-launch/repeat observations are retained in the working folder.
 Only genuinely scored native early-drain saves receive bounded real Space
 relaunches in the lifecycle test; first-score assertions have no retry masking.
+
+
+C2 CI recovery evidence showed a separate test-strength issue: native input was
+accepted (Pull > 0), the ball followed the pulled head and made a short upward
+hop, then settled back in the shooter without entering the field. A fixed 1.2s
+hold is only a partial native charge, especially under a slow simulation. Scoring
+launches now release at the observed native maximum Pull=100, bounded to 10s,
+while retaining the immediate accepted-keydown assertion. Touch uses the same
+observed full-pull condition. There are no first-score retries or physics changes.
+Failure recovery replaces stale “Working…” text with “Ready to retry”.

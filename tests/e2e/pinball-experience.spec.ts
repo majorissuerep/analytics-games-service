@@ -3,6 +3,7 @@ import { captureExperience, expectActionReady, overflowIssues } from './helpers/
 
 const cabinet = (page: Page) => page.frameLocator('iframe[title="Space Cadet Pinball"]:visible').frameLocator('iframe[title="Space Cadet runtime"]')
 const score = async (game: FrameLocator) => Number((await game.locator('#score').innerText()).replaceAll(',', ''))
+const plungerPull = (game: FrameLocator) => game.locator('canvas').evaluate(() => (window as unknown as { Module: { cabinetState: { plungerPull: number } } }).Module.cabinetState.plungerPull)
 async function ready(page: Page) {
   await page.goto('/')
   if ((page.viewportSize()?.width ?? 1280) < 600) {
@@ -16,9 +17,15 @@ async function ready(page: Page) {
 async function launch(page: Page, game: FrameLocator) {
   await game.locator('canvas').focus()
   await page.keyboard.down('Space')
-  await expect.poll(() => game.locator('canvas').evaluate(() => (window as unknown as { Module: { cabinetState: { plungerPull: number } } }).Module.cabinetState.plungerPull)).toBeGreaterThan(0)
-  await page.waitForTimeout(1200)
-  await page.keyboard.up('Space')
+  try {
+    await expect.poll(() => plungerPull(game), { message: 'First ready Space must actually charge the native plunger' }).toBeGreaterThan(0)
+    // A fixed real-time hold can be a soft shot when native simulation is slow.
+    // Release only at the observed native maximum, without changing physics.
+    await expect.poll(() => plungerPull(game), { timeout: 10_000, message: 'Native plunger must reach full pull before the scoring shot' }).toBe(100)
+    await test.info().attach('native-full-pull', { body: JSON.stringify({ plungerPull: await plungerPull(game) }), contentType: 'application/json' })
+  } finally {
+    await page.keyboard.up('Space')
+  }
 }
 async function heldPointer(page: Page, control: ReturnType<FrameLocator['locator']>, duration: number) {
   await expectActionReady(control)
@@ -134,9 +141,14 @@ test('pinball-narrow: visible score and ball, held pointer controls, live resize
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
   await page.mouse.down()
   await expect(plunger).toHaveAttribute('data-held', 'true')
-  await captureExperience(page, info, 'pinball-narrow', 'touch-plunger-held', 'clamped')
-  await page.waitForTimeout(1200)
-  await page.mouse.up()
+  try {
+    await expect.poll(() => plungerPull(game)).toBeGreaterThan(0)
+    await captureExperience(page, info, 'pinball-narrow', 'touch-plunger-held', 'clamped')
+    await expect.poll(() => plungerPull(game), { timeout: 10_000 }).toBe(100)
+    await captureExperience(page, info, 'pinball-narrow', 'touch-plunger-full-pull', 'clamped')
+  } finally {
+    await page.mouse.up()
+  }
   await expect(plunger).toHaveAttribute('data-held', 'false')
   await expect.poll(() => score(game), { timeout: 20_000 }).toBeGreaterThan(0)
   await captureExperience(page, info, 'pinball-narrow', 'touch-flight-native-score', 'clamped')
@@ -161,6 +173,7 @@ test('pinball-play: a failed real WASM download exposes Retry and returns to a p
   const game = cabinet(page)
   await expect(game.getByRole('button', { name: 'Retry Pinball' })).toBeVisible({ timeout: 20_000 })
   await expect(game.getByRole('button', { name: 'New game', exact: true })).toBeDisabled()
+  await expect(game.locator('#progress-value')).toHaveText('Ready to retry')
   await expectActionReady(game.getByRole('button', { name: 'Retry Pinball' }))
   await captureExperience(page, info, 'pinball-play', 'real-asset-failure-retry')
   await page.unroute('**/SpaceCadetPinball.wasm')

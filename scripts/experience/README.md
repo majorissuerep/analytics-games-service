@@ -7,6 +7,9 @@ visual approval. The reviewer must actually open the cited images/sequences and
 exercise or observe the interactions. Definitions live in
 [`docs/experience/WORKFLOW.md`](../../docs/experience/WORKFLOW.md).
 
+Each report has one writer. Run mutation commands serially, including `run`; do not
+start a second recorder or collector while a command is still recording.
+
 No server or build is started by a gate. The coordinator owns the running server.
 Evidence lives in ignored `experience-evidence/`; keep the bundle downloadable in
 CI/PR artifacts. CI always retains `test-results/`, `playwright-report/` and this

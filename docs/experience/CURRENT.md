@@ -31,3 +31,6 @@
   occluded test fixtures and hidden Suspense selectors; extended native gameplay
   exposed early ball readiness and background keyboard Resume issues. These
   require fresh candidate proof, including a successful first launch.
+- Second frozen run: all83 local browser cases passed, but CI needed two retries.
+  Promotion remained withheld; Privacy focus now follows DOM commit, and native
+  launch validation releases at observed full charge rather than elapsed wall time.
