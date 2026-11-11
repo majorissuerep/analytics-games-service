@@ -33,7 +33,7 @@ import {
   chessTimeLabel,
   formatClock,
 } from '../time-control'
-import { heatColor, type PresentedLine } from '@/lib/engine/reckless-presentation'
+import { formatCp, formatMoveLoss, lineQualityColor, MOVE_QUALITY_GRADIENT, MOVE_QUALITY_STOPS, type PresentedLine } from '@/lib/engine/reckless-presentation'
 import './chess.css'
 
 type Mode = 'setup' | 'bot' | 'local' | 'online'
@@ -580,16 +580,16 @@ export function ChessGame() {
       : localResult || (engineThinking ? `${opponentName} is thinking…` : `${chess.turn() === 'w' ? 'White' : 'Black'} to move${chess.inCheck() ? ' · Check' : ''}`)
   const level = stockfishLevel(levelId)
 
-  // Heat map: candidate destination squares tinted green (engine best) through
-  // red (weakest listed), matching the rail rows and the scale legend. Cheap
+  // Fixed loss-from-best heat map: 0cp green, 50cp+ red. Candidate count and
+  // overall position balance never stretch this scale. Cheap
   // (≤20 entries) so it is derived on each render instead of memoized.
   const heatBySquare = new Map<Square, { color: string; colorFill: string; rank: number; line: PresentedLine }>()
   if (hintsVisible && suggestions) {
     suggestions.forEach((line, index) => {
       const target = line.uci.slice(2, 4) as Square
       if (!heatBySquare.has(target)) heatBySquare.set(target, {
-        color: heatColor(line.scoreCp, line.mateIn),
-        colorFill: heatColor(line.scoreCp, line.mateIn, 0.24),
+        color: lineQualityColor(line),
+        colorFill: lineQualityColor(line, 0.24),
         rank: index,
         line,
       })
@@ -602,7 +602,7 @@ export function ChessGame() {
       backgroundColor: heat.colorFill,
       boxShadow: `inset 0 0 0 4px ${heat.color}`,
     }] as const),
-    ...(hoverLine ? [[hoverLine.uci.slice(0, 2) as Square, { boxShadow: `inset 0 0 0 6px ${heatColor(hoverLine.scoreCp, hoverLine.mateIn)}` } as CSSProperties]] : []),
+    ...(hoverLine ? [[hoverLine.uci.slice(0, 2) as Square, { boxShadow: `inset 0 0 0 6px ${lineQualityColor(hoverLine)}` } as CSSProperties]] : []),
     ...(displayLastMove ? [[displayLastMove.from, lastMoveStyle], [displayLastMove.to, lastMoveStyle]] : []),
     ...(checkSquare ? [[checkSquare, checkStyle]] : []),
     ...[...pinned].map((square) => [square, pinStyle] as const),
@@ -612,7 +612,7 @@ export function ChessGame() {
   ]) as Record<string, CSSProperties>
 
   const hoverArrow = hoverLine
-    ? [{ startSquare: hoverLine.uci.slice(0, 2), endSquare: hoverLine.uci.slice(2, 4), color: heatColor(hoverLine.scoreCp, hoverLine.mateIn) }]
+    ? [{ startSquare: hoverLine.uci.slice(0, 2), endSquare: hoverLine.uci.slice(2, 4), color: lineQualityColor(hoverLine) }]
     : []
 
   return (
@@ -706,8 +706,8 @@ export function ChessGame() {
             setHoverLine(heat ? heat.line : null)
           }} onMouseLeave={() => setHoverLine(null)}>
             {hintsVisible && hoverLine && suggestions && <div className="chess-hover-card">
-              <b>{hoverLine.san} <span style={{ color: heatColor(hoverLine.scoreCp, hoverLine.mateIn) }}>●</span></b>
-              <small>{hoverLine.scoreLabel}{hoverLine.deltaCp ? ` · −${(hoverLine.deltaCp / 100).toFixed(2)} vs best` : ' · engine pick'} · depth {hoverLine.depth}</small>
+              <b>{hoverLine.san} <span style={{ color: lineQualityColor(hoverLine) }}>●</span></b>
+              <small>{formatMoveLoss(hoverLine)} vs best · Eval {hoverLine.scoreLabel} · depth {hoverLine.depth}</small>
               <small>{hoverLine.pvSan.slice(0, 10).join(' ')}</small>
             </div>}
             <Chessboard options={{
@@ -732,18 +732,21 @@ export function ChessGame() {
             {mode === 'bot' && engineControl === 'auto' && ['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(modelRevision) && <EvaluationBar evaluation={evaluation} error={evaluationError || undefined} engineName={opponentName} />}
             {mode === 'bot' && engineControl !== 'auto' && analyzing && <div className="chess-suggestions">Engine is evaluating…</div>}
             {hintsVisible && suggestions && <div className="chess-suggestions" role="group" aria-label="Engine move suggestions">
-              <div className="chess-suggestion-balance"><span>Balance</span><b>{suggestionBalance}</b></div>
-              <div className="chess-scale" aria-hidden="true"><div className="chess-scale-gradient" /><div className="chess-scale-labels"><span>−3.00</span><span>0.00</span><span>+3.00</span></div></div>
+              <div className="chess-suggestion-balance"><span>Position balance</span><b>{suggestionBalance}</b></div>
+              <div className="chess-quality-heading"><b>Move quality</b><span>Loss vs best · pawns</span></div>
+              <div className="chess-scale" role="img" aria-label="Move quality: 0.00 is best and green; −0.10 is still greenish; −0.50 or worse is fully red">
+                <div className="chess-scale-gradient" style={{ background: MOVE_QUALITY_GRADIENT }} />
+                <div className="chess-scale-labels">{MOVE_QUALITY_STOPS.map(stop => <span key={stop.lossCp} style={{ left: `${stop.lossCp * 2}%` }}>{stop.lossCp === 50 ? '≤' : ''}{formatCp(-stop.lossCp)}</span>)}</div>
+              </div>
               <div className="chess-suggestion-list">
-                {suggestions.map((line, index) => <button key={`${line.uci}-${index}`} className={`chess-suggestion${hoverLine === line ? ' hovered' : ''}`} style={{ borderLeftColor: heatColor(line.scoreCp, line.mateIn) }} onClick={() => playPickMove(line)} onMouseEnter={() => setHoverLine(line)} onMouseLeave={() => setHoverLine((current) => (current === line ? null : current))}>
-                  <span className="chess-suggestion-rank" style={{ background: heatColor(line.scoreCp, line.mateIn) }}>{index + 1}</span>
-                  <b className="chess-suggestion-move">{line.san}</b>
-                  <span className="chess-suggestion-score">{line.scoreLabel}</span>
-                  <span className="chess-suggestion-delta">{index === 0 ? 'engine pick' : line.deltaCp === null ? 'mate' : line.deltaCp === 0 ? 'equal best' : `−${(line.deltaCp / 100).toFixed(2)}`}</span>
-                  <small className="chess-suggestion-pv">{line.pvSan.slice(0, 8).join(' ')}</small>
+                {suggestions.map((line, index) => <button key={`${line.uci}-${index}`} className={`chess-suggestion${hoverLine === line ? ' hovered' : ''}`} data-uci={line.uci} data-loss-cp={line.deltaCp ?? undefined} title={`Loss vs best: ${formatMoveLoss(line)}; position evaluation: ${line.scoreLabel}`} style={{ borderLeftColor: lineQualityColor(line) }} onClick={() => playPickMove(line)} onMouseEnter={() => setHoverLine(line)} onMouseLeave={() => setHoverLine((current) => (current === line ? null : current))}>
+                  <span className="chess-suggestion-rank" style={{ background: lineQualityColor(line) }}>{index + 1}</span>
+                  <b className="chess-suggestion-move">{line.san}{line.deltaCp === 0 && <span className="chess-suggestion-best">{index === 0 ? 'engine pick' : 'equal best'}</span>}</b>
+                  <span className="chess-suggestion-score" style={{ color: lineQualityColor(line) }}>{formatMoveLoss(line)}</span>
+                  <small className="chess-suggestion-pv"><span className="chess-suggestion-eval">Eval {line.scoreLabel}</span> · {line.pvSan.slice(0, 8).join(' ')}</small>
                 </button>)}
               </div>
-              <div className="chess-suggestion-hint">{engineControl === 'pick' ? 'Colors show fixed scores for the side to move: green ahead, grey equal, red behind. Hover a square or row to preview, click to play.' : 'Hints only — move any piece however you like. Click a row to play that move instantly.'}</div>
+              <div className="chess-suggestion-hint">Best = 0.00 and green. Up to −0.10 stays greenish; −0.50 or worse is red. Position balance is separate. Mate changes are labeled, not converted to pawns. {engineControl === 'pick' ? 'Hover to preview; click a row to play.' : 'Play any move or click a hint.'}</div>
             </div>}
             {engineError && <p className="chess-notice" role="alert">{engineError} <button onClick={() => setEngineRetry(value => value + 1)}>Retry</button></p>}
             {mode === 'online' && roomClient.room && <div className="chess-room-panel"><small>ROOM CODE</small><div><strong>{roomClient.room.code}</strong><button onClick={() => void navigator.clipboard.writeText(roomClient.room?.code ?? '')}>Copy</button></div><p>{roomClient.room.players.map((player) => player.name).join('  vs  ')}</p>{online?.phase === 'lobby' && roomClient.room.hostId === playerId && <button className="chess-primary" disabled={roomClient.room.players.length !== 2 || roomClient.pending} onClick={() => void roomClient.dispatch({ type: 'chess.start', hostColor: colorChoice, timeControlId })}>{roomClient.room.players.length === 2 ? 'Start match' : 'Waiting for opponent…'}</button>}</div>}

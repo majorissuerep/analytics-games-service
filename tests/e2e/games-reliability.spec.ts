@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { Chess } from 'chess.js'
-import { heatColor } from '../../lib/engine/reckless-presentation'
+import { presentAnalysis } from '../../lib/engine/reckless-presentation'
 
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => localStorage.setItem('analytics-games.analytics-consent.v1', 'denied'))
@@ -42,14 +42,52 @@ for (const engine of engines) {
     const rowBounds = await first.boundingBox()
     const continuationBounds = await first.locator('.chess-suggestion-pv').boundingBox()
     expect(continuationBounds!.y + continuationBounds!.height, 'the full continuation must fit inside its hint row').toBeLessThanOrEqual(rowBounds!.y + rowBounds!.height)
-    const score = (await first.locator('.chess-suggestion-score').innerText()).replace('−', '-')
-    expect(await first.evaluate(element => (element as HTMLElement).style.borderLeftColor)).toBe(heatColor(Math.round(Number(score) * 100)))
+    await expect(first.locator('.chess-suggestion-score')).toHaveText('0.00')
+    await expect(first).toHaveCSS('border-left-color', 'rgb(29, 118, 65)')
     await first.click()
     await expect(page.getByRole('heading', { name: 'Black to move' })).toBeVisible()
     await expect(page.locator('.chess-suggestion').first()).toBeVisible({ timeout: 30_000 })
+    await expect(page.locator('.chess-suggestion').first().locator('.chess-suggestion-score')).toHaveText('0.00')
+    await expect(page.locator('.chess-suggestion').first()).toHaveCSS('border-left-color', 'rgb(29, 118, 65)')
     await page.screenshot({ path: `test-results/qa-${engine}-hints.png`, fullPage: true })
   })
 }
+
+test('move quality uses zero-based loss, a half-pawn red cutoff, and matching board colors', async ({ page }) => {
+  await page.route('**/api/chess/analyse', async route => {
+    const { fen } = route.request().postDataJSON() as { fen: string }
+    const chess = new Chess(fen)
+    const moves = chess.turn() === 'b' ? ['e7e6', 'e7e5', 'c7c5', 'g8f6', 'b8c6', 'd7d6'] : ['e2e4', 'd2d4', 'c2c4', 'g1f3', 'b1c3', 'a2a3']
+    const losses = [0, 2, 10, 25, 50, 90]
+    const lines = moves.map((uci, index) => ({ multipv: index + 1, uci, scoreCp: -30 - losses[index], mateIn: null, bounded: false, depth: 18, pv: [uci] }))
+    const legal = new Set(chess.moves({ verbose: true }).map(move => `${move.from}${move.to}${move.promotion ?? ''}`))
+    await route.fulfill({ json: { analysis: presentAnalysis(fen, chess.turn(), { bestMove: moves[0], lines: [...lines].reverse() }, legal) } })
+  })
+  await page.goto('/games/chess')
+  await page.getByRole('button', { name: 'Free both sides' }).click()
+  await page.getByRole('button', { name: 'Play both sides · free moves' }).click()
+  await expect(page.locator('.chess-suggestion').first()).toBeVisible()
+  await page.locator('#analytics-chess-board-square-e2').click()
+  await page.locator('#analytics-chess-board-square-e4').click()
+  await expect(page.locator('.chess-suggestion-balance')).toContainText('White +0.30')
+  await expect(page.getByRole('img', { name: /Move quality: 0.00 is best/ })).toBeVisible()
+  const rows = page.locator('.chess-suggestion')
+  await expect(rows.locator('.chess-suggestion-score')).toHaveText(['0.00', '−0.02', '−0.10', '−0.25', '−0.50', '−0.90'])
+  await expect(rows.first().locator('.chess-suggestion-eval')).toHaveText('Eval −0.30')
+  await expect(rows.first()).toHaveCSS('border-left-color', 'rgb(29, 118, 65)')
+  await expect(rows.nth(1)).toHaveCSS('border-left-color', 'rgb(37, 119, 65)')
+  await expect(rows.nth(2)).toHaveCSS('border-left-color', 'rgb(70, 125, 64)')
+  await expect(rows.nth(3)).toHaveCSS('border-left-color', 'rgb(143, 102, 27)')
+  for (const index of [4, 5]) await expect(rows.nth(index)).toHaveCSS('border-left-color', 'rgb(181, 48, 44)')
+  await rows.first().hover()
+  await expect(page.locator('.chess-hover-card')).toContainText('0.00 vs best · Eval −0.30')
+  await expect(page.locator('#analytics-chess-board-square-e6 > div')).toHaveCSS('box-shadow', /rgb\(29, 118, 65\)/)
+  await expect(page.locator('.chess-board-wrap svg path[marker-end]')).toHaveAttribute('stroke', 'rgb(29, 118, 65)')
+  await page.screenshot({ path: 'test-results/chess-quality-calibration.png', fullPage: true })
+  await page.setViewportSize({ width: 320, height: 844 })
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await page.locator('.chess-suggestions').screenshot({ path: 'test-results/chess-quality-calibration-phone.png' })
+})
 
 for (const [white, black] of [['builtin-stockfish-19', 'reckless-local'], ['builtin-styled-opening', 'builtin-stockfish-18']]) {
   test(`arena ${white} versus ${black} advances, pauses, and resumes`, async ({ page }) => {

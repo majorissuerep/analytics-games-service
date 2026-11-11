@@ -152,16 +152,23 @@
 .chess-suggestion-balance span{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted)}
 .chess-suggestion-balance b{font-family:Consolas,monospace;font-size:14px;color:var(--green-dark)}
 .chess-scale{display:grid;gap:3px;margin:2px 0}
-.chess-scale-gradient{height:10px;border-radius:999px;background:linear-gradient(90deg,#b53c34,#b1773a 33%,#707b84 50%,#4e8e64 67%,#22844d)}
-.chess-scale-labels{display:flex;justify-content:space-between;font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
+.chess-scale-gradient{height:10px;border-radius:999px}
+.chess-scale-labels{position:relative;height:18px;font:11px/1.5 var(--ui-mono);color:var(--muted)}
+.chess-scale-labels span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.chess-scale-labels span:first-child{transform:none}
+.chess-scale-labels span:last-child{transform:translateX(-100%)}
+.chess-quality-heading{display:flex;justify-content:space-between;gap:8px;font-size:12px}
+.chess-quality-heading span{color:var(--muted)}
 .chess-suggestion-list{display:grid;grid-auto-rows:max-content;gap:4px;max-height:430px;overflow:auto;padding-right:2px}
-.chess-suggestion{display:grid;grid-template-columns:auto auto auto 1fr;column-gap:8px;row-gap:2px;align-items:center;border:1px solid var(--ui-line);border-left-width:6px;border-radius:var(--ui-radius);background:var(--ui-raised);padding:6px 9px;text-align:left;color:var(--ink);cursor:pointer}
+.chess-suggestion{display:grid;grid-template-columns:20px minmax(0,1fr) auto;column-gap:8px;row-gap:4px;align-items:center;border:1px solid var(--ui-line);border-left-width:6px;border-radius:var(--ui-radius);background:var(--ui-raised);padding:8px 9px;text-align:left;color:var(--ink);cursor:pointer}
 .chess-suggestion:hover,.chess-suggestion.hovered{border-color:var(--green);box-shadow:none;transform:none}
 .chess-suggestion-rank{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;color:var(--ui-raised);font-size:12px;font-weight:800}
 .chess-suggestion-move{font-size:15px;font-family:Consolas,monospace;color:var(--green-dark)}
 .chess-suggestion-score{font-family:Consolas,monospace;font-weight:700}
 .chess-suggestion-delta{justify-self:end;font-size:12px;font-weight:700;border-radius:999px;padding:2px 8px;background:var(--ui-recessed);color:var(--ui-muted);white-space:nowrap}
-.chess-suggestion-pv{grid-column:2/5;color:var(--muted);font:12px/1.5 Consolas,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chess-suggestion-pv{grid-column:2/4;color:var(--muted);font:12px/1.5 Consolas,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chess-suggestion-eval{font-weight:650}
+.chess-suggestion-best{display:inline-block;margin-left:8px;padding:2px 6px;border:1px solid currentColor;border-radius:999px;font:600 10px/1.4 var(--ui-font);color:var(--ui-positive);vertical-align:middle;white-space:nowrap}
 .chess-suggestion-hint{color:var(--muted);font-size:12px;line-height:1.45}
 .chess-hover-card{position:absolute;top:10px;right:10px;z-index:10;display:grid;gap:3px;max-width:240px;padding:9px 12px;border:1px solid var(--ui-line);border-radius:var(--ui-panel-radius);background:var(--ui-surface);box-shadow:none;pointer-events:none}
 .chess-hover-card b{font-size:16px;font-family:Consolas,monospace}

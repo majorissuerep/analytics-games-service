@@ -87,12 +87,22 @@ score, with faster winning mates and slower losing mates preferred. Deltas use
 the resulting best comparable score, so finite deltas cannot become negative.
 Negative mate scores name the actual winning side.
 
-Colors use fixed absolute mover-perspective evaluations, shared by list badges,
-row borders, square highlights, arrows, and legend: −3 pawns red, −1 amber,
-0 slate, +1 muted green, +3 green. Intermediate scores interpolate continuously;
-values beyond ±3 saturate. Rank and candidate count never influence color.
-The bar remains White-perspective and is reset while a new position is pending.
-Numeric score and loss-versus-best labels accompany the colors.
+Move quality is loss versus the best evaluated move, not position balance.
+The primary row value is 0.00 for best (including in a losing position), then
+negative pawn losses. Fixed stops are 0.00 green, −0.10 greenish, −0.25 amber,
+and −0.50 saturated red. All worse losses retain the same red. Intermediate
+values interpolate continuously. Candidate count and the worst displayed move
+never stretch the scale. These are the requested product calibration thresholds,
+not universal engine definitions of a chess blunder.
+
+One shared scale drives ranks, row edges, score text, squares, arrows, hover
+previews, and the visible legend. Position balance remains separately labeled
+from White's perspective, with each candidate's mover-perspective evaluation
+shown as secondary “Eval” text. Bounds are marked uncertain; mate alternatives
+use qualitative labels without pretending mate distance is centipawn loss.
+Equivalent best moves share zero loss. Exact score ordering prefers faster
+winning mates and slower losing mates, honors the engine choice among ties, and
+deduplicates stale entries using their freshest exact evaluation.
 
 ## Validation
 

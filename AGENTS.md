@@ -14,6 +14,7 @@
 - Pink anchors primary intent and selection. Put useful category/value/status color in content; backgrounds may be whitish or greyish. Use material, typography, shape, spacing, and explicit interaction states together; a background recolor is insufficient.
 - Use bounded frosted layers for controls/floating surfaces, stable backing for dense content, and opaque playfields. Honor reduced transparency/contrast/motion and the persisted material preference across frames; never reduce entire-component opacity to create glass.
 - Preserve semantic gameplay color (paint swatches, team identities, chess score colors) and essential playfield artwork. Do not style chess piece buttons as application form controls.
+- Chess move-quality color measures loss from the best move: 0 green, −0.10 pawns greenish, −0.50 and worse saturated red. Show position balance separately; never color candidates by absolute position score or stretch colors across the listed candidates.
 - The standalone pinball cabinet links the shared stylesheet; the Cosmic Forge workbench assembly copies it. External games can opt in using the stylesheet documented on `/develop`.
 - Verify `tests/e2e/application-design.spec.ts` together with relevant gameplay regressions before release.
 
