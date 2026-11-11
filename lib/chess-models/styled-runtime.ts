@@ -27,6 +27,8 @@ export function parseStyledMove(body: unknown, legalMoves: readonly string[]) {
 }
 
 function configuredStyledInferenceUrl() {
+  // Deployment is Vercel-only; preserve the sidecar solely for local parity work.
+  if (process.env.NODE_ENV === 'production') return undefined
   const configured = process.env.STYLED_CHESS_INFERENCE_URL?.trim()
   if (!configured) return undefined
   const base = new URL(configured)
