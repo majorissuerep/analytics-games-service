@@ -154,14 +154,14 @@
 .chess-scale{display:grid;gap:3px;margin:2px 0}
 .chess-scale-gradient{height:10px;border-radius:999px;background:linear-gradient(90deg,#b53c34,#b1773a 33%,#707b84 50%,#4e8e64 67%,#22844d)}
 .chess-scale-labels{display:flex;justify-content:space-between;font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
-.chess-suggestion-list{display:grid;gap:4px;max-height:430px;overflow:auto;padding-right:2px}
+.chess-suggestion-list{display:grid;grid-auto-rows:max-content;gap:4px;max-height:430px;overflow:auto;padding-right:2px}
 .chess-suggestion{display:grid;grid-template-columns:auto auto auto 1fr;column-gap:8px;row-gap:2px;align-items:center;border:1px solid var(--ui-line);border-left-width:6px;border-radius:var(--ui-radius);background:var(--ui-raised);padding:6px 9px;text-align:left;color:var(--ink);cursor:pointer}
 .chess-suggestion:hover,.chess-suggestion.hovered{border-color:var(--green);box-shadow:none;transform:none}
 .chess-suggestion-rank{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;color:var(--ui-raised);font-size:12px;font-weight:800}
 .chess-suggestion-move{font-size:15px;font-family:Consolas,monospace;color:var(--green-dark)}
 .chess-suggestion-score{font-family:Consolas,monospace;font-weight:700}
 .chess-suggestion-delta{justify-self:end;font-size:12px;font-weight:700;border-radius:999px;padding:2px 8px;background:var(--ui-recessed);color:var(--ui-muted);white-space:nowrap}
-.chess-suggestion-pv{grid-column:2/5;color:var(--muted);font:11px/1.5 Consolas,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chess-suggestion-pv{grid-column:2/5;color:var(--muted);font:12px/1.5 Consolas,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chess-suggestion-hint{color:var(--muted);font-size:12px;line-height:1.45}
 .chess-hover-card{position:absolute;top:10px;right:10px;z-index:10;display:grid;gap:3px;max-width:240px;padding:9px 12px;border:1px solid var(--ui-line);border-radius:var(--ui-panel-radius);background:var(--ui-surface);box-shadow:none;pointer-events:none}
 .chess-hover-card b{font-size:16px;font-family:Consolas,monospace}
