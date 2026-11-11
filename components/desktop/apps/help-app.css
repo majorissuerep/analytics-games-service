@@ -1,0 +1,51 @@
+.system-panel.app-surface.help-panel {
+  --ui-canvas: #efede8;
+  --ui-surface: #fffefa;
+  --ui-recessed: #f1eee8;
+  --ui-ink: #302d30;
+  --ui-muted: #686168;
+  --ui-line: #d5cfcf;
+  --ui-accent: #a52562;
+  --ui-selection: #fbe3ed;
+  padding: 0;
+  background: var(--ui-canvas);
+  container-type: inline-size;
+}
+.app-surface.help-panel .help-masthead { padding: 20px 24px 16px; border-bottom: 1px solid var(--ui-line); background: var(--ui-surface); }
+.app-surface.help-panel .help-edition { margin: 0 0 8px; color: var(--ui-accent); font-size: 11px; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }
+.app-surface.help-panel h2 { margin: 0 0 8px; font-size: 26px; line-height: 1.15; letter-spacing: -.025em; }
+.app-surface.help-panel .help-masthead > p:last-child { margin: 0; color: var(--ui-muted); }
+.app-surface.help-panel .help-layout { display: grid; grid-template-columns: 138px minmax(0, 1fr); align-items: start; }
+.app-surface.help-panel .help-index { display: grid; gap: 4px; padding: 16px 8px; position: sticky; top: 0; }
+.app-surface.help-panel .help-index a { display: flex; align-items: center; min-height: 40px; gap: 8px; padding: 8px; border-radius: 4px; color: var(--ui-ink); font-size: 12px; font-weight: 600; text-decoration: none; }
+.app-surface.help-panel .help-index a span { color: var(--ui-accent); font: 11px var(--ui-font-mono, monospace); }
+.app-surface.help-panel .help-index a:hover { background: var(--ui-selection); color: var(--ui-accent); }
+.app-surface.help-panel .help-pages { padding: 16px 20px 24px 0; min-width: 0; }
+.app-surface.help-panel .help-card { margin: 0 0 12px; padding: 16px; background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: 3px 12px 12px 3px; scroll-margin-top: 12px; }
+.app-surface.help-panel .help-card h3 { margin: 0 0 12px; font-size: 16px; line-height: 1.3; }
+.app-surface.help-panel .help-card h3 > span { display: inline-block; margin-right: 8px; color: var(--ui-accent); font: 12px var(--ui-font-mono, monospace); }
+.app-surface.help-panel .help-card p { margin: 8px 0; }
+.app-surface.help-panel .help-card p:last-child { margin-bottom: 0; }
+.app-surface.help-panel .help-card dl { margin: 0; }
+.app-surface.help-panel .help-reference-row { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 12px; padding: 9px 0; border-top: 1px solid #e7e1df; }
+.app-surface.help-panel .help-reference-row:first-child { padding-top: 0; border-top: 0; }
+.app-surface.help-panel dt { font-size: 12px; font-weight: 700; }
+.app-surface.help-panel dd { margin: 0; font-size: 13px; }
+.app-surface.help-panel kbd { display: inline-block; padding: 1px 5px; border: 1px solid #c6bfc2; border-bottom-width: 2px; border-radius: 3px; background: #f8f5f4; color: var(--ui-ink); font: 11px/1.5 var(--ui-font-mono, monospace); white-space: nowrap; }
+.app-surface.help-panel .help-appearance .ui-material-setting { display: flex; align-items: center; gap: 8px; min-height: 44px; width: fit-content; margin-top: 12px; font-size: 13px; }
+.app-surface.help-panel .help-note { color: var(--ui-muted); font-size: 12px; }
+.app-surface.help-panel .help-links { display: grid; gap: 8px; margin-top: 12px; }
+.app-surface.help-panel .help-links a { display: block; min-height: 40px; padding: 9px 12px; border: 1px solid var(--ui-line); border-radius: 5px; font-size: 13px; text-decoration: none; }
+.app-surface.help-panel .help-links a:first-child { color: var(--ui-accent); background: var(--ui-selection); border-color: #dca4be; font-weight: 700; }
+.app-surface.help-panel a:focus-visible { outline: 3px solid var(--ui-accent); outline-offset: 2px; }
+@container (max-width: 440px) {
+  .app-surface.help-panel .help-masthead { padding: 16px; }
+  .app-surface.help-panel .help-layout { grid-template-columns: minmax(0, 1fr); }
+  .app-surface.help-panel .help-index { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 8px 12px; border-bottom: 1px solid var(--ui-line); }
+  .app-surface.help-panel .help-pages { padding: 12px; }
+  .app-surface.help-panel .help-reference-row { grid-template-columns: 72px minmax(0, 1fr); gap: 8px; }
+}
+@media (forced-colors: active) {
+  .app-surface.help-panel .help-card, .app-surface.help-panel .help-links a { border-color: CanvasText; }
+  .app-surface.help-panel a:focus-visible { outline-color: Highlight; }
+}

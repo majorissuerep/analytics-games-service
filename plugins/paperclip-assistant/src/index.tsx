@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import Image from 'next/image'
+import './pip.css'
 import { LoadingState } from '@/components/ui/LoadingState'
 import type { DesktopPluginDefinition, DesktopPluginProps } from '@analytics-games/plugin-sdk'
 
@@ -82,11 +83,13 @@ async function readSseStream(
         const event = raw.match(/^event: (.+)$/m)?.[1]
         const dataLine = raw.match(/^data: (.*)$/m)?.[1]
         if (event && dataLine) {
+          let data: Record<string, unknown> | undefined
           try {
-            onEvent(event, JSON.parse(dataLine) as Record<string, unknown>)
+            data = JSON.parse(dataLine) as Record<string, unknown>
           } catch {
-            // Ignore malformed event payloads; the stream continues.
+            // Ignore malformed payloads, but preserve errors from valid events.
           }
+          if (data) onEvent(event, data)
         }
         boundary = buffer.indexOf('\n\n')
       }
@@ -118,6 +121,13 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
   const reasoningRef = useRef('')
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const messagesRef = useRef<HTMLDivElement>(null)
+  const talkRef = useRef<HTMLButtonElement>(null)
+  const followMessagesRef = useRef(true)
+
+  const closeChat = () => {
+    setChatOpen(false)
+    requestAnimationFrame(() => talkRef.current?.focus())
+  }
 
   const resolveUserKey = () => {
     if (userKey) return userKey
@@ -131,13 +141,16 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
   }, [chatOpen])
 
   useEffect(() => {
-    messagesRef.current?.scrollTo({ top: messagesRef.current.scrollHeight, behavior: 'smooth' })
-  }, [messages, streamingText, statusLine])
+    if (followMessagesRef.current) {
+      messagesRef.current?.scrollTo({ top: messagesRef.current.scrollHeight, behavior: 'instant' })
+    }
+  }, [messages, streamingText, statusLine, toolCards])
 
   const sendMessage = async (event?: FormEvent) => {
     event?.preventDefault()
     const content = draft.trim()
     if (!content || sending) return
+    followMessagesRef.current = true
     setMessages((current) => [...current, { role: 'user' as const, content }].slice(-12))
     setDraft('')
     setError('')
@@ -209,6 +222,8 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
       })
       if (!finished) throw new Error('Pip lost the line to the model office. Try again!')
     } catch (requestError) {
+      setToolCards((current) => current.map((card) => card.state === 'open' ? { ...card, state: 'error' } : card))
+      setDraft((current) => current || content)
       setError(controller.signal.aborted ? 'Response stopped. Send another message when ready.' : requestError instanceof Error ? requestError.message : 'Pip could not answer')
     } finally {
       setSending(false)
@@ -219,7 +234,7 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
   }
 
   const submitOnEnter = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
       event.preventDefault()
       void sendMessage()
     }
@@ -230,26 +245,23 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
       {visible && (
         <motion.aside
           className="paperclip-assistant"
-          initial={{ opacity: 0, y: 28, scale: 0.85 }}
+          data-chat-open={chatOpen}
+          style={{ filter: 'none' }}
+          initial={reducedMotion ? false : { opacity: 0, y: 28, scale: 0.85 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 18, scale: 0.9 }}
+          exit={reducedMotion ? undefined : { opacity: 0, y: 18, scale: 0.9 }}
           transition={{ type: 'spring', stiffness: 260, damping: 20 }}
           aria-label="Pip desktop guide"
         >
           <button className="paperclip-dismiss" onClick={() => setVisible(false)} aria-label="Hide guide">×</button>
-          <motion.div
-            className="paperclip-character"
-            animate={reducedMotion ? undefined : { y: [0, -2, 0] }}
-            transition={{ duration: 4, repeat: 1, ease: 'easeInOut' }}
-            aria-hidden
-          >
+          <div className="paperclip-character" aria-hidden>
             <Image src="/pip-assistant.webp" width={100} height={140} alt="" unoptimized />
-          </motion.div>
+          </div>
           <div className="app-surface paperclip-bubble">
-            <strong>Pip says:</strong>
+            <strong>Pip, at your service</strong>
             <p>{tips[tipIndex]}</p>
             <div>
-              <button className="pip-talk-button" onClick={() => setChatOpen(true)}>Talk to me</button>
+              <button ref={talkRef} className="pip-talk-button" onClick={() => setChatOpen(true)}>Talk to me</button>
               <button onClick={() => setTipIndex((current) => randomTipAfter(current))}>Surprise me</button>
               <button onClick={context.openHelp}>Help</button>
             </div>
@@ -261,9 +273,10 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
                 role="dialog"
                 aria-modal="false"
                 aria-label="Talk to Pip"
-                initial={{ opacity: 0, y: 18, scale: 0.96 }}
+                initial={reducedMotion ? false : { opacity: 0, y: 18, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 12, scale: 0.97 }}
+                exit={reducedMotion ? undefined : { opacity: 0, y: 12, scale: 0.97 }}
+                onKeyDown={(event) => { if (event.key === 'Escape') { event.stopPropagation(); closeChat() } }}
               >
                 <header>
                   <div>
@@ -271,12 +284,16 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
                     <strong>Talk to Pip</strong>
                     <small>{modelChip ? `${modelChip} · ZDR` : 'Repo-aware · ZDR'}</small>
                   </div>
-                  <button onClick={() => setChatOpen(false)} aria-label="Close Pip chat">×</button>
+                  <button onClick={closeChat} aria-label="Close Pip chat">×</button>
                 </header>
-                <div className="pip-chat-messages" ref={messagesRef} aria-live="polite">
+                <div className="pip-conversation-heading"><span>YOUR DESKTOP CONCIERGE</span><strong>A little help, right here.</strong><p>Games, code, and finding your way.</p></div>
+                <div className="pip-chat-messages" ref={messagesRef} role="log" aria-label="Conversation with Pip" aria-live="polite" onScroll={() => {
+                  const panel = messagesRef.current
+                  if (panel) followMessagesRef.current = panel.scrollHeight - panel.scrollTop - panel.clientHeight < 48
+                }}>
                   {messages.map((message, index) => (
                     <div className={`pip-chat-message ${message.role}${message.blocked ? ' blocked' : ''}`} key={`${message.role}-${index}`}>
-                      <span>{message.role === 'assistant' ? 'Pip' : 'You'}{message.blocked ? ' · 🛡' : ''}</span>
+                      <span>{message.role === 'assistant' ? 'Pip' : 'You'}{message.blocked ? ' · Request blocked' : ''}</span>
                       <p>{message.content}</p>
                       {message.reasoning && (
                         <details className="pip-chat-reasoning">
@@ -302,11 +319,14 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
                   )}
                   {sending && <LoadingState scope="inline" label={streamingText === null ? statusLine || 'Pip is preparing a response' : 'Receiving Pip’s response'} onCancel={() => requestRef.current?.abort()} cancelLabel="Stop response" />}
                 </div>
+                <details className="pip-starters" open={messages.length === 1 ? true : undefined}>
+                  <summary>Try asking Pip</summary>
                 <div className="pip-chat-suggestions" aria-label="Suggested questions">
                   {['How do I play Minefield?', 'What is planned for Mafia Online?', 'Where do games live in the repo?'].map((question) => (
                     <button key={question} onClick={() => { setDraft(question); inputRef.current?.focus() }}>{question}</button>
                   ))}
                 </div>
+                </details>
                 <form onSubmit={sendMessage}>
                   <textarea
                     ref={inputRef}
@@ -317,9 +337,11 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
                     rows={2}
                     placeholder="Ask about a game or the code…"
                     aria-label="Message Pip"
+                    aria-describedby="pip-composer-hint"
                   />
-                  <button type="submit" disabled={sending || !draft.trim()} aria-label="Send message">➤</button>
+                  <button type="submit" disabled={sending || !draft.trim()} aria-label="Send message">Send ↗</button>
                 </form>
+                <div className="pip-composer-hint" id="pip-composer-hint">Enter to send · Shift + Enter for a new line</div>
                 {error && <p className="pip-chat-error" role="alert">{error}</p>}
                 <footer>AI can make mistakes · Pip remembers this conversation for up to 14 days</footer>
               </motion.section>

@@ -1,0 +1,81 @@
+/* Pip: correspondence on warm paper. XP header remains shell-owned. */
+.app-surface.pip-chat-window,
+.app-surface.paperclip-bubble {
+  --ui-ink: #352d32;
+  --ui-muted: #6b5b65;
+  --ui-surface: #fffdfa;
+  --ui-raised: #f5f0eb;
+  --ui-canvas: #f5f0eb;
+  --ui-accent: #a32660;
+  --ui-on-accent: #fff;
+  --ui-selection: #fbe6ef;
+  --ui-control-border: #aa959f;
+  --ui-line: #d7c9ce;
+  --ui-radius: 10px;
+  --ui-violet: #754658;
+  --ui-glass-strong-fill: #fffdfa;
+  --ui-glass-edge: #d7c9ce;
+}
+.app-surface.paperclip-bubble { padding: 16px; border-radius: 16px 16px 16px 4px; border-color: #d7c9ce; background: #fffdfa; backdrop-filter: none; }
+.app-surface.paperclip-bubble strong { color: #754658; font-size: 14px; }
+.app-surface.paperclip-bubble p { margin: 8px 0 16px; }
+.app-surface.paperclip-bubble button { min-height: 36px; padding: 6px 10px; }
+.app-surface.pip-chat-window { display: flex; flex-direction: column; width: min(430px, calc(100vw - 24px)); max-height: calc(100dvh - 68px); background: #fffdfa; border-radius: 7px 7px 16px 16px; }
+.app-surface.pip-chat-window > header { flex-shrink: 0; }
+.pip-chat-window .pip-conversation-heading { padding: 16px 20px 12px; border-bottom: 1px solid var(--ui-line); background: #fffdfa; }
+.pip-chat-window .pip-conversation-heading > span { display: block; color: #754658; font: 700 10px/1.4 var(--ui-font); letter-spacing: .12em; }
+.pip-chat-window .pip-conversation-heading > strong { display: block; margin-top: 4px; color: var(--ui-ink); font: 600 21px/1.25 var(--ui-font); letter-spacing: -.03em; }
+.pip-chat-window .pip-conversation-heading > p { margin: 4px 0 0; color: var(--ui-muted); font: 12px/1.5 var(--ui-font); }
+.app-surface.pip-chat-window .pip-chat-messages { flex: 1 1 auto; min-height: 105px; height: min(290px, calc(100dvh - 440px)); padding: 16px 20px; background: #f5f0eb; background-image: linear-gradient(#f5f0eb, #f5f0eb); scroll-behavior: auto; overscroll-behavior: contain; overflow-wrap: anywhere; }
+.pip-chat-window .pip-chat-message { max-width: 92%; margin-bottom: 16px; }
+.pip-chat-window .pip-chat-message > span { margin: 0 0 5px; color: #754658; font-size: 11px; letter-spacing: .02em; text-transform: none; }
+.pip-chat-window .pip-chat-message p { padding: 12px 14px; border: 1px solid #d7c9ce; border-radius: 3px 14px 14px; color: #352d32; background: #fffdfa; line-height: 1.55; }
+.pip-chat-window .pip-chat-message.user p { color: #57253e; background: #fbe6ef; border-color: #d4a3b7; border-radius: 14px 3px 14px 14px; }
+.pip-chat-window .pip-chat-message.streaming p { border-color: #a32660; }
+.pip-chat-window .pip-cursor { animation: none; }
+.pip-chat-window .pip-tool-card { border: 0; border-left: 2px solid #a32660; border-radius: 0; padding: 8px 10px; background: #fffdfa; }
+.pip-chat-window .pip-tool-card small { white-space: pre-wrap; max-height: 52px; overflow: auto; overflow-wrap: anywhere; }
+.pip-chat-window .pip-tool-card.done strong { color: #28613f; }
+.pip-chat-window .pip-chat-message.blocked p { color: #654617; background: #fff6df; border-color: #a27832; }
+.pip-chat-window .pip-chat-reasoning summary { min-height: 28px; padding: 4px 0; text-transform: none; letter-spacing: 0; }
+.pip-chat-window .pip-starters { flex-shrink: 0; padding: 10px 16px 0; background: #fffdfa; }
+.pip-chat-window .pip-starters > summary { width: fit-content; color: #754658; font-size: 12px; font-weight: 600; cursor: pointer; min-height: 24px; }
+.app-surface.pip-chat-window .pip-chat-suggestions { display: grid; gap: 4px; padding: 4px 0; overflow: visible; background: transparent; }
+.app-surface.pip-chat-window .pip-chat-suggestions button { display: block; width: 100%; max-width: none; min-height: 30px; padding: 5px 8px; text-align: left; white-space: normal; color: #754658; background: #fffdfa; border: 1px solid #e2d5da; border-radius: 6px; font-size: 12px; }
+.app-surface.pip-chat-window .pip-chat-suggestions button:hover { border-color: #a32660; background: #fbe6ef; }
+.app-surface.pip-chat-window form { flex-shrink: 0; padding: 12px 16px 4px; align-items: stretch; background: #fffdfa; }
+.app-surface.pip-chat-window textarea { background: #fff; border-color: #aa959f; min-height: 68px; padding: 10px 12px; }
+.app-surface.pip-chat-window textarea::placeholder { color: #74616b; opacity: 1; }
+.app-surface.pip-chat-window form button { align-self: flex-end; width: 64px; min-width: 64px; height: 40px; min-height: 40px; padding: 0 8px; border-radius: 10px; background: #a32660; color: #fff; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.app-surface.pip-chat-window form button:disabled { opacity: 1; background: #e8dfe3; color: #705d67; border-color: #d0bfc7; cursor: default; }
+.pip-chat-window .pip-composer-hint { flex-shrink: 0; padding: 2px 16px 8px; color: #6b5b65; font-size: 10px; }
+.app-surface.pip-chat-window > footer { flex-shrink: 0; padding: 10px 16px; text-align: left; color: #6b5b65; background: #f5f0eb; border-top: 1px solid #d7c9ce; font-size: 10px; line-height: 1.5; }
+.app-surface.pip-chat-window .pip-chat-error { padding: 4px 16px 10px; color: #a5261d; }
+.app-surface.pip-chat-window :is(button, textarea, summary):focus-visible,
+.app-surface.paperclip-bubble button:focus-visible { outline: 3px solid #a32660; outline-offset: 2px; }
+@media (max-width: 480px) {
+  .paperclip-assistant[data-chat-open] { right: 92px; bottom: 48px; }
+  .paperclip-assistant .app-surface.paperclip-bubble { width: auto; padding: 0; border: 0; border-radius: 12px; background: transparent; box-shadow: none; }
+  .paperclip-assistant .app-surface.paperclip-bubble > :is(strong, p),
+  .paperclip-assistant .app-surface.paperclip-bubble > div > button:not(.pip-talk-button) { display: none; }
+  .paperclip-assistant .app-surface.paperclip-bubble > div { display: block; }
+  .paperclip-assistant .app-surface.paperclip-bubble .pip-talk-button { min-height: 44px; padding: 10px 16px; border-radius: 12px; box-shadow: 0 2px 8px #352d3226; }
+  .paperclip-assistant[data-chat-open="true"] > .paperclip-dismiss,
+  .paperclip-assistant[data-chat-open="true"] > .paperclip-bubble { visibility: hidden; }
+
+  .app-surface.pip-chat-window { right: 8px; bottom: 48px; width: calc(100vw - 16px); max-height: calc(100dvh - 60px); }
+  .pip-chat-window .pip-conversation-heading { padding: 12px 16px 10px; }
+  .app-surface.pip-chat-window .pip-chat-messages { padding: 12px 16px; }
+}
+@media (max-height: 620px) {
+  .pip-chat-window .pip-conversation-heading { display: none; }
+  .app-surface.pip-chat-window .pip-chat-messages { height: 180px; }
+  .pip-chat-window .pip-starters { max-height: 100px; overflow-y: auto; }
+}
+@media (prefers-contrast: more) {
+  .app-surface.pip-chat-window { --ui-control-border: #754658; --ui-line: #754658; }
+}
+@media (forced-colors: active) {
+  .app-surface.pip-chat-window :is(p, button, textarea, footer, .pip-chat-messages, .pip-conversation-heading, .pip-tool-card) { color: CanvasText; background: Canvas; border-color: CanvasText; }
+  .app-surface.pip-chat-window :is(button, textarea, summary):focus-visible { outline-color: Highlight; }
+}

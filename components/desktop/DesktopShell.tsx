@@ -1,8 +1,6 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import Link from 'next/link'
-import { MaterialPreference } from '@/components/platform/MaterialPreference'
 import { Rnd } from 'react-rnd'
 import type { DesktopPluginContext, DesktopPluginSlot } from '@analytics-games/plugin-sdk'
 import type { GameManifest } from '@/lib/engine/types'
@@ -14,6 +12,9 @@ import { ComingSoonGame } from '@/components/games/ComingSoonGame'
 import { GameFrame } from './GameFrame'
 import { useDesktopStore, type DesktopWindowState } from './store'
 import 'xp.css/dist/XP.css'
+import { WelcomeApp } from './apps/WelcomeApp'
+import { HelpApp } from './apps/HelpApp'
+import { PluginManagerApp } from './apps/PluginManagerApp'
 import './desktop.css'
 
 interface DesktopShellProps {
@@ -324,56 +325,7 @@ function WindowContent({
     return <GameFrame game={game} onExit={close} />
   }
 
-  if (window.systemId === 'plugins') {
-    return (
-      <div className="app-surface system-panel plugin-manager">
-        <header><h2>Installed desktop plugins</h2><p>Build-time packages with typed, explicit desktop slots.</p></header>
-        {DESKTOP_PLUGINS.map((plugin) => (
-          <label className="plugin-row" data-tone={plugin.manifest.id.includes('sticky') ? 'amber' : plugin.manifest.id.includes('meter') ? 'teal' : 'pink'} key={plugin.manifest.id}>
-            <input
-              type="checkbox"
-              checked={Boolean(plugins[plugin.manifest.id])}
-              onChange={(event) => setPlugin(plugin.manifest.id, event.target.checked)}
-            />
-            <span><strong>{plugin.manifest.title}</strong><small>{plugin.manifest.description}</small></span>
-            <code>v{plugin.manifest.version}</code>
-          </label>
-        ))}
-      </div>
-    )
-  }
-
-  if (window.systemId === 'help') {
-    return (
-      <div className="app-surface system-panel help-panel">
-        <h2>Bring any web game</h2>
-        <ol>
-          <li>Host game anywhere over HTTPS.</li>
-          <li>Implement bridge v1: <code>game.ready</code> and <code>game.exit</code>.</li>
-          <li>Register strict manifest through platform API.</li>
-          <li>Desktop handles discovery, window, entry, focus, and exit.</li>
-        </ol>
-        <p>Internal games can additionally use shared rooms, actions, projections, and leaderboards.</p>
-        <section className="help-appearance"><h3>Appearance</h3><MaterialPreference /></section>
-        <Link href="/develop">Open full developer guide →</Link>
-        <p><Link href="/design-system">Explore the Prism design system →</Link></p>
-      </div>
-    )
-  }
-
-  return (
-    <div className="app-surface system-panel welcome-panel">
-      <div className="welcome-logo" aria-hidden><span>AG</span></div>
-      <div>
-        <p className="welcome-kicker">ANALYTICS GAMES DESKTOP</p>
-        <h1>Team games live here.</h1>
-        <p>Double-click a game icon. Local modules and independently hosted games launch through the same desktop.</p>
-        <div className="welcome-actions">
-          {games.filter(game => game.status !== 'coming-soon').slice(0, 3).map((game) => <button data-tone={game.id === 'chess' ? 'pink' : 'teal'} key={game.id} onClick={() => openGame(game)}>Open {game.title}</button>)}
-          <Link href="/develop">Developer guide</Link>
-          <Link href="/design-system">Design system</Link>
-        </div>
-      </div>
-    </div>
-  )
+  if (window.systemId === 'plugins') return <PluginManagerApp plugins={plugins} setPlugin={setPlugin} />
+  if (window.systemId === 'help') return <HelpApp />
+  return <WelcomeApp games={games} openGame={openGame} />
 }

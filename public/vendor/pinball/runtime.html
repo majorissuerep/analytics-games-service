@@ -8,15 +8,16 @@
 </head>
 <body class="app-surface">
   <header class="pinball-bar ui-glass">
-    <strong>🪐 Space Cadet</strong><span class="ui-badge" id="art-label">Open Cadet art · CC0</span>
-    <button id="new-game" disabled>New game</button><button id="pause" disabled>Pause</button>
+    <div class="pinball-identity"><span class="pinball-eyebrow">FLIGHT DECK / 01</span><strong>Space Cadet</strong></div>
+    <button id="new-game" class="ui-primary" title="New game · F2" disabled>New game</button><button id="pause" title="Pause or resume · F3" disabled>Pause</button>
     <button id="sound" disabled aria-pressed="false">Sound off</button>
     <button id="exit">Exit</button>
   </header>
-  <div class="pinball-data-tools">
-    <label class="pinball-import">Use original XP files <input id="original-files" type="file" accept=".dat,.wav,.mid,.bmp" multiple></label>
-    <span>Local files stay in this browser.</span><button id="free-play" hidden>Return to free-play art</button>
-  </div>
+  <details class="pinball-data-tools">
+    <summary>Table files <span id="art-label">Open Cadet art · CC0</span></summary>
+    <div class="pinball-data-content"><label class="pinball-import">Use original XP files <input id="original-files" type="file" accept=".dat,.wav,.mid,.bmp" multiple></label>
+    <span>Choose your own game data and sounds. Files stay in this browser.</span><button id="free-play" hidden>Return to free-play art</button></div>
+  </details>
   <main class="pinball-stage" aria-label="Space Cadet game">
     <canvas id="canvas" tabindex="0" aria-label="Space Cadet pinball table" hidden></canvas>
     <section class="ui-loading ui-loading-app" id="loader">
@@ -28,9 +29,9 @@
     </section>
   </main>
   <div class="pinball-touch-controls" role="group" aria-label="Touch controls">
-    <button disabled data-key="z" data-code="KeyZ" data-keycode="90" aria-label="Left flipper">Left flipper · Z</button>
-    <button disabled data-key=" " data-code="Space" data-keycode="32" aria-label="Hold to launch">Hold to launch · Space</button>
-    <button disabled data-key="/" data-code="Slash" data-keycode="191" aria-label="Right flipper">Right flipper · /</button>
+    <button disabled data-key="z" data-code="KeyZ" data-keycode="90" aria-label="Left flipper"><span>Left flipper</span><kbd>Z</kbd></button>
+    <button disabled data-key=" " data-code="Space" data-keycode="32" aria-label="Hold to launch"><span>Hold to launch</span><kbd>Space</kbd></button>
+    <button disabled data-key="/" data-code="Slash" data-keycode="191" aria-label="Right flipper"><span>Right flipper</span><kbd>/</kbd></button>
   </div>
   <footer><span id="notice" role="status">F2 new game · F3 pause · Z / flippers · Space launch</span><a href="/vendor/space-cadet/UPSTREAM.md" target="_blank" rel="noopener">Engine &amp; asset licenses</a></footer>
   <script type="module" src="cabinet.js"></script>

@@ -1,11 +1,17 @@
 # Prism application design system
 
-Version 1, 11 November 2026. [Research and source assessment](DESIGN_SYSTEM_RESEARCH.md).
+Version 2, 11 November 2026. [Research and source assessment](DESIGN_SYSTEM_RESEARCH.md).
 Live reference: `/design-system`.
 
-Prism combines luminous neutral foundations, frosted control layers, expressive
-colored content, and a pink signature. Foundations include materials, type,
-spacing, shape, elevation, color roles, components, states, and responsive rules.
+Prism is a shared perceptual and interaction engine. Apps have individual
+personalities: different composition, surface temperature, density, signature
+shapes and bounded gloss. They share readable contrast, predictable controls,
+focus, feedback, spacing rhythm and accessible fallbacks. Pink is a signature,
+not a requirement to paint every surface alike.
+
+[App personality brief](APP_PERSONALITY_BRIEF.md) defines the per-app research and
+implementation process. [Individual dossiers](app-personalities/) record direct
+references, rejected alternatives, chosen personality and verification.
 
 ## Boundary and ownership
 
@@ -18,26 +24,32 @@ primitives. App CSS maps game components to these roles and owns game geometry.
 Next.js imports the theme globally; Pinball links it; Cosmic Forge copies it at
 workbench assembly. A shared script applies persisted material preferences.
 
-## Color roles
+## Color budget and ownership
 
-| Role | Foreground meaning |
+Every app declares a small neutral ramp and **at most two decorative chromatic
+families**, normally pink intent plus one subdued identity. Ink, fill and edge
+variants of a family are allowed. Semantic feedback and essential domain colors
+are separately justified exceptions; they never become decorative card colors.
+A one-family app is welcome. The shared palette is a library of options, not a
+checklist to display every hue at once.
+
+| Role | Contract |
 | --- | --- |
-| Pink: `--ui-accent`, `--ui-accent-ink`, `--ui-pink-bg` | Primary fill, darker text ink, selection and key value |
-| Violet: `--ui-violet`, `--ui-violet-bg` | Analysis, second category, timer |
-| Teal: `--ui-teal`, `--ui-teal-bg` | Collaboration, creation, shared session |
-| Amber: `--ui-amber`, `--ui-amber-bg` | Time budget and attention category |
-| Positive / warning / negative / info | Actual state feedback, distinct from category identity |
-| Canvas / surface / raised / recessed | Whitish foundation, content, input, grouping |
+| Pink intent | Primary action, active selection, restrained brand signature |
+| App identity | One optional family, chosen for the app and fixed by meaning |
+| Neutrals | Small coherent ramp for canvas, stable content, recessed groups and text |
+| State | Positive/warning/negative/info only when those states occur; explicit labels |
+| Domain | Drawing pigments, native table artwork, chess quality and board information retain their data meaning |
 
-Use `ui-tone` with `data-tone="pink|violet|teal|amber"` for meaningful content
-groups. Compose `ui-badge`, `ui-metric`, and `ui-icon` for colored content accents.
-`ui-primary` is the pink action; `ui-selected` adds a structural selected cue.
-Category identity remains stable by role, never randomized by current ranking.
+`public/styles/app-theme.css` provides defaults and primitives. Each app scopes
+`--ui-*` values to its own `app-surface` root. Use `data-tone="identity"` for
+app identity, or remap existing named categories into that family. Do not leak
+app variables into `:root`, XP chrome or another app. Compatibility aliases are
+rebound at each app root so local ink/material values reach legacy components.
 
-Most useful groups should show category, value, identity, or state color: mode
-cards, metrics, avatars, room information, selected tools, and status chips.
-Body prose stays dark and readable. Neutral backgrounds are valid. Avoid using
-success/error for decoration or turning every word into a different color.
+Useful content receives intentional color through selected tools, values,
+identity, meaningful edges and states. Other content stays legible and calm.
+No default rainbow of cards; no monochrome treatment that removes useful cues.
 
 Chess move quality uses fixed loss-from-best thresholds: best is 0.00/green,
 −0.10 remains greenish, and −0.50 or worse saturates red. The overall position
@@ -51,7 +63,7 @@ shape, and labels. Essential playfield artwork and geometry remain game-owned.
 
 | Material / primitive | Definition | Use |
 | --- | --- | --- |
-| Canvas | Near-white with soft stationary pink/violet light | Foundation, never the only colored area |
+| Canvas | App-specific neutral foundation; optional restrained stationary light | Foundation, never the only colored area |
 | Solid / `ui-card` | Opaque backing, quiet edge | Dense content, code, metrics, playfields |
 | Frost / `ui-glass` | White at 76% alpha, 18px blur, highlight edge, short soft shadow | Control bars, app navigation, floating groups |
 | Strong frost | White at 90% alpha, bounded blur | Text-rich floating/overlay panels |
@@ -75,7 +87,8 @@ selection outlines. Same-origin embedded apps share the persisted preference.
   Establish hierarchy with weight and space. Paragraphs target 65 characters.
 - Space 4/8/12/16/24/32/48px. Labels within 8px of controls; groups separated
   by 16–24px. Dense data remains compact, aligned, and independently scrollable.
-- Radius: 10px controls, 16px panels, 24px feature/overlay. Pills are reserved
+- Default radius: 10px controls, 16px panels, 24px feature/overlay. Apps may select
+  a coherent smaller set appropriate to their tools and density. Pills are reserved
   for badges, identity marks, and segmented containers. Board cells stay square.
 - Elevation: default edge; raised short shadow; floating deeper shadow; overlay
   scrim plus floating surface. Elevation communicates actual hierarchy.
@@ -86,9 +99,9 @@ selection outlines. Same-origin embedded apps share the persisted preference.
 
 | Component | Appearance and behavior |
 | --- | --- |
-| Primary action | Pink fill/white label; darker hover/pressed; 3px focus; explicit disabled state |
+| Primary action | Pink fill/contrasting label; darker hover/pressed; 3px focus; explicit disabled state |
 | Secondary action | Light backing/readable edge; pink hover; no moving target or layout shift |
-| Category/mode card | Named colored icon and tint; selected edge/inset cue, label, and weight |
+| Category/mode card | App identity or neutral icon and tint; selected edge/inset cue, label, and weight |
 | Input/select/textarea | Stable backing/visible boundary; external focus; invalid state with explanatory text |
 | Metric/status | Colored value, explicit label/unit, fixed meaning, tabular number |
 | Segmented control | Quiet group; selected pink segment plus structural cue; keyboard focus visible |
@@ -114,7 +127,7 @@ medical eye-safety claim.
 ## Adoption and acceptance
 
 Apply `app-surface` to content roots; compose `ui-glass`, `ui-card`, `ui-tone`,
-`ui-badge`, `ui-icon`, `ui-metric`, `ui-primary`, and `ui-selected`. Never attach
+`ui-badge`, `ui-icon`, `ui-metric`, `ui-primary`, and `ui-selected`. Choose primitives appropriate to the app, not identical compositions. Never attach
 the theme to XP wrappers or apply form sizing to chess piece buttons.
 
 Coverage: Chess/arena, Mafia preview, Minefield, Paintbox, Pinball cabinet, Cosmic

@@ -95,8 +95,12 @@ export function GameFrame({ game, onExit, launchContext = 'desktop' }: GameFrame
     }
 
     window.addEventListener('message', receive)
+    // The SSR iframe starts blank. Bind the host before navigation so a cached
+    // app cannot finish (or emit its only ready event) before React hydrates.
+    const frame = frameRef.current
+    if (frame && frame.getAttribute('src') !== src) frame.src = src
     return () => window.removeEventListener('message', receive)
-  }, [completeSession, game, markExit, onExit, sessionId])
+  }, [attempt, completeSession, game, markExit, onExit, sessionId, src])
 
   if (game.integration.kind === 'external' && game.integration.openMode === 'redirect') {
     const integration = game.integration
@@ -125,15 +129,16 @@ export function GameFrame({ game, onExit, launchContext = 'desktop' }: GameFrame
       className="desktop-game-frame"
       aria-busy={!ready && !failed}
       inert={!ready}
-      src={src}
+      src="about:blank"
       title={game.title}
       sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups"
       allow="autoplay; fullscreen; gamepad; clipboard-write"
       referrerPolicy="no-referrer"
       allowFullScreen
       onLoad={() => {
-        if (game.integration.kind === 'external' || game.integration.launchPath) { setReady(true); return }
-        // A fast child may mount before the host's message listener hydrates.
+        if (frameRef.current?.contentDocument?.URL === 'about:blank') return
+        if (game.integration.kind === 'external') { setReady(true); return }
+        // Same-origin readiness can also be recovered from the document marker.
         if (frameRef.current?.contentDocument?.documentElement.dataset.appReady === 'true') setReady(true)
       }}
       onError={() => setFailed(true)}

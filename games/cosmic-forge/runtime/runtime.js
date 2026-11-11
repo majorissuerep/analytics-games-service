@@ -42,6 +42,12 @@ async function boot() {
     : index.evaluations[0]
   if (!evaluation) throw new Error(`Unknown evaluation: ${requestedId ?? '(none available)'}`)
 
+  document.querySelector('#evaluation-name').textContent = evaluation.name
+  document.querySelector('#focus-body').textContent = evaluation.focusBodyId
+  document.querySelector('#local-scale').textContent = `${evaluation.scale.metersPerCell} m / cell`
+  document.querySelector('#domain-size').textContent = `${evaluation.scale.widthM} × ${evaluation.scale.heightM} m`
+  document.querySelector('#projection').textContent = evaluation.projection.replaceAll('-', ' ')
+
   setStatus(`Loading ${evaluation.name}…`)
   const scene = await fetch(evaluation.sceneUrl).then(response => {
     if (!response.ok) throw new Error(`Scene failed: ${response.status}`)

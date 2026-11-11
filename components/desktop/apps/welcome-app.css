@@ -1,0 +1,83 @@
+.app-surface.welcome-panel {
+  --ui-canvas: #f5f3f0;
+  --ui-ink: #302a30;
+  --ui-muted: #6c626c;
+  --ui-accent: #a52366;
+  --ui-line: #d9d1d5;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 22px;
+  padding: 26px 30px 22px;
+  background: var(--ui-canvas);
+}
+.welcome-panel .welcome-heading { display: flex; align-items: center; gap: 12px; }
+.welcome-panel .welcome-monogram { position: relative; display: grid; place-items: center; flex: 0 0 42px; height: 42px; border-radius: 13px; background: #a52366; color: white; font-size: 24px; font-weight: 750; letter-spacing: -.08em; box-shadow: inset 0 1px 0 #ffffff65, 0 3px 7px #6e24451c; }
+.welcome-panel .welcome-monogram > span { position: absolute; top: -7px; right: -7px; color: #a52366; background: #f5f3f0; border-radius: 50%; font-size: 16px; line-height: 20px; width: 20px; text-align: center; letter-spacing: 0; }
+.welcome-panel .welcome-kicker { margin: 0; color: #51464e; font-size: 10px; font-weight: 750; letter-spacing: .09em; }
+.welcome-panel .welcome-kicker > span { display: block; margin-top: 3px; color: #766b73; font-size: 10px; font-weight: 500; letter-spacing: .07em; }
+.welcome-panel .welcome-intro h1 { margin: 0 0 6px; font-size: clamp(25px, 4vw, 32px); line-height: 1.15; font-weight: 700; letter-spacing: -.045em; }
+.welcome-panel .welcome-intro p { margin: 0; color: #6c626c; font-size: 14px; }
+.welcome-panel .welcome-shelf { padding: 15px; border: 1px solid #d8cfd4; border-radius: 19px; background: linear-gradient(155deg, #ffffffeb, #ede7eada); box-shadow: inset 0 1px 0 white, 0 5px 14px #49323f0b; }
+@supports (backdrop-filter: blur(12px)) { .welcome-panel .welcome-shelf { backdrop-filter: blur(12px); } }
+.welcome-panel .welcome-shelf-heading { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 11px; align-items: baseline; }
+.welcome-panel .welcome-shelf-heading h2 { margin: 0; font-size: 13px; font-weight: 700; }
+.welcome-panel .welcome-shelf-heading > span { color: #756773; font-size: 11px; }
+.welcome-panel .welcome-actions { display: grid; gap: 7px; margin: 0; }
+.welcome-panel .welcome-actions .welcome-launch { display: flex; align-items: center; gap: 13px; width: 100%; min-width: 0; min-height: 72px; padding: 10px 13px; border: 1px solid #d8ccd3; border-radius: 11px; background: #fffdfd; color: #302a30; text-align: left; box-shadow: 0 1px 2px #49323f08; }
+.welcome-panel .welcome-game-mark { display: grid; place-items: center; flex: 0 0 42px; height: 42px; background: #f6e8ef; border: 1px solid #ead1de; border-radius: 10px; color: #a52366; font: 29px/1 Georgia, serif; }
+.welcome-panel .welcome-launch-copy { display: grid; gap: 3px; min-width: 0; flex: 1; }
+.welcome-panel .welcome-launch-copy strong { font-size: 16px; line-height: 1.2; font-weight: 650; }
+.welcome-panel .welcome-launch-copy > span { color: #6c626c; font-size: 12px; line-height: 1.35; }
+.welcome-panel .welcome-launch-end { display: grid; align-self: stretch; align-content: space-between; text-align: right; color: #a52366; font-size: 19px; }
+.welcome-panel .welcome-launch-end > span:first-child { color: #83757f; font: 10px/1.3 var(--ui-font-mono, monospace); }
+.welcome-panel .welcome-actions .welcome-launch:hover { border-color: #a52366; background: #fff6fa; box-shadow: inset 3px 0 #a52366; }
+.welcome-panel .welcome-actions .welcome-launch:active { background: #f3dce7; }
+.welcome-panel .welcome-footer { margin-top: auto; }
+.welcome-panel .welcome-footer p { margin: 0 0 12px; font-size: 12px; color: #51464e; }
+.welcome-panel .welcome-footer p span { color: #6c626c; }
+.welcome-panel .welcome-footer nav { display: flex; gap: 8px 20px; flex-wrap: wrap; border-top: 1px solid #d9d1d5; padding-top: 12px; }
+.welcome-panel .welcome-footer a { color: #8f1e58; font-size: 12px; text-underline-offset: 3px; }
+.welcome-panel .welcome-empty { margin: 0; padding: 12px; background: #fffdfd; border-radius: 10px; }
+html[data-ui-material='solid'] .welcome-panel .welcome-shelf { background: #eee8eb; backdrop-filter: none; }
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) { .welcome-panel .welcome-shelf { background: #eee8eb; backdrop-filter: none; } }
+@media (max-width: 480px) {
+  .app-surface.welcome-panel { padding: 20px 16px; gap: 20px; }
+  .welcome-panel .welcome-shelf { padding: 11px; }
+  .welcome-panel .welcome-actions .welcome-launch { gap: 10px; padding: 10px; }
+  .welcome-panel .welcome-game-mark { flex-basis: 34px; height: 38px; }
+  .welcome-panel .welcome-launch-copy > span { font-size: 11px; }
+  .welcome-panel .welcome-footer p span { display: block; }
+}
+@media (forced-colors: active) {
+  .welcome-panel .welcome-monogram, .welcome-panel .welcome-game-mark, .welcome-panel .welcome-actions .welcome-launch, .welcome-panel .welcome-shelf { border: 1px solid CanvasText; background: Canvas; color: CanvasText; box-shadow: none; }
+}
+@media (min-width: 481px) {
+  .app-surface.welcome-panel { display: grid; grid-template-columns: 142px minmax(0, 1fr); align-content: start; gap: 16px 18px; padding: 20px 24px; }
+  .welcome-panel .welcome-heading { gap: 8px; }
+  .welcome-panel .welcome-monogram { flex-basis: 34px; height: 36px; font-size: 22px; }
+  .welcome-panel .welcome-kicker { font-size: 9px; letter-spacing: .025em; }
+  .welcome-panel .welcome-kicker > span { font-size: 9px; letter-spacing: 0; }
+  .welcome-panel .welcome-intro h1 { font-size: 26px; }
+  .welcome-panel .welcome-intro p { font-size: 12px; }
+  .welcome-panel .welcome-shelf, .welcome-panel .welcome-footer { grid-column: 1 / -1; }
+  .welcome-panel .welcome-shelf { padding: 12px; }
+  .welcome-panel .welcome-actions .welcome-launch { min-height: 57px; padding: 7px 12px; }
+  .welcome-panel .welcome-game-mark { height: 36px; flex-basis: 38px; }
+  .welcome-panel .welcome-launch-copy strong { font-size: 15px; }
+  .welcome-panel .welcome-launch-copy > span { font-size: 11px; }
+  .welcome-panel .welcome-footer p { margin-bottom: 8px; }
+  .welcome-panel .welcome-footer nav { padding-top: 8px; }
+}
+html[data-ui-material='solid'] .app-surface.welcome-panel .welcome-shelf { background: #eee8eb; backdrop-filter: none; }
+@media (min-width: 481px) {
+  .app-surface.welcome-panel { padding: 16px 24px; gap: 12px 18px; }
+  .welcome-panel .welcome-shelf { padding: 10px; }
+  .welcome-panel .welcome-actions .welcome-launch { min-height: 54px; padding-block: 6px; }
+}
+.welcome-panel .welcome-launch-copy > span { font-weight: 400; }
+@media (min-width: 481px) { .app-surface.welcome-panel { padding-block: 12px; row-gap: 10px; } }
+@media (min-width: 481px) {
+  .welcome-panel .welcome-actions { gap: 5px; }
+  .welcome-panel .welcome-shelf-heading { margin-bottom: 8px; }
+}

@@ -1,0 +1,42 @@
+.app-surface.plugin-manager {
+  --ui-canvas: #eeefed;
+  --ui-canvas-image: none;
+  --ui-surface: #ffffff;
+  --ui-ink: #282b29;
+  --ui-muted: #5b615c;
+  --ui-line: #cbd0ca;
+  padding: 24px;
+  color: var(--ui-ink);
+  background: #eeefed;
+  min-width: 0;
+  font-size: 14px;
+}
+.plugin-manager .plugin-manager-heading { margin: 0 0 20px; }
+.plugin-manager .plugin-manager-eyebrow { margin: 0 0 8px; color: #5b615c; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.plugin-manager .plugin-manager-heading h2 { margin: 0 0 8px; font-size: 24px; line-height: 1.2; letter-spacing: -.035em; color: #282b29; }
+.plugin-manager .plugin-manager-heading p:last-child { margin: 0; max-width: 48ch; line-height: 1.5; color: #5b615c; }
+.plugin-manager .plugin-manager-summary { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; padding: 12px 16px; border: 1px solid #cbd0ca; border-bottom: 0; border-radius: 12px 12px 0 0; background: #f8f9f7; }
+.plugin-manager .plugin-manager-summary strong { color: #a51f59; font-size: 13px; font-variant-numeric: tabular-nums; }
+.plugin-manager .plugin-manager-summary span { color: #5b615c; font-size: 12px; }
+.plugin-manager .plugin-manager-list { overflow: hidden; border: 1px solid #cbd0ca; border-radius: 0 0 12px 12px; background: #fff; }
+.plugin-manager .plugin-row { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 16px; margin: 0; border: 0; border-bottom: 1px solid #e0e3de; border-radius: 0; background: #fff; cursor: pointer; }
+.plugin-manager .plugin-row:last-child { border-bottom: 0; }
+.plugin-manager .plugin-row:hover { background: #f8f9f7; }
+.plugin-manager .plugin-row:focus-within { z-index: 1; outline: 3px solid #a51f59; outline-offset: -3px; }
+.plugin-manager .plugin-row .plugin-manager-copy { display: block; min-width: 0; }
+.plugin-manager .plugin-row strong { display: block; color: #282b29; font-size: 14px; line-height: 1.45; }
+.plugin-manager .plugin-row small { display: block; margin-top: 4px; color: #5b615c; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.plugin-manager .plugin-row .plugin-manager-version { display: block; margin-top: 8px; color: #686e68; font-size: 11px; }
+.plugin-manager .plugin-row .plugin-manager-control { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-width: 58px; min-height: 44px; }
+.plugin-manager .plugin-row input[type="checkbox"] { position: static; appearance: none; opacity: 1; display: block; width: 40px; height: 24px; min-height: 0; padding: 0; margin: 0; border: 1px solid #757d75; border-radius: 20px; background: #e3e6e0; cursor: pointer; box-shadow: none; outline-offset: 4px; }
+.plugin-manager .plugin-row input[type="checkbox"]::before { content: ''; display: block; width: 16px; height: 16px; margin: 3px; border-radius: 50%; background: #596159; box-shadow: none; transition: transform 140ms ease; }
+.plugin-manager .plugin-row input[type="checkbox"]:checked { background: #a51f59; border-color: #a51f59; }
+.plugin-manager .plugin-row input[type="checkbox"]:checked::before { background: white; transform: translateX(16px); }
+.plugin-manager .plugin-row .plugin-manager-state { color: #5b615c; font-size: 11px; font-weight: 600; line-height: 1; }
+.plugin-manager .plugin-row[data-enabled="true"] .plugin-manager-state { color: #a51f59; }
+.plugin-manager .plugin-manager-footnote { margin: 12px 0 0; font-size: 11px; line-height: 1.5; color: #5b615c; }
+@media (max-width: 480px) { .app-surface.plugin-manager { padding: 16px; } .plugin-manager .plugin-row { gap: 12px; padding: 14px 12px; } .plugin-manager .plugin-manager-heading h2 { font-size: 22px; } }
+@media (prefers-reduced-motion: reduce) { .plugin-manager .plugin-row input[type="checkbox"]::before { transition: none; } }
+@media (forced-colors: active) { .plugin-manager .plugin-row input[type="checkbox"] { appearance: auto; forced-color-adjust: auto; } .plugin-manager .plugin-row input[type="checkbox"]::before { display: none; } .plugin-manager .plugin-row:focus-within { outline-color: Highlight; } }
+
+.plugin-manager label.plugin-row { font-family: var(--ui-font); }

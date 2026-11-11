@@ -14,8 +14,8 @@ let lastRuntimeError = ''
 try { soundOn = localStorage.getItem(KEY) === 'true' } catch { /* Browser storage is optional. */ }
 
 function announce(message, error = false) { $('notice').textContent = message; $('notice').classList.toggle('error', error) }
-function key(type, key, code, keyCode) {
-  canvas.focus({ preventScroll: true })
+function key(type, key, code, keyCode, focusTable = true) {
+  if (focusTable) canvas.focus({ preventScroll: true })
   canvas.dispatchEvent(new KeyboardEvent(type, { key, code, keyCode, which: keyCode, bubbles: true, cancelable: true }))
 }
 function press(name, code, number) { key('keydown', name, code, number); key('keyup', name, code, number) }
@@ -122,10 +122,23 @@ for (const button of document.querySelectorAll('[data-key]')) {
   let down = false
   button.addEventListener('pointerdown', event => {
     if (!ready) return
-    event.preventDefault(); button.setPointerCapture(event.pointerId); down = true
-    key('keydown', button.dataset.key, button.dataset.code, Number(button.dataset.keycode))
+    event.preventDefault(); button.setPointerCapture(event.pointerId)
+    // Focus can blur a previously keyboard-focused control. Release that hold
+    // before starting the pointer hold, so blur cannot clear the new key state.
+    canvas.focus({ preventScroll: true })
+    down = true
+    key('keydown', button.dataset.key, button.dataset.code, Number(button.dataset.keycode), false)
   })
-  const release = () => { if (down) { down = false; key('keyup', button.dataset.key, button.dataset.code, Number(button.dataset.keycode)) } }
+  const release = () => { if (down) { down = false; key('keyup', button.dataset.key, button.dataset.code, Number(button.dataset.keycode), false) } }
+  button.addEventListener('keydown', event => {
+    if (!ready || !['Space', 'Enter'].includes(event.code)) return
+    event.preventDefault()
+    if (!down) { down = true; key('keydown', button.dataset.key, button.dataset.code, Number(button.dataset.keycode), false) }
+  })
+  button.addEventListener('keyup', event => {
+    if (['Space', 'Enter'].includes(event.code)) { event.preventDefault(); release() }
+  })
+  button.addEventListener('blur', release)
   button.addEventListener('pointerup', release); button.addEventListener('pointercancel', release); button.addEventListener('lostpointercapture', release)
 }
 $('original-files').addEventListener('change', async event => {
@@ -151,6 +164,7 @@ window.addEventListener('message', event => {
   activeImport = Boolean(event.data.files)
   $('art-label').textContent = activeImport ? 'Your original XP files · local' : 'Open Cadet art · CC0'
   $('free-play').hidden = !activeImport
+  if (activeImport) document.querySelector('.pinball-data-tools').open = true
   void start(event.data.files)
 })
 document.documentElement.dataset.appReady = 'true'

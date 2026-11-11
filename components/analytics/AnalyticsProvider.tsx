@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useRef,
   useSyncExternalStore,
   type ReactNode,
 } from 'react'
@@ -39,6 +40,14 @@ export function AnalyticsProvider({ enabled, children }: { enabled: boolean; chi
     () => 'unknown' as const,
   )
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [dismissed, setDismissed] = useState(false)
+  const privacyButton = useRef<HTMLButtonElement>(null)
+  const closeButton = useRef<HTMLButtonElement>(null)
+  const closeSettings = () => {
+    setDismissed(true)
+    setSettingsOpen(false)
+    window.requestAnimationFrame(() => privacyButton.current?.focus())
+  }
   const isTopLevel = useSyncExternalStore(
     subscribeToWindowPosition,
     () => window.self === window.top,
@@ -49,23 +58,42 @@ export function AnalyticsProvider({ enabled, children }: { enabled: boolean; chi
     if (enabled && isTopLevel) initializeAnalytics(enabled)
   }, [enabled, isTopLevel])
 
-  const showDialog = Boolean(enabled && isTopLevel && (consent === 'unknown' || settingsOpen))
+  const showDialog = Boolean(enabled && isTopLevel && ((consent === 'unknown' && !dismissed) || settingsOpen))
 
   return (
     <AnalyticsContext.Provider value={{ consent, configured: enabled }}>
       {children}
       {showDialog ? (
-        <section className="app-surface analytics-consent" role="dialog" aria-label="Analytics privacy settings" aria-live="polite">
-          <div>
-            <strong>Help improve Analytics Games</strong>
-            <p>Allow privacy-safe self-hosted analytics so we can understand game launches, completions, multiplayer starts, and return visits. We never send names, room codes, or message content.</p>
-          </div>
+        <section
+          className="app-surface analytics-consent"
+          role="dialog"
+          aria-label="Analytics privacy settings"
+          aria-describedby="analytics-consent-summary"
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') {
+              event.stopPropagation()
+              closeSettings()
+            }
+          }}
+        >
+          <header className="analytics-consent-heading">
+            <div>
+              <span className="analytics-consent-eyebrow">Your privacy · {consent === 'granted' ? 'Analytics on' : consent === 'denied' ? 'Analytics off' : 'No choice saved'}</span>
+              <h2>Share a little. Help us improve.</h2>
+            </div>
+            <button ref={closeButton} className="analytics-consent-close" type="button" aria-label="Close privacy settings" onClick={closeSettings}>×</button>
+          </header>
+          <p id="analytics-consent-summary">Usage analytics are optional and require your consent. They help us understand which games people play.</p>
+          <dl className="analytics-consent-data">
+            <div><dt>Shared</dt><dd>Game launches, outcomes, play time, multiplayer activity and return visits.</dd></div>
+            <div><dt>Excluded</dt><dd>Names, room codes and message content.</dd></div>
+          </dl>
           <div className="analytics-consent-actions">
             <button
               type="button"
               onClick={() => {
                 setAnalyticsConsent('denied')
-                setSettingsOpen(false)
+                closeSettings()
               }}
             >
               Decline analytics
@@ -75,15 +103,19 @@ export function AnalyticsProvider({ enabled, children }: { enabled: boolean; chi
               className="analytics-consent-primary"
               onClick={() => {
                 setAnalyticsConsent('granted')
-                setSettingsOpen(false)
+                closeSettings()
               }}
             >
               Accept analytics
             </button>
           </div>
+          <p className="analytics-consent-note">Your choice is saved on this device. Change it anytime in Privacy.</p>
         </section>
       ) : enabled && isTopLevel ? (
-        <button className="analytics-settings-button" type="button" onClick={() => setSettingsOpen(true)}>
+        <button ref={privacyButton} className="app-surface analytics-settings-button" type="button" onClick={() => {
+          setSettingsOpen(true)
+          window.requestAnimationFrame(() => closeButton.current?.focus())
+        }}>
           Privacy
         </button>
       ) : null}

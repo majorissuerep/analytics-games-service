@@ -10,7 +10,8 @@
 
 - All application content uses Prism in `public/styles/app-theme.css` and an `app-surface` root. Read [docs/APPLICATION_DESIGN.md](docs/APPLICATION_DESIGN.md) and its research before changing presentation; `/design-system` is the live component reference.
 - Keep the XP desktop, Start menu, taskbar, outer window borders, title bars, and window controls styled by `xp.css` and the shell. Application content does not inherit XP bevels or title-bar styling.
-- Define shared palette, typography, spacing, focus, and control primitives once in the theme. Use those tokens in game-specific layout CSS; do not introduce independent decorative palettes or permanent glow/animation.
+- Read [docs/APP_PERSONALITY_BRIEF.md](docs/APP_PERSONALITY_BRIEF.md). The shared engine defines interaction, typography roles, spacing, focus, feedback and accessibility; every app owns its composition, material character and scoped token palette. At most two decorative chromatic families per app plus a small neutral ramp; semantic domain colors are explicit exceptions. No permanent glow/animation. Research and record each app in `docs/app-personalities/`.
+- Shared patterns are reusable, not a mandatory uniform appearance. For app-specific design work, use a separate GPT-6.1 Sol agent per app when available, with the research/alternatives/implementation brief above. Preserve cross-app accessibility and regression checks.
 - Pink anchors primary intent and selection. Put useful category/value/status color in content; backgrounds may be whitish or greyish. Use material, typography, shape, spacing, and explicit interaction states together; a background recolor is insufficient.
 - Use bounded frosted layers for controls/floating surfaces, stable backing for dense content, and opaque playfields. Honor reduced transparency/contrast/motion and the persisted material preference across frames; never reduce entire-component opacity to create glass.
 - Preserve semantic gameplay color (paint swatches, team identities, chess score colors) and essential playfield artwork. Do not style chess piece buttons as application form controls.
@@ -19,25 +20,31 @@
 - All user-visible waits use scoped progress with stage and elapsed time. Unknown work stays indeterminate; percentages require measured work and a known total. Keep unrelated controls responsive, abort stale work, bound network waits, and offer recovery on failure. See the waiting contract in `docs/APPLICATION_DESIGN.md`.
 - Verify `tests/e2e/application-design.spec.ts` together with relevant gameplay regressions before release.
 
-## Analytics (Mixpanel)
+## Analytics (consent-gated event relay)
 
-### SDK and configuration
+### Runtime and configuration
 
-- SDK: `mixpanel-browser`.
-- Project token source: server-only environment lookup of `MIXPANEL_PROJECT_TOKEN` in `app/layout.tsx`; the public project token is passed to `AnalyticsProvider` at runtime. Never hard-code the token in source.
-- Initialization: `lib/analytics/client.ts`, mounted only in the top-level browsing context by `components/analytics/AnalyticsProvider.tsx`.
-- Data residency: the Mixpanel project is hosted in the EU; SDK requests must use `https://api-eu.mixpanel.com`.
-- Initialization settings: local-storage persistence, no automatic page-view tracking, no batching, and opt-out by default.
-- Consent: explicit opt-in. No custom events are sent before `granted` consent. The top-level app owns the consent UI; embedded game frames do not show duplicate prompts.
-- Identity: anonymous Mixpanel device identity only. This project has no authenticated user identity, so do not call `identify`, `alias`, or set People profiles unless authentication is introduced and the identity plan is reviewed.
-- Session recording and autocapture are not enabled.
+- Browser transport: `lib/analytics/client.ts` sends allowlisted events to the
+  same-origin `/api/analytics/events` relay. No third-party browser SDK is loaded.
+- Server configuration: `EVENT_TRACKING_ENABLED`, `EVENT_WRITE_KEY` and optional
+  `EVENT_TRACKING_URL`; keys stay server-side. `app/layout.tsx` passes only the
+  configured boolean to `AnalyticsProvider`.
+- Initialization and consent UI run only in the top-level browsing context.
+  Embedded games relay events to their same-origin parent.
+- Consent is explicit opt-in, browser-local persistence, and opt-out by default.
+  Closing the initial card does not grant consent. The Privacy control reopens it.
+- Identity is an opaque browser-local anonymous ID. No user profiles, free-form
+  message data, autocapture or session recording. Never put credentials in events.
+- The server validates event names, property allowlists and payload size before
+  forwarding through `EventTrackingClient`. Do not claim a hosting region or
+  retention period unless deployment evidence establishes it.
 
 ### Tracking API
 
 - Use `trackAnalyticsEvent` or `trackGameSessionStarted` from `lib/analytics/client.ts`.
 - Event names are a fixed TypeScript union in `lib/analytics/controller.ts`. Do not introduce dynamic event names.
 - Game completion signals go through `emitGameSessionCompleted` in `lib/analytics/game-events.ts`; embedded games send the versioned game-bridge telemetry message and the host records the event.
-- Embedded room events use the allowlisted same-origin relay in `lib/analytics/internal-relay.ts`; game frames never initialize a second Mixpanel SDK instance.
+- Embedded room events use the allowlisted same-origin relay in `lib/analytics/internal-relay.ts`; game frames never initialize a second analytics controller.
 - Never include room codes, player names, prompts, message text, passwords, email addresses, tokens, or other free-form user content in analytics properties.
 
 ### Event taxonomy
@@ -73,7 +80,7 @@ All events also receive `platform: "web"` from the analytics controller.
 - Owners: repository maintainers until explicit Product and Engineering analytics owners are assigned.
 - Review this plan whenever an event/property changes, authentication is added, consent requirements change, or a game adds/removes a completion state.
 - Unit tests: `lib/analytics/*.test.ts`.
-- Browser verification: the Mixpanel Playwright test in `tests/e2e/platform.spec.ts` intercepts the real SDK endpoint and proves pre-consent silence, launch, completion, and end events.
+- Browser verification: the event-relay Playwright test in `tests/e2e/platform.spec.ts` intercepts the same-origin analytics endpoint and proves pre-consent silence, launch, completion, and end events.
 - Run `npm run test`, `npm run lint`, `npm run typecheck`, `npm run check`, `npm run build`, and the relevant Playwright test before release.
 
 <!-- BEGIN:nextjs-agent-rules -->
