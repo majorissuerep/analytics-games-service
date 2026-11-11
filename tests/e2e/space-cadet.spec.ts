@@ -9,7 +9,7 @@ test('faithful Space Cadet engine starts, plays, pauses, supports touch controls
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))
   await page.goto('/games/orbit-pinball')
-  const game = page.frameLocator('iframe[title="Space Cadet Pinball"]').frameLocator('iframe[title="Space Cadet runtime"]')
+  const game = page.frameLocator('iframe[title="Space Cadet Pinball"]:visible').frameLocator('iframe[title="Space Cadet runtime"]')
   await expect(game.getByRole('button', { name: 'New game', exact: true })).toBeEnabled({ timeout: 30_000 })
   await expect(game.locator('#art-label')).toHaveText('Open Cadet art · CC0')
   const canvas = game.getByLabel('Space Cadet pinball table')
@@ -65,7 +65,7 @@ test('slow native runtime loading is visible and the app can exit while download
   const gate = new Promise<void>(resolve => { release = resolve })
   await page.route('**/SpaceCadetPinball.wasm', async route => { await gate; await route.continue().catch(() => undefined) })
   await page.goto('/games/orbit-pinball', { waitUntil: 'domcontentloaded' })
-  const game = page.frameLocator('iframe[title="Space Cadet Pinball"]').frameLocator('iframe[title="Space Cadet runtime"]')
+  const game = page.frameLocator('iframe[title="Space Cadet Pinball"]:visible').frameLocator('iframe[title="Space Cadet runtime"]')
   await expect(game.getByRole('progressbar', { name: 'Loading Space Cadet' })).toBeVisible()
   await expect(game.getByRole('progressbar')).not.toHaveAttribute('aria-valuenow')
   await game.getByRole('button', { name: 'Exit', exact: true }).click()
