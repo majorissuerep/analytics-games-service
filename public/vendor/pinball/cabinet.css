@@ -17,3 +17,10 @@ body { display: flex; flex-direction: column; -webkit-user-select: none; user-se
 .pinball-loader-spinner { width: 32px; height: 32px; border-radius: 50%; border: 3px solid var(--ui-line); border-top-color: var(--ui-accent); animation: pinball-loader-spin 1s linear infinite; }
 @keyframes pinball-loader-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .pinball-loader-spinner { animation: none; } }
+
+body { background-image: var(--ui-canvas-image); }
+.pinball-bar { flex-basis: 56px; padding-inline: 14px; background: var(--ui-glass-fill); backdrop-filter: var(--ui-material-filter); border-color: var(--ui-glass-edge); box-shadow: var(--ui-shadow); z-index: 10; }
+.pinball-bar-title { color: var(--ui-violet); }
+.pinball-stage { background: var(--ui-recessed); background-image: var(--ui-canvas-image); }
+.pinball-loader { inset-block-start: 56px; background-image: var(--ui-canvas-image); }
+.pinball-loader-text { color: var(--ui-accent); }

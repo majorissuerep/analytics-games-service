@@ -38,3 +38,17 @@
 .developer-back { padding: 32px 0 16px; }
 @media (max-width: 860px) { .developer-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } .developer-steps article:nth-child(2) { border-right: 0; } .developer-steps article:nth-child(-n+2) { border-bottom: 1px solid var(--ui-line); } .developer-code { grid-template-columns: minmax(0, 1fr); } .developer-register { grid-template-columns: minmax(0, 1fr); } .developer-register div { border-right: 0; border-bottom: 1px solid var(--ui-line); } .developer-register div:last-child { border-bottom: 0; } }
 @media (max-width: 540px) { .platform-wordmark small { display: none; } .platform-nav a:first-child { display: none; } .developer-steps { grid-template-columns: minmax(0, 1fr); } .developer-steps article { border-right: 0; border-bottom: 1px solid var(--ui-line); } .developer-steps article:last-child { border-bottom: 0; } .developer-hero { padding-top: 32px; } .developer-theme, .developer-code pre { padding: 16px; } }
+
+.developer-shell { background: transparent; }
+.platform-header { padding: 16px 20px; background: var(--ui-glass-fill); backdrop-filter: var(--ui-material-filter); border: 1px solid var(--ui-glass-edge); border-radius: 20px; box-shadow: var(--ui-shadow); }
+.developer-hero h1 em { color: var(--ui-accent); }
+.platform-kicker { color: var(--ui-accent); }
+.developer-steps { gap: 12px; border: 0; background: transparent; }
+.developer-steps article { border: 1px solid var(--ui-line); border-radius: 16px; background: var(--ui-pink-bg); }
+.developer-steps article:nth-child(2) { background: var(--ui-violet-bg); }
+.developer-steps article:nth-child(3) { background: var(--ui-teal-bg); }
+.developer-steps article:nth-child(4) { background: var(--ui-amber-bg); }
+.developer-steps article > span { color: var(--ui-accent); font-size: 16px; font-weight: 650; }
+.developer-theme { background: var(--ui-glass-fill); backdrop-filter: var(--ui-material-filter); box-shadow: var(--ui-shadow); border-color: var(--ui-glass-edge); }
+@media(max-width:540px) { .platform-header { padding: 12px; gap: 8px; } .platform-nav { gap: 0; } .platform-nav a { font-size: 12px; padding: 8px; } }
+@media(max-width:600px) { .platform-header { flex-wrap: wrap; } .platform-nav { width: 100%; justify-content: flex-end; } }

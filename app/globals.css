@@ -16,6 +16,7 @@ html, body {
 
 body {
   background: var(--ui-canvas);
+  background-image: var(--ui-canvas-image);
   min-height: 100svh;
   display: flex;
   flex-direction: column;

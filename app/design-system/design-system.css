@@ -1,0 +1,80 @@
+.prism-reference { width: min(1180px, 100%); background: transparent; }
+.prism-nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 20px; border-radius: 20px; }
+.prism-wordmark { display: flex; gap: 12px; align-items: center; text-decoration: none; color: var(--ui-ink); }
+.prism-wordmark > span:last-child { display: grid; }
+.prism-wordmark strong { font-size: 22px; letter-spacing: -.04em; }
+.prism-wordmark small { font-size: 12px; color: var(--ui-muted); }
+.prism-nav nav, .prism-actions { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
+.prism-nav nav a { font-size: 13px; text-decoration: none; font-weight: 600; }
+.prism-hero { display: grid; grid-template-columns: 1fr 1.1fr; gap: 56px; align-items: center; padding: 72px 0 56px; }
+.prism-hero h1 { margin: 20px 0; font-size: clamp(36px, 4.4vw, 54px); line-height: 1.08; letter-spacing: -.055em; }
+.prism-hero h1 em { font-style: normal; color: var(--ui-accent); }
+.prism-hero > div > p { color: var(--ui-muted); font-size: 16px; max-width: 46ch; }
+.prism-actions { gap: 12px; margin-top: 24px; }
+.prism-actions > a { font-size: 13px; font-weight: 650; }
+.app-surface .prism-action-primary { display: inline-flex; align-items: center; padding: 12px 18px; color: white; background: var(--ui-accent); border-radius: var(--ui-radius); text-decoration: none; }
+.prism-session { padding: 24px; border-radius: var(--ui-feature-radius); }
+.prism-session header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 20px; }
+.prism-session h2 { margin-top: 5px; font-size: 22px; }
+.prism-eyebrow { font-size: 12px; color: var(--ui-accent-ink); font-weight: 650; }
+.prism-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.prism-metrics .ui-metric { padding: 16px 12px; }
+.prism-metrics strong { font-size: 26px; }
+.prism-people { display: flex; gap: 20px; margin-top: 24px; }
+.prism-people > span { display: grid; gap: 6px; text-align: center; font-size: 12px; color: var(--ui-muted); }
+.prism-people .ui-icon { width: 36px; height: 36px; border-radius: 50%; font-size: 13px; }
+.prism-session > p { font-size: 12px; color: var(--ui-muted); margin-top: 20px; }
+.prism-section { padding: 40px 0; scroll-margin-top: 24px; }
+.prism-section-title { display: flex; justify-content: space-between; gap: 32px; align-items: flex-end; margin-bottom: 24px; }
+.prism-section h2 { font-size: 28px; letter-spacing: -.035em; margin-top: 8px; }
+.prism-section-title > p { max-width: 48ch; font-size: 14px; color: var(--ui-muted); }
+.prism-tone-grid, .prism-game-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.prism-tone-card { padding: 24px; }
+.prism-tone-swatch { display: block; width: 32px; height: 7px; background: var(--ui-tone-ink); border-radius: 99px; margin-bottom: 24px; }
+.prism-tone-card small { font-size: 12px; }
+.prism-tone-card h3 { font-size: 23px; margin: 5px 0 12px; }
+.prism-tone-card p { font-size: 13px; }
+.prism-statuses { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+.prism-status { padding: 7px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+.prism-status.positive, .prism-feedback.complete { color: var(--ui-positive); background: var(--ui-positive-bg); }
+.prism-status.info { color: var(--ui-info); background: var(--ui-info-bg); }
+.prism-status.warning { color: var(--ui-warning); background: var(--ui-warning-bg); }
+.prism-status.negative { color: var(--ui-negative); background: var(--ui-negative-bg); }
+.prism-materials { display: grid; grid-template-columns: .85fr 1.15fr; gap: 64px; align-items: center; }
+.prism-materials > div > p { margin-top: 16px; max-width: 52ch; color: var(--ui-muted); }
+.prism-preference { margin-top: 24px; padding: 16px; border-radius: var(--ui-radius); border: 1px solid var(--ui-line); }
+.prism-preference small { display: block; margin-top: 8px; color: var(--ui-muted); font-size: 12px; }
+.prism-material-stage { position: relative; padding: 36px; isolation: isolate; background: #eee9f2; border-radius: 24px; overflow: hidden; }
+.prism-material-shape { position: absolute; z-index: -1; width: 170px; height: 170px; border-radius: 48px; transform: rotate(-18deg); }
+.prism-material-shape.one { top: -25px; left: -20px; background: #ed80b8; }
+.prism-material-shape.two { bottom: -35px; right: -20px; background: #a38ee6; transform: rotate(24deg); }
+.prism-material-sample { padding: 24px; }
+.prism-material-sample h3 { margin: 16px 0 10px; font-size: 24px; }
+.prism-material-sample p { font-size: 13px; color: var(--ui-muted); }
+.prism-solid-sample { display: grid; gap: 4px; padding: 16px; margin-top: 20px; font-size: 12px; }
+.prism-solid-sample span { color: var(--ui-muted); }
+.prism-component-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px; }
+.prism-component-panel, .prism-type-panel { padding: 28px; }
+.prism-component-panel h3 { margin-bottom: 24px; font-size: 20px; }
+.prism-segments { display: flex; gap: 4px; border-radius: 12px; background: var(--ui-recessed); padding: 4px; }
+.app-surface .prism-segments button { flex: 1; padding-inline: 8px; background: transparent; border-color: transparent; font-size: 13px; }
+.app-surface .prism-segments button[aria-pressed='true'] { color: var(--ui-accent); background: var(--ui-selection); border-color: var(--ui-accent); }
+.prism-demo-controls > p { margin: 14px 0; color: var(--ui-muted); font-size: 12px; }
+.prism-field { display: grid; gap: 8px; font-size: 13px; margin-top: 20px; }
+.prism-field input { width: 100%; }
+.prism-demo-controls .prism-feedback { border-radius: 10px; padding: 12px; }
+.prism-type-panel h3 { margin: 16px 0; font-size: 28px; }
+.prism-type-panel p { color: var(--ui-muted); }
+.prism-type-values { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+.prism-number { display: block; font: 600 40px/1.2 var(--ui-mono); color: var(--ui-violet); letter-spacing: -.04em; }
+.prism-type-panel > small { display: block; margin: 8px 0 24px; color: var(--ui-muted); }
+.prism-game-card { padding: 24px; text-decoration: none; }
+.app-surface .prism-game-card { color: var(--ui-tone-ink); }
+.prism-game-card h3 { font-size: 18px; margin: 20px 0 10px; }
+.prism-game-card p { font-size: 13px; min-height: 44px; }
+.prism-game-card > span:last-child { display: block; font-size: 12px; font-weight: 650; margin-top: 20px; }
+.prism-footer { display: flex; gap: 20px; flex-wrap: wrap; padding: 32px 0; margin-top: 24px; border-top: 1px solid var(--ui-line); font-size: 12px; color: var(--ui-muted); }
+.prism-footer > span { margin-right: auto; }
+@media(max-width:900px) { .prism-hero, .prism-materials { grid-template-columns: 1fr; gap: 32px; } .prism-hero { padding: 40px 0; } .prism-tone-grid, .prism-game-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .prism-component-grid { grid-template-columns: 1fr; } .prism-section-title { display: block; } .prism-section-title > p { margin-top: 16px; } }
+@media(max-width:540px) { .prism-nav { padding: 12px; } .prism-nav nav a:not(:last-child) { display: none; } .prism-wordmark small { max-width: 155px; } .prism-hero h1 { font-size: 38px; } .prism-session { padding: 16px; } .prism-metrics { gap: 6px; } .prism-metrics .ui-metric { padding: 12px 8px; } .prism-metrics strong { font-size: 21px; } .prism-metrics small { font-size: 11px; } .prism-tone-grid, .prism-game-grid { grid-template-columns: 1fr; } .prism-tone-card { padding: 20px; } .prism-material-stage { padding: 20px; } .prism-material-sample { padding: 18px; } .prism-component-panel, .prism-type-panel { padding: 20px; } .prism-section { padding-block: 28px; } }
+@media(max-width:360px) { .prism-nav { gap: 8px; } .prism-wordmark small { max-width: 125px; } }

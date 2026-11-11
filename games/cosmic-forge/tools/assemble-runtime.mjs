@@ -15,6 +15,7 @@ await rm(runtimeOutputRoot, { recursive: true, force: true })
 await mkdir(runtimeOutputRoot, { recursive: true })
 await cp(join(gameRoot, 'runtime'), runtimeOutputRoot, { recursive: true })
 await cp(join(repoRoot, 'public/styles/app-theme.css'), join(runtimeOutputRoot, 'app-theme.css'))
+await cp(join(repoRoot, 'public/styles/app-appearance.js'), join(runtimeOutputRoot, 'app-appearance.js'))
 
 const assets = []
 for (const [group, files] of [

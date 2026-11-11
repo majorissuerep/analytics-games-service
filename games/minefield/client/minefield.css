@@ -26,3 +26,20 @@
 .minefield-status { max-width: 850px; margin: 10px 0 0; font-size: 12px; }
 @media (max-width: 640px) { .minefield-app { padding: 10px; } .minefield-machine { padding: 8px; } }
 @media (prefers-reduced-motion: reduce) { .minefield-app * { animation: none; transition: none; scroll-behavior: auto; } }
+
+/* Prism metrics carry color; the dense clue field stays opaque and quiet. */
+.minefield-app { background-image: var(--ui-canvas-image); }
+.minefield-header, .minefield-toolbar { padding: 12px 16px; border: 1px solid var(--ui-glass-edge); border-radius: var(--ui-panel-radius); background: var(--ui-glass-fill); backdrop-filter: var(--ui-material-filter); box-shadow: var(--ui-shadow); }
+.minefield-header strong { color: var(--ui-teal); }
+.minefield-machine { padding: 16px; border-radius: 20px; background: var(--ui-glass-strong-fill); border-color: var(--ui-glass-edge); box-shadow: var(--ui-shadow); backdrop-filter: var(--ui-material-filter); }
+.minefield-scoreboard { gap: 12px; }
+.minefield-scoreboard > div { padding: 8px 10px; border-radius: 12px; }
+.minefield-scoreboard output { color: var(--ui-tone-ink); }
+.minefield-scoreboard button { color: white; background: var(--ui-accent); border-color: var(--ui-accent); border-radius: var(--ui-radius); }
+.minefield-grid { background: var(--ui-surface); }
+.minefield-cell { background: #b7a8c7; border-color: #59466c; color: #332c3c; box-shadow: inset 1px 1px rgb(255 255 255 / 40%); transition: none; }
+.minefield-cell:hover:not(.revealed) { background: #c9bdd7; }
+.minefield-cell.revealed { background: #fcfbfd; border-color: #e4dce8; }
+.minefield-cell.flagged, .minefield-cell.flagged:hover { background: #81336b; border-color: #642852; color: #fff; box-shadow: none; }
+.minefield-progress > span:first-child { color: var(--ui-teal); font-weight: 650; }
+@media(max-width:640px) { .minefield-machine { padding: 10px; } .minefield-header, .minefield-toolbar { padding: 10px; } }

@@ -8,10 +8,11 @@
 
 ## Application design
 
-- All application content uses the shared calm visual language in `public/styles/app-theme.css` and an `app-surface` root. Read [docs/APPLICATION_DESIGN.md](docs/APPLICATION_DESIGN.md) before adding a new screen or changing presentation.
+- All application content uses Prism in `public/styles/app-theme.css` and an `app-surface` root. Read [docs/APPLICATION_DESIGN.md](docs/APPLICATION_DESIGN.md) and its research before changing presentation; `/design-system` is the live component reference.
 - Keep the XP desktop, Start menu, taskbar, outer window borders, title bars, and window controls styled by `xp.css` and the shell. Application content does not inherit XP bevels or title-bar styling.
 - Define shared palette, typography, spacing, focus, and control primitives once in the theme. Use those tokens in game-specific layout CSS; do not introduce independent decorative palettes or permanent glow/animation.
-- Keep the subdued colored palette: soft blue backgrounds, ivory panels, sage insets, and teal actions. Do not turn the application surfaces into a predominantly grey interface.
+- Pink anchors primary intent and selection. Put useful category/value/status color in content; backgrounds may be whitish or greyish. Use material, typography, shape, spacing, and explicit interaction states together; a background recolor is insufficient.
+- Use bounded frosted layers for controls/floating surfaces, stable backing for dense content, and opaque playfields. Honor reduced transparency/contrast/motion and the persisted material preference across frames; never reduce entire-component opacity to create glass.
 - Preserve semantic gameplay color (paint swatches, team identities, chess score colors) and essential playfield artwork. Do not style chess piece buttons as application form controls.
 - The standalone pinball cabinet links the shared stylesheet; the Cosmic Forge workbench assembly copies it. External games can opt in using the stylesheet documented on `/develop`.
 - Verify `tests/e2e/application-design.spec.ts` together with relevant gameplay regressions before release.

@@ -136,9 +136,9 @@ export function MinefieldGame() {
       </div>
       <section className="minefield-machine" aria-label="Minefield game">
         <div className="minefield-scoreboard">
-          <div><small>Mines left</small><output aria-label="Mines remaining">{String(Math.max(0, board.mineCount - flags)).padStart(3, '0')}</output></div>
+          <div className="ui-tone" data-tone="pink"><small>Mines left</small><output aria-label="Mines remaining">{String(Math.max(0, board.mineCount - flags)).padStart(3, '0')}</output></div>
           <button onClick={() => reset()} aria-label="New game">New game</button>
-          <div><small>Seconds</small><output aria-label="Elapsed seconds">{String(elapsed).padStart(3, '0')}</output></div>
+          <div className="ui-tone" data-tone="violet"><small>Seconds</small><output aria-label="Elapsed seconds">{String(elapsed).padStart(3, '0')}</output></div>
         </div>
         <div className="minefield-board-scroll" tabIndex={0} aria-label="Scrollable minefield">
         <div

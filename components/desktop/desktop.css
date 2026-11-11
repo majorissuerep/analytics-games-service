@@ -200,3 +200,26 @@
 .external-game-suspended p { margin: 0; max-width: 420px; }
 
 @media (prefers-reduced-motion: reduce) { .paperclip-assistant *, .pip-chat-window * { animation: none !important; transition: none !important; scroll-behavior: auto; } }
+
+/* Prism applies inside the XP shell. The shell rules above retain XP geometry. */
+.system-panel.app-surface { background-image: var(--ui-canvas-image); }
+.welcome-logo { border: 0; border-radius: 20px; color: var(--ui-accent); background: var(--ui-selection); box-shadow: 0 6px 20px rgb(177 45 117 / 10%); }
+.welcome-kicker { color: var(--ui-accent); }
+.welcome-panel h1 { font-size: 32px; letter-spacing: -.04em; }
+.welcome-actions button { background: var(--ui-tone-bg); color: var(--ui-tone-ink); border-color: color-mix(in srgb, var(--ui-tone-ink) 40%, white); border-radius: 12px; }
+.welcome-actions a { font-size: 12px; }
+.help-appearance { margin: 20px 0; padding: 16px; border: 1px solid var(--ui-line); border-radius: 14px; background: var(--ui-surface); }
+.help-appearance h3 { margin-bottom: 12px; }
+.plugin-row { background: var(--ui-tone-bg); border-left: 3px solid var(--ui-tone-ink); border-radius: 12px; padding: 14px; }
+.plugin-row strong { color: var(--ui-tone-ink); }
+.paperclip-bubble { border-color: var(--ui-glass-edge); background: var(--ui-glass-strong-fill); backdrop-filter: var(--ui-material-filter); border-radius: 18px; box-shadow: var(--ui-shadow-floating); }
+.paperclip-bubble::after { background: var(--ui-glass-strong-fill); border-color: var(--ui-glass-edge); }
+.pip-chat-window { box-shadow: var(--ui-shadow-floating); }
+.pip-chat-messages { background: var(--ui-canvas); background-image: var(--ui-canvas-image); }
+.pip-chat-message p { border: 1px solid var(--ui-line); border-radius: 14px; background: var(--ui-surface); }
+.pip-chat-message.user p { color: var(--ui-accent); background: var(--ui-selection); border-color: var(--ui-accent); }
+.pip-chat-message > span { color: var(--ui-violet); }
+.pip-tool-card { background: var(--ui-violet-bg); }
+.sticky-note-plugin { border-radius: 16px; background: var(--ui-amber-bg); box-shadow: var(--ui-shadow); }
+.sticky-note-plugin header { color: var(--ui-amber); }
+.sticky-note-plugin textarea { border-radius: 10px; }

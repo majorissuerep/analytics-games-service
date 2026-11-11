@@ -64,11 +64,15 @@ parent.postMessage(exitMessage('complete'), PLATFORM_ORIGIN)`}</code></pre>
       </section>
 
       <section className="developer-theme" aria-label="Shared application design">
-        <h2>One application language</h2>
-        <p>Use soft blue backgrounds, warm ivory panels, sage insets, teal controls, and clear labels. Keep colors subdued and preserve gameplay colors. The desktop supplies the XP window frame.</p>
+        <h2>Build with Prism</h2>
+        <p>Use the shared materials, typography, spacing, and component states. Pink anchors primary intent; colored categories, metrics, and status bring the useful content to life. The desktop supplies the XP frame.</p>
+        <p><Link href="/design-system">Explore foundations and live components →</Link></p>
         <pre><code>{`<link rel="stylesheet" href="https://analytics-games-service.vercel.app/styles/app-theme.css">
 <main class="app-surface">
-  <h1>Your game</h1>
+  <header class="ui-glass">Your game controls</header>
+  <section class="ui-tone ui-metric" data-tone="pink">
+    <span>Players ready</span><strong>04</strong>
+  </section>
   <button class="ui-primary">Start game</button>
 </main>`}</code></pre>
       </section>

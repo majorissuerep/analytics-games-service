@@ -20,3 +20,13 @@
 .paintbox-palette button.selected { outline: 2px solid var(--ui-ink); outline-offset: 2px; }
 .paintbox-footer output { margin-left: auto; color: var(--ui-muted); font-size: 12px; }
 @media (max-width: 600px) { .paintbox-tools { width: 76px; padding: 8px; gap: 6px; } .paintbox-tools button { grid-column: 1 / -1; } .paintbox-footer output { display: none; } .paintbox-footer { flex-wrap: wrap; } }
+
+.paintbox-titlebar, .paintbox-menu, .paintbox-tools, .paintbox-footer { background: var(--ui-glass-fill); backdrop-filter: var(--ui-material-filter); border-color: var(--ui-line); }
+.paintbox-titlebar { min-height: 52px; }
+.paintbox-titlebar strong { color: var(--ui-amber); }
+.paintbox-menu { padding-block: 10px; }
+.paintbox-tools button { border-radius: 12px; }
+.paintbox-tools button.selected { background: var(--ui-selection); color: var(--ui-accent); }
+.paintbox-canvas-scroll { background: #efecf2; background-image: var(--ui-canvas-image); }
+.paintbox-canvas-scroll canvas { border-radius: 4px; box-shadow: var(--ui-shadow); }
+.paintbox-footer { min-height: 64px; }
