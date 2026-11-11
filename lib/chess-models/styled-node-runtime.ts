@@ -36,6 +36,18 @@ type RuntimeResources = {
 }
 
 let resourcesPromise: Promise<RuntimeResources> | undefined
+const IDLE_MS = 2 * 60 * 60 * 1000
+let lastUsed = Date.now()
+let activeRequests = 0
+let idleTimer: ReturnType<typeof setTimeout> | undefined
+
+async function releaseIdleResources() {
+  if (activeRequests || !resourcesPromise) return
+  const previous = resourcesPromise
+  resourcesPromise = undefined
+  const loaded = await previous.catch(() => undefined)
+  await loaded?.session.release()
+}
 
 function configuredPath(environmentName: string, defaultName: string) {
   const configured = process.env[environmentName]?.trim()
@@ -78,7 +90,7 @@ async function loadResources(): Promise<RuntimeResources> {
 }
 
 async function resources() {
-  resourcesPromise ??= loadResources()
+  resourcesPromise ??= loadResources().catch(error => { resourcesPromise = undefined; throw error })
   return resourcesPromise
 }
 
@@ -216,16 +228,29 @@ function policyMove(input: StyledMoveRequest, output: ort.Tensor, turn: Color, v
 }
 
 export async function predictStyledMove(input: StyledMoveRequest) {
-  const loaded = await resources()
-  const parsedFen = parseFen(input.fen)
-  const opening = bookMove(input, loaded.openingBook)
-  if (opening) {
-    return { move: opening, mode: 'opening_book' as const, repertoireId: input.repertoireId }
-  }
+  clearTimeout(idleTimer)
+  if (!activeRequests && Date.now() - lastUsed >= IDLE_MS) await releaseIdleResources()
+  activeRequests += 1
+  try {
+    const loaded = await resources()
+    const computeStarted = Date.now()
+    const parsedFen = parseFen(input.fen)
+    const opening = bookMove(input, loaded.openingBook)
+    if (opening) return { move: opening, mode: 'opening_book' as const, repertoireId: input.repertoireId, durationMs: Date.now() - computeStarted }
 
-  const output = await loaded.session.run(inputFeeds(input, loaded.vocabulary))
-  const move = policyMove(input, output.policy_logits, parsedFen.turn, loaded.vocabulary)
-  return { move, mode: 'policy' as const, repertoireId: input.repertoireId }
+    const output = await loaded.session.run(inputFeeds(input, loaded.vocabulary))
+    try {
+      const move = policyMove(input, output.policy_logits, parsedFen.turn, loaded.vocabulary)
+      return { move, mode: 'policy' as const, repertoireId: input.repertoireId, durationMs: Date.now() - computeStarted }
+    } finally { Object.values(output).forEach(tensor => tensor.dispose()) }
+  } finally {
+    activeRequests -= 1
+    lastUsed = Date.now()
+    if (!activeRequests) {
+      idleTimer = setTimeout(() => { void releaseIdleResources().catch(error => console.error('[chess-runtime] release failed', error)) }, IDLE_MS)
+      idleTimer.unref?.()
+    }
+  }
 }
 
 export function boardTensorFromFen(fen: string) {

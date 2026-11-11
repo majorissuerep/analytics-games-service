@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import Image from 'next/image'
 import type { DesktopPluginDefinition, DesktopPluginProps } from '@analytics-games/plugin-sdk'
 
 const tips = [
@@ -95,6 +96,7 @@ async function readSseStream(
 }
 
 function PaperclipAssistant({ context }: DesktopPluginProps) {
+  const reducedMotion = useReducedMotion()
   const [visible, setVisible] = useState(true)
   const [tipIndex, setTipIndex] = useState(0)
   const [chatOpen, setChatOpen] = useState(false)
@@ -231,14 +233,11 @@ function PaperclipAssistant({ context }: DesktopPluginProps) {
           <button className="paperclip-dismiss" onClick={() => setVisible(false)} aria-label="Hide guide">×</button>
           <motion.div
             className="paperclip-character"
-            animate={{ rotate: [-4, 4, -4], y: [0, -4, 0] }}
-            transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+            animate={reducedMotion ? undefined : { y: [0, -2, 0] }}
+            transition={{ duration: 4, repeat: 1, ease: 'easeInOut' }}
             aria-hidden
           >
-            <span className="paperclip-loop paperclip-loop-outer" />
-            <span className="paperclip-loop paperclip-loop-inner" />
-            <span className="paperclip-eye paperclip-eye-left" />
-            <span className="paperclip-eye paperclip-eye-right" />
+            <Image src="/pip-assistant.webp" width={100} height={140} alt="" unoptimized />
           </motion.div>
           <div className="paperclip-bubble">
             <strong>Pip says:</strong>

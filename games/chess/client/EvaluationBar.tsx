@@ -14,14 +14,14 @@ export function formatEvaluation(evaluation: StockfishEvaluation | null) {
   return `${pawns >= 0 ? '+' : ''}${pawns.toFixed(1)}`
 }
 
-export function EvaluationBar({ evaluation, error }: { evaluation: StockfishEvaluation | null; error?: string }) {
+export function EvaluationBar({ evaluation, error, engineName = 'Stockfish 19' }: { evaluation: StockfishEvaluation | null; error?: string; engineName?: string }) {
   const whitePercent = evaluationWhitePercent(evaluation)
   const score = formatEvaluation(evaluation)
   const detail = evaluation?.depth ? `Depth ${evaluation.depth}` : error || 'Evaluating…'
   const scoreLabel = evaluation ? `White ${score}` : 'Evaluation pending'
 
   return (
-    <section className="chess-evaluation" aria-label="Stockfish 19 evaluation">
+    <section className="chess-evaluation" aria-label={`${engineName} evaluation`}>
       <div
         className="chess-evaluation-track"
         role="meter"
@@ -37,7 +37,7 @@ export function EvaluationBar({ evaluation, error }: { evaluation: StockfishEval
         <span className="chess-evaluation-side chess-evaluation-black-label">Black</span>
       </div>
       <div className="chess-evaluation-meta">
-        <b>Stockfish 19</b>
+        <b>{engineName}</b>
         <small>{detail}</small>
       </div>
     </section>

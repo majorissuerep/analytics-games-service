@@ -7,7 +7,7 @@ import { createQuarantineUpload, modelStorageConfigured } from '@/lib/chess-mode
 
 export async function GET() {
   try {
-    const [models, registry] = await Promise.all([listPublicModels(), listPublicModelRegistry()])
+    const [models, registry] = await Promise.all([listPublicModels(), listPublicModelRegistry().catch(() => [])])
     return NextResponse.json({ models, registry, capabilities: { directUpload: modelStorageConfigured(), huggingFaceImport: true } })
   } catch (error) {
     console.error('[chess-models] list failed', error)

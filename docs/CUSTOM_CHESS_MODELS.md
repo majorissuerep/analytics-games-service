@@ -1,6 +1,6 @@
 # Custom Chess model operations
 
-Canonical product/security contract: [`../specs/chess-custom-model-runtime.md`](../specs/chess-custom-model-runtime.md)
+Historical cluster product/security contract: [`../specs/chess-custom-model-runtime.md`](../specs/chess-custom-model-runtime.md)
 
 ## Implemented foundation
 
@@ -11,11 +11,20 @@ Canonical product/security contract: [`../specs/chess-custom-model-runtime.md`](
 - Admin review: `POST /api/admin/chess-models/{modelId}/revisions/{revisionId}/decision`
 - Durable model matches: `GET/POST /api/chess-model-matches` plus move and pause endpoints
 - Package schema: `/schemas/chess-model-v1.json`
-- KServe runtime/security definitions: `deploy/kserve/`
+- Active Vercel runtime: [reliability and runtime contract](GAME_RELIABILITY.md)
 - Immutable public Hugging Face import with executable/remote-code rejection
 - Optional checksum-bound S3-compatible quarantine upload
 
-Stockfish 18 remains the default opponent, Stockfish 19 is an additional selectable browser opponent, and the bundled `Tuned Opening Style` CPU opponent is also built in. Computer games show a side evaluation bar calculated by an independent Stockfish 19 search with one CPU thread, a 16 MB hash, an 8,000-node cap, and a 180 ms settle debounce. The tuned runtime uses the committed ONNX export and opening book through `onnxruntime-web`'s single-threaded WASM backend; the Python sidecar remains an optional local override. Community custom models remain unavailable until a revision completes scanning, admin approval, KServe deployment, and contract canary verification. Pending or approved-but-not-ready community revisions are never listed as playable. Ready community revisions automatically appear in the opponent selector; the server re-derives legal moves from FEN and rejects malformed, stale, or illegal runtime output. The built-in tuned path follows the same legal-output validation.
+Stockfish 18, Stockfish 19, Reckless 0.9, and Tuned Opening Style run on Vercel,
+loaded only when selected. Computer games evaluate with the selected UCI engine;
+the policy model does not start a second evaluator. Resources have a two-hour
+idle expiry within a warm function instance, subject to earlier Vercel eviction.
+
+Cluster hosting is retired. Community submissions remain reviewable, but approval
+alone does not make them playable. A supported Vercel adapter and canary proof are
+required before adding a revision to the executable catalog. The inference route
+re-derives legal moves from FEN, validates history, and rejects malformed or illegal
+output. Historical cluster endpoints are never invoked.
 
 ## Required production secrets
 
@@ -59,24 +68,19 @@ curl -X POST "$BASE/api/admin/chess-models/$MODEL_ID/revisions/$REVISION_ID/deci
   --data '{"decision":"approve"}'
 ```
 
-Approval is accepted only from `pending_review`; it does not make a model playable. A deployment controller must create the `InferenceService`, run the `chess-move-v1` canary, and atomically mark the deployment/revision ready.
+Approval is accepted only from `pending_review`; it does not make a model playable. A supported Vercel adapter must be implemented and pass the legal-move canary before a model becomes selectable.
 
 ## Model arena and replay
 
-- Any two `ready` revisions may be selected; Stockfish 18 remains the default built-in opponent and Stockfish 19 is also available.
-- Computer games render the Stockfish 19 side evaluation bar; model-arena replays do not create a separate evaluation stream.
-- Each model receives at most 3,000 ms per turn. Browser Stockfish searches for 2,800 ms, reserving time to persist the move. Remote KServe inference receives the same 2,800 ms compute budget.
+- Any two supported built-in revisions may be selected, including Reckless and Tuned Opening Style.
+- Computer games render the selected UCI engine’s evaluation; arena replays do not create an evaluation stream.
+- The configured turn budget is 1–10 seconds; UCI search time excludes cold loading and queue wait. A move exceeding the budget is rejected, not silently clamped.
 - A random control token authorizes move and pause mutations. Only its SHA-256 digest is stored; the browser keeps the token in local storage so the creator can resume after reload.
 - Every accepted move stores UCI, SAN, resulting FEN, duration, timestamp, full PGN, and an optimistic-concurrency version in PostgreSQL.
 - Match records and replay snapshots are public and immutable through replay APIs. Controls support first, previous, play/pause replay, next, and last position.
 
-## Apply runtime policy
+## Deployment
 
-These manifests define the hostable stacks but do not deploy unreviewed models:
-
-```bash
-kubectl apply -f deploy/kserve/chess-model-security.yaml
-kubectl apply -f deploy/kserve/chess-serving-runtimes.yaml
-```
-
-Before applying, mirror and digest-pin runtime images in the trusted registry, then replace image tags. The manifests intentionally disable Hugging Face network downloads; approved artifacts must be copied to immutable internal object storage first.
+Push tested application changes to the Vercel-connected GitHub branch. Production
+builds fetch the pinned Reckless binary, verify its checksum, and trace all bundled
+WASM/NNUE/model assets. No Kubernetes deployment or cluster credentials are used.

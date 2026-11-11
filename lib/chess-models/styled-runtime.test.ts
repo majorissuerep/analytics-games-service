@@ -28,7 +28,7 @@ describe('local tuned opening model bridge', () => {
       moveTimeMs: 500,
     })
 
-    expect(result).toEqual({ move: 'e2e4', revisionId: 'builtin-styled-opening', repertoireId: 'white_italian' })
+    expect(result).toMatchObject({ move: 'e2e4', revisionId: 'builtin-styled-opening', repertoireId: 'white_italian' })
     expect(fetchMock).toHaveBeenCalledTimes(1)
     const [url, init] = fetchMock.mock.calls[0] as [URL, RequestInit]
     expect(url.toString()).toBe('http://127.0.0.1:8765/predict')
@@ -49,6 +49,19 @@ describe('local tuned opening model bridge', () => {
       legalMoves: ['e2e4', 'd2d4', 'd7d5'],
       moveTimeMs: 500,
     })
-    expect(result).toEqual({ move: 'e2e4', revisionId: 'builtin-styled-opening', repertoireId: 'white_italian' })
+    expect(result).toMatchObject({ move: 'e2e4', revisionId: 'builtin-styled-opening', repertoireId: 'white_italian', durationMs: expect.any(Number) })
   })
+  it('uses the bundled runtime in production even if a retired sidecar URL remains configured', async () => {
+    vi.stubEnv('NODE_ENV', 'production')
+    vi.stubEnv('STYLED_CHESS_INFERENCE_URL', 'https://retired.invalid')
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    const result = await requestStyledMove({
+      fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+      history: [], repertoireId: 'white_italian', legalMoves, moveTimeMs: 500,
+    })
+    expect(result.move).toBe('e2e4')
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
 })

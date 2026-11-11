@@ -1,11 +1,10 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Chess } from 'chess.js'
 import { Chessboard } from 'react-chessboard'
 import type { ModelMatchState } from '@/lib/chess-models/model-match'
 import { emitGameSessionCompleted } from '@/lib/analytics/game-events'
-import { StockfishBrowserEngine } from './stockfish'
 
 type ModelOption = { revisionId: string; displayName: string }
 type MatchRecord = {
@@ -31,10 +30,10 @@ export function ModelArena({ models }: { models: ModelOption[] }) {
   const [matches, setMatches] = useState<MatchRecord[]>([])
   const [controlToken, setControlToken] = useState('')
   const [thinking, setThinking] = useState(false)
+  const [retry, setRetry] = useState(0)
   const [error, setError] = useState('')
   const [replayPly, setReplayPly] = useState(0)
   const [replayPlaying, setReplayPlaying] = useState(false)
-  const engineRef = useRef<StockfishBrowserEngine | null>(null)
 
   const refreshArchive = async () => {
     const response = await fetch('/api/chess-model-matches')
@@ -48,7 +47,6 @@ export function ModelArena({ models }: { models: ModelOption[] }) {
       return response.json()
     }).then((body: { matches?: MatchRecord[] }) => setMatches(body.matches ?? [])).catch(() => setError('Could not load the saved-match archive. Is the database running?'))
   }, [])
-  useEffect(() => () => engineRef.current?.destroy(), [])
 
   const replayFen = useMemo(() => {
     if (!match) return new Chess().fen()
@@ -74,29 +72,24 @@ export function ModelArena({ models }: { models: ModelOption[] }) {
       try {
         const chess = new Chess(match.state.fen)
         const revisionId = chess.turn() === 'w' ? match.white_revision_id : match.black_revision_id
-        let uci: string
-        if (revisionId === BUILTIN) {
-          engineRef.current ??= new StockfishBrowserEngine()
-          const move = await engineRef.current.findBestMoveTimed(match.state.fen, searchMs)
-          uci = `${move.from}${move.to}${move.promotion ?? ''}`
-        } else {
-          const legalMoves = chess.moves({ verbose: true }).map(move => `${move.from}${move.to}${move.promotion ?? ''}`)
-          const response = await fetch(`/api/chess-models/${encodeURIComponent(revisionId)}/move`, {
-            method: 'POST', headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ fen: match.state.fen, legalMoves, moveTimeMs: searchMs }),
-          })
-          const body = await response.json() as { move?: string; error?: string }
-          if (!response.ok || !body.move) throw new Error(body.error || 'Model inference failed')
-          uci = body.move
-        }
+        const legalMoves = chess.moves({ verbose: true }).map(move => `${move.from}${move.to}${move.promotion ?? ''}`)
+        const responseMove = await fetch(`/api/chess-models/${encodeURIComponent(revisionId)}/move`, {
+          method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ fen: match.state.fen, legalMoves, history: match.state.moves.map(move => move.uci), moveTimeMs: Math.min(10000, searchMs) }),
+          signal: AbortSignal.timeout(55_000),
+        })
+        const moveBody = await responseMove.json() as { move?: string; durationMs?: number; error?: string }
+        if (!responseMove.ok || !moveBody.move || !legalMoves.includes(moveBody.move)) throw new Error(moveBody.error || 'Model inference failed')
+        const uci = moveBody.move
         if (cancelled) return
         const response = await fetch(`/api/chess-model-matches/${match.id}/moves`, {
           method: 'POST',
           headers: { 'content-type': 'application/json', authorization: `Bearer ${controlToken}` },
-          body: JSON.stringify({ uci, durationMs: Math.min(match.state.turnBudgetMs, Math.round(performance.now() - started)), expectedPly: match.state.moves.length }),
+          body: JSON.stringify({ uci, durationMs: Math.max(0, Math.round(moveBody.durationMs ?? performance.now() - started)), expectedPly: match.state.moves.length }),
         })
         const body = await response.json() as { match?: MatchRecord; error?: string }
         if (!response.ok || !body.match) throw new Error(body.error || 'Could not save move')
+        if (cancelled) return
         setMatch(body.match)
         setReplayPly(body.match.state.moves.length)
         if (body.match.state.status === 'completed') {
@@ -111,7 +104,7 @@ export function ModelArena({ models }: { models: ModelOption[] }) {
     }
     void play()
     return () => { cancelled = true }
-  }, [controlToken, match])
+  }, [controlToken, match, retry])
 
   async function createMatch() {
     setError('')
@@ -156,7 +149,7 @@ export function ModelArena({ models }: { models: ModelOption[] }) {
       <label>Turn budget<select aria-label="Turn budget" value={turnBudgetMs} onChange={event => setTurnBudgetMs(Number(event.target.value))}>{TURN_BUDGET_OPTIONS.map(budget => <option key={budget} value={budget}>{budget / 1000} second{budget >= 2000 ? 's' : ''} per move</option>)}</select></label>
     </div>
     <button className="chess-primary" onClick={() => void createMatch()}>Start model match</button>
-    {error && <p className="chess-notice" role="alert">{error}</p>}
+    {error && <p className="chess-notice" role="alert">{error} {match && <button onClick={() => setRetry(value => value + 1)}>Retry move</button>}</p>}
     {match && <div className="chess-arena-live">
       <div><Chessboard options={{ id: 'model-arena-board', position: replayFen, allowDragging: false, animationDurationInMs: 180, lightSquareStyle: { backgroundColor: '#e8d7b7' }, darkSquareStyle: { backgroundColor: '#66866f' } }} /></div>
       <aside><h3>{match.white_model_name} vs {match.black_model_name}</h3><p>{match.state.status}{thinking ? ' · thinking' : ''} · {match.state.moves.length} plies · {match.state.turnBudgetMs / 1000}s/turn</p>

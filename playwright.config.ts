@@ -11,11 +11,18 @@ export default defineConfig({
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
     ...devices['Desktop Chrome'],
+    channel: process.env.PLAYWRIGHT_CHANNEL || undefined,
     baseURL,
     extraHTTPHeaders: bypass ? { 'x-vercel-protection-bypass': bypass } : undefined,
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
   },
+  webServer: process.env.PLAYWRIGHT_START_SERVER ? {
+    command: 'npm run start -- --port 3130',
+    url: baseURL,
+    reuseExistingServer: !process.env.CI,
+    timeout: 60_000,
+  } : undefined,
   outputDir: 'test-results',
 })

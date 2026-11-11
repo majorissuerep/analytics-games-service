@@ -27,6 +27,8 @@ export function parseStyledMove(body: unknown, legalMoves: readonly string[]) {
 }
 
 function configuredStyledInferenceUrl() {
+  // Deployment is Vercel-only; preserve the sidecar solely for local parity work.
+  if (process.env.NODE_ENV === 'production') return undefined
   const configured = process.env.STYLED_CHESS_INFERENCE_URL?.trim()
   if (!configured) return undefined
   const base = new URL(configured)
@@ -36,12 +38,12 @@ function configuredStyledInferenceUrl() {
   return new URL('/predict', base)
 }
 
-export async function requestStyledMove(input: StyledMoveRequest) {
+export async function requestStyledMove(input: StyledMoveRequest): Promise<{ move: string; revisionId: string; repertoireId: StyledRepertoireId; durationMs?: number }> {
   const endpoint = configuredStyledInferenceUrl()
   if (!endpoint) {
     const { predictStyledMove } = await import('./styled-node-runtime')
     const result = await predictStyledMove(input)
-    return { move: result.move, revisionId: BUILTIN_STYLED_OPENING, repertoireId: result.repertoireId }
+    return { move: result.move, revisionId: BUILTIN_STYLED_OPENING, repertoireId: result.repertoireId, durationMs: result.durationMs }
   }
 
   const response = await fetch(endpoint, {

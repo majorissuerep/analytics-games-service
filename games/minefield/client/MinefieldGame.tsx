@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import Link from 'next/link'
 import { emitGameSessionCompleted } from '@/lib/analytics/game-events'
 import {
-  armMinefield,
+  chordMinefieldCell,
   createMinefield,
   revealMinefieldCell,
   toggleMinefieldFlag,
@@ -39,6 +39,14 @@ export function MinefieldGame() {
   const [difficulty, setDifficulty] = useState<Difficulty>('beginner')
   const [board, setBoard] = useState(() => freshBoard('beginner'))
   const [elapsed, setElapsed] = useState(0)
+  const [generating, setGenerating] = useState(false)
+  const [generationError, setGenerationError] = useState('')
+  const [cellSize, setCellSize] = useState(30)
+  const [focusedCell, setFocusedCell] = useState(0)
+  const [flagMode, setFlagMode] = useState(false)
+  const workerRef = useRef<Worker | null>(null)
+  const generationEpoch = useRef(0)
+  useEffect(() => () => workerRef.current?.terminate(), [])
 
   useEffect(() => {
     if (!board.armed || board.status !== 'playing') return
@@ -53,29 +61,60 @@ export function MinefieldGame() {
   }, [board.status])
 
   const reset = (nextDifficulty = difficulty) => {
+    generationEpoch.current += 1
+    workerRef.current?.terminate()
+    workerRef.current = null
+    setGenerating(false)
+    setGenerationError('')
     setElapsed(0)
+    setFocusedCell(0)
     setBoard(freshBoard(nextDifficulty))
   }
 
   const reveal = (index: number) => {
-    if (board.status !== 'playing') return
+    if (board.status !== 'playing' || generating) return
+    if (flagMode) { setBoard(current => toggleMinefieldFlag(current, index)); return }
+    if (board.cells[index].flagged) return
     if (!board.armed) {
-      setBoard((current) => revealMinefieldCell(armMinefield(current, index), index))
+      const epoch = ++generationEpoch.current
+      setGenerating(true)
+      setGenerationError('')
+      const worker = new Worker(new URL('./generator.worker.ts', import.meta.url))
+      workerRef.current = worker
+      const fail = (message: string) => {
+        if (epoch !== generationEpoch.current) return
+        worker.terminate()
+        workerRef.current = null
+        setGenerating(false)
+        setGenerationError(message)
+      }
+      worker.onmessage = (event: MessageEvent<{ board?: MinefieldBoard; error?: string }>) => {
+        if (epoch !== generationEpoch.current) return
+        if (!event.data.board) { fail(event.data.error || 'Generation failed. Try again.'); return }
+        const generated = event.data.board
+        setBoard(current => revealMinefieldCell({ ...generated, cells: generated.cells.map((cell, i) => ({ ...cell, flagged: current.cells[i]?.flagged ?? false })) }, index))
+        setGenerating(false)
+        worker.terminate()
+        workerRef.current = null
+      }
+      worker.onerror = () => fail('Board generation failed. Please try again.')
+      worker.postMessage({ width: board.width, height: board.height, mines: board.mineCount, opening: index })
       return
     }
-    setBoard((current) => revealMinefieldCell(current, index))
+    setBoard(current => current.cells[index].revealed ? chordMinefieldCell(current, index) : revealMinefieldCell(current, index))
   }
 
   const flags = board.cells.filter((cell) => cell.flagged).length
-  const face = board.status === 'lost' ? '😵' : board.status === 'won' ? '😎' : '🙂'
+  const progress = Math.round(100 * board.cells.filter(cell => cell.revealed && !cell.mine).length / (board.cells.length - board.mineCount))
 
   return (
     <main className="minefield-app">
       <header className="minefield-header">
-        <Link href="/" aria-label="Back to desktop">💣 <strong>Minefield</strong></Link>
+        <Link href="/" aria-label="Back to desktop"><strong>Minefield</strong></Link>
         <label>
           Level
           <select
+            aria-label="Level"
             value={difficulty}
             onChange={(event) => {
               const next = event.target.value as Difficulty
@@ -88,22 +127,44 @@ export function MinefieldGame() {
         </label>
       </header>
 
+      <div className="minefield-toolbar">
+        <span>Deduction-only boards</span>
+        <label>Cell size <select aria-label="Cell size" value={cellSize} onChange={event => setCellSize(Number(event.target.value))}>
+          <option value={26}>Compact</option><option value={30}>Standard</option><option value={36}>Large</option><option value={44}>Extra large</option>
+        </select></label>
+        <button aria-pressed={flagMode} onClick={() => setFlagMode(value => !value)}>Flag mode</button>
+      </div>
       <section className="minefield-machine" aria-label="Minefield game">
         <div className="minefield-scoreboard">
-          <output aria-label="Mines remaining">{String(Math.max(0, board.mineCount - flags)).padStart(3, '0')}</output>
-          <button onClick={() => reset()} aria-label="New game">{face}</button>
-          <output aria-label="Elapsed seconds">{String(elapsed).padStart(3, '0')}</output>
+          <div><small>Mines left</small><output aria-label="Mines remaining">{String(Math.max(0, board.mineCount - flags)).padStart(3, '0')}</output></div>
+          <button onClick={() => reset()} aria-label="New game">New game</button>
+          <div><small>Seconds</small><output aria-label="Elapsed seconds">{String(elapsed).padStart(3, '0')}</output></div>
         </div>
+        <div className="minefield-board-scroll" tabIndex={0} aria-label="Scrollable minefield">
         <div
           className="minefield-grid"
-          style={{ gridTemplateColumns: `repeat(${board.width}, minmax(20px, 30px))` }}
+          aria-busy={generating}
+          style={{ gridTemplateColumns: `repeat(${board.width}, var(--cell-size))`, '--cell-size': `${cellSize}px` } as CSSProperties}
           onContextMenu={(event) => event.preventDefault()}
         >
           {board.cells.map((cell, index) => (
             <button
               key={index}
+              tabIndex={index === focusedCell ? 0 : -1}
+              onFocus={() => setFocusedCell(index)}
               className={`minefield-cell${cell.revealed ? ' revealed' : ''}${cell.flagged ? ' flagged' : ''}`}
-              data-adjacent={cell.adjacent}
+              data-adjacent={cell.revealed ? cell.adjacent : undefined}
+              disabled={generating}
+              onKeyDown={event => {
+                if (event.key.toLowerCase() === 'f') { event.preventDefault(); setBoard(current => toggleMinefieldFlag(current, index)) }
+                const offset = ({ ArrowRight: 1, ArrowLeft: -1, ArrowDown: board.width, ArrowUp: -board.width } as Record<string, number>)[event.key]
+                if (offset !== undefined) {
+                  event.preventDefault()
+                  const next = Math.max(0, Math.min(board.cells.length - 1, index + offset))
+                  const buttons = event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('.minefield-cell')
+                  buttons?.[next]?.focus()
+                }
+              }}
               aria-label={cellLabel(board, index)}
               onClick={() => reveal(index)}
               onContextMenu={(event) => {
@@ -115,8 +176,10 @@ export function MinefieldGame() {
             </button>
           ))}
         </div>
+        </div>
+        <div className="minefield-progress"><span>{progress}% cleared</span><span>{board.width} × {board.height} · {board.mineCount} mines</span></div>
         <p className="minefield-status" role="status">
-          {board.status === 'won' ? `Cleared in ${elapsed} seconds!` : board.status === 'lost' ? 'Mine triggered. Try again.' : 'Left-click to reveal · right-click to flag'}
+          {generating ? 'Preparing a verified board…' : generationError || (board.status === 'won' ? `Cleared in ${elapsed} seconds!` : board.status === 'lost' ? 'Mine triggered. Try again.' : 'Click to open · right-click or F to flag · click a completed clue to clear neighbors')}
         </p>
       </section>
     </main>

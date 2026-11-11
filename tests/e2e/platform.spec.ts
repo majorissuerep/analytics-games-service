@@ -1,5 +1,11 @@
 import { expect, test, type Browser, type BrowserContext, type Page } from '@playwright/test'
 
+test.beforeEach(async ({ context }, info) => {
+  if (!info.title.startsWith('self-hosted analytics')) {
+    await context.addInitScript(() => localStorage.setItem('analytics-games.analytics-consent.v1', 'denied'))
+  }
+})
+
 test('self-hosted analytics remains silent until consent and tracks the game launch journey', async ({ page }) => {
   const trackedEvents: string[] = []
   await page.route('**/api/analytics/events', async (route) => {
@@ -74,7 +80,7 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   })
 
   await page.goto('/')
-  await expect(page.locator('.desktop-sky')).toHaveCSS('background-image', /millennium-horizon\.svg/)
+  await expect(page.locator('.desktop-sky')).toHaveCSS('background-image', /millennium-meadow\.webp/)
   await expect(page.getByLabel('Desktop sticky note')).toBeVisible()
   await expect(page.getByLabel('5 games installed')).toBeVisible()
   await page.getByRole('button', { name: 'start' }).click()
@@ -153,12 +159,13 @@ test('desktop icons launch games and tools from the keyboard', async ({ page }) 
 
 test('Pip opens a repo-aware chat and renders an answer', async ({ page }) => {
   await page.route('**/api/pip/chat', async (route) => {
-    const body = route.request().postDataJSON() as { messages: Array<{ role: string; content: string }> }
-    expect(body.messages.at(-1)).toEqual({ role: 'user', content: 'How do I play Minefield?' })
+    const body = route.request().postDataJSON() as { userKey: string; message: string }
+    expect(body.message).toBe('How do I play Minefield?')
+    expect(body.userKey).toMatch(/^[A-Za-z0-9-]{8,100}$/)
     await route.fulfill({
       status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ message: 'Right-click to flag mines, and clear every safe square!', model: 'xiaomi/mimo-v2.5' }),
+      contentType: 'text/event-stream',
+      body: 'event: meta\ndata: {"model":"qa-model"}\n\nevent: delta\ndata: {"text":"Right-click to flag mines, and clear every safe square!"}\n\nevent: done\ndata: {"text":"Right-click to flag mines, and clear every safe square!"}\n\n',
     })
   })
   await page.goto('/')
@@ -289,6 +296,7 @@ test('Chess model arena pauses and replays durable matches', async ({ page }) =>
 test('Chess password room synchronizes legal moves', async ({ browser }) => {
   const hostContext = await browser.newContext()
   const guestContext = await browser.newContext()
+  await Promise.all([hostContext, guestContext].map(context => context.addInitScript(() => localStorage.setItem('analytics-games.analytics-consent.v1', 'denied'))))
   const host = await hostContext.newPage()
   const guest = await guestContext.newPage()
   try {
@@ -334,6 +342,7 @@ interface EmulatedPlayer {
 
 async function enterPlayer(browser: Browser, name: string): Promise<EmulatedPlayer> {
   const context = await browser.newContext()
+  await context.addInitScript(() => localStorage.setItem('analytics-games.analytics-consent.v1', 'denied'))
   const page = await context.newPage()
   await page.goto('/games/consensus-radar')
   await page.getByRole('button', { name: 'EN', exact: true }).click()

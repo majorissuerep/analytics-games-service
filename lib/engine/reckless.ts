@@ -1,4 +1,3 @@
-import { spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -23,6 +22,8 @@ export interface RecklessAnalysisLine {
 }
 
 export interface RecklessAnalysis {
+  /** Search wall time, excluding cold startup and queue wait. */
+  durationMs?: number
   bestMove: string
   lines: RecklessAnalysisLine[]
 }
@@ -75,84 +76,29 @@ export function parseRecklessInfoLine(line: string): RecklessAnalysisLine | null
  * are only used when an index produced nothing else.
  */
 export function collectRecklessLines(rawLines: string[]): RecklessAnalysisLine[] {
-  const last = new Map<number, RecklessAnalysisLine>()
-  const lastSolid = new Map<number, RecklessAnalysisLine>()
-  for (const raw of rawLines) {
-    const parsed = parseRecklessInfoLine(raw)
-    if (!parsed) continue
-    last.set(parsed.multipv, parsed)
-    if (!parsed.bounded) lastSolid.set(parsed.multipv, parsed)
+  const parsed = rawLines.map(parseRecklessInfoLine).filter((line): line is RecklessAnalysisLine => line !== null)
+  const total = Math.max(0, ...parsed.map(line => line.multipv))
+  const depths = new Map<number, Map<number, RecklessAnalysisLine>>()
+  for (const line of parsed) {
+    if (line.bounded) continue
+    const iteration = depths.get(line.depth) ?? new Map<number, RecklessAnalysisLine>()
+    iteration.set(line.multipv, line)
+    depths.set(line.depth, iteration)
   }
-  const merged = new Map([...last])
-  for (const [index, line] of lastSolid) merged.set(index, line)
-  return [...merged.values()].sort((a, b) => a.multipv - b.multipv)
+  // Never combine a partial new iteration with an older complete iteration.
+  const complete = [...depths.entries()].filter(([, lines]) => lines.size === total)
+    .sort(([a], [b]) => b - a)[0]?.[1]
+  if (complete) return [...complete.values()].sort((a, b) => a.multipv - b.multipv)
+  const fallback = new Map<number, RecklessAnalysisLine>()
+  for (const line of parsed) {
+    const previous = fallback.get(line.multipv)
+    if (!previous || !line.bounded || previous.bounded) fallback.set(line.multipv, line)
+  }
+  return [...fallback.values()].sort((a, b) => a.multipv - b.multipv)
 }
 
-/** Spawn the local Reckless binary, run one MultiPV search, and resolve on `bestmove`. */
-export function analyseWithReckless(request: RecklessAnalyseRequest): Promise<RecklessAnalysis> {
-  return new Promise((resolve, reject) => {
-    if (!recklessAvailable()) {
-      reject(new Error('Reckless engine binary is missing. Run the chess setup step to install vendor/native/reckless.'))
-      return
-    }
-    const child = spawn(RECKLESS_BINARY_PATH, [], { stdio: ['pipe', 'pipe', 'ignore'] })
-    let buffer = ''
-    let stage: 'handshake' | 'configured' | 'searching' = 'handshake'
-    const rawLines: string[] = []
-    let settled = false
-    let bestMove = ''
-
-    const finish = (error: Error | null) => {
-      if (settled) return
-      settled = true
-      clearTimeout(guard)
-      child.kill()
-      const forceKill = setTimeout(() => child.kill('SIGKILL'), 1000)
-      forceKill.unref?.()
-      if (error) reject(error)
-      else resolve({ bestMove, lines: collectRecklessLines(rawLines) })
-    }
-
-    const guard = setTimeout(
-      () => finish(new Error(`Reckless search timed out after ${request.moveTimeMs + 15000} ms.`)),
-      request.moveTimeMs + 15000,
-    )
-    guard.unref?.()
-
-    child.on('error', (error) => finish(new Error(`Could not start Reckless: ${error.message}`)))
-    child.on('exit', (code) => { if (!settled) finish(new Error(`Reckless exited unexpectedly (code ${code}).`)) })
-    child.stdout.setEncoding('utf8')
-    child.stdout.on('data', (chunk: string) => {
-      buffer += chunk
-      let newline = buffer.indexOf('\n')
-      while (newline >= 0) {
-        const line = buffer.slice(0, newline).trim()
-        buffer = buffer.slice(newline + 1)
-        if (line) {
-          if (stage === 'handshake' && line === 'uciok') {
-            stage = 'configured'
-            child.stdin.write(`setoption name Threads value ${request.threads ?? 8}\n`)
-            child.stdin.write(`setoption name Hash value ${request.hashMb ?? 256}\n`)
-            child.stdin.write(`setoption name MultiPV value ${request.multiPv}\n`)
-            child.stdin.write('isready\n')
-          } else if (stage === 'configured' && line === 'readyok') {
-            stage = 'searching'
-            child.stdin.write(`position fen ${request.fen}\n`)
-            child.stdin.write(`go movetime ${request.moveTimeMs}\n`)
-          } else if (stage === 'searching') {
-            if (line.startsWith('info ')) rawLines.push(line)
-            else if (line.startsWith('bestmove')) {
-              const move = /^bestmove\s+(\S+)/.exec(line)
-              bestMove = move?.[1] ?? ''
-              finish(null)
-            }
-          }
-        }
-        newline = buffer.indexOf('\n')
-      }
-    })
-
-    child.stdin.on('error', () => undefined)
-    child.stdin.write('uci\n')
-  })
+/** Compatibility entry point; all callers share the demand-loaded runtime. */
+export async function analyseWithReckless(request: RecklessAnalyseRequest): Promise<RecklessAnalysis> {
+  const { analyseWithEngine } = await import('./uci-runtime')
+  return analyseWithEngine('reckless-local', request)
 }

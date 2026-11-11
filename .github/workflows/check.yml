@@ -19,6 +19,24 @@ jobs:
   check:
     name: Lint, test, typecheck, build
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine@sha256:e5d2edd28b1f8d40a0a6c0c9cdc545b19b56a0d5d88f94bc11a97d970d4700d0
+        env:
+          POSTGRES_USER: analytics_games
+          POSTGRES_PASSWORD: analytics_games
+          POSTGRES_DB: analytics_games
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://analytics_games:analytics_games@localhost:5432/analytics_games?sslmode=disable
+      EVENT_TRACKING_ENABLED: 'true'
+      EVENT_WRITE_KEY: local-ci-placeholder
+      EVENT_TRACKING_URL: http://127.0.0.1:9
+      PLAYWRIGHT_START_SERVER: 'true'
+      PLAYWRIGHT_CHANNEL: chrome
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -36,3 +54,9 @@ jobs:
 
       - name: Run quality gate
         run: npm run check
+
+      - name: Install Playwright video encoder
+        run: npx playwright install ffmpeg
+
+      - name: Browser regression tests with real chess engines
+        run: npx playwright test tests/e2e/platform.spec.ts tests/e2e/games-reliability.spec.ts
