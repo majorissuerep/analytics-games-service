@@ -55,5 +55,8 @@ jobs:
       - name: Run quality gate
         run: npm run check
 
+      - name: Install Playwright video encoder
+        run: npx playwright install ffmpeg
+
       - name: Browser regression tests with real chess engines
         run: npx playwright test tests/e2e/platform.spec.ts tests/e2e/games-reliability.spec.ts
