@@ -296,6 +296,7 @@ test('Chess model arena pauses and replays durable matches', async ({ page }) =>
 test('Chess password room synchronizes legal moves', async ({ browser }) => {
   const hostContext = await browser.newContext()
   const guestContext = await browser.newContext()
+  await Promise.all([hostContext, guestContext].map(context => context.addInitScript(() => localStorage.setItem('analytics-games.analytics-consent.v1', 'denied'))))
   const host = await hostContext.newPage()
   const guest = await guestContext.newPage()
   try {
@@ -341,6 +342,7 @@ interface EmulatedPlayer {
 
 async function enterPlayer(browser: Browser, name: string): Promise<EmulatedPlayer> {
   const context = await browser.newContext()
+  await context.addInitScript(() => localStorage.setItem('analytics-games.analytics-consent.v1', 'denied'))
   const page = await context.newPage()
   await page.goto('/games/consensus-radar')
   await page.getByRole('button', { name: 'EN', exact: true }).click()
