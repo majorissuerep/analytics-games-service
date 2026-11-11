@@ -876,4 +876,10 @@ input[type="text"]:focus {
 .phase-dots { display: flex; align-items: center; gap: 5px; }
 .phase-dot { width: 6px; height: 6px; border-radius: 3px; background: var(--ui-line); }
 .phase-dot.on { width: 18px; background: var(--ui-accent); }
-@media (max-width: 600px) { .radar-app .card { padding: 18px 16px; } }
+@media (max-width: 600px) {
+  .radar-app .card { padding: 18px 16px; }
+  .radar-app .topbar { flex-wrap: wrap; }
+  .radar-app .brand { flex-basis: 100%; min-width: 0; }
+  .radar-app .topbar-actions { width: 100%; flex-wrap: wrap; justify-content: flex-end; }
+  .radar-app .player-pill { max-width: 100%; overflow-wrap: anywhere; }
+}

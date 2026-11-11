@@ -74,3 +74,20 @@ test('a primary action and keyboard focus carry the same meaning in the redesign
   await expect(page.getByRole('button', { name: /Continue/ })).toHaveCSS('background-color', accent)
   await expect(page.locator('.logo-big')).toHaveCSS('animation-name', 'none')
 })
+
+test('Radar keeps its identity and translated controls readable on narrow phones', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 900 })
+  await page.goto('/games/consensus-radar')
+  for (const language of ['EN', 'УКР']) {
+    await page.getByRole('button', { name: language, exact: true }).click()
+    const brand = await page.locator('.brand').boundingBox()
+    const actions = await page.locator('.topbar-actions').boundingBox()
+    expect(actions!.y).toBeGreaterThanOrEqual(brand!.y + brand!.height)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  }
+  await page.getByRole('button', { name: 'EN', exact: true }).click()
+  await page.getByPlaceholder('Your name…').fill('A player with a long name')
+  await page.getByRole('button', { name: /Continue/ }).click()
+  await expect(page.locator('.player-pill')).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+})
