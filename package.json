@@ -41,7 +41,7 @@
     "react-dom": "^19.2.8",
     "react-rnd": "^10.5.3",
     "xp.css": "^0.2.6",
-    "zod": "^4.4.3",
+    "zod": "^4.6.7",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
