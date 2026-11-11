@@ -50,7 +50,7 @@ test('desktop opens and closes a readable game while Pip responds', async ({ pag
   })
 
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'A good place to play.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Games', exact: true })).toBeVisible()
 
   const pip = page.getByLabel('Pip desktop guide')
   await expect(pip).toBeVisible()
@@ -69,7 +69,7 @@ test('desktop opens and closes a readable game while Pip responds', async ({ pag
   })
   await gameWindow.getByRole('button', { name: 'Close' }).click()
   await expect(page.locator('iframe[title="Minefield"]')).toHaveCount(0)
-  await expect(page.getByRole('heading', { name: 'A good place to play.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Games', exact: true })).toBeVisible()
   expect(errors).toEqual([])
 })
 
