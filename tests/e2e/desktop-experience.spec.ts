@@ -178,8 +178,13 @@ test('shell-focus: ten real first-action switches keyboard nested canvas drag an
     await expect(canvas).toBeFocused() // The original pointer action reaches the nested canvas.
   }
   await page.keyboard.down('Space')
-  await page.waitForTimeout(1200) // Hold duration charges the native plunger.
-  await page.keyboard.up('Space')
+  try {
+    const pull = () => canvas.evaluate(() => (window as unknown as { Module: { cabinetState: { plungerPull: number } } }).Module.cabinetState.plungerPull)
+    await expect.poll(pull, { message: 'First focused Space must charge the native plunger' }).toBeGreaterThan(0)
+    await expect.poll(pull, { timeout: 10_000, message: 'Release the scoring shot at observed full native pull' }).toBe(100)
+  } finally {
+    await page.keyboard.up('Space')
+  }
   await expect.poll(async () => Number((await native.locator('#score').innerText()).replaceAll(',', '')), { timeout: 20_000 }).toBeGreaterThan(0)
   await captureExperience(page, info, 'shell-focus', 'nested-canvas-first-action-played')
   await expectActionReady(native.getByRole('button', { name: 'Pause', exact: true }))

@@ -38,7 +38,7 @@ test('self-hosted analytics remains silent until consent and tracks the game lau
   const gameWindow = page.locator('.desktop-rnd-window').filter({
     has: page.locator('iframe[title="Paintbox"]'),
   })
-  await gameWindow.getByRole('button', { name: 'Close' }).click()
+  await gameWindow.getByRole('button', { name: 'Close', exact: true }).click()
   await expect.poll(() => trackedEvents).toContain('game_session_ended')
 })
 
@@ -67,7 +67,7 @@ test('desktop opens and closes a readable game while Pip responds', async ({ pag
   const gameWindow = page.locator('.desktop-rnd-window').filter({
     has: page.locator('iframe[title="Minefield"]'),
   })
-  await gameWindow.getByRole('button', { name: 'Close' }).click()
+  await gameWindow.getByRole('button', { name: 'Close', exact: true }).click()
   await expect(page.locator('iframe[title="Minefield"]')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Games', exact: true })).toBeVisible()
   expect(errors).toEqual([])
@@ -96,7 +96,7 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   await expect(page.getByLabel('4 games installed')).toHaveCount(0)
   await counterToggle.check()
   await expect(page.getByLabel('4 games installed')).toBeVisible()
-  await pluginWindow.getByRole('button', { name: 'Close' }).click()
+  await pluginWindow.getByRole('button', { name: 'Close', exact: true }).click()
 
   await page.locator('.desktop-icon[aria-label="Open Minefield"]').dblclick()
   const minefield = page.frameLocator('iframe[title="Minefield"]')
@@ -107,7 +107,7 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   await minefield.getByLabel('Flagged cell, row 1, column 1').click({ button: 'right' })
   await minefield.getByLabel('Covered cell, row 1, column 1').click()
   await expect(minefield.locator('.minefield-cell.revealed').first()).toBeVisible()
-  await page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Minefield"]') }).getByRole('button', { name: 'Close' }).click()
+  await page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Minefield"]') }).getByRole('button', { name: 'Close', exact: true }).click()
 
   await page.locator('.desktop-icon[aria-label="Open Paintbox"]').dblclick()
   const paintbox = page.frameLocator('iframe[title="Paintbox"]')
@@ -128,7 +128,7 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   await paintbox.getByRole('button', { name: 'Undo' }).click()
   await paintbox.getByRole('button', { name: 'Eraser' }).click()
   await expect(paintbox.getByRole('button', { name: 'Eraser' })).toHaveAttribute('aria-pressed', 'true')
-  await page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Paintbox"]') }).getByRole('button', { name: 'Close' }).click()
+  await page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Paintbox"]') }).getByRole('button', { name: 'Close', exact: true }).click()
 
   expect(errors).toEqual([])
 })
