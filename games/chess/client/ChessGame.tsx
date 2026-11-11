@@ -646,31 +646,31 @@ export function ChessGame() {
             aria-label={soundOn ? 'Mute sounds' : 'Unmute sounds'}
             title={soundOn ? 'Mute sounds' : 'Unmute sounds'}
             onClick={() => { const next = !soundOn; setSoundOn(next); setSoundEnabled(next) }}
-          >{soundOn ? '🔊' : '🔇'}</button>
+          >{soundOn ? '♪' : '×♪'}</button>
           {mode !== 'setup' && <button onClick={resetToSetup}>New game</button>}
         </div>
       </header>
 
       {mode === 'setup' ? (
         <section className="chess-setup" aria-label="Chess setup">
-          <div className="chess-intro"><span>♞</span><div><p className="chess-kicker">CLASSIC BOARD GAME</p><h1>Play chess your way</h1><p>Stockfish opponents, Reckless, both-sides play, pass-and-play, or a protected online room.</p></div></div>
+          <div className="chess-intro"><span>♞</span><div><p className="chess-kicker">THE CHESS ROOM</p><h1>A place to think.</h1><p>Stockfish opponents, Reckless, both-sides play, pass-and-play, or a protected online room.</p></div></div>
           <nav className="chess-mode-tabs" aria-label="Game mode">
-            <button data-tone="violet" aria-pressed={setupMode === 'bot'} className={setupMode === 'bot' ? 'active' : ''} onClick={() => setSetupMode('bot')}><b>♟</b><span>Computer<small>Versus, pick, or free</small></span></button>
-            <button data-tone="teal" aria-pressed={setupMode === 'online'} className={setupMode === 'online' ? 'active' : ''} onClick={() => setSetupMode('online')}><b>♜</b><span>Online<small>Private room</small></span></button>
-            <button data-tone="amber" aria-pressed={setupMode === 'local'} className={setupMode === 'local' ? 'active' : ''} onClick={() => setSetupMode('local')}><b>♚</b><span>Local<small>Same device</small></span></button>
-            <button data-tone="pink" aria-pressed={setupMode === 'arena'} className={setupMode === 'arena' ? 'active' : ''} onClick={() => setSetupMode('arena')}><b>⚔</b><span>Model arena<small>3s turns + replay</small></span></button>
+            <button data-tone="violet" aria-pressed={setupMode === 'bot'} className={setupMode === 'bot' ? 'active' : ''} onClick={() => setSetupMode('bot')}><b aria-hidden="true">♟︎</b><span>Computer<small>Versus, pick, or free</small></span></button>
+            <button data-tone="teal" aria-pressed={setupMode === 'online'} className={setupMode === 'online' ? 'active' : ''} onClick={() => setSetupMode('online')}><b aria-hidden="true">♜</b><span>Online<small>Private room</small></span></button>
+            <button data-tone="amber" aria-pressed={setupMode === 'local'} className={setupMode === 'local' ? 'active' : ''} onClick={() => setSetupMode('local')}><b aria-hidden="true">♚</b><span>Local<small>Same device</small></span></button>
+            <button data-tone="pink" aria-pressed={setupMode === 'arena'} className={setupMode === 'arena' ? 'active' : ''} onClick={() => setSetupMode('arena')}><b aria-hidden="true">♘</b><span>Model arena<small>Match + replay</small></span></button>
           </nav>
 
           {setupMode === 'arena' ? <ModelArena models={modelOptions} /> : <div className="chess-setup-panel">
-            <div className="chess-choice-row"><span>Play as</span><div className="chess-segmented">{(['white', 'random', 'black'] as const).map((color) => <button key={color} className={colorChoice === color ? 'selected' : ''} onClick={() => setColorChoice(color)}>{color === 'white' ? '○ White' : color === 'black' ? '● Black' : '◐ Random'}</button>)}</div></div>
+            <div className="chess-choice-row"><span>Play as</span><div className="chess-segmented">{(['white', 'random', 'black'] as const).map((color) => <button key={color} aria-pressed={colorChoice === color} className={colorChoice === color ? 'selected' : ''} onClick={() => setColorChoice(color)}>{color === 'white' ? '○ White' : color === 'black' ? '● Black' : '◐ Random'}</button>)}</div></div>
 
             {setupMode === 'bot' && <>
               <div className="chess-field">
                 <span className="chess-control-label">Engine control</span>
                 <div className="chess-segmented">
-                  <button className={engineControl === 'auto' ? 'selected' : ''} onClick={() => setEngineControl('auto')}>Opponent plays</button>
-                  <button className={engineControl === 'pick' ? 'selected' : ''} onClick={() => { setEngineControl('pick'); if (!['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(modelRevision)) setModelRevision(RECKLESS_LOCAL) }}>I pick opponent moves</button>
-                  <button className={engineControl === 'free' ? 'selected' : ''} onClick={() => { setEngineControl('free'); if (!['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(modelRevision)) setModelRevision(RECKLESS_LOCAL) }}>Free both sides</button>
+                  <button aria-pressed={engineControl === 'auto'} className={engineControl === 'auto' ? 'selected' : ''} onClick={() => setEngineControl('auto')}>Opponent plays</button>
+                  <button aria-pressed={engineControl === 'pick'} className={engineControl === 'pick' ? 'selected' : ''} onClick={() => { setEngineControl('pick'); if (!['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(modelRevision)) setModelRevision(RECKLESS_LOCAL) }}>I pick opponent moves</button>
+                  <button aria-pressed={engineControl === 'free'} className={engineControl === 'free' ? 'selected' : ''} onClick={() => { setEngineControl('free'); if (!['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(modelRevision)) setModelRevision(RECKLESS_LOCAL) }}>Free both sides</button>
                 </div>
                 <small>{engineControl === 'auto' ? 'The chosen opponent answers on its turn.' : engineControl === 'pick' ? 'The selected engine ranks every position; you play the opponent side by choosing from its top moves.' : 'Move both sides freely — the ranked engine list is a live hint, not a limit.'}</small>
               </div>
@@ -750,7 +750,7 @@ export function ChessGame() {
           </div>
           <aside className="chess-sidebar">
             <div className="chess-status"><span className={`turn-dot ${chess.turn() === 'w' ? 'white' : 'black'}`} /><div><small>{mode === 'bot' ? engineControl === 'auto' ? `You are ${humanColor === 'w' ? 'White' : 'Black'}` : engineControl === 'pick' ? 'Both sides · engine side manual' : 'Both sides · free moves' : mode === 'local' ? 'Pass and play' : onlineColor ? `You are ${onlineColor === 'w' ? 'White' : 'Black'}` : 'Online game'}</small><h2>{status}</h2></div></div>
-            {mode === 'bot' && <div className="chess-opponent"><span>{engineControl === 'auto' ? '♞' : engineControl === 'pick' ? '☝' : '⚔'}</span><div><b>{engineControl === 'auto' ? opponentName : opponentName}</b><small>{engineControl === 'auto' ? stockfishEngineIdForRevision(modelRevision) ? `${level.label} · Skill ${level.skill}/20` : modelRevision === RECKLESS_LOCAL ? `Local engine · ${rethinkMs >= 1000 ? `${rethinkMs / 1000}s` : `${rethinkMs}ms`} think` : 'Custom model' : engineControl === 'pick' ? `Pick from ${hintLines} ranked moves` : `Live hints · ${hintLines} lines · ${rethinkMs >= 1000 ? `${rethinkMs / 1000}s` : `${rethinkMs}ms`}`}</small></div></div>}
+            {mode === 'bot' && <div className="chess-opponent"><span>{engineControl === 'auto' ? '♞' : engineControl === 'pick' ? '☞' : '♘'}</span><div><b>{engineControl === 'auto' ? opponentName : opponentName}</b><small>{engineControl === 'auto' ? stockfishEngineIdForRevision(modelRevision) ? `${level.label} · Skill ${level.skill}/20` : modelRevision === RECKLESS_LOCAL ? `Local engine · ${rethinkMs >= 1000 ? `${rethinkMs / 1000}s` : `${rethinkMs}ms`} think` : 'Custom model' : engineControl === 'pick' ? `Pick from ${hintLines} ranked moves` : `Live hints · ${hintLines} lines · ${rethinkMs >= 1000 ? `${rethinkMs / 1000}s` : `${rethinkMs}ms`}`}</small></div></div>}
             {mode === 'bot' && engineControl === 'auto' && ['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(modelRevision) && <EvaluationBar evaluation={evaluation} error={evaluationError || undefined} engineName={opponentName} progress={evaluationProgress} onCancel={() => evaluationAbortRef.current?.abort()} onRetry={() => setEngineRetry(value => value + 1)} />}
             {mode === 'bot' && (engineThinking || analyzing) && <LoadingState key={`${localFen}:${modelRevision}:${engineRetry}:${rethinkMs}:${hintLines}`} label={`${opponentName}: ${engineProgress?.message ?? 'Connecting to engine'}`} detail={engineProgress?.detail} onCancel={() => engineAbortRef.current?.abort()} />}
             {hintsVisible && suggestions && <div className="chess-suggestions" role="group" aria-label="Engine move suggestions">

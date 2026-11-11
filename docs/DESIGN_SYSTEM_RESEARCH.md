@@ -28,9 +28,10 @@ foreground rather than merely recolor the page behind monochrome content.
 
 ## Synthesis and explicit choices
 
-Pink anchors primary intent and selection. Violet identifies analysis, teal
-collaboration/creation, and amber time/attention. These are category roles, not
-interchangeable success/error signals. Useful content receives color through
+Version 2 tightens the decorative palette to two families per app. Pink anchors
+intent, with one optional app-specific identity. The earlier four-category
+palette is a source library, not a required appearance. Semantic signals remain
+fixed and distinct from identity. Useful content receives color through
 mode cards, metrics, room identities, selected tools, status chips, and values.
 Body prose remains dark on readable surfaces. Backgrounds may be neutral.
 
@@ -49,7 +50,7 @@ improves task performance. The studies inform search cues, grouping, density, an
 contrast; neither validates this exact product. Pink is a user/brand preference.
 Our alpha, blur, radius, and spacing are design choices requiring rendered review.
 
-Acceptance covers desktop/narrow phones; four-player Radar; human/free/arena
+Acceptance covers desktop/narrow phones; human/free/arena
 chess; late-game expert Minefield; drawing/export; Pinball; keyboard focus;
 material preference across frames; reduced motion/transparency; forced colors;
 and final alpha-composited contrast. Review actual useful content for color,
@@ -58,3 +59,30 @@ scales are outside the design migration.
 
 Implementation: [APPLICATION_DESIGN.md](APPLICATION_DESIGN.md).
 Live reference: `/design-system`, using the actual shipped tokens and primitives.
+
+
+## Version 2: personality within a shared engine
+
+The user's November 11 clarification requires individual design solutions for
+all apps. A two-family decorative budget is a product constraint, not a threshold
+proven by a scientific paper. Each app now has its own GPT-6.1 Sol research pass,
+three candidate directions, task-based selection and implementation dossier.
+
+Additional direct sources checked for this revision:
+
+- [GNOME design principles](https://developer.gnome.org/hig/principles.html):
+  task focus, progressive disclosure, frequent actions close at hand, considerate
+  recovery. We use this to define shared interaction care without copying layouts.
+- [GNOME UI styling](https://developer.gnome.org/hig/guidelines/ui-styling.html):
+  reuse tested variables/patterns, test custom styling under high contrast, avoid
+  color-only information and flashing. Local identities therefore inherit shared
+  focus, states and fallbacks instead of reinventing their control behaviors.
+- The [Aalto visual-search study](https://research.aalto.fi/en/publications/understanding-visual-search-in-graphical-user-interfaces/)
+  was rechecked at its primary record: GUI/cue type and target presence matter.
+  Its findings support task-specific hierarchy, not a universal grey interface.
+
+App-level references, what was directly inspected, alternative concepts and
+limits are recorded under [app-personalities](app-personalities/). The final
+checks evaluate distinct structures and usable tasks as well as cross-app
+consistency. Desktop quality is an aspiration validated by interaction review;
+this is not a claim of native OS rendering or measured clinical eye comfort.

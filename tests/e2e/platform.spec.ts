@@ -49,7 +49,7 @@ test('desktop opens and closes a readable game while Pip responds', async ({ pag
   })
 
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'Team games live here.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'A good place to play.' })).toBeVisible()
 
   const pip = page.getByLabel('Pip desktop guide')
   await expect(pip).toBeVisible()
@@ -68,7 +68,7 @@ test('desktop opens and closes a readable game while Pip responds', async ({ pag
   })
   await gameWindow.getByRole('button', { name: 'Close' }).click()
   await expect(page.locator('iframe[title="Minefield"]')).toHaveCount(0)
-  await expect(page.getByRole('heading', { name: 'Team games live here.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'A good place to play.' })).toBeVisible()
   expect(errors).toEqual([])
 })
 
@@ -84,7 +84,7 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   await expect(page.getByLabel('Desktop sticky note')).toBeVisible()
   await expect(page.getByLabel('4 games installed')).toBeVisible()
   await page.getByRole('button', { name: 'start' }).click()
-  await expect(page.getByRole('button', { name: /Open a random installed game/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: /Play a random available game/ })).toBeVisible()
   await page.getByRole('button', { name: 'start' }).click()
 
   await page.locator('.desktop-icon').filter({ hasText: 'Plugins' }).dblclick()
@@ -212,10 +212,12 @@ test('embedded games use only the desktop window chrome', async ({ page }) => {
   await page.goto('/')
   await page.locator('.desktop-icon[aria-label="Open Minefield"]').dblclick()
   const minefield = page.frameLocator('iframe[title="Minefield"]')
+  await expect(minefield.locator('.minefield-app')).toBeVisible()
   await expect(minefield.getByRole('link', { name: 'Back to desktop' })).toHaveCount(0)
 
   await page.locator('.desktop-icon[aria-label="Open Paintbox"]').dblclick()
   const paintbox = page.frameLocator('iframe[title="Paintbox"]')
+  await expect(paintbox.locator('.paintbox-app')).toBeVisible()
   await expect(paintbox.getByRole('link', { name: 'Back to desktop' })).toHaveCount(0)
 })
 

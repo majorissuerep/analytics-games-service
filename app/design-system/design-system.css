@@ -78,3 +78,59 @@
 @media(max-width:900px) { .prism-hero, .prism-materials { grid-template-columns: 1fr; gap: 32px; } .prism-hero { padding: 40px 0; } .prism-tone-grid, .prism-game-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .prism-component-grid { grid-template-columns: 1fr; } .prism-section-title { display: block; } .prism-section-title > p { margin-top: 16px; } }
 @media(max-width:540px) { .prism-nav { padding: 12px; } .prism-nav nav a:not(:last-child) { display: none; } .prism-wordmark small { max-width: 155px; } .prism-hero h1 { font-size: 38px; } .prism-session { padding: 16px; } .prism-metrics { gap: 6px; } .prism-metrics .ui-metric { padding: 12px 8px; } .prism-metrics strong { font-size: 21px; } .prism-metrics small { font-size: 11px; } .prism-tone-grid, .prism-game-grid { grid-template-columns: 1fr; } .prism-tone-card { padding: 20px; } .prism-material-stage { padding: 20px; } .prism-material-sample { padding: 18px; } .prism-component-panel, .prism-type-panel { padding: 20px; } .prism-section { padding-block: 28px; } }
 @media(max-width:360px) { .prism-nav { gap: 8px; } .prism-wordmark small { max-width: 125px; } }
+
+/* A specimen lab: pink intent, violet annotation, a cool neutral ramp. */
+.prism-reference { --ui-canvas: #f5f5f8; --ui-ink: #242331; --ui-muted: #4f4b5c; --ui-radius: 8px; --ui-panel-radius: 12px; --ui-feature-radius: 16px; background: var(--ui-canvas); padding: 24px; border-radius: 16px; }
+.prism-reference > * { min-width: 0; }
+.prism-nav { border-radius: 12px; box-shadow: none; }
+.prism-hero { grid-template-columns: 1.05fr 1fr; gap: 40px; padding-block: 56px; }
+.prism-hero h1 { font-size: clamp(36px, 4.2vw, 50px); }
+.prism-contract { padding: 28px; border-top: 3px solid var(--ui-violet); }
+.prism-contract h2 { font-size: 24px; margin-top: 10px; letter-spacing: -.035em; }
+.prism-contract dl { margin-block: 20px; }
+.prism-contract dl > div { display: grid; grid-template-columns: 110px 1fr; gap: 16px; padding-block: 12px; border-top: 1px solid var(--ui-line); font-size: 13px; }
+.prism-contract dt { font-weight: 650; color: var(--ui-violet); }
+.prism-contract dd { margin: 0; color: var(--ui-muted); }
+.prism-contract > p { color: var(--ui-muted); font-size: 12px; }
+.prism-tone-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.prism-tone-card { display: grid; grid-template-columns: 36px 1fr; gap: 4px 16px; border-radius: 12px; }
+.prism-tone-swatch { grid-row: 1 / 4; height: 100%; width: 8px; margin: 0; border-radius: 3px; }
+.prism-tone-card h3 { margin: 0; }
+.prism-tone-card p { max-width: 48ch; }
+.prism-section { border-top: 1px solid var(--ui-line); }
+.prism-materials { gap: 36px; }
+.prism-material-stage { border-radius: 12px; background: repeating-linear-gradient(0deg,#eae8ef 0,#eae8ef 1px,#f2f0f5 1px,#f2f0f5 20px); }
+.prism-material-shape { border-radius: 12px; }
+.prism-material-shape.one { background: #e6a3c2; }
+.prism-material-shape.two { background: #b5a8cd; }
+.prism-component-panel, .prism-type-panel { border-radius: 12px; padding: 24px; }
+.prism-specimen-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
+.prism-specimen { padding: 18px; border-radius: 12px; min-width: 0; }
+.prism-specimen-label { display: flex; justify-content: space-between; font: 11px var(--ui-mono); color: var(--ui-violet); margin-bottom: 14px; }
+.prism-specimen h3 { font-size: 18px; margin-block: 18px 8px; }
+.prism-specimen h3 a { color: var(--ui-ink); text-decoration: none; }
+.prism-specimen p { color: var(--ui-muted); font-size: 13px; min-height: 40px; }
+.prism-open-app { display: inline-flex; align-items: center; min-height: 40px; font-size: 12px; font-weight: 650; margin-top: 8px; }
+.prism-caption { font-size: 12px; color: var(--ui-muted); margin-top: 16px; }
+.prism-miniature { height: 148px; padding: 12px; border: 1px solid #d9d7df; background: #f4f3f6; border-radius: 6px; overflow: hidden; pointer-events: none; }
+.prism-miniature-chess { display: grid; grid-template-columns: 106px 1fr; gap: 12px; align-items: center; }
+.prism-mini-board { display: grid; grid-template-columns: repeat(4,1fr); border: 1px solid #a29aaa; }
+.prism-mini-board i { background: #fcfaf6; height: 26px; display: grid; place-items: center; font-style: normal; font-size: 23px; color: #302b36; }
+.prism-mini-board i:nth-child(8n+2),.prism-mini-board i:nth-child(8n+4),.prism-mini-board i:nth-child(8n+5),.prism-mini-board i:nth-child(8n+7) { background: #bcb1c8; }
+.prism-mini-ledger { display: grid; gap: 9px; font: 10px var(--ui-mono); color: #514b60; }
+.prism-mini-ledger strong { border-top: 1px solid #d6d0de; padding-top: 9px; font-size: 9px; }
+.prism-miniature-paint { display: grid; grid-template-columns: 24px 1fr; gap: 8px; }
+.prism-mini-tools { display: grid; align-content: start; gap: 8px; text-align: center; color: #6c3755; }
+.prism-mini-tools b { background: #f5d4e4; border: 1px solid #bd638f; border-radius: 3px; }
+.prism-mini-canvas { position: relative; background: white; border: 1px solid #d8d5dc; overflow: hidden; }
+.prism-mini-canvas span { position: absolute; left: 25%; top: 27%; height: 45px; width: 70px; border-radius: 50% 30% 50% 20%; border: 10px solid #b94d86; transform: rotate(-22deg); }
+.prism-mini-pigments { grid-column: 2; display: flex; gap: 5px; }
+.prism-mini-pigments i { width: 13px; height: 9px; background: #b94d86; }.prism-mini-pigments i:nth-child(2) { background: #765b9b; }.prism-mini-pigments i:last-child { background: #302b36; }
+.prism-mini-counters { display: flex; justify-content: space-between; font: 10px var(--ui-mono); margin-bottom: 10px; color: #514b60; }
+.prism-mini-field { display: grid; grid-template-columns: repeat(8,1fr); gap: 3px; }
+.prism-mini-field i { height: 20px; background: #d7d1df; border: 1px solid #b4a9c0; border-radius: 2px; font: 700 11px/18px var(--ui-mono); text-align: center; color: #5e397e; }
+.prism-mini-field .open { background: #fcfbfd; border-color: #e2dde7; }
+@media(max-width:1000px) { .prism-specimen-grid { grid-template-columns: 1fr; }.prism-specimen { display: grid; grid-template-columns: minmax(200px,1fr) 1fr; gap: 0 24px; }.prism-specimen-label { grid-column: 1/-1; }.prism-miniature { grid-row: 2/5; }.prism-specimen h3 { margin-top: 0; }.prism-miniature-chess { grid-template-columns: 106px 1fr; } }
+@media(max-width:900px) { .prism-hero { grid-template-columns: 1fr; gap: 24px; } }
+@media(max-width:540px) { .prism-reference { padding: 12px; border-radius: 0; }.prism-nav { flex-wrap: wrap; }.prism-nav nav { gap: 14px; }.prism-nav nav a:not(:last-child) { display: inline; }.prism-hero { padding-block: 32px; }.prism-contract { padding: 20px; }.prism-contract dl > div { grid-template-columns: 1fr; gap: 5px; }.prism-tone-grid { grid-template-columns: 1fr; }.prism-tone-card { padding: 18px; grid-template-columns: 12px 1fr; gap: 4px 12px; }.prism-specimen { display: block; }.prism-specimen h3 { margin-top: 16px; }.prism-specimen p { min-height: 0; }.prism-component-panel,.prism-type-panel { padding: 16px; }.prism-material-stage { padding: 14px; }.prism-material-sample { padding: 16px; }.prism-actions { gap: 8px; }.prism-actions button { min-width: 0; }.prism-segments { gap: 0; } }
+@media(forced-colors:active) { .prism-miniature,.prism-mini-board i,.prism-mini-field i,.prism-mini-canvas { border: 1px solid CanvasText; }.prism-mini-field .open { border-style: dotted; } }

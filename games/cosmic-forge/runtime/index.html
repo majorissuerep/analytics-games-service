@@ -9,28 +9,69 @@
   <style>
     :root { color-scheme: light; }
     * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; background: var(--ui-canvas); background-image: var(--ui-canvas-image); color: var(--ui-ink); display: grid; grid-template-rows: auto 1fr; }
-    header { padding: 10px 14px; border-bottom: 1px solid var(--ui-line); display: flex; gap: 16px; align-items: center; }
-    #status { color: var(--ui-violet); background: var(--ui-violet-bg); border-radius: 999px; padding: 5px 10px; font-size: 12px; }
-    main { min-height: 0; display: grid; place-items: center; overflow: auto; }
-    canvas { display: none; max-width: 100%; image-rendering: pixelated; outline: none; }
+    body.app-surface { --ui-canvas: #eeede9; --ui-canvas-image: none; --ui-surface: #faf9f6; --ui-recessed: #e8e7e2; --ui-ink: #292d30; --ui-muted: #596166; --ui-line: #c6c9c7; --ui-panel-radius: 8px; --ui-control-radius: 6px; margin: 0; min-height: 100vh; background: var(--ui-canvas); color: var(--ui-ink); }
+    header { padding: 16px 20px; border-bottom: 1px solid var(--ui-line); display: flex; gap: 12px 24px; align-items: center; justify-content: space-between; }
+    .eyebrow { margin: 0 0 4px; color: var(--ui-muted); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { font-size: 21px; margin: 0; }
+    .development { border: 1px solid var(--ui-line); border-radius: 4px; padding: 5px 8px; font-size: 11px; font-family: var(--ui-mono); white-space: nowrap; }
+    main { display: grid; grid-template-columns: 230px minmax(0, 1fr); min-height: calc(100vh - 83px); }
+    aside { padding: 24px 18px; border-right: 1px solid var(--ui-line); background: var(--ui-surface); min-width: 0; }
+    h2 { font-size: 16px; margin: 8px 0 20px; overflow-wrap: anywhere; }
+    dl { margin: 0; }
+    dl > div { padding: 12px 0; border-top: 1px solid var(--ui-line); }
+    dt { color: var(--ui-muted); font-size: 12px; margin-bottom: 4px; }
+    dd { margin: 0; font-family: var(--ui-mono); font-size: 13px; overflow-wrap: anywhere; }
+    .scale-note { font-size: 12px; color: var(--ui-muted); margin: 20px 0 0; }
+    .stage { min-width: 0; padding: 20px; }
+    .stage-heading { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; margin-bottom: 12px; }
+    .stage-heading h2 { font-size: 13px; margin: 0; }
+    .stage-heading span { font-size: 12px; color: var(--ui-muted); }
+    #status { border-left: 3px solid var(--ui-accent); background: var(--ui-surface); padding: 12px; margin: 0 0 16px; font-size: 12px; overflow-wrap: anywhere; }
+    .viewport { border: 1px solid var(--ui-line); border-radius: 6px; background: #171a1d; overflow: auto; min-height: 350px; }
+    .viewport:has(canvas.ready) { width: fit-content; max-width: 100%; }
+    canvas { display: none; max-width: none; image-rendering: pixelated; }
     canvas.ready { display: block; }
+    .ui-loading { width: auto; margin: 24px; color: var(--ui-ink); background: var(--ui-surface); border-radius: 6px; }
+    .ui-loading-app .ui-loading-content { border-radius: 6px; box-shadow: none; background: var(--ui-surface); padding: 16px; }
+    .viewport [hidden] { display: none; }
+    .controls-note { margin: 12px 0 0; font-size: 12px; color: var(--ui-muted); max-width: 65ch; }
     .error { color: var(--ui-negative); white-space: pre-wrap; }
+    @media (max-width: 760px) { header { padding: 16px; flex-wrap: wrap; } main { grid-template-columns: minmax(0, 1fr); } aside { padding: 16px; border-right: 0; border-bottom: 1px solid var(--ui-line); } h2 { margin-bottom: 12px; } dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; } .scale-note { margin-top: 12px; } .stage { padding: 16px; } .ui-loading { margin: 12px; } .stage-heading { flex-wrap: wrap; } }
+    @media (forced-colors: active) { .viewport { background: Canvas; } #status { border-color: Highlight; } }
   </style>
 </head>
 <body class="app-surface">
   <header class="ui-glass">
-    <strong>Cosmic Forge evaluation workbench</strong>
-    <span id="status">Loading content index…</span>
+    <div><p class="eyebrow">Evaluation workbench</p><h1>Cosmic Forge</h1></div>
+    <span class="development">EXPERIMENTAL / LOCAL LAB</span>
   </header>
   <main>
-    <section class="ui-loading ui-loading-app" id="workbench-loading">
-      <div class="ui-loading-content">
-        <div class="ui-loading-heading"><strong id="loading-label" role="status">Loading content index…</strong><span id="loading-elapsed" role="timer" aria-label="Elapsed time">0s</span></div>
-        <div class="ui-loading-meter" role="progressbar" aria-busy="true" aria-label="Opening Cosmic Forge" data-determinate="false"><span></span></div>
-        <button id="retry" hidden>Retry workbench</button>
+    <aside aria-label="Evaluation details">
+      <p class="eyebrow">Selected evaluation</p><h2 id="evaluation-name">Opening evaluation…</h2>
+      <dl>
+        <div><dt>Focus body</dt><dd id="focus-body">Pending</dd></div>
+        <div><dt>Local scale</dt><dd id="local-scale">Pending</dd></div>
+        <div><dt>Domain</dt><dd id="domain-size">Pending</dd></div>
+        <div><dt>Projection</dt><dd id="projection">Pending</dd></div>
+      </dl>
+      <p class="scale-note">A local material experiment, projected from a universe asset. The two views do not share a physics grid.</p>
+    </aside>
+    <section class="stage" aria-label="Material lab">
+      <div class="stage-heading"><h2>Powder Toy · material lab</h2><span>Native simulation controls</span></div>
+      <p id="status">Loading content index…</p>
+      <div class="viewport" role="region" aria-label="Simulation viewport; scroll to reach native controls on small screens" tabindex="0">
+        <section class="ui-loading ui-loading-app" id="workbench-loading">
+          <div class="ui-loading-content">
+            <div class="ui-loading-heading"><strong id="loading-label" role="status">Loading content index…</strong><span id="loading-elapsed" role="timer" aria-label="Elapsed time">0s</span></div>
+            <div class="ui-loading-meter" role="progressbar" aria-busy="true" aria-label="Opening Cosmic Forge" data-determinate="false"><span></span></div>
+            <button id="retry" class="ui-primary" hidden>Retry workbench</button>
+          </div>
+        </section>
+        <canvas id="canvas" tabindex="-1" aria-label="Powder Toy material simulation" oncontextmenu="event.preventDefault()"></canvas>
       </div>
-    </section><canvas id="canvas" tabindex="-1" oncontextmenu="event.preventDefault()"></canvas></main>
+      <p class="controls-note">The scene opens paused for inspection. Use the simulation’s own controls to experiment. On a narrow screen, scroll inside the viewport to reach all tools.</p>
+    </section>
+  </main>
   <script src="runtime.js" type="module"></script>
 </body>
 </html>

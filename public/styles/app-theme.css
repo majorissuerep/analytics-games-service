@@ -50,7 +50,7 @@
   --ui-space-6: 24px;
   --ui-space-8: 32px;
   --ui-space-12: 48px;
-  /* Compatibility aliases for room/game components. Keep all palette ownership here. */
+  /* Defaults only. Apps own scoped palettes within the personality budget. */
   --bg: var(--ui-canvas);
   --panel: var(--ui-surface);
   --panel-2: var(--ui-raised);
@@ -73,6 +73,29 @@
 }
 
 .app-surface {
+  /* Rebind aliases here: inherited custom properties otherwise resolve on :root
+     before an app's local material/ink overrides can take effect. */
+  --bg: var(--ui-canvas);
+  --panel: var(--ui-surface);
+  --panel-2: var(--ui-raised);
+  --panel-3: var(--ui-recessed);
+  --ink: var(--ui-ink);
+  --ink-dim: var(--ui-muted);
+  --ink-muted: var(--ui-muted);
+  --line: var(--ui-line);
+  --sweep: var(--ui-accent);
+  --sweep-dim: var(--ui-control-border);
+  --sweep-bg: var(--ui-selection);
+  --hot: var(--ui-negative);
+  --warm: var(--ui-warning);
+  --cold: var(--ui-focus);
+  --gold: var(--ui-warning);
+  --shadow: var(--ui-shadow);
+  --shadow-sm: var(--ui-shadow);
+  --radius: var(--ui-panel-radius);
+  --radius-sm: var(--ui-radius);
+  --ui-identity: var(--ui-accent-ink);
+  --ui-identity-bg: var(--ui-pink-bg);
   color-scheme: light;
   color: var(--ui-ink);
   background: var(--ui-canvas);
@@ -124,6 +147,7 @@
 [data-tone='violet'] { --ui-tone-ink: var(--ui-violet); --ui-tone-bg: var(--ui-violet-bg); }
 [data-tone='teal'] { --ui-tone-ink: var(--ui-teal); --ui-tone-bg: var(--ui-teal-bg); }
 [data-tone='amber'] { --ui-tone-ink: var(--ui-amber); --ui-tone-bg: var(--ui-amber-bg); }
+[data-tone='identity'] { --ui-tone-ink: var(--ui-identity); --ui-tone-bg: var(--ui-identity-bg); }
 .ui-tone { color: var(--ui-tone-ink); background: var(--ui-tone-bg); border: 1px solid color-mix(in srgb, var(--ui-tone-ink) 25%, transparent); border-radius: var(--ui-panel-radius); }
 .ui-card { background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: var(--ui-panel-radius); }
 .ui-glass { background: var(--ui-glass-fill); border: 1px solid var(--ui-glass-edge); border-radius: var(--ui-panel-radius); box-shadow: var(--ui-shadow); -webkit-backdrop-filter: var(--ui-material-filter); backdrop-filter: var(--ui-material-filter); }
@@ -139,15 +163,15 @@
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   :root { --ui-glass-fill: rgb(255 255 255 / 76%); --ui-glass-strong-fill: rgb(255 255 255 / 90%); --ui-material-filter: blur(18px) saturate(135%); }
 }
-html[data-ui-material='solid'] { --ui-glass-fill: #fff; --ui-glass-strong-fill: #fff; --ui-material-filter: none; }
+html[data-ui-material='solid'], html[data-ui-material='solid'] .app-surface { --ui-glass-fill: var(--ui-surface); --ui-glass-strong-fill: var(--ui-surface); --ui-material-filter: none; }
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
-  :root { --ui-glass-fill: #fff; --ui-glass-strong-fill: #fff; --ui-material-filter: none; }
+  :root, html:root .app-surface { --ui-glass-fill: var(--ui-surface); --ui-glass-strong-fill: var(--ui-surface); --ui-material-filter: none; }
 }
 @media (pointer: coarse) {
   .app-surface :where(button, select, input:not([type='checkbox']):not([type='radio']), textarea):not(:where(.chess-board-wrap button, .chess-arena-live > div button, .minefield-cell, .paintbox-palette button, .sticky-note-plugin button, .pip-chat-window > header button, .team-dot-btn, .lang-toggle button)) { min-height: 44px; }
 }
 @media (forced-colors: active) {
-  .app-surface { --ui-canvas: Canvas; --ui-surface: Canvas; --ui-raised: Canvas; --ui-recessed: Canvas; --ui-glass-fill: Canvas; --ui-glass-strong-fill: Canvas; --ui-ink: CanvasText; --ui-muted: CanvasText; --ui-accent: LinkText; --ui-focus: Highlight; --ui-control-border: ButtonText; --ui-line: ButtonText; --ui-glass-edge: ButtonText; --ui-material-filter: none; --ui-canvas-image: none; }
+  html:root .app-surface { --ui-canvas: Canvas; --ui-surface: Canvas; --ui-raised: Canvas; --ui-recessed: Canvas; --ui-glass-fill: Canvas; --ui-glass-strong-fill: Canvas; --ui-ink: CanvasText; --ui-muted: CanvasText; --ui-accent: LinkText; --ui-focus: Highlight; --ui-control-border: ButtonText; --ui-line: ButtonText; --ui-glass-edge: ButtonText; --ui-material-filter: none; --ui-canvas-image: none; }
   .app-surface :is(.ui-tone, .ui-badge, .ui-icon) { color: CanvasText; background: Canvas; border: 1px solid ButtonText; }
   .app-surface :is(button[aria-pressed='true'], .ui-selected) { outline: 2px solid Highlight; }
 }

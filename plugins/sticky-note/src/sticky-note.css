@@ -1,0 +1,83 @@
+.app-surface.sticky-note-plugin {
+  --ui-ink: #382e30;
+  --ui-muted: #71615e;
+  --ui-line: #d8c5b8;
+  --ui-control-border: #b39889;
+  --ui-focus: #a01762;
+  position: absolute;
+  z-index: 3;
+  top: 20px;
+  right: 22px;
+  width: 264px;
+  max-width: calc(100% - 44px);
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #cdb6a8;
+  border-top: 4px solid #b72b71;
+  border-radius: 4px 4px 14px 4px;
+  color: var(--ui-ink);
+  background: #fff9ed;
+  box-shadow: 0 5px 14px #39211924;
+  font: 14px/1.5 var(--ui-font);
+  user-select: text;
+}
+.app-surface.sticky-note-plugin header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 12px 8px 16px;
+  color: var(--ui-ink);
+  border-bottom: 1px solid #e7d9c8;
+  background: #f8ebdf;
+}
+.app-surface.sticky-note-plugin header > div { display: grid; gap: 2px; }
+.app-surface.sticky-note-plugin .sticky-note-eyebrow { color: #8a2354; font-size: 10px; font-weight: 700; letter-spacing: .12em; }
+.app-surface.sticky-note-plugin .sticky-note-title { font-size: 17px; line-height: 1.3; font-weight: 600; letter-spacing: -.02em; }
+.app-surface.sticky-note-plugin button {
+  min-width: 40px;
+  min-height: 40px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #7d3156;
+  background: transparent;
+  box-shadow: none;
+  font: 600 13px/1.3 var(--ui-font);
+  cursor: pointer;
+}
+.app-surface.sticky-note-plugin header button { font-size: 22px; font-weight: 400; }
+.app-surface.sticky-note-plugin button:hover { border-color: #c88aa8; background: #f5dde7; }
+.app-surface.sticky-note-plugin button:active { background: #ebc5d6; }
+.app-surface.sticky-note-plugin textarea {
+  display: block;
+  width: calc(100% - 16px);
+  min-height: 140px;
+  max-height: min(50vh, 420px);
+  margin: 8px;
+  padding: 8px;
+  resize: vertical;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: var(--ui-ink);
+  background: #fff9ed;
+  box-shadow: none;
+  font: 15px/1.65 var(--ui-font);
+  caret-color: #a01762;
+}
+.app-surface.sticky-note-plugin textarea::placeholder { color: #71615e; }
+.app-surface.sticky-note-plugin textarea:focus-visible,
+.app-surface.sticky-note-plugin button:focus-visible { outline: 3px solid #a01762; outline-offset: 1px; }
+.app-surface.sticky-note-plugin textarea::selection { color: #382e30; background: #efbbd0; }
+.app-surface.sticky-note-plugin footer { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; min-height: 34px; padding: 0 16px 10px; color: #71615e; font-size: 11px; line-height: 1.5; }
+.app-surface.sticky-note-plugin footer button { margin-left: -8px; text-decoration: underline; }
+@media (pointer: coarse) { .app-surface.sticky-note-plugin button { min-width: 44px; min-height: 44px; } }
+/* Desktop overlays stay out of the phone's full-window workspace. */
+@media (max-width: 760px) { .app-surface.sticky-note-plugin { display: none; } }
+@media (forced-colors: active) {
+  .app-surface.sticky-note-plugin { border-color: CanvasText; background: Canvas; color: CanvasText; box-shadow: none; }
+  .app-surface.sticky-note-plugin header, .app-surface.sticky-note-plugin textarea { color: CanvasText; background: Canvas; border-color: CanvasText; }
+  .app-surface.sticky-note-plugin .sticky-note-eyebrow, .app-surface.sticky-note-plugin footer, .app-surface.sticky-note-plugin button { color: CanvasText; }
+  .app-surface.sticky-note-plugin textarea:focus-visible, .app-surface.sticky-note-plugin button:focus-visible { outline-color: Highlight; }
+}

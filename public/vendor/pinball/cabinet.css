@@ -1,18 +1,55 @@
 html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
-body { display: flex; flex-direction: column; }
-.pinball-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 14px; flex-shrink: 0; border-radius: 0; }
-.pinball-bar strong { color: var(--ui-violet); margin-right: auto; }
-.pinball-bar button, .pinball-data-tools button { min-height: 34px; font-size: 12px; padding: 5px 10px; }
-.pinball-data-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 8px 14px; border-bottom: 1px solid var(--ui-line); font-size: 12px; color: var(--ui-muted); }
-.pinball-import { cursor: pointer; color: var(--ui-accent-ink); font-weight: 600; }
-.pinball-import input { max-width: 210px; font-size: 11px; }
-.pinball-stage { position: relative; min-height: 0; flex: 1; display: grid; place-items: center; overflow: hidden; background: #151322; }
+body.app-surface {
+  --ui-canvas: #ededeb;
+  --ui-surface: #fafaf8;
+  --ui-raised: #ffffff;
+  --ui-recessed: #e4e5e2;
+  --ui-ink: #242a2b;
+  --ui-muted: #50585a;
+  --ui-line: #cbd0cd;
+  --ui-control-border: #788182;
+  --ui-canvas-image: none;
+  --ui-radius: 6px;
+  --ui-panel-radius: 10px;
+  display: flex; flex-direction: column;
+}
+.pinball-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 14px; flex-shrink: 0; border-radius: 0; border-bottom: 1px solid var(--ui-line); }
+.pinball-identity { margin-right: auto; min-width: 140px; }
+.pinball-eyebrow { display: block; font: 10px/1.4 var(--ui-mono); letter-spacing: .12em; color: var(--ui-muted); }
+.pinball-bar strong { display: block; font-size: 19px; line-height: 1.3; letter-spacing: -.03em; }
+.pinball-bar button, .pinball-data-tools button { font-size: 12px; padding: 6px 12px; }
+.pinball-data-tools { flex-shrink: 0; border-bottom: 1px solid var(--ui-line); background: var(--ui-surface); font-size: 12px; color: var(--ui-muted); }
+.pinball-data-tools summary { min-height: 36px; padding: 8px 14px; cursor: pointer; font-weight: 600; }
+.pinball-data-tools summary span { margin-left: 12px; font-weight: 400; }
+.pinball-data-content { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 0 14px 12px; }
+.pinball-import { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; cursor: pointer; color: var(--ui-accent-ink); font-weight: 600; }
+.pinball-import input { max-width: 240px; min-height: 40px; font-size: 12px; }
+.pinball-stage { position: relative; min-height: 0; flex: 1; display: grid; place-items: center; overflow: hidden; background: #202627; border-inline: 8px solid #31393a; }
 .pinball-stage canvas { display: block; outline-offset: -3px; touch-action: none; image-rendering: pixelated; }
 .pinball-stage canvas[hidden] { display: none; }
 #loader { position: absolute; inset: 0; height: 100%; overflow: auto; }
-.pinball-touch-controls { display: flex; gap: 8px; padding: 8px 12px; background: var(--ui-surface); border-top: 1px solid var(--ui-line); }
-.pinball-touch-controls button { flex: 1; min-width: 0; touch-action: none; user-select: none; font-size: 12px; }
+.pinball-touch-controls { display: grid; grid-template-columns: 1fr 1.15fr 1fr; gap: 10px; padding: 10px 14px; background: var(--ui-surface); border-top: 1px solid var(--ui-line); }
+.pinball-touch-controls button { min-width: 0; min-height: 50px !important; display: flex; align-items: center; justify-content: space-between; gap: 6px; touch-action: none; user-select: none; font-size: 12px; border-bottom-width: 3px !important; }
 .pinball-touch-controls button:active { background: var(--ui-selection); }
-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 6px 12px; color: var(--ui-muted); background: var(--ui-surface); font-size: 11px; }
+.pinball-touch-controls kbd { font: 11px var(--ui-mono); border: 1px solid var(--ui-line); border-radius: 3px; padding: 2px 5px; background: var(--ui-recessed); }
+footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 0 14px 8px; color: var(--ui-muted); background: var(--ui-surface); font-size: 11px; }
 #notice.error { color: var(--ui-negative); }
-@media(max-width:480px) { .pinball-bar { padding: 8px; } .pinball-bar strong { font-size: 14px; } .pinball-bar .ui-badge { font-size: 10px; } .pinball-data-tools { padding: 6px 8px; } .pinball-touch-controls { gap: 4px; padding: 6px; } .pinball-touch-controls button { padding: 6px; font-size: 11px; } }
+@media(max-width:580px) {
+  .pinball-bar { gap: 6px; padding: 8px; }
+  .pinball-identity { width: 100%; display: flex; align-items: baseline; justify-content: space-between; }
+  .pinball-eyebrow { order: 1; }
+  .pinball-bar button { flex: 1; padding-inline: 8px; }
+  .pinball-data-tools summary { padding-inline: 8px; }
+  .pinball-data-content { padding-inline: 8px; }
+  .pinball-stage { border-inline-width: 4px; }
+  .pinball-touch-controls { gap: 6px; padding: 8px; }
+  .pinball-touch-controls button { flex-direction: column; justify-content: center; padding: 6px 3px; font-size: 11px; }
+  footer { padding-inline: 8px; }
+}
+@media(max-height:500px) and (min-width:581px) {
+  .pinball-bar { padding-block: 4px; }
+  .pinball-eyebrow { display: none; }
+  .pinball-touch-controls { padding-block: 4px; }
+  .pinball-touch-controls button { min-height: 40px !important; }
+}
+@media(forced-colors:active) { .pinball-stage { border-color: CanvasText; } }

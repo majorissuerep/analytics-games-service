@@ -1,32 +1,83 @@
-.paintbox-app { width: 100%; min-height: 100svh; align-self: stretch; display: flex; flex-direction: column; overflow: hidden; }
-.paintbox-titlebar { min-height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; color: var(--ui-ink); background: var(--ui-surface); border-bottom: 1px solid var(--ui-line); }
-.paintbox-titlebar a { color: inherit; text-decoration: none; font-size: 18px; }
-.paintbox-titlebar span { color: var(--ui-muted); font-size: 12px; }
-.paintbox-menu { display: flex; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--ui-line); background: var(--ui-surface); }
-.paintbox-menu button { padding: 6px 12px; }
+.paintbox-app {
+  --ui-canvas: #f5f2ec;
+  --ui-canvas-image: none;
+  --ui-surface: #faf8f4;
+  --ui-recessed: #e9e5dc;
+  --ui-ink: #302e29;
+  --ui-muted: #69645c;
+  --ui-line: #d6d0c5;
+  --ui-control-border: #aaa398;
+  --ui-radius: 8px;
+  width: 100%; min-height: 100svh; align-self: stretch; display: flex; flex-direction: column; overflow: hidden; background: var(--ui-canvas); color: var(--ui-ink);
+}
+.paintbox-titlebar { min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 20px; background: var(--ui-surface); border-bottom: 1px solid var(--ui-line); }
+.paintbox-titlebar a { display: flex; align-items: center; gap: 10px; color: inherit; text-decoration: none; font-size: 20px; letter-spacing: -.6px; }
+.paintbox-mark { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--ui-accent); color: var(--ui-accent); border-radius: 50% 50% 50% 8px; font-size: 25px; }
+.paintbox-studio-label { color: var(--ui-muted); font-size: 12px; }
+.paintbox-menu { display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: var(--ui-glass-fill); backdrop-filter: var(--ui-material-filter); border-bottom: 1px solid var(--ui-line); }
+.paintbox-document { display: grid; gap: 2px; margin-right: auto; min-width: 110px; }
+.paintbox-document strong { font-size: 14px; font-weight: 600; }
+.paintbox-document small { font-size: 11px; color: var(--ui-muted); }
+.paintbox-history { display: flex; gap: 4px; border-right: 1px solid var(--ui-line); padding-right: 12px; margin-right: 4px; }
+.paintbox-menu button { padding: 8px 12px; min-height: 40px; border-radius: 7px; font-size: 12px; }
 .paintbox-workspace { min-height: 0; display: flex; flex: 1; }
-.paintbox-tools { width: 96px; flex: 0 0 auto; display: grid; align-content: start; grid-template-columns: 1fr; gap: 8px; padding: 12px; border-right: 1px solid var(--ui-line); background: var(--ui-surface); }
-.paintbox-tools button { min-width: 0; height: 58px; padding: 4px; font-size: 22px; }
-.paintbox-tools button.selected { border-color: var(--ui-accent); background: var(--ui-selection); box-shadow: inset 0 -3px var(--ui-accent); }
+.paintbox-tools { width: 178px; flex: 0 0 auto; display: flex; flex-direction: column; gap: 18px; padding: 22px 16px; border-right: 1px solid var(--ui-line); background: var(--ui-surface); }
+.paintbox-section-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ui-muted); }
+.paintbox-tool-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.paintbox-tool-pair button { min-width: 0; height: 70px; padding: 6px; font-size: 26px; border-radius: 8px; }
+.paintbox-tool-pair button.selected { border-color: var(--ui-accent); background: var(--ui-selection); color: var(--ui-accent-ink); box-shadow: inset 0 -3px var(--ui-accent); }
 .paintbox-tools small { display: block; font-size: 12px; }
-.paintbox-tools label { grid-column: 1 / -1; display: grid; gap: 8px; padding-top: 12px; color: var(--ui-muted); font-size: 12px; }
-.paintbox-tools input { width: 100%; }
-.paintbox-canvas-scroll { min-width: 0; flex: 1; overflow: auto; padding: 16px; background: var(--ui-recessed); }
-.paintbox-canvas-scroll canvas { display: block; width: min(960px, 100%); height: auto; border: 1px solid var(--ui-control-border); background: white; box-shadow: none; touch-action: none; cursor: crosshair; }
-.paintbox-footer { min-height: 60px; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-top: 1px solid var(--ui-line); background: var(--ui-surface); }
-.paintbox-current-color { width: 36px; height: 36px; flex: 0 0 auto; border: 1px solid var(--ui-control-border); border-radius: var(--ui-radius); }
-.paintbox-palette { display: flex; flex-wrap: wrap; gap: 6px; max-width: 320px; }
-.paintbox-palette button { width: 26px; min-width: 26px; height: 26px; min-height: 26px; padding: 0; border: 1px solid var(--ui-control-border); border-radius: 3px; box-shadow: none; }
-.paintbox-palette button.selected { outline: 2px solid var(--ui-ink); outline-offset: 2px; }
-.paintbox-footer output { margin-left: auto; color: var(--ui-muted); font-size: 12px; }
-@media (max-width: 600px) { .paintbox-tools { width: 76px; padding: 8px; gap: 6px; } .paintbox-tools button { grid-column: 1 / -1; } .paintbox-footer output { display: none; } .paintbox-footer { flex-wrap: wrap; } }
-
-.paintbox-titlebar, .paintbox-menu, .paintbox-tools, .paintbox-footer { background: var(--ui-glass-fill); backdrop-filter: var(--ui-material-filter); border-color: var(--ui-line); }
-.paintbox-titlebar { min-height: 52px; }
-.paintbox-titlebar strong { color: var(--ui-amber); }
-.paintbox-menu { padding-block: 10px; }
-.paintbox-tools button { border-radius: 12px; }
-.paintbox-tools button.selected { background: var(--ui-selection); color: var(--ui-accent); }
-.paintbox-canvas-scroll { background: #efecf2; background-image: var(--ui-canvas-image); }
-.paintbox-canvas-scroll canvas { border-radius: 4px; box-shadow: var(--ui-shadow); }
-.paintbox-footer { min-height: 64px; }
+.paintbox-size { display: grid; gap: 8px; color: var(--ui-ink); font-size: 12px; }
+.paintbox-size > span { display: flex; justify-content: space-between; }
+.paintbox-size output { font-variant-numeric: tabular-nums; color: var(--ui-muted); }
+.paintbox-size input { width: 100%; min-width: 0; min-height: 28px; }
+.paintbox-brush-preview { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 54px; border-top: 1px solid var(--ui-line); border-bottom: 1px solid var(--ui-line); font-size: 11px; color: var(--ui-muted); }
+.paintbox-brush-preview i { display: block; border-radius: 50%; border: 1px solid #928b80; flex-shrink: 0; }
+.paintbox-pigments { display: grid; gap: 12px; }
+.paintbox-palette { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.paintbox-palette button { width: 30px; min-width: 30px; height: 30px; min-height: 30px; padding: 0; border: 1px solid #948c80; border-radius: 50%; box-shadow: inset 0 1px 2px #0002; }
+.paintbox-palette button.selected { outline: 2px solid var(--ui-ink); outline-offset: 3px; }
+.paintbox-shortcuts { margin: auto 0 0; padding-top: 24px; font-size: 10px; line-height: 1.8; color: var(--ui-muted); }
+.paintbox-canvas-scroll { min-width: 0; flex: 1; overflow: auto; padding: clamp(16px, 4vw, 48px); background: var(--ui-recessed); }
+.paintbox-paper-label { display: flex; justify-content: space-between; max-width: 960px; margin: 0 auto 12px; font-size: 9px; letter-spacing: 1.5px; color: var(--ui-muted); }
+.paintbox-canvas-scroll canvas { display: block; width: min(960px, 100%); height: auto; margin: auto; border: 1px solid #b9b2a6; border-radius: 0; background: white; box-shadow: 0 3px 6px #302e2914, 0 16px 28px #302e290c; touch-action: none; cursor: crosshair; }
+.paintbox-canvas-help { margin: 18px auto 0; text-align: center; color: var(--ui-muted); font-size: 11px; }
+.paintbox-footer { min-height: 42px; display: flex; align-items: center; gap: 8px; padding: 8px 20px; border-top: 1px solid var(--ui-line); background: var(--ui-surface); font-size: 11px; }
+.paintbox-current-color { width: 16px; height: 16px; flex: 0 0 auto; border: 1px solid #948c80; border-radius: 50%; }
+.paintbox-footer-size { color: var(--ui-muted); }
+.paintbox-footer > output { margin-left: auto; color: var(--ui-muted); }
+@media (max-width: 600px) {
+  .paintbox-titlebar { padding: 10px 12px; min-height: 54px; }
+  .paintbox-studio-label { max-width: 135px; text-align: right; font-size: 10px; }
+  .paintbox-menu { flex-wrap: wrap; padding: 10px 12px; gap: 6px; }
+  .paintbox-document { width: 100%; display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
+  .paintbox-history { padding-right: 8px; margin-right: auto; }
+  .paintbox-menu button { min-height: 40px; padding-inline: 10px; }
+  .paintbox-workspace { flex-direction: column; }
+  .paintbox-tools { width: 100%; display: grid; grid-template-columns: 128px minmax(0, 1fr); padding: 12px; gap: 12px 16px; border-right: 0; border-bottom: 1px solid var(--ui-line); }
+  .paintbox-tools > .paintbox-section-label, .paintbox-brush-preview, .paintbox-shortcuts { display: none; }
+  .paintbox-tool-pair { gap: 6px; }
+  .paintbox-tool-pair button { height: 52px; font-size: 20px; padding: 2px; }
+  .paintbox-tool-pair small { font-size: 11px; }
+  .paintbox-size { align-self: center; gap: 3px; }
+  .paintbox-pigments { grid-column: 1 / -1; gap: 8px; }
+  .paintbox-pigments > .paintbox-section-label { display: none; }
+  .paintbox-palette { grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 5px; }
+  .paintbox-palette button { width: 100%; min-width: 0; min-height: 26px; height: 26px; border-radius: 4px; }
+  .paintbox-canvas-scroll { padding: 20px 12px; }
+  .paintbox-canvas-help { font-size: 10px; }
+  .paintbox-footer { padding-inline: 12px; }
+}
+@media (pointer: coarse) and (min-width: 601px) {
+  .paintbox-tools { width: 190px; }
+  .paintbox-palette { grid-template-columns: repeat(3, 1fr); }
+  .paintbox-palette button { width: 40px; height: 40px; }
+}
+@media (forced-colors: active) {
+  .paintbox-tool-pair button.selected { outline: 2px solid Highlight; }
+  .paintbox-palette button, .paintbox-current-color, .paintbox-brush-preview i { forced-color-adjust: none; }
+}
+@media (pointer: coarse) and (max-width: 600px) {
+  .paintbox-palette { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .paintbox-palette button { height: 44px; }
+}

@@ -98,12 +98,12 @@ export function ModelSubmissionPanel() {
   }
 
   return <section className="chess-model-submit">
-    <button className="chess-model-toggle" onClick={() => setOpen(value => !value)} aria-expanded={open}>
+    <button className="chess-model-toggle" onClick={() => setOpen(value => !value)} aria-expanded={open} aria-controls="chess-model-submission-form">
       <span>◇</span><b>Bring your own Chess model</b><small>Safe ONNX or Hugging Face submission</small>
     </button>
     {registryLoading && <LoadingState scope="inline" label="Loading the model registry" />}
     {registryError ? <p className="chess-notice" role="alert">{registryError} <button onClick={() => { setRegistryLoading(true); setRegistryError(''); setRegistryRetry(value => value + 1) }}>Retry registry</button></p> : registry.length > 0 && <div className="chess-model-registry"><b>Community model registry</b>{registry.map(model => <div key={`${model.slug}-${model.state}`}><span>{model.displayName}<small>{model.runtimeId}</small></span><em>{model.state.replaceAll('_', ' ')}</em></div>)}</div>}
-    {open && <form onSubmit={(event) => void submit(event)}>
+    {open && <form id="chess-model-submission-form" onSubmit={(event) => void submit(event)}>
       <p>Submissions are quarantined, scanned, and require administrator approval before deployment or play.</p>
       <div className="chess-online-tabs">
         <button type="button" className={source === 'huggingface' ? 'active' : ''} onClick={() => setSource('huggingface')}>Hugging Face</button>

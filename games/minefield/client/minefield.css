@@ -1,45 +1,60 @@
-.minefield-app { width: 100%; min-height: 100svh; align-self: stretch; padding: 18px; overflow: auto; color: var(--ui-ink); background: var(--ui-canvas); font: 14px/1.5 var(--ui-font); }
-.minefield-header, .minefield-toolbar { max-width: 1100px; margin: 0 auto 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-.minefield-header a { color: var(--ui-ink); font-size: 20px; text-decoration: none; }
+/* Field notes: warm paper, slate instruments, pink intent. The board is opaque. */
+.minefield-app {
+  --ui-focus: var(--ui-accent-ink);
+  --field-ink: #344b54;
+  --field-soft: #e6edef;
+  --ui-teal: #344b54;
+  --ui-teal-bg: #e6edef;
+  --ui-violet: #344b54;
+  --ui-violet-bg: #e6edef;
+  width: 100%; min-width: 0; min-height: 100svh; align-self: stretch;
+  padding: 24px; overflow: auto; color: var(--ui-ink);
+  background: var(--ui-canvas); background-image: none;
+  font: 14px/1.5 var(--ui-font);
+}
+.minefield-header, .minefield-toolbar { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+.minefield-header { padding-bottom: 20px; border-bottom: 1px solid var(--ui-line); }
+.minefield-heading { display: grid; gap: 4px; }
+.minefield-eyebrow, .minefield-field-label { font: 600 10px/1.5 var(--ui-mono); text-transform: uppercase; letter-spacing: .09em; color: var(--field-ink); }
+.minefield-header a { color: var(--ui-ink); font-size: 28px; line-height: 1.2; text-decoration: none; }
+.minefield-embedded-title { display: none; font-size: 28px; line-height: 1.2; }
+.embedded-game-surface .minefield-heading > a { display: none; }
+.embedded-game-surface .minefield-embedded-title { display: block; }
+.minefield-heading p { margin: 0; color: var(--ui-muted); font-size: 12px; }
 .minefield-app label { display: flex; align-items: center; gap: 8px; }
-.minefield-app select, .minefield-toolbar button { padding: 5px 8px; font: inherit; color: var(--ui-ink); background: var(--ui-raised); border: 1px solid var(--ui-control-border); border-radius: 3px; box-shadow: none; }
-.minefield-toolbar { font-size: 12px; }
-.minefield-toolbar > span { margin-right: auto; }
-.minefield-toolbar button[aria-pressed='true'] { background: var(--ui-accent); color: white; }
-.minefield-machine { width: max-content; max-width: 100%; margin: 0 auto; padding: 12px; border: 1px solid var(--ui-line); border-radius: 4px; background: var(--ui-surface); }
-.minefield-scoreboard { min-width: 245px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
-.minefield-scoreboard > div { display: grid; }
+.minefield-app select, .minefield-toolbar button { font: inherit; }
+.minefield-toolbar { padding: 16px 0; font-size: 12px; }
+.minefield-assurance { margin-right: auto; color: var(--field-ink); font-weight: 650; }
+.minefield-assurance > span { display: block; color: var(--ui-muted); font-size: 11px; font-weight: 400; }
+.minefield-toolbar button[aria-pressed='true'] { background: var(--ui-accent); color: white; border-color: var(--ui-accent); box-shadow: inset 0 -3px rgb(0 0 0 / 18%); }
+.minefield-machine { width: calc(var(--field-width) + 38px); min-width: min(100%, 300px); max-width: 100%; margin: 0 auto; padding: 16px; border: 1px solid #b9c5c8; border-top: 3px solid var(--field-ink); border-radius: 4px 4px 12px 12px; background: #fffefa; box-shadow: 0 4px 14px rgb(26 43 48 / 6%); }
+.minefield-field-label { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding-bottom: 12px; }
+.minefield-scoreboard { min-width: 245px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.minefield-scoreboard > div { display: grid; padding: 0; background: none; border: 0; border-radius: 0; }
 .minefield-scoreboard > div:last-child { text-align: right; }
-.minefield-scoreboard small { font-size: 11px; }
-.minefield-scoreboard output { font: 600 24px/1.2 var(--ui-mono); font-variant-numeric: tabular-nums; }
-.minefield-scoreboard button { padding: 6px 10px; border: 1px solid var(--ui-control-border); border-radius: 3px; background: var(--ui-raised); color: var(--ui-ink); box-shadow: none; }
-.minefield-board-scroll { max-width: 100%; overflow: auto; overscroll-behavior: contain; padding: 2px; }
-.minefield-grid { display: grid; width: max-content; border: 1px solid var(--ui-control-border); background: var(--ui-surface); }
-.minefield-cell { width: var(--cell-size); min-width: var(--cell-size); height: var(--cell-size); min-height: var(--cell-size); padding: 0; border: 1px solid #657783; border-radius: 0; color: #202c34; background: #a7b6c0; box-shadow: inset 1px 1px 0 #d7dfe2; font: 700 calc(var(--cell-size) * .54)/1 var(--ui-mono); cursor: pointer; touch-action: manipulation; }
-.minefield-cell:hover:not(.revealed) { background: #bbc7cf; }
-.minefield-cell.revealed { border: 1px solid #e1e1d9; background: var(--ui-surface); box-shadow: none; cursor: default; }
-.minefield-cell.flagged { color: #f9f5e9; background: #415565; border-color: #344650; box-shadow: none; }
-.minefield-cell.flagged:hover { background: #415565; }
-.minefield-cell:focus-visible, .minefield-app button:focus-visible, .minefield-board-scroll:focus-visible { outline: 3px solid var(--ui-focus); outline-offset: -3px; z-index: 1; }
-.minefield-cell:disabled { opacity: 1; cursor: wait; }
-.minefield-progress { display: flex; justify-content: space-between; gap: 16px; margin-top: 10px; font-size: 11px; }
-.minefield-status { max-width: 850px; margin: 10px 0 0; font-size: 12px; }
-@media (max-width: 640px) { .minefield-app { padding: 10px; } .minefield-machine { padding: 8px; } }
+.minefield-scoreboard small { color: var(--ui-muted); font-size: 11px; }
+.minefield-scoreboard output { color: var(--field-ink); font: 600 26px/1.2 var(--ui-mono); font-variant-numeric: tabular-nums; }
+.minefield-scoreboard button { color: white; background: var(--ui-accent); border-color: var(--ui-accent); }
+.minefield-board-scroll { max-width: 100%; overflow: auto; overscroll-behavior: contain; padding: 2px; background: #f4f4ee; border: 1px solid #9baeb5; border-radius: 2px; }
+.minefield-grid { display: grid; width: max-content; background: #f4f4ee; }
+.minefield-app .minefield-cell { width: var(--cell-size); min-width: var(--cell-size); height: var(--cell-size); min-height: var(--cell-size); padding: 0; border: 1px solid #718b95; border-radius: 0; color: #263d47; background: #aebfc5; box-shadow: inset 1px 1px 0 #dfe7e9; font: 700 calc(var(--cell-size) * .54)/1 var(--ui-mono); cursor: pointer; touch-action: manipulation; transition: none; }
+.minefield-app .minefield-cell:hover:not(.revealed) { background: #c5d2d6; border-color: #344b54; }
+.minefield-app .minefield-cell.revealed { border: 1px solid #e1e3dc; background: #fffefa; box-shadow: none; cursor: default; color: #263d47; }
+.minefield-app .minefield-cell.flagged, .minefield-app .minefield-cell.flagged:hover { color: white; background: #344b54; border-color: #263d47; box-shadow: none; }
+.minefield-app .minefield-cell.mine { color: #8d1d35; background: #ffe0e5; border-color: #c54c66; }
+.minefield-app .minefield-cell:focus-visible, .minefield-board-scroll:focus-visible { outline: 3px solid var(--ui-focus); outline-offset: -3px; z-index: 1; }
+.minefield-app .minefield-cell:disabled { opacity: 1; cursor: wait; }
+.minefield-progress { display: flex; align-items: center; gap: 12px; margin-top: 14px; color: var(--field-ink); font: 11px/1.5 var(--ui-mono); }
+.minefield-progress label { white-space: nowrap; }
+.minefield-progress progress { flex: 1; width: 48px; min-width: 24px; height: 5px; accent-color: var(--field-ink); border: 0; border-radius: 0; background: var(--field-soft); }
+.minefield-progress progress::-webkit-progress-bar { background: var(--field-soft); }
+.minefield-progress progress::-webkit-progress-value { background: var(--field-ink); }
+.minefield-progress progress::-moz-progress-bar { background: var(--field-ink); }
+.minefield-progress > span { white-space: nowrap; }
+.minefield-mode-help { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--ui-line); color: var(--field-ink); font-size: 12px; max-width: 850px; }
+.minefield-status { max-width: 850px; margin: 4px 0 0; color: var(--ui-muted); font-size: 11px; }
+@media (max-width: 640px) { .minefield-app { padding: 12px; } .minefield-header { gap: 12px; padding-bottom: 14px; } .minefield-header a { font-size: 24px; } .minefield-machine { padding: 10px; } .minefield-toolbar { gap: 10px; padding: 12px 0; } .minefield-assurance { flex-basis: 100%; } .minefield-scoreboard { gap: 8px; } }
+@media (max-width: 350px) { .minefield-app { padding: 8px; } .minefield-header { align-items: flex-start; } .minefield-heading p { max-width: 160px; } .minefield-toolbar label { gap: 4px; } }
+@media (max-width: 640px) { .minefield-embedded-title { font-size: 24px; } }
 @media (prefers-reduced-motion: reduce) { .minefield-app * { animation: none; transition: none; scroll-behavior: auto; } }
-
-/* Prism metrics carry color; the dense clue field stays opaque and quiet. */
-.minefield-app { background-image: var(--ui-canvas-image); }
-.minefield-header, .minefield-toolbar { padding: 12px 16px; border: 1px solid var(--ui-glass-edge); border-radius: var(--ui-panel-radius); background: var(--ui-glass-fill); backdrop-filter: var(--ui-material-filter); box-shadow: var(--ui-shadow); }
-.minefield-header strong { color: var(--ui-teal); }
-.minefield-machine { padding: 16px; border-radius: 20px; background: var(--ui-glass-strong-fill); border-color: var(--ui-glass-edge); box-shadow: var(--ui-shadow); backdrop-filter: var(--ui-material-filter); }
-.minefield-scoreboard { gap: 12px; }
-.minefield-scoreboard > div { padding: 8px 10px; border-radius: 12px; }
-.minefield-scoreboard output { color: var(--ui-tone-ink); }
-.minefield-scoreboard button { color: white; background: var(--ui-accent); border-color: var(--ui-accent); border-radius: var(--ui-radius); }
-.minefield-grid { background: var(--ui-surface); }
-.minefield-cell { background: #b7a8c7; border-color: #59466c; color: #332c3c; box-shadow: inset 1px 1px rgb(255 255 255 / 40%); transition: none; }
-.minefield-cell:hover:not(.revealed) { background: #c9bdd7; }
-.minefield-cell.revealed { background: #fcfbfd; border-color: #e4dce8; }
-.minefield-cell.flagged, .minefield-cell.flagged:hover { background: #81336b; border-color: #642852; color: #fff; box-shadow: none; }
-.minefield-progress > span:first-child { color: var(--ui-teal); font-weight: 650; }
-@media(max-width:640px) { .minefield-machine { padding: 10px; } .minefield-header, .minefield-toolbar { padding: 10px; } }
+@media (forced-colors: active) { .minefield-app .minefield-cell { border: 1px solid ButtonText; background: ButtonFace; color: ButtonText; } .minefield-app .minefield-cell.revealed { background: Canvas; border-color: GrayText; color: CanvasText; } .minefield-app .minefield-cell.flagged { background: Highlight; color: HighlightText; } }
