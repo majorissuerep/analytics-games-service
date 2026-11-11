@@ -17,6 +17,8 @@
   an independent agent review of the exact candidate evidence. A green test count,
   CSS token or screenshot file alone is never visual approval. Blocking findings
   stop promotion; deployed failures produce an explicit hotfix/rollback decision.
+- CI retains a retry for diagnosis but fails runs with flaky tests. Investigate
+  the first failed attempt; a later passing retry cannot authorize promotion.
 - Use actual elementary OS and Zorin OS references for current app content; inspect
   real screenshots and translate their task hierarchy/material into original app
   decisions. Preserve XP outer chrome. No opening slogans or ornamental editorial

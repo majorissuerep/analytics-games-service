@@ -125,6 +125,9 @@ test('Chess anchors navigation and actions while its selected pane scrolls', asy
 test('Chess board grows with both available axes and keeps all actions on constrained screens', async ({ page }, info) => {
   await page.setViewportSize({ width: 1920, height: 1400 })
   await page.goto('/')
+  // Keep the full 1300px target within the workspace; a second cascaded window
+  // starts lower and is correctly clamped to 1298px at this viewport height.
+  await page.locator(desktopWindow('system:welcome')).getByRole('button', { name: 'Close', exact: true }).click()
   await page.locator('.desktop-icon:visible').filter({ has: page.getByText('Chess', {exact: true}) }).dblclick()
   const window = page.locator(desktopWindow('game:chess')), game = page.frameLocator('iframe[title="Chess"]:visible')
   await expect(page.locator('iframe[title="Chess"]:visible')).toHaveAttribute('aria-busy', 'false', { timeout: 20000 })
