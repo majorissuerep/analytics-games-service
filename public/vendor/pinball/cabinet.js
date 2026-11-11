@@ -4,9 +4,9 @@ const canvas = $('canvas')
 const ASSETS = '/vendor/space-cadet/'
 const KEY = 'analytics-games.pinball.sound.v2'
 let ready = false
+let engineArmed = false
 let paused = false
 let soundOn = false
-let activeImport = false
 let started = Date.now()
 let timeout
 let timer
@@ -16,7 +16,7 @@ try { soundOn = localStorage.getItem(KEY) === 'true' } catch { /* Browser storag
 function announce(message, error = false) { $('notice').textContent = message; $('notice').classList.toggle('error', error) }
 function key(type, key, code, keyCode, focusTable = true) {
   if (focusTable) canvas.focus({ preventScroll: true })
-  canvas.dispatchEvent(new KeyboardEvent(type, { key, code, keyCode, which: keyCode, bubbles: true, cancelable: true }))
+  window.Module?._cabinet_key?.(keyCode, type === 'keydown' ? 1 : 0)
 }
 function press(name, code, number) { key('keydown', name, code, number); key('keyup', name, code, number) }
 let audioBound = false
@@ -28,7 +28,7 @@ function applySound() {
   else void audio.suspend()
 }
 function toggleSound() { soundOn = !soundOn; applySound(); soundLabel(); try { localStorage.setItem(KEY, String(soundOn)) } catch { /* Optional persistence. */ } }
-function soundLabel() { $('sound').textContent = soundOn ? 'Sound on' : 'Sound off'; $('sound').setAttribute('aria-pressed', String(soundOn)) }
+function soundLabel() { $('sound').setAttribute('aria-label', soundOn ? 'Sound on' : 'Sound off'); $('sound').setAttribute('aria-pressed', String(soundOn)) }
 function fit() {
   if (!canvas.width || !canvas.height) return
   const stage = canvas.parentElement
@@ -48,26 +48,41 @@ function fail(message) {
 }
 function begin() {
   started = Date.now(); ready = false
-  canvas.hidden = false; canvas.width = 600; canvas.height = 440; fit()
+  canvas.hidden = false; canvas.width = 365; canvas.height = 470; fit()
   $('loader').hidden = false; $('progress').hidden = false; $('retry').hidden = true
   timer = setInterval(() => { $('elapsed').textContent = `${Math.floor((Date.now() - started) / 1000)}s` }, 1000)
-  timeout = setTimeout(() => fail('Loading took too long. Retry or choose a different set of local files.'), 45_000)
+  timeout = setTimeout(() => fail('Loading took too long. Check your connection and retry.'), 45_000)
 }
 function showReady() {
-  if (!canvas.width || !canvas.height) { requestAnimationFrame(showReady); return }
-  if (lastRuntimeError) { fail('The selected files could not be opened. Check PINBALL.DAT and try again.'); return }
+  canvas.focus({ preventScroll: true })
+  if (!canvas.width || !canvas.height || !engineArmed) { $('loading-detail').textContent = 'Feeding the first ball…'; requestAnimationFrame(showReady); return }
+  if (lastRuntimeError) { fail('The table could not start. Please retry.'); return }
   stopTimer(); ready = true; $('loader').hidden = true; canvas.hidden = false
   for (const id of ['new-game','pause','sound']) $(id).disabled = false
   for (const button of document.querySelectorAll('[data-key]')) button.disabled = false
   fit(); soundLabel()
   // Suspend the engine's own audio context until the player opts in.
   applySound()
-  announce(activeImport ? 'Original files loaded locally. F2 starts a game.' : 'Free-play ready · Space Cadet engine with original CC0 replacement art.')
+  canvas.focus({ preventScroll: true })
+  announce('Hold Space to launch · ← → flippers')
 }
-async function start(originalFiles) {
+async function start() {
   begin()
   const module = {
     canvas,
+    onCabinetState(score, remaining, isPaused, message, armed) {
+      engineArmed = Boolean(armed)
+      $('score').textContent = Math.max(0, score).toLocaleString('en-US')
+      $('ball').textContent = remaining > 0 ? `${4 - remaining} / 3` : '—'
+      paused = Boolean(isPaused)
+      $('pause').textContent = paused ? '▶' : 'Ⅱ'
+      $('pause').setAttribute('aria-label', paused ? 'Resume' : 'Pause')
+      document.body.dataset.paused = String(paused)
+      if (remaining === 0 && ready) announce('Game over · ↻ to play again')
+      else if (paused) announce('Paused')
+      else if (message && !/Awaiting Deployment/i.test(message)) announce(message.replace(/\n/g, ' · '))
+      else announce('Hold Space to launch · ← → flippers')
+    },
     arguments: [],
     locateFile: name => ASSETS + name,
     setStatus: message => { if (message) $('loading-detail').textContent = /Running/.test(message) ? 'Starting the table and controls…' : 'Loading runtime and table files…' },
@@ -87,15 +102,6 @@ async function start(originalFiles) {
     },
     postRun: [() => requestAnimationFrame(() => requestAnimationFrame(showReady))],
   }
-  if (originalFiles) {
-    // Override default resources with user-local bytes before main. No network upload.
-    module.onRuntimeInitialized = () => {
-      for (const file of originalFiles) {
-        try { module.FS_unlink('/game_resources/' + file.name) } catch { /* New sound name. */ }
-        module.FS_createDataFile('/game_resources', file.name, file.bytes, true, true)
-      }
-    }
-  }
   // Fetch the data ourselves so legacy loader errors cannot leave a silent wait.
   try {
     const response = await fetch(ASSETS + 'SpaceCadetPinball.data', { signal: AbortSignal.timeout(30_000) })
@@ -108,16 +114,11 @@ async function start(originalFiles) {
   script.onerror = () => fail('The engine download failed. Check your connection and retry.')
   document.head.appendChild(script)
 }
-$('new-game').addEventListener('click', () => { if (ready) { press('F2','F2',113); paused = false; $('pause').textContent = 'Pause'; announce('Game started. Hold Space, then release to launch.'); } })
-$('pause').addEventListener('click', () => { if (ready) { press('F3','F3',114); paused = !paused; $('pause').textContent = paused ? 'Resume' : 'Pause'; } })
+$('new-game').addEventListener('click', () => { if (ready) { press('F2','F2',113); paused = false; $('pause').textContent = 'Ⅱ'; announce('Game started. Hold Space, then release to launch.'); } })
+$('pause').addEventListener('click', () => { if (ready) { press('F3','F3',114); paused = !paused; $('pause').textContent = paused ? '▶' : 'Ⅱ'; } })
 $('sound').addEventListener('click', () => { if (ready) toggleSound() })
 window.addEventListener('keydown', event => { if (event.code === 'F5') { event.preventDefault(); event.stopImmediatePropagation(); if (ready) toggleSound() } }, true)
-$('exit').addEventListener('click', () => {
-  if (window.parent !== window) window.parent.postMessage({ protocol: 'analytics-games.bridge', version: 1, type: 'game.exit', payload: { reason: 'cancel' } }, window.location.origin)
-  else location.assign('/')
-})
 $('retry').addEventListener('click', () => location.reload())
-$('free-play').addEventListener('click', () => window.parent.postMessage({ type: 'space-cadet:free-play' }, location.origin))
 for (const button of document.querySelectorAll('[data-key]')) {
   let down = false
   button.addEventListener('pointerdown', event => {
@@ -141,34 +142,27 @@ for (const button of document.querySelectorAll('[data-key]')) {
   button.addEventListener('blur', release)
   button.addEventListener('pointerup', release); button.addEventListener('pointercancel', release); button.addEventListener('lostpointercapture', release)
 }
-$('original-files').addEventListener('change', async event => {
-  const files = [...event.target.files]
-  if (!files.length) return
-  if (!files.some(file => file.name.toUpperCase() === 'PINBALL.DAT')) { announce('Choose PINBALL.DAT together with the sound files from your own game folder.', true); return }
-  if (files.length > 100 || files.some(file => !/^(PINBALL\.DAT|FONT\.DAT|SOUND\w*\.WAV|PINBALL\d?\.MID|TABLE\.BMP)$/i.test(file.name) || file.size > 16 * 1024 * 1024) || files.reduce((sum, file) => sum + file.size, 0) > 48 * 1024 * 1024) {
-    announce('Choose only the game data and sounds, up to 48 MB total. Executables are not needed.', true); return
+// Arrow keys belong to the game; vertical arrows have no action and never scroll.
+window.addEventListener('keydown', event => {
+  if (['ArrowUp', 'ArrowDown'].includes(event.code)) { event.preventDefault(); event.stopImmediatePropagation(); return }
+  if (!['ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) return
+  event.preventDefault()
+  if (event.target !== canvas && !event.target.closest?.('[data-key]')) {
+    event.stopImmediatePropagation()
+    if (ready) key('keydown', event.key, event.code, event.keyCode)
   }
-  // Engine instances run in their own document. Restart this document with local
-  // file bytes delivered through a same-origin MessageChannel; never persist/upload.
-  const bytes = await Promise.all(files.map(async file => ({ name: file.name.toUpperCase(), bytes: new Uint8Array(await file.arrayBuffer()) })))
-  window.dispatchEvent(new CustomEvent('space-cadet:local-files', { detail: bytes }))
-  announce('Local import is preparing…')
-})
-// The parent document can retain user-selected bytes across a runtime-only frame
-// restart. A direct cabinet launch uses the same small outer import controller.
-window.addEventListener('space-cadet:local-files', event => {
-  window.parent.postMessage({ type: 'space-cadet:import', files: event.detail }, window.location.origin)
-})
-window.addEventListener('message', event => {
-  if (event.origin !== location.origin || event.source !== window.parent || event.data?.type !== 'space-cadet:start') return
-  activeImport = Boolean(event.data.files)
-  $('art-label').textContent = activeImport ? 'Your original XP files · local' : 'Open Cadet art · CC0'
-  $('free-play').hidden = !activeImport
-  if (activeImport) document.querySelector('.pinball-data-tools').open = true
-  void start(event.data.files)
+}, true)
+window.addEventListener('keyup', event => {
+  if (!['ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) return
+  event.preventDefault()
+  if (event.target !== canvas && !event.target.closest?.('[data-key]')) {
+    event.stopImmediatePropagation()
+    if (ready) key('keyup', event.key, event.code, event.keyCode)
+  }
+}, true)
+window.addEventListener('blur', () => {
+  for (const [name, code, number] of [['ArrowLeft','ArrowLeft',37],['ArrowRight','ArrowRight',39],[' ','Space',32]]) key('keyup', name, code, number, false)
 })
 document.documentElement.dataset.appReady = 'true'
-if (window.parent !== window) window.parent.postMessage({ protocol: 'analytics-games.bridge', version: 1, type: 'game.ready' }, window.location.origin)
-// A same-origin outer controller handles restart without reusing a running WASM instance.
-if (window.parent === window || !new URLSearchParams(location.search).has('runtime')) void start()
-else window.parent.postMessage({ type: 'space-cadet:awaiting-data' }, location.origin)
+if (window.parent !== window) window.parent.postMessage({ protocol: 'analytics-games.bridge', version: 1, type: 'game.ready' }, location.origin)
+void start()
