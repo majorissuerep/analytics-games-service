@@ -92,7 +92,11 @@ export function validateRequest(value, apps) {
   return request
 }
 
-export function loadContext(root, requestPath) {
+export function currentExperience(root) {
+  return parse(z.object({ request: text, review: text }), readJson(root, 'experience/current.json'), 'current experience')
+}
+
+export function loadContext(root, requestPath = currentExperience(root).request) {
   const raw = readJson(root, requestPath)
   assert(Array.isArray(raw.scope), 'request.scope must be an array')
   const appPaths = raw.scope.filter(id => id !== 'process').map(id => {

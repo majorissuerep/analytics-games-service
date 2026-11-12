@@ -1,3 +1,8 @@
+Current CLI/CI defaults resolve `experience/current.json`. Change that pointer once
+per iteration; explicit `--request` and `--review` still inspect a chosen request.
+Historical request contracts must be evaluated at their matching source commit.
+The worked examples below describe the original desktop-refinement release.
+
 # Experience gates
 
 The current request and app contracts define coverage. These small Node tools

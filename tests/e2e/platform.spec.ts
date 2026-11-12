@@ -81,7 +81,9 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   })
 
   await page.goto('/')
-  await expect(page.locator('.desktop-sky')).toHaveCSS('background-image', /millennium-meadow\.webp/)
+  // Next streaming can retain a hidden desktop copy until hydration commits.
+  await expect(page.locator('[data-window-id="system:welcome"]:visible')).toBeVisible()
+  await expect(page.locator('.desktop-sky:visible')).toHaveCSS('background-image', /millennium-meadow\.webp/)
   await expect(page.getByLabel('Desktop sticky note')).toBeVisible()
   await expect(page.getByLabel('4 games installed')).toBeVisible()
   await page.getByRole('button', { name: 'start' }).click()
