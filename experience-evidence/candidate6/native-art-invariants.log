@@ -1,0 +1,5 @@
+$ python scripts/generate-pinball-art.py --check
+318 bitmaps; 911260 bytes; SHA256 543c2d207297b9c303f3c9341c40bbbfe06cbf8e58a38f7d03e9abe2ccc1fc00
+
+
+exit=0; error=none

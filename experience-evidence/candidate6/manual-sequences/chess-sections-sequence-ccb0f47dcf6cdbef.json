@@ -1,0 +1,24 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/candidate6/manual/chess-sections-fixture-archive24-top.png",
+      "sha256": "78da9530b2ce8d3921bed939a0b8f95ba2465ff24753bbb5bb022b014865aec7",
+      "bytes": 300213,
+      "capturedAt": "2026-11-12T00:03:19.645Z",
+      "state": "fixture-archive24-top"
+    },
+    {
+      "path": "experience-evidence/candidate6/manual/chess-sections-fixture-archive24-wheel-bottom.png",
+      "sha256": "8dc3edd62efed263d52f766d2cf485e9081c000585e582be49b280a7a4dc0622",
+      "bytes": 295576,
+      "capturedAt": "2026-11-12T00:03:20.218Z",
+      "state": "fixture-archive24-wheel-bottom"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: fixture-archive24-top → fixture-archive24-wheel-bottom. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

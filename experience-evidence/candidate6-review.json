@@ -1,0 +1,213 @@
+{
+  "schemaVersion": 1,
+  "requestId": "desktop-refinement",
+  "requestSha256": "3d3016d15a1b99aa7f85c3bd2c378ab3d42f081c0ead3ec714edcfde281eb377",
+  "contractsSha256": "9ba6185fa1b370bda4ecd72939f96171a6e0b2be10063ad0555238b3646ea59a",
+  "reviewer": "experience_gate_review",
+  "authors": [
+    "root"
+  ],
+  "reviewedAt": "2026-11-12T00:10:44.413Z",
+  "verdict": "approve",
+  "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+  "environment": "candidate",
+  "reportSha256": "72f6c56b6a4770310a6549e441b426010873b8d565d74bd70fa7c28a2de09369",
+  "referenceComparison": "Compared the viewed Zorin OS18 desktop and elementary Code/AppCenter references with native-ready C6 app views. Adopted anchored navigation, restrained silver material, rounded grouped controls and clear separation of scenery from opaque task content. Minefield is a compact slate field, Chess an olive/ivory board with a quiet pink intention rail, and Pinball a navy cabinet with cyan physical targets and pink flippers. XP desktop/window boundaries remain XP. This does not claim pixel imitation of those operating systems or universal visual perfection; the remaining native raster edges are an explicit minor limitation. Candidate promotion does not approve the future deployed build.",
+  "findings": [
+    {
+      "id": "C6-PIN-RASTER-POLISH",
+      "severity": "minor",
+      "status": "open",
+      "description": "Native365×470 table art retains some jagged masked target/flipper edges and a faint plunger-tail silhouette below the field when enlarged. Ball, collision fixtures, score and controls remain readable in observed flight. Track future source-resolution polish; this does not violate a hard interaction/geometry contract."
+    },
+    {
+      "id": "C6-ARCHIVE-PROOF",
+      "severity": "major",
+      "status": "resolved",
+      "description": "A sparse real archive did not exercise the required long selected-detail scroll.",
+      "resolution": "Fresh clearly labelled24-row browser-only fixture, actual wheel0→1454px, unchanged nav bounds/hit tests and narrow capture now provide direct geometry proof without database writes."
+    },
+    {
+      "id": "C6-SIZING-SEQUENCE",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Cross-app same-state screenshot groups did not demonstrate requested→maximized→restored geometry.",
+      "resolution": "Explicit shell-sizing-sequence-184 links the exact three same-app, same-viewport rendered states and actual resize/restore assertions."
+    },
+    {
+      "id": "C6-FLAKY-PROMOTION",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Earlier candidate CI retries had hidden real focus timing and brittle selectors/partial-charge assumptions.",
+      "resolution": "C6 uses committed Privacy focus, exact Close selectors and observed native full pull;85 browser tests pass first attempt locally and in CI. Deliberate retry-pass probe is rejected by enforced failOnFlakyTests."
+    }
+  ],
+  "observations": [
+    {
+      "requirementId": "REF-01",
+      "note": "Opened requested/maximized native-ready Pinball, Minefield and Chess images and the opaque Chess preference. Rounded silver controls show highlights and soft edge depth; pink identifies intention instead of assigning each tab a competing hue. Minefield slate/white, Chess olive/ivory and Pinball navy/cyan retain distinct domains. The requested comparison sequence is a material comparison across apps, not proof of gameplay. Performed three fresh Privacy Enter/Escape cycles on this exact build: committed dialog receives focus and taskbar opener regains it; useful Welcome task labels are visible. This is candidate approval only; deployed visuals remain a separate gate.",
+      "artifactIds": [
+        "visual-matrix-viewport-b26bd88113feb774",
+        "visual-matrix-viewport-faf8dfad65b30be4",
+        "visual-matrix-viewport-bec624fd6b850968",
+        "visual-matrix-viewport-d38d8f3a1abe84e5",
+        "visual-matrix-viewport-9e113544f462f3fa",
+        "visual-matrix-viewport-dd599d780cfdbb2a",
+        "visual-matrix-viewport-4b757032018c2705",
+        "visual-matrix-viewport-ff4dbf5b0ecfcc77",
+        "visual-matrix-viewport-e1c0e381f35effbc",
+        "visual-matrix-viewport-d4b278b4f87378ba",
+        "visual-matrix-viewport-a51dee830183835a",
+        "visual-matrix-viewport-acdab252dfc7d7ed",
+        "visual-matrix-sequence-232f1864936c7aee",
+        "visual-matrix-sequence-fa2a16ba2cf6d938",
+        "visual-matrix-sequence-30250f637b3540c5"
+      ]
+    },
+    {
+      "requirementId": "MINE-01",
+      "note": "Beginner requested 480×600 now contains level, New game, counters, full board and concise interaction help without the old page/board scrollbar. Removed Cell size/Flag mode are absent. Viewed all eight input-sequence states: flag, worker failure, pending generation, reset, Retry, chord and touch hold/cancel. Failure is distinct from progress and has a reachable Retry. The test asserts state transitions and accidental-reveal prevention; static images alone do not prove those properties.",
+      "artifactIds": [
+        "mine-start-viewport-c5ad4e3a03c2594e",
+        "mine-input-viewport-70c1e8627bebb387",
+        "mine-input-viewport-07716718e570dba2",
+        "mine-input-viewport-69122e46e1b8e434",
+        "mine-input-viewport-c64fb13901fb7634",
+        "mine-input-viewport-7cfcd3f94d554e69",
+        "mine-input-viewport-d920aacd3a6e82c1",
+        "mine-input-viewport-9707f3996b693a98",
+        "mine-input-viewport-cd4743c19de795ca",
+        "mine-input-sequence-68d502a30b9e2cec"
+      ]
+    },
+    {
+      "requirementId": "MINE-02",
+      "note": "Viewed ready→267/381 safe cells opened→won on the actual 99-mine board; pale revealed cells, dark flags and slate covered cells remain distinguishable without rainbow flags or heavy bevel noise. Public-clue automated deduction reached the win; this finite run is not a mathematical claim about all seeds. Independently dispatched real browser touch events at 320×640: Intermediate pan 0→116 px; Expert 116→388 px, with zero flags/reveals and zero document overflow. Viewed keyboard edge-reveal captures too. The constrained 24px-cell board is the explicit spatial pan region, not accidental whole-app horizontal overflow.",
+      "artifactIds": [
+        "mine-start-viewport-c5ad4e3a03c2594e",
+        "mine-expert-viewport-2de548a31570ea30",
+        "mine-expert-viewport-6fb6c7046642475f",
+        "mine-expert-viewport-1ebe094f091f616f",
+        "mine-narrow-viewport-953eb6f39d53569e",
+        "mine-narrow-viewport-25d73f26911e3133",
+        "mine-narrow-viewport-7e0a224213f033cb",
+        "mine-narrow-viewport-080593ceaaabc732",
+        "mine-narrow-viewport-21f98affb0ee0513",
+        "mine-narrow-viewport-33e9dcad14c08ac1",
+        "mine-expert-sequence-afd0984425bafdcf",
+        "mine-narrow-sequence-38544fe305f85b39"
+      ]
+    },
+    {
+      "requirementId": "CHESS-01",
+      "note": "Viewed compact fixed navigation and selected details at desktop and 320px, with no opening slogan or multicolor category cards. Challenged the apparent long-list proof: one or two real archive rows cannot demonstrate scrolling. Closed that gap by intercepting only the GET response with 24 explicitly labelled Archive fixture rows in the real app (no database writes), then actual wheel input moved details 0→1454 px (488px client/1942px scroll height). Navigation bounds/hit tests stayed unchanged, document overflow remained zero, and the narrow view retained navigation. The labelled fixture proves long-content geometry; separate real arena captures/tests prove persistence and replay.",
+      "artifactIds": [
+        "chess-sections-viewport-d322899cbe66599e",
+        "chess-sections-viewport-c83e9f8672309ce1",
+        "chess-sections-viewport-0b2c6fe19896b460",
+        "chess-sections-viewport-7ce96f03fccea7eb",
+        "chess-sections-viewport-8886c3ce7228841e",
+        "chess-sections-viewport-c74e132760c70f41",
+        "chess-sections-viewport-6ef14eb96f2100e2",
+        "chess-sections-viewport-51f5ae03c3d78483",
+        "chess-sections-viewport-be3dff1504f45ceb",
+        "chess-sections-sequence-ccb0f47dcf6cdbef"
+      ]
+    },
+    {
+      "requirementId": "CHESS-02",
+      "note": "Viewed every frame of the exact outer-window resize sequence 960×900→1200×1100→1600×1300 at a fixed 1920×1400 viewport, the larger maximized board, and constrained 1280/390/320 captures. The board remains square and grows with its stage; Leave/New game and state-appropriate actions remain reachable. Viewed local move/Undo and all genuine Stockfish18/19/Reckless response/hint frames plus waiting→failure→Retry analysis. Best move displays zero loss, close losses receive close shades, and the fixed ≤−0.50 red endpoint is separate from position balance. A few immediate move screenshots catch animation; final state is corroborated by the interaction assertions, not inferred from a single moving-piece frame.",
+      "artifactIds": [
+        "chess-play-viewport-31adf304eda240f4",
+        "chess-play-viewport-5e83788b26171793",
+        "chess-resize-viewport-01e5450f7caf1b08",
+        "chess-resize-viewport-a221b7dc86206468",
+        "chess-resize-viewport-8bfaf877bd75ff75",
+        "chess-resize-viewport-151c5ccf042cb0de",
+        "chess-resize-viewport-e0f8cfc90712971d",
+        "chess-resize-viewport-e3611c9e0cb35201",
+        "chess-resize-viewport-8d57ef23fb9b9805",
+        "chess-play-viewport-7a9a425351eed739",
+        "chess-play-viewport-e2c7647332796776",
+        "chess-play-viewport-e3415168fc3008a9",
+        "chess-play-viewport-be73cd4f279868e4",
+        "chess-play-viewport-17f309cbcd28098e",
+        "chess-play-viewport-afeea1cba5a7cd05",
+        "chess-play-viewport-b0f86b579234c839",
+        "chess-play-viewport-bd01129a8cf628ad",
+        "chess-play-viewport-d68d1f6f0aabb934",
+        "chess-play-sequence-5668acc6486033ea",
+        "chess-play-sequence-76ca86e4318b1b85",
+        "chess-resize-sequence-964894a1386f7a20"
+      ]
+    },
+    {
+      "requirementId": "PIN-01",
+      "note": "Viewed every frame of the native lifecycle sequence: ready table, both held arrows, actual upper-orbit flight, pause, resumed ball, score, natural drain to Ball2/3, fed plunger, second flight and failed WASM→Retry→2,000-point recovery. Ivory ball and pink flippers are separated from navy floor and silver physical rails; the old dominant fictitious central seal and menus/import controls are absent. Native pause pixel checks corroborate actual frozen motion. Independently used touchStart/touchEnd at390×844: both flippers held/released; first launch accepted (pull1 after105ms), held to actual100 then released once and scored2,000. Viewed320px resize/pause: table, score, ball and controls remain visible. Read pinned native checksums and318-mask/non-art invariants; those checks are provenance evidence, not by themselves proof that art matches collision geometry. Flight observations show no major false obstacle, with residual raster polish tracked below.",
+      "artifactIds": [
+        "pinball-play-viewport-cf61fe424987ed29",
+        "pinball-play-viewport-aeab10c7db6c1206",
+        "pinball-play-viewport-e2fcde8d9a8679bc",
+        "pinball-play-viewport-dfe59263d16ee0be",
+        "pinball-play-viewport-68414e972d7d9382",
+        "pinball-play-viewport-4fca6a3c3793767d",
+        "pinball-play-viewport-f26a3b84da4d2f52",
+        "pinball-play-viewport-b363aeaeebc0af94",
+        "pinball-play-viewport-2033ea75604aa765",
+        "pinball-play-viewport-d83b2d2b30d900f8",
+        "pinball-play-viewport-7b114db4a558ee1c",
+        "pinball-play-viewport-e4502fc646e263c8",
+        "pinball-play-viewport-2a538aba23dedc7c",
+        "pinball-narrow-viewport-bd6577f092a42bd5",
+        "pinball-narrow-viewport-870e988296e5b7e1",
+        "pinball-narrow-viewport-dfbd44ffa0d4e411",
+        "pinball-narrow-viewport-1287dc159aacbc6c",
+        "pinball-narrow-viewport-5d7b0d51afdd7133",
+        "pinball-narrow-viewport-e44a03c43ab50fe9",
+        "pinball-narrow-viewport-37d058f3758e14ed",
+        "pinball-narrow-viewport-fa7bb2ea88c6ef0c",
+        "pinball-narrow-viewport-a697ea62fc2c54c6",
+        "pinball-play-sequence-6218ebe45214fbdd",
+        "pinball-narrow-sequence-0b30ab2ef298e41f",
+        "native-provenance-log",
+        "native-art-invariants-log"
+      ]
+    },
+    {
+      "requirementId": "SHELL-01",
+      "note": "Viewed requested/maximized/restored Chess and both constrained captures. The explicit same-app shell-sizing sequence184 proves requested1000×758→max1280×758→user800×620 restore at1280×800; it replaces the insufficient inference from a cross-app comparison slideshow. The 758px height is the actual workspace after one42px taskbar deduction. The complete browser run measures requested/max/restore/clamping for all five installed games and three system windows plus external default; my direct visual sampling here focuses Chess plus the requested/min/max views already cited for Minefield/Pinball.",
+      "artifactIds": [
+        "shell-sizing-viewport-5efe1aa3b82d5573",
+        "shell-sizing-viewport-e22c2094ae724128",
+        "shell-sizing-viewport-3dded7c865eea942",
+        "shell-sizing-viewport-567b2dbf999fa1b2",
+        "shell-sizing-viewport-9f6e1ebcb8f15d1f",
+        "shell-sizing-sequence-184"
+      ]
+    },
+    {
+      "requirementId": "SHELL-02",
+      "note": "Viewed all nine frames of the focus sequence with source assertions: first-click switches1/5/10, keyboard activation, continuous iframe crossing drag, background nested Pinball first action yielding real score,100 active clicks with stable stack, body action and keyboard raise. A visible active title alone would not prove original click delivery; the sequence is supported by flag/state checks, completed drawing stroke and actual native scoring. No new major stacking or focus defect was observed.",
+      "artifactIds": [
+        "shell-focus-viewport-8b053e0f94097e05",
+        "shell-focus-viewport-64ae9284607cabae",
+        "shell-focus-viewport-3fe50bb79ef24f59",
+        "shell-focus-viewport-dc25e51f7fdc3af2",
+        "shell-focus-viewport-d442bd2c15650ac6",
+        "shell-focus-viewport-89eecff7537316e9",
+        "shell-focus-viewport-38b11791f5c9b0a4",
+        "shell-focus-viewport-cf2765d52e7bf780",
+        "shell-focus-viewport-484de43f1628bc62",
+        "shell-focus-sequence-87a93dc067b3ad86"
+      ]
+    },
+    {
+      "requirementId": "GATE-01",
+      "note": "Read all36 contract/collector negative-test outcomes, real-browser rejection of deliberate2px overflow/clipped action/broken body focus, and the intentional first-fail/retry-pass probe returning exit1. Reviewed CI212 unit checks and85 browser first-attempt passes plus local85 first-attempt passes. Revalidated all188 artifact records (155viewport,27sequence,6logs), sidecar checksums and current report hash against the frozen tree; fresh live build identity and native hashes match. The gate rejects stale/self-only/missing dynamics and unresolved-major reviews, and requires separate deployed evidence and an explicit accept/hotfix/rollback decision. It checks evidence integrity and reviewer accountability, not aesthetic truth; observed image review above supplies that judgment.",
+      "artifactIds": [
+        "gate-negative-log",
+        "ci-retry-rejection-log"
+      ]
+    }
+  ]
+}

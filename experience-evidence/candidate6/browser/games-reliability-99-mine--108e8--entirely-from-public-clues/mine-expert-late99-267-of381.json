@@ -1,0 +1,22 @@
+{
+  "scenarioId": "mine-expert",
+  "state": "late99-267-of381",
+  "window": "requested-expert1120x760",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "capturedAt": "2026-11-11T23:57:52.146Z",
+  "url": "http://localhost:3132/",
+  "identity": {
+    "schemaVersion": 1,
+    "commit": "145ef28f571da314f9b4f3376b9318611a80eea8",
+    "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+    "nativeAssets": {
+      "public/vendor/space-cadet/SpaceCadetPinball.js": "ddff8bf22ebd7c4888cd1cbbbe011c9563cff144f7a0051362f4c5fb5f0ef117",
+      "public/vendor/space-cadet/SpaceCadetPinball.wasm": "48ba94b1de0eb0e97b5db2681da93badf8e8178628465a9f1149ae0f9e2f7ef1",
+      "public/vendor/space-cadet/SpaceCadetPinball.data": "199c5fdcefd62b1965053bf47b0848e08d97830e0fe9e6ba595f8d7006d8782c"
+    }
+  },
+  "sha256": "4457d03506d133e91421890a7f72d43e86cdbafac5bf749d2a43bf0bee1ea725"
+}

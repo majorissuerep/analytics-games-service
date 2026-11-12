@@ -1,0 +1,38 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/candidate6/browser/privacy-focus-Privacy-comm-265c5-s-on-open-and-dismissal-at-/visual-matrix-privacy-desktop-open.png",
+      "sha256": "a146e904354469800a50fea94a87b41715863343b50c425f93a81e1eedb4167c",
+      "bytes": 668809,
+      "capturedAt": "2026-11-12T00:00:04.940Z",
+      "state": "privacy-desktop-open"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/privacy-focus-Privacy-comm-265c5-s-on-open-and-dismissal-at-/visual-matrix-privacy-desktop-returned-focus.png",
+      "sha256": "78ddbc4d21b181548a0ade8cbe1fe8b39b3282de78df3e95f2dc83b06364ce32",
+      "bytes": 770750,
+      "capturedAt": "2026-11-12T00:00:05.453Z",
+      "state": "privacy-desktop-returned-focus"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/privacy-focus-Privacy-comm-3b7d3-en-and-dismissal-at-develop/visual-matrix-privacy-document-open.png",
+      "sha256": "65f2a67f84f8e70f03b4da973f6eb4e058053d006eb0fcb8480701cd7115f239",
+      "bytes": 133402,
+      "capturedAt": "2026-11-12T00:00:08.237Z",
+      "state": "privacy-document-open"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/privacy-focus-Privacy-comm-3b7d3-en-and-dismissal-at-develop/visual-matrix-privacy-document-returned-focus.png",
+      "sha256": "4538dbc2da7bcdd72708d97f078ad28453667a6ffb6185d1ebe05eb9f9d8ca71",
+      "bytes": 98341,
+      "capturedAt": "2026-11-12T00:00:08.379Z",
+      "state": "privacy-document-returned-focus"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: privacy-desktop-open → privacy-desktop-returned-focus → privacy-document-open → privacy-document-returned-focus. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

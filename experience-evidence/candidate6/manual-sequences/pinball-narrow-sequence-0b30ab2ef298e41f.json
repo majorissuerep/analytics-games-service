@@ -1,0 +1,59 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/candidate6/manual/pinball-narrow-true-touch-left-held.png",
+      "sha256": "3e94676caa711067fdd2db8e3feea7875493ba6b69657292528261458e48c0b6",
+      "bytes": 170244,
+      "capturedAt": "2026-11-11T23:54:46.605Z",
+      "state": "true-touch-left-held"
+    },
+    {
+      "path": "experience-evidence/candidate6/manual/pinball-narrow-true-touch-left-released.png",
+      "sha256": "3af3e7432f9675d701ea44c398799ba1c5538fcb70532ff954c0a738445ab30a",
+      "bytes": 170307,
+      "capturedAt": "2026-11-11T23:54:46.911Z",
+      "state": "true-touch-left-released"
+    },
+    {
+      "path": "experience-evidence/candidate6/manual/pinball-narrow-true-touch-right-held.png",
+      "sha256": "a3106dede70753e5daea7a2f9c540ca2e947064ade4344bb341bf0a292b30073",
+      "bytes": 170534,
+      "capturedAt": "2026-11-11T23:54:47.362Z",
+      "state": "true-touch-right-held"
+    },
+    {
+      "path": "experience-evidence/candidate6/manual/pinball-narrow-true-touch-right-released.png",
+      "sha256": "16f38e9d934dd9904ed239bc7d75f2b477e88dbc03ad9c8c9afab33d7c57f6f7",
+      "bytes": 170261,
+      "capturedAt": "2026-11-11T23:54:47.765Z",
+      "state": "true-touch-right-released"
+    },
+    {
+      "path": "experience-evidence/candidate6/manual/pinball-narrow-true-touch-launch-held.png",
+      "sha256": "2078474af125326ebc4a82c655d069b8e39a2cfde3e25a1b27c6d3e6bf329b5f",
+      "bytes": 169560,
+      "capturedAt": "2026-11-11T23:54:52.051Z",
+      "state": "true-touch-launch-held"
+    },
+    {
+      "path": "experience-evidence/candidate6/manual/pinball-narrow-true-touch-launch-released.png",
+      "sha256": "280709d0a9b7389644d82044360056abfa713c926b7d62e9637ca5da940c368b",
+      "bytes": 170224,
+      "capturedAt": "2026-11-11T23:54:52.508Z",
+      "state": "true-touch-launch-released"
+    },
+    {
+      "path": "experience-evidence/candidate6/manual/pinball-narrow-true-touch-live-score.png",
+      "sha256": "ea519d2786d679daf381f9a08afd994824b527c64ae74289d0aece0ed7341e3f",
+      "bytes": 172065,
+      "capturedAt": "2026-11-11T23:54:56.237Z",
+      "state": "true-touch-live-score"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: true-touch-left-held → true-touch-left-released → true-touch-right-held → true-touch-right-released → true-touch-launch-held → true-touch-launch-released → true-touch-live-score. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

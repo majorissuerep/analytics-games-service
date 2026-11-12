@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "id": "desktop",
+  "vision": "docs/experience/VISION.md",
+  "request": "desktop-refinement",
+  "route": "/",
+  "preferredWindow": null,
+  "scrollOwners": [
+    "system-panel only for long document content"
+  ],
+  "requiredControls": [
+    "window close/minimize/maximize",
+    "taskbar activation",
+    "actual first clicked app control"
+  ],
+  "states": [
+    "requested",
+    "overlapping",
+    "maximized",
+    "restored",
+    "constrained"
+  ],
+  "forbidden": [
+    "double taskbar subtraction",
+    "unclamped minimum dimensions",
+    "body activation overlays",
+    "unbounded focus ranks"
+  ],
+  "requestedWindows": {
+    "minefield": {
+      "width": 480,
+      "height": 600
+    },
+    "chess": {
+      "width": 1000,
+      "height": 760
+    },
+    "orbit-pinball": {
+      "width": 920,
+      "height": 740
+    },
+    "paintbox": {
+      "width": 1000,
+      "height": 760
+    },
+    "mafia": {
+      "width": 780,
+      "height": 640
+    },
+    "welcome": {
+      "width": 620,
+      "height": 430
+    },
+    "help": {
+      "width": 720,
+      "height": 620
+    },
+    "plugins": {
+      "width": 620,
+      "height": 520
+    },
+    "externalDefault": {
+      "width": 960,
+      "height": 720
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/candidate6/browser/games-reliability-Minefiel-35b90-n-only-their-readable-board/mine-narrow-intermediate-edge-reveal.png",
+      "sha256": "b537f85b916e949e2db2dac56c9f5f0196307b1bdc0b137cf4265f6b5bb49093",
+      "bytes": 41731,
+      "capturedAt": "2026-11-11T23:58:12.057Z",
+      "state": "intermediate-edge-reveal"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/games-reliability-Minefiel-35b90-n-only-their-readable-board/mine-narrow-expert-edge-reveal.png",
+      "sha256": "7a5b886be074c2795876dae8f09fad721b1cfd82246bb046e48f1f25ba9ca675",
+      "bytes": 40785,
+      "capturedAt": "2026-11-11T23:58:13.050Z",
+      "state": "expert-edge-reveal"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: intermediate-edge-reveal → expert-edge-reveal. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

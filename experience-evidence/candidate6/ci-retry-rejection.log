@@ -1,0 +1,37 @@
+$ node experience-evidence/candidate6/flake-policy/probe.mjs
+
+Running 1 test using 1 worker
+
+  ✘  1 experience-evidence/candidate6/flake-policy/intentional-flake.spec.ts:2:5 › known intermittent fixture must reject CI promotion (6ms)
+  ✓  2 experience-evidence/candidate6/flake-policy/intentional-flake.spec.ts:2:5 › known intermittent fixture must reject CI promotion (retry #1) (4ms)
+
+
+  1) experience-evidence/candidate6/flake-policy/intentional-flake.spec.ts:2:5 › known intermittent fixture must reject CI promotion 
+
+    Error: Deliberately fail first attempt and pass the retry
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      1 | import { test, expect } from '@playwright/test'
+      2 | test('known intermittent fixture must reject CI promotion', async ({}, info) => {
+    > 3 |   expect(info.retry, 'Deliberately fail first attempt and pass the retry').toBe(1)
+        |                                                                            ^
+      4 | })
+      5 |
+        at /workspace/analytics-games-service/experience-evidence/candidate6/flake-policy/intentional-flake.spec.ts:3:76
+
+    Error Context: experience-evidence/candidate6/flake-policy/outputs/intentional-flake-known-in-59c8d-re-must-reject-CI-promotion/error-context.md
+
+  1 flaky
+    experience-evidence/candidate6/flake-policy/intentional-flake.spec.ts:2:5 › known intermittent fixture must reject CI promotion 
+{"expected":"A passing retry still fails CI","actualExit":1,"rejected":true}
+
+(node:150757) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:150770) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+exit=0; error=none

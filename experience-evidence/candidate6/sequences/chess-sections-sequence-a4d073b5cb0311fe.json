@@ -1,0 +1,59 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/candidate6/browser/games-reliability-arena-bu-a1a33-advances-pauses-and-resumes/chess-sections-builtin-stockfish-19-arena-paused.png",
+      "sha256": "b57cf6f7dbb03621362cecc1ad8f991ebd6b2d5f0236845af5f51bfea22d328c",
+      "bytes": 107062,
+      "capturedAt": "2026-11-11T23:57:29.453Z",
+      "state": "builtin-stockfish-19-arena-paused"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/games-reliability-arena-bu-a1a33-advances-pauses-and-resumes/chess-sections-builtin-stockfish-19-replay-playing.png",
+      "sha256": "cebb79ed6a0eb4edc6ba55d0eceba9311045b945d20a7a7a7030bbd6e178cf6d",
+      "bytes": 106027,
+      "capturedAt": "2026-11-11T23:57:29.725Z",
+      "state": "builtin-stockfish-19-replay-playing"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/games-reliability-arena-bu-a1a33-advances-pauses-and-resumes/chess-sections-builtin-stockfish-19-durable-archive.png",
+      "sha256": "01bd4bbd65fa6490880e31968cf9eca005c18998e08eebabe687772cc2d09a5f",
+      "bytes": 77096,
+      "capturedAt": "2026-11-11T23:57:31.481Z",
+      "state": "builtin-stockfish-19-durable-archive"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/games-reliability-arena-bu-7dff2-advances-pauses-and-resumes/chess-sections-builtin-styled-opening-arena-paused.png",
+      "sha256": "e72d5950672848f838117c110bab2862a9613f40523244dfae35d1da02fd9cab",
+      "bytes": 108333,
+      "capturedAt": "2026-11-11T23:57:35.718Z",
+      "state": "builtin-styled-opening-arena-paused"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/games-reliability-arena-bu-7dff2-advances-pauses-and-resumes/chess-sections-builtin-styled-opening-replay-playing.png",
+      "sha256": "2f5e385bc622c0983a4e53336822c71c672bebb9458452d61323b783d324c097",
+      "bytes": 106781,
+      "capturedAt": "2026-11-11T23:57:36.073Z",
+      "state": "builtin-styled-opening-replay-playing"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/games-reliability-arena-bu-7dff2-advances-pauses-and-resumes/chess-sections-builtin-styled-opening-durable-archive.png",
+      "sha256": "d866b029c57840f653169bff0d37e72519469b61dffcb5a48d3b10f16e7a1aa7",
+      "bytes": 80573,
+      "capturedAt": "2026-11-11T23:57:37.795Z",
+      "state": "builtin-styled-opening-durable-archive"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/platform-Chess-exposes-saf-5ee32-hout-changing-built-in-play/chess-sections-model-submission.png",
+      "sha256": "71040ba123e16839cdf4ebcdd7fa3b8342f36ab45c8037b3902940898f7b2c76",
+      "bytes": 92358,
+      "capturedAt": "2026-11-11T23:59:50.065Z",
+      "state": "model-submission"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: builtin-stockfish-19-arena-paused → builtin-stockfish-19-replay-playing → builtin-stockfish-19-durable-archive → builtin-styled-opening-arena-paused → builtin-styled-opening-replay-playing → builtin-styled-opening-durable-archive → model-submission. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

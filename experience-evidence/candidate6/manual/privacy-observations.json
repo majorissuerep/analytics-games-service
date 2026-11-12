@@ -1,0 +1,20 @@
+[
+  {
+    "iteration": 1,
+    "keys": "Enter then Escape",
+    "closeFocused": true,
+    "returned": true
+  },
+  {
+    "iteration": 2,
+    "keys": "Enter then Escape",
+    "closeFocused": true,
+    "returned": true
+  },
+  {
+    "iteration": 3,
+    "keys": "Enter then Escape",
+    "closeFocused": true,
+    "returned": true
+  }
+]

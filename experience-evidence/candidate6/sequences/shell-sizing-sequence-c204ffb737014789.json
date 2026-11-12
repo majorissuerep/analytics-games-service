@@ -1,0 +1,73 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/candidate6/browser/desktop-experience-shell-s-26fc8-e-and-constrained-workspace/shell-sizing-system-welcome-constrained-390.png",
+      "sha256": "51125a011c625b5ec92c43431f3f9b5331b77f28e3ea1b81cbb001cc470aa3e5",
+      "bytes": 297843,
+      "capturedAt": "2026-11-11T23:55:26.483Z",
+      "state": "system:welcome-constrained-390"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/desktop-experience-shell-s-7f1c1-e-and-constrained-workspace/shell-sizing-system-help-constrained-390.png",
+      "sha256": "cee8e2aa4941814b147bde9bf967b879203169f8750661b06fd4715e7f02df94",
+      "bytes": 220281,
+      "capturedAt": "2026-11-11T23:55:29.641Z",
+      "state": "system:help-constrained-390"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/desktop-experience-shell-s-60296-e-and-constrained-workspace/shell-sizing-system-plugins-constrained-390.png",
+      "sha256": "3766240791027d37715ccd8a117b66f61c53427ee85e1144fb2225a4a1c5ff5f",
+      "bytes": 272068,
+      "capturedAt": "2026-11-11T23:55:32.594Z",
+      "state": "system:plugins-constrained-390"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/desktop-experience-shell-s-aa7cd-e-and-constrained-workspace/shell-sizing-game-minefield-constrained-390.png",
+      "sha256": "01d6c471aabc3c418141cb75e51555260e756f936a11848c4b49176b16846412",
+      "bytes": 205441,
+      "capturedAt": "2026-11-11T23:55:36.333Z",
+      "state": "game:minefield-constrained-390"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/desktop-experience-shell-s-ce44c-e-and-constrained-workspace/shell-sizing-game-chess-constrained-390.png",
+      "sha256": "3da5c43e1859772906f33a4d869071d52064c1d8523a0901a414221aa3c5f5ee",
+      "bytes": 213605,
+      "capturedAt": "2026-11-11T23:55:40.451Z",
+      "state": "game:chess-constrained-390"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/desktop-experience-shell-s-866ba-e-and-constrained-workspace/shell-sizing-game-orbit-pinball-constrained-390.png",
+      "sha256": "81cb51c105154eb53263d82178bd0d623751a1583baf3e0cdd286b8bc7f69e74",
+      "bytes": 239765,
+      "capturedAt": "2026-11-11T23:55:45.259Z",
+      "state": "game:orbit-pinball-constrained-390"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/desktop-experience-shell-s-7ddc7-e-and-constrained-workspace/shell-sizing-game-paintbox-constrained-390.png",
+      "sha256": "a9b277eaffa57fc6b5e425328d9d8b4eadf1844a72532fdd575f33300269bb0a",
+      "bytes": 172249,
+      "capturedAt": "2026-11-11T23:55:48.558Z",
+      "state": "game:paintbox-constrained-390"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/desktop-experience-shell-s-f18a6-e-and-constrained-workspace/shell-sizing-game-mafia-constrained-390.png",
+      "sha256": "d330b6c45c784665e14eb5f81ac791899fd0b16475ac2e4b928adb74d0b4a03b",
+      "bytes": 199287,
+      "capturedAt": "2026-11-11T23:55:51.559Z",
+      "state": "game:mafia-constrained-390"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/experience-contracts-reque-731c1-to-actual-taskbar-workspace/shell-sizing-clamped-390.png",
+      "sha256": "beaa4115d9741d4fb86618449d77119da188b5f9eada873395052a18ec1332ea",
+      "bytes": 157561,
+      "capturedAt": "2026-11-11T23:56:38.796Z",
+      "state": "clamped-390"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: system:welcome-constrained-390 → system:help-constrained-390 → system:plugins-constrained-390 → game:minefield-constrained-390 → game:chess-constrained-390 → game:orbit-pinball-constrained-390 → game:paintbox-constrained-390 → game:mafia-constrained-390 → clamped-390. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

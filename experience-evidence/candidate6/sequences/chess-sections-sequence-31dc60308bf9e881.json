@@ -1,0 +1,59 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/candidate6/browser/experience-contracts-Chess-682f0-e-its-selected-pane-scrolls/chess-sections-setup.png",
+      "sha256": "c16fe9362b432ebcc1fffcaca9831ed219707472ffea59cae4ebca423404d7fa",
+      "bytes": 319004,
+      "capturedAt": "2026-11-11T23:56:45.182Z",
+      "state": "setup"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/experience-contracts-Chess-682f0-e-its-selected-pane-scrolls/chess-sections-models-details-scrolled.png",
+      "sha256": "415dbfc41063019ac502244a85108fbf0feb9b51616051d4a14ae9f2d72647ad",
+      "bytes": 278430,
+      "capturedAt": "2026-11-11T23:56:45.674Z",
+      "state": "models-details-scrolled"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-Computer-selected-details-scrolled.png",
+      "sha256": "765227c829f15d6b47bc574067c47545352a62961b7a3937f2a5731fa71bc4b5",
+      "bytes": 119879,
+      "capturedAt": "2026-11-11T23:59:51.255Z",
+      "state": "Computer-selected-details-scrolled"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-Online-selected-details-scrolled.png",
+      "sha256": "7d6bae3a8fa4855ba5a0550d842efdc41117f5e6fc365a9e887bc9c331cf9ce6",
+      "bytes": 108877,
+      "capturedAt": "2026-11-11T23:59:51.883Z",
+      "state": "Online-selected-details-scrolled"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-Local-selected-details-scrolled.png",
+      "sha256": "f281751bcd4be18768fe7cfe105122a477aa0ae798f9975256f65a77b0c44a3b",
+      "bytes": 123157,
+      "capturedAt": "2026-11-11T23:59:52.327Z",
+      "state": "Local-selected-details-scrolled"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-Model-arena-selected-details-scrolled.png",
+      "sha256": "033b244a2282b0b87af5327f54ddf101d4039b0ce6a9a96a20011f460bca3e62",
+      "bytes": 90729,
+      "capturedAt": "2026-11-11T23:59:52.825Z",
+      "state": "Model arena-selected-details-scrolled"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-Models-selected-details-scrolled.png",
+      "sha256": "094b834b80516aeb983ec62d054de1f9a32517ba6c2e40bc7d86ead445a9cd46",
+      "bytes": 90862,
+      "capturedAt": "2026-11-11T23:59:53.366Z",
+      "state": "Models-selected-details-scrolled"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: setup → models-details-scrolled → Computer-selected-details-scrolled → Online-selected-details-scrolled → Local-selected-details-scrolled → Model arena-selected-details-scrolled → Models-selected-details-scrolled. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

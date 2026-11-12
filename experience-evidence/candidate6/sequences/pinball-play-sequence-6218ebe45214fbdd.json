@@ -1,0 +1,94 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/candidate6/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-ready-original-art.png",
+      "sha256": "0aa8608ef3ebc277b85dd4057ebca627ad3b939199143a1387f6e0a34b9b5d95",
+      "bytes": 571421,
+      "capturedAt": "2026-11-11T23:58:27.483Z",
+      "state": "ready-original-art"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-ArrowLeft-held.png",
+      "sha256": "8385e2d028445a0b2cd972aca1818a9ab74ad5c96a494561c90526b0750e4549",
+      "bytes": 570865,
+      "capturedAt": "2026-11-11T23:58:28.153Z",
+      "state": "ArrowLeft-held"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-ArrowRight-held.png",
+      "sha256": "8c27c4daee16b3450dcfe793ebad85b320603440ecff55d4e756f345099fb346",
+      "bytes": 571538,
+      "capturedAt": "2026-11-11T23:58:28.972Z",
+      "state": "ArrowRight-held"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-first-ball-upper-orbit.png",
+      "sha256": "d04d8a4b9fa1aea7e69514d404a7225a8a30f91834109615b4081222206ed8c0",
+      "bytes": 572207,
+      "capturedAt": "2026-11-11T23:58:34.415Z",
+      "state": "first-ball-upper-orbit"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-paused-in-flight.png",
+      "sha256": "c5ba66bddd9d2a9fa6c7583bdb329bded8259da74cbd4aed17e82b2c574141b2",
+      "bytes": 493539,
+      "capturedAt": "2026-11-11T23:58:34.943Z",
+      "state": "paused-in-flight"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-resumed-moving-ball.png",
+      "sha256": "86bb0a3796ebf187e3a7a5a7db81c29247c2f44d2dda2e1eb0e193bb13b75cc4",
+      "bytes": 571538,
+      "capturedAt": "2026-11-11T23:58:37.669Z",
+      "state": "resumed-moving-ball"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-genuine-native-score.png",
+      "sha256": "0387f0b83e63bd5fae8c2549db7367b26cc3d81e9325ba723a57942632fc9944",
+      "bytes": 571899,
+      "capturedAt": "2026-11-11T23:58:38.336Z",
+      "state": "genuine-native-score"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-drain-observation-1-ball-23-score-17750.png",
+      "sha256": "587fb10da579d63a73beaff1d15683423becbb1f9b6df6c943c62b9f0eb4110c",
+      "bytes": 570990,
+      "capturedAt": "2026-11-11T23:58:47.965Z",
+      "state": "drain-observation-1-ball-23-score-17750"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-next-ball-fed-at-plunger.png",
+      "sha256": "fd32270c8531b83b1a5780bc7e3018f9b7e83667df50d6d5c2b7fd0a90ab6248",
+      "bytes": 572001,
+      "capturedAt": "2026-11-11T23:58:54.457Z",
+      "state": "next-ball-fed-at-plunger"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-second-ball-real-flight.png",
+      "sha256": "ebd374d81c4cb9a22cca24582561ac6b3e4df00e8604546472ce44a5bfc6cd62",
+      "bytes": 572822,
+      "capturedAt": "2026-11-11T23:59:00.148Z",
+      "state": "second-ball-real-flight"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/pinball-experience-pinball-607e1-turns-to-a-playable-cabinet/pinball-play-real-asset-failure-retry.png",
+      "sha256": "5b65a893eca7a6b0ec730c734361688b00efe74d6e088af7ac16e91857e1b16e",
+      "bytes": 45171,
+      "capturedAt": "2026-11-11T23:59:14.331Z",
+      "state": "real-asset-failure-retry"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/pinball-experience-pinball-607e1-turns-to-a-playable-cabinet/pinball-play-retry-recovered-real-flight.png",
+      "sha256": "78bc7ce1e041b715f8a96708a34e81fd6a7ff390aaaaac08a6c20eab7613cd07",
+      "bytes": 225515,
+      "capturedAt": "2026-11-11T23:59:24.114Z",
+      "state": "retry-recovered-real-flight"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: ready-original-art → ArrowLeft-held → ArrowRight-held → first-ball-upper-orbit → paused-in-flight → resumed-moving-ball → genuine-native-score → drain-observation-1-ball-23-score-17750 → next-ball-fed-at-plunger → second-ball-real-flight → real-asset-failure-retry → retry-recovered-real-flight. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

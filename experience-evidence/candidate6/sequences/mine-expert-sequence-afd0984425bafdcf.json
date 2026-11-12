@@ -1,0 +1,31 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/candidate6/browser/games-reliability-99-mine--108e8--entirely-from-public-clues/mine-expert-ready.png",
+      "sha256": "8bfab8e2a88bd84501f1be8d1f68c3efde575e43b50f5b23d8cf8af7ba48bd05",
+      "bytes": 742976,
+      "capturedAt": "2026-11-11T23:57:41.513Z",
+      "state": "ready"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/games-reliability-99-mine--108e8--entirely-from-public-clues/mine-expert-late99-267-of381.png",
+      "sha256": "4457d03506d133e91421890a7f72d43e86cdbafac5bf749d2a43bf0bee1ea725",
+      "bytes": 761394,
+      "capturedAt": "2026-11-11T23:57:52.146Z",
+      "state": "late99-267-of381"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/games-reliability-99-mine--108e8--entirely-from-public-clues/mine-expert-won.png",
+      "sha256": "c4815a909ab658fd6a8b35a34aedbb51e296f39c42d0aa2c44c0ae4ede025542",
+      "bytes": 762001,
+      "capturedAt": "2026-11-11T23:57:59.752Z",
+      "state": "won"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: ready → late99-267-of381 → won. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

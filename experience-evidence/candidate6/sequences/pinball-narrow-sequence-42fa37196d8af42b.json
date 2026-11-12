@@ -1,0 +1,24 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/candidate6/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-live-resize-320.png",
+      "sha256": "6f1313492db640ea359adbdf61994c042f91ab671c9070194b6ac90f70a820c8",
+      "bytes": 105969,
+      "capturedAt": "2026-11-11T23:59:13.162Z",
+      "state": "live-resize-320"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-paused-320.png",
+      "sha256": "aadc783f20df2a9eacaef6e9a643f4c5c2a93406d46a8717ccbf14000f70d695",
+      "bytes": 71884,
+      "capturedAt": "2026-11-11T23:59:13.377Z",
+      "state": "paused-320"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: live-resize-320 → paused-320. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/candidate6/browser/desktop-experience-shell-s-26fc8-e-and-constrained-workspace/shell-sizing-system-welcome-maximized.png",
+      "sha256": "34a5f4cb897d7f0332be3c20e50323c67441c1c629ad6eeb9869c6f31fec1aab",
+      "bytes": 177420,
+      "capturedAt": "2026-11-11T23:55:24.991Z",
+      "state": "system:welcome-maximized"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/desktop-experience-shell-s-7f1c1-e-and-constrained-workspace/shell-sizing-system-help-maximized.png",
+      "sha256": "37a4cb683da0abb7501b91b9fc84ef4ed2bd3b9095e157bfa4144551c2d92fd6",
+      "bytes": 123002,
+      "capturedAt": "2026-11-11T23:55:28.155Z",
+      "state": "system:help-maximized"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/desktop-experience-shell-s-60296-e-and-constrained-workspace/shell-sizing-system-plugins-maximized.png",
+      "sha256": "00a8357605e7115560cae2ffa72a19d10ad2e72573fccc6e0cf7a9c170368085",
+      "bytes": 109371,
+      "capturedAt": "2026-11-11T23:55:31.407Z",
+      "state": "system:plugins-maximized"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/desktop-experience-shell-s-aa7cd-e-and-constrained-workspace/shell-sizing-game-minefield-maximized.png",
+      "sha256": "9ca0738d1b470170b411337e6caa291d597396685e5e573078f783adb179ce8f",
+      "bytes": 50174,
+      "capturedAt": "2026-11-11T23:55:34.593Z",
+      "state": "game:minefield-maximized"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/desktop-experience-shell-s-ce44c-e-and-constrained-workspace/shell-sizing-game-chess-maximized.png",
+      "sha256": "6d3c5e1d032de3993856487335314a458c802c160f907f15387d11b43648fa47",
+      "bytes": 172692,
+      "capturedAt": "2026-11-11T23:55:38.369Z",
+      "state": "game:chess-maximized"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/desktop-experience-shell-s-866ba-e-and-constrained-workspace/shell-sizing-game-orbit-pinball-maximized.png",
+      "sha256": "9d9ad4a675103dd83c79c596060af44e77434a2cf4ea09396d55809311e0fc98",
+      "bytes": 204518,
+      "capturedAt": "2026-11-11T23:55:42.969Z",
+      "state": "game:orbit-pinball-maximized"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/desktop-experience-shell-s-7ddc7-e-and-constrained-workspace/shell-sizing-game-paintbox-maximized.png",
+      "sha256": "7673ed48664ae0d3dc5bd9622ffe1f5f23f82df17bbdb65fb4e1767f27452a45",
+      "bytes": 51776,
+      "capturedAt": "2026-11-11T23:55:47.173Z",
+      "state": "game:paintbox-maximized"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/desktop-experience-shell-s-f18a6-e-and-constrained-workspace/shell-sizing-game-mafia-maximized.png",
+      "sha256": "79d4c99f70330fa3ae02ab6bc8f0dd7a719d59b1b092093671e9a43661589d13",
+      "bytes": 102113,
+      "capturedAt": "2026-11-11T23:55:50.166Z",
+      "state": "game:mafia-maximized"
+    },
+    {
+      "path": "experience-evidence/candidate6/browser/experience-contracts-reque-731c1-to-actual-taskbar-workspace/shell-sizing-maximized.png",
+      "sha256": "7b439a69db89db1a5dd7cf6afddc0a1e0c2a4544fa05b4d6f37338a9ee2994fb",
+      "bytes": 51477,
+      "capturedAt": "2026-11-11T23:56:38.147Z",
+      "state": "maximized"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: system:welcome-maximized → system:help-maximized → system:plugins-maximized → game:minefield-maximized → game:chess-maximized → game:orbit-pinball-maximized → game:paintbox-maximized → game:mafia-maximized → maximized. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

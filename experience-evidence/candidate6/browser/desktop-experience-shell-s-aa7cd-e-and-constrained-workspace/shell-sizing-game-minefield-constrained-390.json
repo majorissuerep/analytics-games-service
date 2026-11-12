@@ -1,0 +1,22 @@
+{
+  "scenarioId": "shell-sizing",
+  "state": "game:minefield-constrained-390",
+  "window": "clamped",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "capturedAt": "2026-11-11T23:55:36.333Z",
+  "url": "http://localhost:3132/",
+  "identity": {
+    "schemaVersion": 1,
+    "commit": "145ef28f571da314f9b4f3376b9318611a80eea8",
+    "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+    "nativeAssets": {
+      "public/vendor/space-cadet/SpaceCadetPinball.js": "ddff8bf22ebd7c4888cd1cbbbe011c9563cff144f7a0051362f4c5fb5f0ef117",
+      "public/vendor/space-cadet/SpaceCadetPinball.wasm": "48ba94b1de0eb0e97b5db2681da93badf8e8178628465a9f1149ae0f9e2f7ef1",
+      "public/vendor/space-cadet/SpaceCadetPinball.data": "199c5fdcefd62b1965053bf47b0848e08d97830e0fe9e6ba595f8d7006d8782c"
+    }
+  },
+  "sha256": "01d6c471aabc3c418141cb75e51555260e756f936a11848c4b49176b16846412"
+}

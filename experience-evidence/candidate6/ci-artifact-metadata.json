@@ -1,0 +1,14 @@
+{
+  "repository": "majorissuerep/analytics-games-service",
+  "runId": 43123170335,
+  "headSha": "145ef28f571da314f9b4f3376b9318611a80eea8",
+  "conclusion": "success",
+  "browserCasesPassedFirstAttempt": 85,
+  "artifactId": 13900819894,
+  "artifactName": "experience-evidence-731aa2ffd2b3ba38361c4458ea6059cfaaff101a",
+  "artifactSha256": "d6a8e0fae7d50b8b01f6a1ce8d78a027ad36ee8215903be231ce24484ffa5616",
+  "artifactExpiresAt": "2026-12-12T00:00:37Z",
+  "artifactUrl": "https://github.com/majorissuerep/analytics-games-service/actions/runs/43123170335/artifacts/13900819894",
+  "ciMergeCommit": "731aa2ffd2b3ba38361c4458ea6059cfaaff101a",
+  "verifiedTree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb"
+}

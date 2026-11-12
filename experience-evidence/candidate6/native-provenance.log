@@ -1,0 +1,5 @@
+$ node scripts/vendor-space-cadet.mjs --verify
+Space Cadet engine and CC0 data checksums verified.
+
+
+exit=0; error=none

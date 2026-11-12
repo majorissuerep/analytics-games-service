@@ -1,0 +1,24 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/candidate6/manual/visual-matrix-manual-privacy-keyboard-open.png",
+      "sha256": "a063e2b3187da14876948e35796a5a5d69faf45acf5873a5a65bac7d86a387ef",
+      "bytes": 782273,
+      "capturedAt": "2026-11-11T23:55:02.590Z",
+      "state": "manual-privacy-keyboard-open"
+    },
+    {
+      "path": "experience-evidence/candidate6/manual/visual-matrix-manual-privacy-returned-focus.png",
+      "sha256": "3c51fe93c0f30e630fd3b11f551962462b58b3cb9151659cdfbe73ecc68340bc",
+      "bytes": 902467,
+      "capturedAt": "2026-11-11T23:55:02.848Z",
+      "state": "manual-privacy-returned-focus"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: manual-privacy-keyboard-open → manual-privacy-returned-focus. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}
