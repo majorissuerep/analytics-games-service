@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "requestId": "minefield-elite",
+  "requestSha256": "8074e59dfd198409e577d4344fd9247339d64661cfbd6a6565b5c73ade78cb81",
+  "contractsSha256": "6bcc1d2de9e163d0915cb4ec1ccccb30aeb7b46e761206ffbd77b0a0f5aec958",
+  "reviewer": "minefield_review",
+  "authors": [
+    "root",
+    "minefield_extreme_owner"
+  ],
+  "reviewedAt": "2026-11-12T11:33:42.293Z",
+  "verdict": "approve",
+  "tree": "b18c7c72cd0755243b3dbba76a7a68f295518d51",
+  "environment": "deployed",
+  "reportSha256": "1ba34c8b7e763208835ad19eb67879bfdec300a1c9a5c1926b8b8400552c141f",
+  "referenceComparison": "Previously downloaded/opened exact official elementaryCode screenshot and Zorin18hero provide concrete comparison: attached task controls/tab hierarchy, bounded rounded material and a stable quiet work area. Actual deployed viewport/proof/terminal states retain the approved original Minefield translation—pink intent, slate field identity, crisp opaque two-line clues, compact persistent inspector, bounded gloss and preserved XP chrome—across touch, font and solid-material views.",
+  "findings": [],
+  "observations": [
+    {
+      "requirementId": "MINE-LOGIC",
+      "note": "Verified actual merged deploymente816ad49 has the approvedb18c7c72 tree. Opened fresh live99-mine74%-cleared and terminal screenshots plus sequence, with ordinary controls/readable dense frontier. Read18current-tree model/solver/oracle passes including independent feasible-world certainty/privacy/50-50 checks. Fresh120Node generation samples had no failures/badcertificates; those are local same-tree measurements, not Vercel/device performance claims. No false certainty or unverified admission observed.",
+      "artifactIds": [
+        "deployed-tree-oracle-log",
+        "deployed-tree-generation-sample-log",
+        "classic-play-viewport-fb146ccd440a0e58",
+        "classic-play-viewport-ed3552cd5c5bf0b3",
+        "classic-play-viewport-5734bc6804643104",
+        "classic-play-viewport-33119d0b021a640d",
+        "classic-play-sequence-a36139beb71b4189",
+        "classic-play-sequence-2397b9c2afb19834"
+      ]
+    },
+    {
+      "requirementId": "MINE-EXPLAIN",
+      "note": "Independently played a real liveElite entirely through public Explain/scan targets to a100-safe win. Opened cross/subset explanation, expanded/scrolled15-step supporting proof, source values/counts/regions and fixed reachableClose; Showcell actualfocus and close restoration passed. Opened live wrong-safe-flag explanation and explicit Unflagandopen-to-win sequence. Unscanned echoes remainunknown; scan requests are explicitly information rather than safe-cell claims.",
+      "artifactIds": [
+        "classic-play-viewport-fb146ccd440a0e58",
+        "classic-play-viewport-ed3552cd5c5bf0b3",
+        "classic-play-viewport-5734bc6804643104",
+        "classic-play-viewport-33119d0b021a640d",
+        "classic-play-sequence-a36139beb71b4189",
+        "classic-play-sequence-2397b9c2afb19834",
+        "elite-play-viewport-4d8b0bfdce6315be",
+        "elite-play-viewport-11dabf2ae7dc9fcf",
+        "elite-play-viewport-fa8933335be124c1",
+        "elite-play-viewport-f11b5fa915dea0bc",
+        "elite-play-sequence-29a1fa57281c7af1",
+        "live-independent-manual-observations"
+      ]
+    },
+    {
+      "requirementId": "ELITE-RULES",
+      "note": "LiveExplain-only journey completed172actions,83total unlimited permanent scans,50+50opened=100safe, using actual cross/subset deductions. Verified E/repeated scan no-op, truthful local0 opening with initially unknown echo, source persistence, exact corner4/interior9 footprints, and nativehold/cancel followed by genuine mouse selection. Scan policy is deliberately simple and no optimality claim is made; scans cannot run out.",
+      "artifactIds": [
+        "deployed-tree-oracle-log",
+        "deployed-tree-generation-sample-log",
+        "elite-play-viewport-4d8b0bfdce6315be",
+        "elite-play-viewport-11dabf2ae7dc9fcf",
+        "elite-play-viewport-fa8933335be124c1",
+        "elite-play-viewport-f11b5fa915dea0bc",
+        "elite-play-sequence-29a1fa57281c7af1",
+        "live-independent-manual-observations"
+      ]
+    },
+    {
+      "requirementId": "ELITE-UX",
+      "note": "Actually opened deployed inspector/footprint,320proof/default/serif,solidshort,crossproof,longproof and terminal captures. Native-touch320x640 stage226.765625px,32pxcells, doc312x569 without overflow; Arial/sans and Georgia/serif stress variants retained226.765625px and reachable controls. Requested/maximize/restore,390x844,short576, material and namedpan/proof scrolling passed. Stable opaque board, clear local/echo type, restrained pink/slate, bounded gloss and XP chrome match the approved candidate.",
+      "artifactIds": [
+        "classic-play-viewport-fb146ccd440a0e58",
+        "classic-play-viewport-ed3552cd5c5bf0b3",
+        "classic-play-viewport-5734bc6804643104",
+        "classic-play-viewport-33119d0b021a640d",
+        "classic-play-sequence-a36139beb71b4189",
+        "classic-play-sequence-2397b9c2afb19834",
+        "elite-play-viewport-4d8b0bfdce6315be",
+        "elite-layout-viewport-527bbd14e9a0b436",
+        "elite-layout-viewport-6fe228caffc5b750",
+        "elite-layout-viewport-aee5eb2b710b8a6b",
+        "elite-layout-viewport-37275353f2863be6",
+        "elite-play-viewport-11dabf2ae7dc9fcf",
+        "elite-play-viewport-fa8933335be124c1",
+        "elite-play-viewport-f11b5fa915dea0bc",
+        "elite-layout-sequence-15d8927bf24a2b59",
+        "elite-play-sequence-29a1fa57281c7af1",
+        "live-independent-manual-observations"
+      ]
+    },
+    {
+      "requirementId": "MINE-WAIT",
+      "note": "Independently induced silent liveworker fixture, observed scoped indeterminate loading and10s watchdog, hit-tested reachableRetry before clicking, then returned to genuine verified liveplay. Opened actualtimeout/recovery frames; read live8-case log and stale/reset/level-change sequences. No stuck wait, stale overwrite or fallback admission observed.",
+      "artifactIds": [
+        "generation-recovery-viewport-5045ea1cb9718c46",
+        "generation-recovery-viewport-caf32c10503b7e36",
+        "generation-recovery-sequence-5229ad81dda330fd"
+      ]
+    },
+    {
+      "requirementId": "ELITE-GATE",
+      "note": "Fresh deployed sidecars and report bind mergedcommite816ad49/treeb18c7c72 after identity verification. Read8livecritical passes,18same-tree model/solver/oracle passes,36gatefixture passes and120freshNode generation samples. All six scenarios pass; candidate approval/requiredCI remain linked separately. Productionanalyticsdisabled is explicitly recorded, with consent-enabled coverage retained in CI. Corrected proxy/native-touch replay and timing caveat are retained; game elapsed time includes inspections and is not performance evidence. No blocker/major finding remains; independent review supports deployedacceptance.",
+      "artifactIds": [
+        "live-critical-browser-log",
+        "deployed-tree-gate-fixtures-log"
+      ]
+    }
+  ]
+}

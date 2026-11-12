@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "stage": "deployed",
+  "decision": "accept",
+  "accepted": true,
+  "requestId": "minefield-elite",
+  "tree": "b18c7c72cd0755243b3dbba76a7a68f295518d51",
+  "commit": "e816ad49f861f23e05e76f4d2d60d758475cc6c7",
+  "createdAt": "2026-11-12T11:34:07.161Z",
+  "owner": "root",
+  "rationale": "Vercel serves merged e816ad49f861f23e05e76f4d2d60d758475cc6c7 with the exact approved candidate tree. Eight fresh live browser checks pass, including classic99 and Elite real wins, wrong-flag correction, touch/layout and failed/silent/stale worker recovery. Independent live manual review confirms cross-layer proofs,100safe win, reachable320px controls with226.77px board stage, bounded proof and Retry recovery; no major/blocker findings. Source-matched oracle/gate fixtures and120generation sample pass. Candidate fullCI221unit/90browser evidence and promotion are retained.",
+  "identity": {
+    "url": "https://analytics-games-service.vercel.app/api/build-identity",
+    "checkedAt": "2026-11-12T11:34:07.157Z",
+    "commit": "e816ad49f861f23e05e76f4d2d60d758475cc6c7",
+    "tree": "b18c7c72cd0755243b3dbba76a7a68f295518d51",
+    "nativeAssets": {
+      "public/vendor/space-cadet/SpaceCadetPinball.js": "ddff8bf22ebd7c4888cd1cbbbe011c9563cff144f7a0051362f4c5fb5f0ef117",
+      "public/vendor/space-cadet/SpaceCadetPinball.wasm": "48ba94b1de0eb0e97b5db2681da93badf8e8178628465a9f1149ae0f9e2f7ef1",
+      "public/vendor/space-cadet/SpaceCadetPinball.data": "199c5fdcefd62b1965053bf47b0848e08d97830e0fe9e6ba595f8d7006d8782c"
+    }
+  },
+  "inputs": {
+    "promotion": {
+      "path": "experience-evidence/elite-promotion.json",
+      "sha256": "0882b5a9f910227166b42a89e88eb87ec84615b76ba3d356071ee075f0ac152a",
+      "bytes": 1706
+    },
+    "report": {
+      "path": "experience-evidence/elite-deployed.json",
+      "sha256": "1ba34c8b7e763208835ad19eb67879bfdec300a1c9a5c1926b8b8400552c141f",
+      "bytes": 92634
+    },
+    "review": {
+      "path": "experience-evidence/elite-deployed-review.json",
+      "sha256": "9c614271030ec6f8511fdbcd83074c2e8da596238c0cc1b3ab0a3f4d3b495a1e",
+      "bytes": 7027
+    },
+    "decision": {
+      "path": "experience-evidence/elite-decision.json",
+      "sha256": "3489b68967d54356a2efadb4f0c4a8215ae7e597aa6fbdcc51c006a4bbcd7e64",
+      "bytes": 749
+    }
+  }
+}
