@@ -1,3 +1,11 @@
 {
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "functions": {
+    "app/api/chess/analyse/route.ts": {
+      "supportsCancellation": true
+    },
+    "app/api/chess-models/*/move/route.ts": {
+      "supportsCancellation": true
+    }
+  }
 }

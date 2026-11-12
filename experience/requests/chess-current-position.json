@@ -1,0 +1,272 @@
+{
+  "schemaVersion": 1,
+  "id": "chess-current-position",
+  "title": "Cancel obsolete chess searches and predict only the current position",
+  "source": {
+    "date": "2026-11-12",
+    "requestor": "user",
+    "summary": "When a chess position becomes irrelevant, abort its processing and remove queued work. Predictions follow only the current position, especially in Free both sides."
+  },
+  "baseline": {
+    "commit": "e816ad49f861f23e05e76f4d2d60d758475cc6c7",
+    "url": "https://analytics-games-service.vercel.app"
+  },
+  "scope": [
+    "chess",
+    "process"
+  ],
+  "outOfScope": [
+    "New chess engines or a different hosting provider",
+    "New visual design, evaluation calibration or gameplay rules",
+    "Global cancellation across unrelated clients or Vercel instances",
+    "Historical prediction cache or speculative future-position analysis"
+  ],
+  "references": [
+    {
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal",
+      "adopt": "Cooperative per-operation cancellation with already-aborted checks and listener cleanup",
+      "reject": "Assuming abort alone invalidates already delivered results"
+    },
+    {
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream/cancel",
+      "adopt": "Propagate cancellation from the response consumer to the producer job",
+      "reject": "Closing the UI stream while continuing hidden inference"
+    },
+    {
+      "url": "https://official-stockfish.github.io/docs/stockfish-wiki/UCI-&-Commands.html",
+      "adopt": "Stop active UCI search and drain its bestmove before reusing the serial command channel",
+      "reject": "Treating readyok as a search completion barrier"
+    },
+    {
+      "url": "https://vercel.com/docs/functions/functions-api-reference#cancel-requests",
+      "adopt": "Explicit per-function supportsCancellation and preregistered after/waitUntil lifetime for bounded engine cleanup after disconnect",
+      "reject": "Assuming standalone Node abort behavior automatically applies to Vercel or using broad cancellation on unrelated mutation routes"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "CHESS-CURRENT",
+      "app": "chess",
+      "title": "Only current-position work reaches the board",
+      "expected": "Accepted moves, undo, New game, mode/model/search-setting changes and unmount immediately invalidate and abort obsolete hint, evaluation and automatic-move work. Same-FEN revisit has a fresh generation. Never display or act on old suggestions, arrows, balance, progress, errors or late automatic moves. Invalid move/selection alone must not cancel useful work. At most one current request per purpose; no past-position backlog.",
+      "proof": "dynamic",
+      "severity": "major",
+      "scenarios": [
+        "current-position",
+        "chess-lifecycle"
+      ]
+    },
+    {
+      "id": "CHESS-QUEUE",
+      "app": "chess",
+      "title": "Canceled jobs leave the actual runtime",
+      "expected": "Queued cancellation rejects promptly before the active job finishes, removes the job and releases capacity immediately. Active cancellation rejects promptly and suppresses progress; UCI stop drains bestmove before another go. A silent stop is bounded to at most 1 second before kill/restart. Cancellation during startup/readiness kills only the active process and advances valid queued clients. Preserve FIFO isolation, process reuse and two-hour idle lifecycle; no cross-client cancellation.",
+      "proof": "process",
+      "severity": "major",
+      "scenarios": [
+        "runtime-cancellation"
+      ]
+    },
+    {
+      "id": "CHESS-TRANSPORT",
+      "app": "chess",
+      "title": "Disconnect cancels inference end to end",
+      "expected": "Request abort and response-stream cancel both abort an owned work signal forwarded by analysis and model-move routes. Pre-aborted work never runs. JSON and SSE client paths reject late results/progress after abort, cancel readers, release listeners and honor timeout. No hanging cancellation promises or unhandled stream writes. Vercel cancellation is explicitly enabled only for analysis and model-move function source paths. Before returning the response, register Next after retention that waits for actual runtime queue removal/channel cleanup, rather than the promptly rejected caller. Retention settles for preabort, queued cancellation, busy/error and normal completion; no retained obsolete inference beyond bounded cleanup.",
+      "proof": "process",
+      "severity": "major",
+      "scenarios": [
+        "runtime-cancellation",
+        "live-engine"
+      ]
+    },
+    {
+      "id": "CHESS-RECOVERY",
+      "app": "chess",
+      "title": "Truthful current loading and recovery",
+      "expected": "Automatic invalidation does not flash obsolete errors. Current loading identifies the selected engine; Cancel stops current work and offers Retry. Board remains responsive in Free both sides, including rapid alternating moves; empty stale hints until new result. Current hint/model auto response and arena still work for all built-in UCI engines. Existing requested/narrow glass layout and accessible controls remain.",
+      "proof": "dynamic",
+      "severity": "major",
+      "scenarios": [
+        "current-position",
+        "chess-lifecycle",
+        "live-engine"
+      ]
+    },
+    {
+      "id": "CHESS-GATE",
+      "app": "process",
+      "title": "Source-bound request, candidate and deployed acceptance",
+      "expected": "Independent readiness, exact-tree candidate review/full required CI, fresh deployed critical scenarios and independent acceptance. Retain logs, viewport sequences, reference notes and receipts with PR.",
+      "proof": "process",
+      "severity": "major",
+      "scenarios": [
+        "release-gates"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "runtime-cancellation",
+      "app": "chess",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "Node transport/runtime fixtures",
+      "initialState": "Controllable engine and streamed requests",
+      "actions": [
+        "Hold an active search; cancel more than queue capacity worth of obsolete waiting jobs, then admit a valid other-client job",
+        "Cancel running, cold startup and readiness work; test delayed/absent bestmove and stale process output before next go",
+        "Cancel Request and stream consumer independently; exercise pre-abort, late JSON/SSE progress/result and timeout paths",
+        "Verify cancellation-enabled Vercel path rules match both inference routes and exclude unrelated mutation routes; retained cleanup registered before stream/work and settles only after actual drain/removal, including early failures"
+      ],
+      "expected": [
+        "Canceled promises settle promptly; only valid jobs send go; unrelated clients finish in order; stopped output cannot contaminate replacement",
+        "Cancellation reaches actual work signal, request parser never publishes obsolete output, all listeners/readers/timers clean up",
+        "Provider configuration and lifecycle adapter prevent disconnect from reclaiming asynchronous engine cleanup prematurely"
+      ],
+      "artifacts": [
+        "log"
+      ],
+      "critical": true
+    },
+    {
+      "id": "current-position",
+      "app": "chess",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested1000x760 then constrained390x844",
+      "initialState": "Free both sides with deliberately slow and adversarial predictions",
+      "actions": [
+        "Play rapid legal moves while analysis is active; verify every prior request signal aborted before next request",
+        "Deliver late progress/results/errors from canceled work including a reset to identical FEN; inspect board/hints/loading",
+        "Finish current request and play a suggested move; inspect hover arrows and balance only for current position"
+      ],
+      "expected": [
+        "Current board stays responsive and only latest generation renders",
+        "No backlog, obsolete errors or visual remnants; reachable controls before auto-scroll"
+      ],
+      "artifacts": [
+        "viewport",
+        "sequence"
+      ],
+      "critical": true
+    },
+    {
+      "id": "chess-lifecycle",
+      "app": "chess",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested then narrow",
+      "initialState": "Pick/Free/auto modes and real chosen engine",
+      "actions": [
+        "Undo and reset during inference, revisit same FEN, change active hint/search settings and selected model via setup",
+        "Explicit Cancel, Retry; close app while work pending; verify abort and no restart after cancel",
+        "Run selected built-in engine auto move and Model arena regression; inspect current evaluation/hint state"
+      ],
+      "expected": [
+        "Every obsolete operation canceled; user Cancel distinct from invalidation; retries and actual gameplay succeed",
+        "Layout/controls remain stable with no accidental scrolling"
+      ],
+      "artifacts": [
+        "viewport",
+        "sequence"
+      ],
+      "critical": true
+    },
+    {
+      "id": "live-engine",
+      "app": "chess",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "actual production-compatible API and browser",
+      "initialState": "Built-in Stockfish18/19 and Reckless demand-loaded engines",
+      "actions": [
+        "Read genuine progress for long analysis, abort its HTTP stream, then request current position",
+        "Exercise genuine legal predictions and model moves for all built-in UCI engines; preserve arena regression",
+        "Capture real Free both gameplay/loading and completed current predictions"
+      ],
+      "expected": [
+        "Legal current predictions with genuine progress; immediate subsequent request usable after cancellation",
+        "HTTP timing reported as observation without claiming shared-instance routing; direct runtime fixtures prove queue removal"
+      ],
+      "artifacts": [
+        "viewport",
+        "sequence",
+        "log"
+      ],
+      "critical": true
+    },
+    {
+      "id": "release-gates",
+      "app": "process",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "fixture",
+      "initialState": "Current request and retained evidence",
+      "actions": [
+        "Validate request/review and negative gate fixtures; run required full CI on frozen source",
+        "Promote exact candidate then verify merged live identity and repeat critical changed journeys",
+        "Require successful Vercel preview build with explicit per-function cancellation configuration before promotion; inspect generated deployment metadata when available"
+      ],
+      "expected": [
+        "No stale/missing artifacts or self-only review promote; explicit live acceptance or hotfix/rollback"
+      ],
+      "artifacts": [
+        "log"
+      ],
+      "critical": true
+    }
+  ],
+  "risks": [
+    {
+      "risk": "Vercel processes are shared and distributed; a new request must not cancel another player",
+      "resolution": "Cancellation is owned by the requesting operation/window. Preserve unrelated FIFO jobs; no global latest-FEN singleton. Live HTTP abort timing is observational; direct transport/runtime tests establish cancellation paths."
+    },
+    {
+      "risk": "Canceled search late output can contaminate the next search",
+      "resolution": "Drain stop to bestmove before the next go; bounded drain timeout kills the process before next job. Startup/readiness cancellation is bounded and cannot strand queued jobs."
+    },
+    {
+      "risk": "A position can return to the same FEN after reset/undo",
+      "resolution": "Use request generation/epoch identity, not just FEN. Invalidate synchronously on accepted actions and relevant settings; abort before replacement starts."
+    },
+    {
+      "risk": "Promise completion/progress may race abort or ignore the transport signal",
+      "resolution": "Check operation relevance and signal before any progress/error/result state update; reject already-aborted work before fetch/spawn; cancel read stream and clean listeners."
+    },
+    {
+      "risk": "Automatic stale cancellation may show error flicker or leave no prediction on current board",
+      "resolution": "Obsolete jobs are silent; current position gets only its own loading/progress/result. Explicit Cancel remains a stopped state with Retry, not an automatic restart loop."
+    },
+    {
+      "risk": "Vercel cancellation is opt-in and a disconnected invocation can be reclaimed before asynchronous stop/drain completes",
+      "resolution": "Enable supportsCancellation on only the two inference function patterns. Register Next after before stream/work; retain a promise covering actual runtime release/removal, not just response/caller completion. Require configuration scope tests and successful Vercel preview build; live cancel/replace checks remain observational under distributed routing."
+    }
+  ],
+  "rollout": {
+    "target": "Vercel",
+    "requiredGates": [
+      "request",
+      "promotion",
+      "deployed"
+    ],
+    "rollbackCommit": "e816ad49f861f23e05e76f4d2d60d758475cc6c7",
+    "rollbackTriggers": [
+      "Current-position predictions cannot recover",
+      "Stale predictions or automatic moves affect a changed board",
+      "Shared-engine queue stalls or unrelated clients are canceled"
+    ],
+    "hotfixPolicy": "Isolated recoverable defects block acceptance until an evidenced hotfix; rollback broken primary interaction or unrecoverable queue.",
+    "acceptanceOwner": "root",
+    "reviewer": "chess_cancellation_review"
+  }
+}

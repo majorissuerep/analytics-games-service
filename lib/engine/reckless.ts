@@ -36,6 +36,7 @@ export interface RecklessAnalyseRequest {
   hashMb?: number
   onProgress?: import('./engine-progress').ReportEngineProgress
   signal?: AbortSignal
+  onCleanup?: (settled: Promise<void>) => void
 }
 
 export function recklessAvailable(): boolean {
@@ -101,6 +102,8 @@ export function collectRecklessLines(rawLines: string[]): RecklessAnalysisLine[]
 
 /** Compatibility entry point; all callers share the demand-loaded runtime. */
 export async function analyseWithReckless(request: RecklessAnalyseRequest): Promise<RecklessAnalysis> {
+  request.signal?.throwIfAborted()
   const { analyseWithEngine } = await import('./uci-runtime')
+  request.signal?.throwIfAborted()
   return analyseWithEngine('reckless-local', request)
 }

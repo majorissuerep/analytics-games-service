@@ -1,4 +1,4 @@
 {
-  "request": "experience/requests/minefield-elite.json",
-  "review": "experience/reviews/minefield-elite.request.json"
+  "request": "experience/requests/chess-current-position.json",
+  "review": "experience/reviews/chess-current-position.request.json"
 }

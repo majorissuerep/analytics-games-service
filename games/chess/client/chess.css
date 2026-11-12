@@ -307,12 +307,24 @@ body:has(.chess-app) { padding:0; overflow:hidden; }
  .chess-status > div { display:flex; flex:1; gap:8px; align-items:center; justify-content:space-between; }
  .turn-dot { width:18px; height:18px; }
  .chess-utility-tabs button { min-height:30px; }
- .chess-actions { padding-top:5px; }
+ /* Recovery actions share the anchored footer; transient feedback must fit above it. */
+ .chess-utility-details:has(.ui-loading, [role=alert], .chess-evaluation) .chess-opponent { display:none; }
+ .chess-utility-details > div:not([hidden]) { gap:6px; }
+ .chess-utility-details .ui-loading { margin:0; padding:6px; }
+ .chess-utility-details .ui-loading-heading { margin-bottom:6px; }
+ .chess-utility-details .ui-loading-footer:not(:has(button)) { display:none; }
+ .chess-utility-details .chess-notice { margin:0; padding:8px; }
+ .chess-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); padding-top:5px; }
+ .chess-actions > :only-child { grid-column:1/-1; }
  .chess-actions button { min-height:32px; }
  .chess-arena-live { grid-template-columns:minmax(0,1fr); }
  .chess-model-grid { grid-template-columns:minmax(0,1fr); }
  .chess-arena { padding:12px; }
  .chess-model-submit form { padding:12px; }
+}
+/* Short embedded windows reserve feedback room even when both engine purposes run. */
+@media(max-width:700px) and (max-height:650px) {
+ .chess-game-layout { grid-template-rows:minmax(0,1fr) minmax(276px,38%); }
 }
 @media(max-width:400px) { .chess-field > .chess-segmented { flex-direction:column; } .chess-field > .chess-segmented button { text-align:left; padding-inline:12px; } }
 @media(prefers-reduced-motion:reduce) { .chess-app * { animation:none!important; transition:none!important; } }

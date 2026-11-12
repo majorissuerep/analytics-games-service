@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "chess",
   "vision": "docs/experience/VISION.md",
-  "request": "desktop-refinement",
+  "request": "chess-current-position",
   "route": "/games/chess",
   "preferredWindow": {
     "width": 1000,
@@ -58,5 +58,6 @@
       "high-level section tabs",
       "form submission action in selected details pane"
     ]
-  }
+  },
+  "predictionOwnership": "Only current position and operation generation; invalidation cancels active and queued requests, clears stale content, preserves unrelated players. Explicit Cancel requires Retry."
 }

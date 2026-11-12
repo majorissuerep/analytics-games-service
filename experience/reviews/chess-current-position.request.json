@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "requestId": "chess-current-position",
+  "requestSha256": "f1d668069e61de816520e9f227200c119a3724dc81b5699a05afc25c9a1e0dec",
+  "contractsSha256": "82ff566aa0d2b7b3d9298f37fa629a64459739135922a54b72e0cb673bdb01de",
+  "reviewer": "chess_cancellation_review",
+  "authors": [
+    "root",
+    "chess_current_position"
+  ],
+  "reviewedAt": "2026-11-12T12:04:40.800015+00:00",
+  "verdict": "approve",
+  "challenges": [
+    "Baseline Promise-tail queue can skip a canceled search yet retain its capacity and pending promise until unrelated active work finishes. The request explicitly requires prompt settlement, immediate removal and capacity recovery while active work is held.",
+    "Stopping an engine is insufficient until its bestmove is drained. The request requires a one-second bounded drain, kill/restart, and delayed old-process output isolation before another go.",
+    "FEN equality and React effect cleanup alone cannot prove relevance: an accepted move can precede cleanup and reset can revisit identical FEN. The request requires synchronous invalidation and fresh operation generations; rejected moves and selection must preserve useful work.",
+    "Closing an SSE stream can leave inference running. Both Request abort and consumer cancel must reach owned work, including pre-aborted requests and all route branches. Late buffered progress/results and legacy JSON must be challenged independently of fetch cooperation.",
+    "Explicit Cancel can otherwise accept a late result or restart automatically. The request requires a distinct stopped state with Retry, and dynamic mode/settings/unmount cases.",
+    "HTTP timing on distributed Vercel cannot prove process queue removal. Direct controlled runtime fixtures carry that proof; real HTTP/browser checks demonstrate production usability without overstating instance identity.",
+    "This readiness approval does not approve implementation, visuals or release. Actual viewport sequences and control hit-testing remain required on the frozen candidate and deployed build.",
+    "Independent provider documentation review found Vercel request cancellation is opt-in per Node function and execution may be reclaimed after disconnect. Candidate2 cannot promote under the original assumption. The amended requirement scopes supportsCancellation to the two inference function source patterns and preregisters Next after retention before stream/work, covering actual runtime release rather than the already-rejected caller.",
+    "A retention promise can hang on early abort/busy/error or finish before stop drain. Controlled tests must prove registration ordering and settlement for every path, including asynchronous Reckless entry, canceled queue removal and delayed/absent bestmove. Source pattern coverage and successful Vercel preview build establish supported configuration acceptance; generated metadata is inspected when accessible. Live HTTP timing still cannot establish same-instance queue behavior."
+  ],
+  "observations": [
+    {
+      "requirementId": "CHESS-CURRENT",
+      "note": "Accepted actions synchronously cancel every obsolete purpose, fresh generation covers identical-FEN reset, and rapid Free both sides plus adversarial late callbacks cover stale suggestions/arrows/balance/progress/errors/auto moves. Invalid selection/moves do not cancel valid work."
+    },
+    {
+      "requirementId": "CHESS-QUEUE",
+      "note": "Controlled held-active tests must establish immediate canceled-queue settlement and capacity recovery, stop drain ordering, startup/readiness abort, one-second silent-stop fallback, old-child output isolation and unrelated-client FIFO with warm reuse/idle lifecycle."
+    },
+    {
+      "requirementId": "CHESS-TRANSPORT",
+      "note": "Both stream-consumer cancellation and request abort own a producer signal forwarded to analysis/model routes. Pre-abort, late JSON/SSE, timeout, reader/listener/timer cleanup and no unhandled writes are explicit acceptance obligations. The amendment additionally requires narrowly scoped Vercel cancellation opt-in, preregistered after lifetime before returning/starting work, actual runtime cleanup settlement and early-failure cleanup. Official Vercel cancel-requests documentation and Next16 after.md/source were independently read; after bridges to waitUntil, so registration cannot be postponed until disconnect."
+    },
+    {
+      "requirementId": "CHESS-RECOVERY",
+      "note": "Explicit Cancel/Retry is distinct from silent stale invalidation. Requested 1000x760 and constrained 390x844 layouts, rapid alternating moves, current hints/evaluation, real all-built-in moves and arena regression preserve existing gameplay and accessible controls."
+    },
+    {
+      "requirementId": "CHESS-GATE",
+      "note": "Independent readiness precedes implementation; exact-tree production-compatible candidate evidence and required CI precede promotion. Deployed identity and critical journeys precede acceptance, with explicit hotfix/rollback and durable retained artifacts. A successful Vercel preview build accepting the explicit function configuration is required before promotion; generated deployment metadata will be inspected when accessible, with distributed live-observation limitations retained."
+    }
+  ],
+  "findings": [
+    {
+      "id": "CHESS-R-PROVIDER",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Original cancellation scope assumed Vercel would forward disconnect and retain asynchronous drain like standalone Node, without opt-in configuration or retained lifecycle.",
+      "resolution": "Amended CHESS-TRANSPORT, runtime-cancellation and release-gates explicitly require two scoped supportsCancellation source patterns, preregistered Next after awaiting actual cleanup, early-path settlement tests and successful preview build. This resolves request completeness only; implementation/candidate2 remains unapproved pending the provider fix and fresh evidence."
+    }
+  ]
+}

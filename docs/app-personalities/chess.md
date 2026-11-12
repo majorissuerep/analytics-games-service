@@ -116,3 +116,30 @@ Local e2–e4 produced `1. e4 *`, Undo was directly hittable and cleared history
 Tab focus computed a3px pink outline; solid sidebar computed no gradient/no blur.
 The parent owns complete regressions, independent review and deployed acceptance.
 No build, server, commit or push was performed by this agent.
+
+
+## Current-position prediction ownership
+
+Predictions belong to the current board and request generation. Every accepted move,
+Undo, reset or relevant configuration change invalidates obsolete hints, evaluation,
+progress and automatic moves synchronously. Returning to the same FEN creates a fresh
+generation. Selection and illegal moves do not discard useful current analysis.
+
+The cancellation signal travels through the streamed response into the shared engine
+runtime. Waiting jobs are removable; active UCI work receives `stop` and drains its
+`bestmove` before reuse, with a one-second process-restart fallback. Other players keep
+their queued work. Explicit Cancel leaves a stopped state with Retry; automatic
+invalidation starts only the current position's work. Existing glass composition and
+absolute loss-color calibration remain the visual contract.
+
+Protocol references: [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal),
+[ReadableStream cancellation](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream/cancel),
+and [Stockfish UCI commands](https://official-stockfish.github.io/docs/stockfish-wiki/UCI-&-Commands.html).
+The executable requirements and evidence scenarios are in
+`experience/requests/chess-current-position.json`.
+
+Vercel requires explicit per-function cancellation. The analysis and model-move
+routes opt in; unrelated mutation routes retain their original behavior. Their
+`after` lifetime is registered before streaming and awaits actual UCI channel
+cleanup, including the bounded stop timeout. Rejecting a caller alone is not
+cleanup completion. See [Vercel cancellation](https://vercel.com/docs/functions/functions-api-reference#cancel-requests).
