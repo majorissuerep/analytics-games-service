@@ -6,7 +6,7 @@
     "license": "MIT",
     "compiler": "Emscripten 3.1.74",
     "patch": "scripts/space-cadet-cabinet.patch",
-    "patchSha256": "6fc0cba075b9c8f12267b783f28ed64dc80afd9e8e1246413f5a2d938f8a0850"
+    "patchSha256": "a98826f07fa731556ec29b0c9fbca9698f31e00013da2f89da1ae1c1c3738a2d"
   },
   "data": {
     "repository": "https://github.com/andrewnakas/open-cadet",
@@ -255,7 +255,7 @@
       }
     ]
   },
-  "localChange": "Native cabinet rebuild: no menus; cropped full-height table; native score/ball/pause/mission feedback; fixed arrow/Space controls and direct native touch input. Original procedural Aster artwork replaces bitmap and palette fields; exact masks and all non-art records preserved.",
+  "localChange": "Original supersampled architectural backing below exact native masked art. Native renderer retains original depth writes and masks. Cabinet readiness observes actual unboosted plunger contact, not active-ball spawn; subsequent feeding shows scoped elapsed progress. Physical inputs dispatch once per non-repeated keydown to existing native gameplay functions, outside removed ImGui capture. Native physics, collision/depth records and DAT masks unchanged.",
   "artifacts": {
     "LICENSE-engine.txt": {
       "bytes": 1079,
@@ -266,28 +266,32 @@
       "sha256": "b63ba4bbec694f53045b3c5b09fbdde07731f4456541e3736cd1d0555f9fce89"
     },
     "SpaceCadetPinball.data": {
-      "bytes": 1432049,
-      "sha256": "c8e664e534d7c7b9ce7bdca83feff90cfbe87a47d22bd520cb73d4ac82330b53"
+      "bytes": 2118249,
+      "sha256": "199c5fdcefd62b1965053bf47b0848e08d97830e0fe9e6ba595f8d7006d8782c"
     },
     "NOTICE-data.md": {
       "bytes": 2568,
       "sha256": "6183f3cce3a9d6130480f03caa27cde4fcf6fb5e9e891ff2f864b8eeb67032b8"
     },
     "SpaceCadetPinball.js": {
-      "bytes": 208301,
-      "sha256": "83d735bb85add1f677a111186125cbcb97e1ba5e72b88680bcbe6c9367a80be3"
+      "bytes": 209990,
+      "sha256": "ddff8bf22ebd7c4888cd1cbbbe011c9563cff144f7a0051362f4c5fb5f0ef117"
     },
     "SpaceCadetPinball.wasm": {
-      "bytes": 4694292,
-      "sha256": "dd49e050d714ea8866d81392680c1e3c332f44dab2f350dd70fa8ea2fbbf4174"
+      "bytes": 4789689,
+      "sha256": "48ba94b1de0eb0e97b5db2681da93badf8e8178628465a9f1149ae0f9e2f7ef1"
     },
     "PINBALL.DAT": {
       "bytes": 911260,
-      "sha256": "1e2fa5236972483157b7cd1ce8e3cac6a6431842cfbda6ce230a6f8ec6c8c41e"
+      "sha256": "543c2d207297b9c303f3c9341c40bbbfe06cbf8e58a38f7d03e9abe2ccc1fc00"
     },
     "art/OPEN-CADET-CC0.DAT": {
       "bytes": 911260,
       "sha256": "3945713ab0fef7bcc291b800786101226852ea966b80904eea35eb5fc067f38e"
+    },
+    "ASTER-BACKING.BGRA": {
+      "bytes": 686200,
+      "sha256": "d077ed4832712e7c60bf71941799d40ed2865d8dbb18d098f9b1208f0aa679f2"
     }
   }
 }

@@ -1,53 +1,102 @@
-# Space Cadet: flight-deck cabinet
+# Space Cadet — Aster Flight 01
 
-11 November 2026. Ownership: platform cabinet only; faithful engine and native table artwork remain unchanged.
+11 November 2026. Scope: cabinet controls and original CC0 art; native physics,
+collision/depth records, sprite masks and geometry remain unchanged.
 
-## Task and friction
+The previous revision was visibly poor despite passing structural tests: pale
+floor and noisy grey fixtures hid the ball, a giant printed seal suggested a
+physical obstacle, labels overlapped flippers, narrow layouts hid Ball, and a
+Unicode Resume rendered as an orange emoji. Those are visual failures, not
+acceptable consequences of faithfully retaining the engine.
 
-The task hierarchy is start game → hold/release plunger → operate two flippers, with pause, sound and exit always reachable. Table data is occasional setup. Previously the file picker permanently competed with play, all control actions had similar emphasis, and on-screen flippers lacked a keyboard activation path. Preserve local-only import, opt-in persisted audio, real startup stages/elapsed time/retry, responsive native canvas fitting, exit during download, and the outer controller's about:blank/listener-before-navigation boot sequence.
+Direct references inspected:
 
-## Direct references inspected
+- [elementary Button HIG](https://docs.elementary.io/hig/widgets/ui-toolkit-elements/button.md): tool button semantics, actionable tooltips and icon/text hierarchy. Adopt compact recognizable actions with accessible names. Reject adding a menu hierarchy to three game actions.
+- [Official Zorin OS](https://zorin.com/os/): inspected the actual OS hero image, including the rounded silver launcher and restrained stable backing. Adopt bounded silver controls and short stationary highlights. Preserve XP outer chrome; do not reproduce another OS shell.
+- [Visual Pinball](https://github.com/vpinball/vpinball): read maintained simulator documentation, camera fitting, cabinet display separation and touch support. Adopt uncropped physical table and separate score/control hierarchy. Do not import its infrastructure or proprietary machine art.
+- [SpaceCadetPinball](https://github.com/k4zmu2a/SpaceCadetPinball): inspected engine/resource distinction and native controls. Keep native launch, scoring, ball lifecycle, pause and flippers. No Microsoft game resources are shipped.
 
-- [SpaceCadetPinball README](https://github.com/k4zmu2a/SpaceCadetPinball) and [maintained options source](https://github.com/k4zmu2a/SpaceCadetPinball/blob/master/SpaceCadetPinball/options.cpp): inspected upstream runtime/data distinction and actual Z, slash, Space, F2 and F3 bindings directly through raw source. Keep the original command vocabulary and full table/score panel. Do not copy bundled Microsoft assets or replace native menus with a speculative score UI.
-- [Game Accessibility Guidelines: simple controls](https://gameaccessibilityguidelines.com/ensure-controls-are-as-simple-as-possible-or-provide-a-simpler-alternative/): inspected the guidance and examples about avoiding unnecessary buttons and complex combinations. Three large, labeled cabinet inputs mirror native controls; Enter/Space can hold and release a focused control. No additional gesture mode or hidden combos.
-- [W3C: target size minimum](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html): inspected minimum 24px size, spacing exceptions and benefit to people with motor impairments. Main controls retain shared 40px targets; flippers/plunger use 50px minimum and separate key legends. The standard is a floor, not a claim of complete product conformance.
+Three directions considered: a silver flight instrument with navy physical table
+(selected); a dark arcade bezel (too much machine-on-machine chrome); and a side
+score dashboard (takes table width from a normal 920×740 XP window). The selected
+composition gives the actual table the available height, keeps live score/ball
+visible, and groups restart/pause/sound as one quiet instrument cluster.
 
-Pinball FX and Playdate help/SDK URLs were attempted but returned HTTP 403 in this environment; they are not claimed as inspected evidence. The three direct references above support the implemented control structure and interaction decisions.
+Character: precise, calm physical cabinet. Controls use cool silver neutrals and
+pink intent. Navy enamel, cyan native lamp/bumper states and rose flippers are
+explicit gameplay material/domain colors. The opaque table is stable; gloss is
+bounded to the header/action group and touch apron. White ball and restrained
+metal rail highlights distinguish movement from the floor. No decorative seal,
+microtype, floating slogans, menus or import setup remain.
 
-## Three alternatives
+The generator now draws original rail paths, raised ramp beds and enamel depth
+at 4× before Lanczos resampling to the native 365×470 bitmap. Physical sprite
+materials use procedural silhouette bevels and smooth dome shading rather than
+inherited texture luminance. Seven bumper backings and target/rollover pedestals use measured native positions;
+they are real existing fixtures. Native off inserts are recessed dark and actual
+lit states become cyan. Native masks remain exact, so small inherited silhouette
+irregularities remain at this resolution. Index zero remains
+exactly zero. A separate opaque original backing is composed beneath the native
+masked texture; internal cutouts reveal cap material rather than navy holes.
+Native depth writes remain unchanged. The complete native
+shooter/plunger stays visible; no physics region is cropped to hide whitespace.
 
-1. **Flight-deck cabinet, selected:** slim command strip, graphite native-table surround, large three-button apron and secondary file drawer. Prioritizes original table visibility and precise inputs with little chrome.
-2. **Museum restoration bench:** persistent side rail with provenance, detailed original-file setup and keyboard reference beside the table. Strong for archival discovery, but reduces native table area and overweights a rare setup task.
-3. **Touch arcade console:** full-width bottom control deck and collapsible top commands, table filling the rest. Strong thumb orientation, but hiding pause/sound/exit behind expansion adds a needless step and changes desktop command habits.
+Cabinet changes: coherent SVG controls replace emoji; score uses tabular figures;
+Ball remains visible at 320/390px; a proper paused veil and Resume action expose
+state clearly. Touch inputs have physical grouping, labels and held feedback.
+Fixed table aspect ratio is independent of the runtime’s internal canvas resize,
+preventing temporary stretching after host resize. Up/down arrows never scroll.
+Keyboard Tab focus remains visible; script-driven table focus does not add an
+unexplained pink rectangle. Native audio opt-in, startup stages, elapsed time,
+error/retry, and the outer listener-before-navigation boot sequence are retained.
 
-The selected design keeps commands visible and moves optional setup into a native details disclosure. This trades one extra action for importing original files for more stable play space every session. Import automatically opens the drawer so restoration to free play stays discoverable.
+Working evidence: `/workspace/scratch/experience-working/pinball/` contains ready,
+held plunger, flight sequence, scoring, paused/resumed, natural drain/next ball,
+narrow 390/320, actual requested/maximized XP captures, real failed WASM download
+and successful Retry recovery, plus full gameplay videos. `dynamic.json` records
+natural score and ball state. Pause is verified by identical native canvas PNGs
+900ms apart; resume changes the canvas within 450ms. Space launch produced real
+score growth; unassisted drain advanced Ball 1/3 to 2/3 and the next fed ball was
+launched again. Screenshots are visually inspected; scores/nodes alone are not
+visual acceptance. Independent reviewer and coordinator retain final acceptance.
 
-## Personality contract and implementation
+Validation: deterministic generator check (318 bitmap records; exact masks and
+all non-art record comparisons); shipped artifact checksum verification; cabinet
+JS syntax; actual engine flight/pause/drain/retry interactions. The native renderer was rebuilt to compose the original backing below unchanged
+masked art. Zero-color sprite writes retain backing while measured depth writes
+remain unchanged; no gameplay code changes. The pinned patch dry-run passed,
+and the rebuilt loader/WASM/preload package hashes are recorded. The coordinator
+owns integration tests/build/deployment. No Git or server actions were performed.
 
-Character: compact, precise arcade instrument. Palette: a short warm-neutral control ramp, graphite playfield surround and shared pink primary intent; no added decorative chromatic family. Native blue table art and semantic error/progress colors remain domain exceptions. Header uses small monospaced instrument identification with a strong compact title. The playfield has opaque backing; bounded shared frost belongs only to the command strip. Material, contrast, motion and focus behavior continue through shared primitives and persisted appearance handling.
-
-Signature interaction: physically grouped left flipper / hold-to-launch / right flipper controls with separate keycaps and a thicker lower edge. New game receives primary emphasis; pause, audio and exit remain aligned secondary commands. All buttons retain existing IDs, accessible names and selectors. The optional file drawer retains the native picker, local-only notice and free-play restoration. Narrow composition makes the identity one row and commands another, with three equal touch zones below. Native canvas scaling and engine/art remain unchanged.
-
-Only `public/vendor/pinball/runtime.html`, `cabinet.css` and `cabinet.js` change. `controller.js`, outer boot handshake, engine files, data and provenance are untouched. Keyboard activation now holds the same synthetic native key until keyup, blur or pointer cancellation, without letting focus transfer prematurely release it.
-
-## Evidence and limits
-
-Against the coordinator's running server at `http://127.0.0.1:3131`, Chromium loaded the actual WASM table and enabled New game. Checked 1280×844, 390×844 and 320×844: document scroll width equals viewport width in each; native canvas remained wholly visible, including score panel. Screenshots saved to `/tmp/pinball-{1280,390,320}.png`; 390px screenshot inspected visually. No CSS recoloring or crop of native artwork.
-
-Real interactions checked: new game, pause → Resume → Pause, focusable flipper Enter down/up and visible solid focus outline. Reduced-motion emulation was exercised. Material fallback is delegated to the shared primitives; coordinator should run the persisted transparency cross-frame regression. Native aspect ratio intentionally leaves vertical space on portrait phones rather than crop table/score content. This is not a mobile engine redesign.
-
-`node --check public/vendor/pinball/cabinet.js` passed. Coordinator owns the complete `space-cadet.spec.ts` recovery/import/audio/boot-race suite and `application-design.spec.ts`; no root build or shared-file changes were made by this app agent.
+Final working direction accepted for frozen review after the opaque backing fixed rectangular cap perforations. `tests/e2e/pinball-experience.spec.ts` is the runnable candidate suite using shared capture/hit-test helpers for requested XP geometry, real arrow flippers, Space flight/score, physical pause freeze/resume, natural drain/next flight, narrow held/released controls, resize, no-scroll, and actual WASM failure/Retry recovery. Dev runs were interrupted by shell reloads during concurrent changes; they are not candidate acceptance. Frozen production execution belongs to the coordinator.
 
 
-## Ready-to-play revision
+The frozen first-launch investigation found a real readiness race: one of three
+immediate first holds never charged/launched while the ball was still settling
+in the shooter. This was not classified as a saved drain. The native ready signal
+now observes an actual unboosted plunger collision, with game mode active, instead
+of merely the ball's ActiveFlag. Loading remains “Feeding the first ball” until
+that observed contact. Later native feeds show a scoped footer meter/elapsed time
+and keep Launch disabled until contact. No arbitrary settle delay or first-score
+retry hides readiness. Physical keys use the same direct native input path as
+touch and ignore OS repeat; keyup/blur still release inputs. Native Boost is exposed
+as read-only cabinet state and the browser launch test asserts actual charging.
 
-The user rejected the inherited asset setup and engine menus. The cabinet now
-opens directly into one-player play, with native live score/ball in its compact
-header, restart/pause/sound actions, and Space + horizontal arrows. Touch devices
-get three controls. No imports, Game/Options/Help menus or vertical-arrow actions
-remain. Python regenerates all 318 bitmap records with original Aster enamel art;
-the exact bitmap masks, dimensions and non-art data are verified unchanged. Native
-source patch, generator, source/output assets and provenance ship in the repo.
-The gameplay table is cropped independently of the old score panel, and the
-renderer includes the entire lower table. Real launch/scoring, pause, audio,
-phone touch, no-scroll, restart and loading/retry are release checks.
+The background keyboard investigation preserved actual browser button defaults.
+SDL's keypress handler had cancelled Enter, despite correct button focus and
+keydown/keyup handling. Ordinary button keys stop at the button; an early
+keypress guard prevents SDL cancellation. Enter now emits a real browser click
+and native Pause resumes after switching away and refocusing. The exact event
+trace and immediate-launch/repeat observations are retained in the working folder.
+Only genuinely scored native early-drain saves receive bounded real Space
+relaunches in the lifecycle test; first-score assertions have no retry masking.
+
+
+C2 CI recovery evidence showed a separate test-strength issue: native input was
+accepted (Pull > 0), the ball followed the pulled head and made a short upward
+hop, then settled back in the shooter without entering the field. A fixed 1.2s
+hold is only a partial native charge, especially under a slow simulation. Scoring
+launches now release at the observed native maximum Pull=100, bounded to 10s,
+while retaining the immediate accepted-keydown assertion. Touch uses the same
+observed full-pull condition. There are no first-score retries or physics changes.
+Failure recovery replaces stale “Working…” text with “Ready to retry”.

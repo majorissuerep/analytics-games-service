@@ -94,13 +94,23 @@
   font: 24px/1 var(--ui-font);
 }
 .analytics-consent .analytics-consent-note { margin: 12px 0 0; color: var(--ui-muted); font-size: 12px; }
+/* A consent panel uses the same reserved utility space as its launcher.
+   Only the top-level provider renders these direct body children. App roots
+   consume this token; embedded frames retain the shared full-viewport value. */
+body:has(> :is(.analytics-settings-button, .analytics-consent)):not(:has(.millennium-desktop, .standalone-game-shell)) {
+  --ui-utility-height: 52px;
+  --ui-app-height: calc(100svh - var(--ui-utility-height));
+}
+
 /* Document/game pages own their layout: this entry follows their content. */
 .analytics-settings-button {
   position: static;
   flex: 0 0 auto;
   align-self: flex-end;
   margin: 8px 12px 12px;
+  height: 32px;
   min-height: 32px;
+  box-sizing: border-box;
   padding: 5px 12px;
   border-radius: 8px;
   background: var(--ui-glass-strong-fill);
@@ -108,8 +118,7 @@
   font-size: 12px;
 }
 
-/* The XP desktop owns the viewport and retains its floating utility entry. */
-body:has(.millennium-desktop) .analytics-settings-button,
+/* Standalone cabinet utility remains outside its control area. */
 body:has(.standalone-game-shell) .analytics-settings-button {
   position: fixed;
   z-index: 99999;
@@ -133,4 +142,15 @@ body:has(.standalone-game-shell) .analytics-settings-button {
   .analytics-consent .analytics-consent-primary,
   .analytics-consent button:hover,
   .analytics-settings-button:hover { color: ButtonText; background: ButtonFace; border-color: ButtonText; }
+}
+
+/* Desktop utilities belong in its reserved taskbar, never over game actions. */
+#desktop-privacy-launcher:empty { display: none; }
+#desktop-privacy-launcher .analytics-settings-button {
+  position: static;
+  margin: 0;
+  min-height: 28px;
+  height: 28px;
+  padding: 3px 7px;
+  border-radius: 5px;
 }

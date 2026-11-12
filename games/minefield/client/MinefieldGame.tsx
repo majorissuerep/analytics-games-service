@@ -4,6 +4,7 @@ import { useAppReady } from '@/lib/engine/client/use-app-ready'
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import Link from 'next/link'
+import { requestWindowSize } from '@/lib/engine/client/request-window-size'
 import { LoadingState } from '@/components/ui/LoadingState'
 import { emitGameSessionCompleted } from '@/lib/analytics/game-events'
 import {
@@ -46,12 +47,33 @@ export function MinefieldGame() {
   const [generating, setGenerating] = useState(false)
   const [generationError, setGenerationError] = useState('')
   const [generationAttempt, setGenerationAttempt] = useState(0)
-  const [cellSize, setCellSize] = useState(30)
+  const [cellSize, setCellSize] = useState(24)
+  const [panning, setPanning] = useState(false)
+  const stageRef = useRef<HTMLDivElement>(null)
+  const holdRef = useRef<{ timer: ReturnType<typeof setTimeout> | null; x: number; y: number; index: number; suppress: boolean } | null>(null)
+  const openingRef = useRef(0)
   const [focusedCell, setFocusedCell] = useState(0)
-  const [flagMode, setFlagMode] = useState(false)
   const workerRef = useRef<Worker | null>(null)
   const generationEpoch = useRef(0)
-  useEffect(() => () => workerRef.current?.terminate(), [])
+  useEffect(() => () => { workerRef.current?.terminate(); if (holdRef.current?.timer) clearTimeout(holdRef.current.timer) }, [])
+  useEffect(() => {
+    const stage = stageRef.current
+    if (!stage) return
+    const observer = new ResizeObserver(() => {
+      const fit = Math.floor(Math.min((stage.clientWidth - 10) / board.width, (stage.clientHeight - 10) / board.height))
+      setCellSize(Math.max(24, fit))
+      setPanning(fit < 24)
+    })
+    observer.observe(stage)
+    return () => observer.disconnect()
+  }, [board.width, board.height])
+  const cancelHold = (suppress = false) => {
+    if (!holdRef.current) return
+    if (holdRef.current.timer) clearTimeout(holdRef.current.timer)
+    holdRef.current.timer = null
+    holdRef.current.suppress ||= suppress
+  }
+
 
   useEffect(() => {
     if (!board.armed || board.status !== 'playing') return
@@ -66,6 +88,7 @@ export function MinefieldGame() {
   }, [board.status])
 
   const reset = (nextDifficulty = difficulty) => {
+    cancelHold(true)
     generationEpoch.current += 1
     workerRef.current?.terminate()
     workerRef.current = null
@@ -78,14 +101,15 @@ export function MinefieldGame() {
 
   const reveal = (index: number) => {
     if (board.status !== 'playing' || generating) return
-    if (flagMode) { setBoard(current => toggleMinefieldFlag(current, index)); return }
     if (board.cells[index].flagged) return
     if (!board.armed) {
       const epoch = ++generationEpoch.current
       setGenerating(true)
       setGenerationAttempt(0)
       setGenerationError('')
-      const worker = new Worker(new URL('./generator.worker.ts', import.meta.url))
+      openingRef.current = index
+      let worker: Worker
+      try { worker = new Worker(new URL('./generator.worker.ts', import.meta.url)) } catch { setGenerating(false); setGenerationError('Board verification could not start. Try again.'); return }
       workerRef.current = worker
       const fail = (message: string) => {
         if (epoch !== generationEpoch.current) return
@@ -116,40 +140,25 @@ export function MinefieldGame() {
 
   return (
     <main className="app-surface minefield-app">
-      <header className="minefield-header">
-        <div className="minefield-heading"><span className="minefield-eyebrow">Logic / field notes</span><Link href="/" aria-label="Back to desktop"><strong>Minefield</strong></Link><strong className="minefield-embedded-title">Minefield</strong><p>One field. Every square a deduction.</p></div>
-        <label>
-          Level
-          <select
-            aria-label="Level"
-            value={difficulty}
-            onChange={(event) => {
-              const next = event.target.value as Difficulty
-              setDifficulty(next)
-              reset(next)
-            }}
-          >
-            {Object.entries(DIFFICULTIES).map(([id, config]) => <option key={id} value={id}>{config.label}</option>)}
-          </select>
-        </label>
+      <header className="minefield-header ui-glass">
+        <Link className="minefield-title" href="/" aria-label="Back to desktop">Minefield</Link>
+        <label>Level <select aria-label="Level" value={difficulty} onChange={event => {
+          const next = event.target.value as Difficulty
+          setDifficulty(next)
+          reset(next)
+          const size = next === 'expert' ? [1120, 760] : next === 'intermediate' ? [720, 660] : [480, 600]
+          requestWindowSize(size[0], size[1])
+        }}>{Object.entries(DIFFICULTIES).map(([id, config]) => <option key={id} value={id}>{config.label}</option>)}</select></label>
+        <button className="ui-primary" onClick={() => reset()} aria-label="New game">New game</button>
       </header>
-
-      <div className="minefield-toolbar">
-        <span className="minefield-assurance">Deduction-only boards<span>Verified from your first square</span></span>
-        <label>Cell size <select aria-label="Cell size" value={cellSize} onChange={event => setCellSize(Number(event.target.value))}>
-          <option value={26}>Compact</option><option value={30}>Standard</option><option value={36}>Large</option><option value={44}>Extra large</option>
-        </select></label>
-        <button aria-pressed={flagMode} aria-describedby="minefield-mode-help" onClick={() => setFlagMode(value => !value)}>⚑ Flag mode{flagMode ? ": on" : ": off"}</button>
-      </div>
-      <section className="minefield-machine" aria-label="Minefield game" style={{ '--field-width': `${board.width * cellSize}px` } as CSSProperties}>
-        <div className="minefield-field-label"><span>{DIFFICULTIES[difficulty].label} field</span><span>{board.width} × {board.height} / {board.mineCount} mines</span></div>
+      <section className="minefield-machine" aria-label="Minefield game" style={{ '--field-width': `${board.width * cellSize}px`, '--field-height': `${board.height * cellSize}px` } as CSSProperties}>
         <div className="minefield-scoreboard">
-          <div className="ui-tone" data-tone="pink"><small>Mines left</small><output aria-label="Mines remaining">{String(Math.max(0, board.mineCount - flags)).padStart(3, '0')}</output></div>
-          <button onClick={() => reset()} aria-label="New game">New game</button>
-          <div className="ui-tone" data-tone="teal"><small>Seconds</small><output aria-label="Elapsed seconds">{String(elapsed).padStart(3, '0')}</output></div>
+          <div><small>Mines left</small><output aria-label="Mines remaining">{String(Math.max(0, board.mineCount - flags)).padStart(3, '0')}</output></div>
+          <span className="minefield-dimensions">{board.width} × {board.height}<small>{board.mineCount} mines</small></span>
+          <div><small>Seconds</small><output aria-label="Elapsed seconds">{String(elapsed).padStart(3, '0')}</output></div>
         </div>
         {generating && <LoadingState label="Verifying a deduction-only board" detail={generationAttempt ? `Checking candidate ${generationAttempt}. Only a fully solvable board will open.` : 'Starting board verification'} onCancel={() => reset()} />}
-        <div className="minefield-board-scroll" tabIndex={0} aria-label="Scrollable minefield">
+        <div className="minefield-stage" ref={stageRef}><div className="minefield-board-scroll" data-scroll-owner="minefield-board" data-panning={panning} tabIndex={0} aria-label="Scrollable minefield">
         <div
           className="minefield-grid"
           aria-busy={generating}
@@ -179,9 +188,20 @@ export function MinefieldGame() {
                 }
               }}
               aria-label={cellLabel(board, index)}
-              onClick={() => reveal(index)}
+              onPointerDown={event => {
+                if (event.pointerType === 'mouse') return
+                cancelHold()
+                const hold = { timer: null as ReturnType<typeof setTimeout> | null, x: event.clientX, y: event.clientY, index, suppress: false }
+                hold.timer = setTimeout(() => { hold.suppress = true; hold.timer = null; if (!generating) setBoard(current => toggleMinefieldFlag(current, index)) }, 450)
+                holdRef.current = hold
+              }}
+              onPointerMove={event => { const hold = holdRef.current; if (hold && Math.hypot(event.clientX - hold.x, event.clientY - hold.y) > 8) cancelHold(true) }}
+              onPointerUp={() => cancelHold()}
+              onPointerCancel={() => cancelHold(true)}
+              onClick={() => { const suppressed = holdRef.current?.suppress; holdRef.current = null; if (!suppressed) reveal(index) }}
               onContextMenu={(event) => {
                 event.preventDefault()
+                if (holdRef.current?.suppress) return
                 setBoard((current) => toggleMinefieldFlag(current, index))
               }}
             >
@@ -190,11 +210,14 @@ export function MinefieldGame() {
           ))}
         </div>
         </div>
+        </div>
         <div className="minefield-progress"><label htmlFor="minefield-cleared">{progress}% cleared</label><progress id="minefield-cleared" max={100} value={progress} aria-label="Safe field cleared" /><span>{flags} flagged</span></div>
-        <p className="minefield-mode-help" id="minefield-mode-help">{flagMode ? '⚑ Flag mode is on · select a covered square to mark or unmark it.' : 'Select a square to open · right-click or F to flag.'}</p>
+        <p className="minefield-mode-help" id="minefield-mode-help">Open: click or Enter · Flag: right-click, F, or hold.</p>
+        {generationError && <button className="minefield-retry" onClick={() => reveal(openingRef.current)}>Retry verification</button>}
         <p className="minefield-status" role="status">
-          {generating ? 'Preparing a verified board…' : generationError || (board.status === 'won' ? `Cleared in ${elapsed} seconds!` : board.status === 'lost' ? 'Mine triggered. Try again.' : 'Arrow keys move · Enter opens · click a clue with matching flags to clear its neighbors.')}
+          {generating ? 'Preparing a verified board…' : generationError || (board.status === 'won' ? `Cleared in ${elapsed} seconds!` : board.status === 'lost' ? 'Mine triggered. Try again.' : 'Arrows move · matching flags + clue click clears neighbors.')}
         </p>
+        <p className="minefield-pan-help">{panning ? 'Pan the board to explore · arrow keys follow focused squares.' : ''}</p>
       </section>
     </main>
   )

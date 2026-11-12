@@ -12,6 +12,7 @@ test('Chess can play against the tuned opening model with a selected repertoire'
   await page.locator('#analytics-chess-board-square-e2').click()
   await page.locator('#analytics-chess-board-square-e4').click()
 
+  await page.getByRole('button', { name: 'Moves', exact: true }).click()
   await expect(page.locator('.chess-moves')).toContainText('e4 c6', { timeout: 15_000 })
   await expect(page.getByRole('heading', { name: 'White to move' })).toBeVisible()
 })

@@ -1,3 +1,6 @@
+> Historical verification record. This is not acceptance evidence for the current
+> release. Current contracts and gates: [experience/WORKFLOW.md](experience/WORKFLOW.md).
+
 # Classic desktop QA report
 
 ## Scope

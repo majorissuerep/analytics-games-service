@@ -1,6 +1,8 @@
 # Prism application design system
 
-Version 2, 11 November 2026. [Research and source assessment](DESIGN_SYSTEM_RESEARCH.md).
+Version 3, 11 November 2026. Normative experience behavior and release gates:
+[Vision](experience/VISION.md), [workflow](experience/WORKFLOW.md),
+[current request](experience/CURRENT.md). [Research and source assessment](DESIGN_SYSTEM_RESEARCH.md).
 Live reference: `/design-system`.
 
 Prism is a shared perceptual and interaction engine. Apps have individual
@@ -128,12 +130,16 @@ understandable. Dense targets never move under the pointer on hover.
 ## Responsive and accessible behavior
 
 Stack groups below 760px. Headers wrap core actions rather than hide them.
-Verify 1280, 390, and 320px. Large boards use their own scroll/zoom region rather
-than widen the page. XP windows own desktop sizing and dragging. Setup forms should fit the normal
-window with their primary action visible. Long forms use document-edge scrolling,
-not a capped setup panel floating a scrollbar over controls. Explicit data regions
-may scroll independently with reserved scrollbar space. Verify actual embedded
-windows as well as standalone routes.
+Verify actual app-requested windows as well as1280,390 and320px viewports. App
+requests are independently clamped to the measured desktop workspace. Minefield
+requests a larger window when its difficulty changes; only physically constrained
+large boards use the explicit pan fallback in their experience contract.
+
+Complex apps keep task navigation and essential actions anchored. Only the selected
+detail pane scrolls, with reserved scrollbar space; neither the whole menu nor an
+unbounded sidebar may carry actions offscreen. Boards fill available width and
+height without arbitrary caps or aspect distortion. Verify every state through the
+real embedded window, not just a standalone route or a full-page screenshot.
 
 Target normal text 4.5:1; large text and essential state/control cues 3:1. Evaluate
 material compositing over light and dark backgrounds. Tone inks pair with their

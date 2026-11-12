@@ -18,6 +18,8 @@ export interface DesktopGameSummary {
 }
 
 export interface DesktopPluginContext {
+  /** A visible game owns the desktop workspace; decorative overlays should yield. */
+  applicationActive?: boolean
   gamesCount: number
   games: readonly DesktopGameSummary[]
   openGame(gameId: string): void

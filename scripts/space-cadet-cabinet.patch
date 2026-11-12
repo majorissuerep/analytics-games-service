@@ -1,8 +1,7 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index fca48f3..53cc4ac 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -218,7 +218,7 @@ target_link_libraries(SpaceCadetPinball ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY})
+@@ -218,7 +218,7 @@
  if(${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
          target_link_libraries(SpaceCadetPinball idbfs.js)
          set_target_properties(SpaceCadetPinball PROPERTIES LINK_FLAGS
@@ -12,10 +11,9 @@ index fca48f3..53cc4ac 100644
          --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/game_resources@game_resources --bind")
  endif()
 diff --git a/SpaceCadetPinball/fullscrn.cpp b/SpaceCadetPinball/fullscrn.cpp
-index 12e18b7..72bbee2 100644
 --- a/SpaceCadetPinball/fullscrn.cpp
 +++ b/SpaceCadetPinball/fullscrn.cpp
-@@ -14,7 +14,7 @@ int fullscrn::display_changed;
+@@ -14,7 +14,7 @@
  int fullscrn::resolution = 0;
  const resolution_info fullscrn::resolution_array[3] =
  {
@@ -25,10 +23,9 @@ index 12e18b7..72bbee2 100644
  	{1024, 768, 960, 666, 503},
  };
 diff --git a/SpaceCadetPinball/gdrv.cpp b/SpaceCadetPinball/gdrv.cpp
-index 6eb5e6b..8636aaa 100644
 --- a/SpaceCadetPinball/gdrv.cpp
 +++ b/SpaceCadetPinball/gdrv.cpp
-@@ -86,43 +86,12 @@ int gdrv::create_bitmap(gdrv_bitmap8& bmp, const dat8BitBmpHeader& header)
+@@ -86,43 +86,12 @@
  
  int gdrv::display_palette(ColorRgba* plt)
  {
@@ -79,10 +76,9 @@ index 6eb5e6b..8636aaa 100644
  	score::ApplyPalette();
  	for (const auto group : pb::record_table->Groups)
 diff --git a/SpaceCadetPinball/options.cpp b/SpaceCadetPinball/options.cpp
-index 99704d2..d303a72 100644
 --- a/SpaceCadetPinball/options.cpp
 +++ b/SpaceCadetPinball/options.cpp
-@@ -67,12 +67,12 @@ void options::init()
+@@ -67,12 +67,12 @@
  	Options.Sounds = 1;
  	Options.Music = 1;
  	Options.FullScreen = 0;
@@ -98,7 +94,7 @@ index 99704d2..d303a72 100644
  	/*pinball::get_rc_int(159, &Options.LeftFlipperKeyDft);
  	pinball::get_rc_int(160, &Options.RightFlipperKeyDft);
  	pinball::get_rc_int(161, &Options.PlungerKeyDft);
-@@ -105,6 +105,12 @@ void options::init()
+@@ -105,6 +105,12 @@
  	Options.UpdatesPerSecond = std::min(MaxUps, std::max(MinUps, get_int("Updates Per Second", DefUps)));
  	Options.UpdatesPerSecond = std::max(Options.UpdatesPerSecond, Options.FramesPerSecond);
  
@@ -112,20 +108,64 @@ index 99704d2..d303a72 100644
  
  	Sound::Enable(0, 7, Options.Sounds);
 diff --git a/SpaceCadetPinball/render.cpp b/SpaceCadetPinball/render.cpp
-index b5f2e88..991e33c 100644
 --- a/SpaceCadetPinball/render.cpp
 +++ b/SpaceCadetPinball/render.cpp
-@@ -639,5 +639,7 @@ void render::BlitVScreen()
+@@ -1,5 +1,6 @@
+ #include "pch.h"
+ #include "render.h"
++#include <fstream>
+ 
+ #include "GroupData.h"
+ #include "memory.h"
+@@ -18,9 +19,20 @@
+ zmap_header_type render::zscreen;
+ SDL_Texture* render::vScreenTex = nullptr;
+ SDL_Rect render::DestinationRect{};
++static SDL_Texture* cabinetBackingTexture = nullptr;
+ 
+ void render::init(gdrv_bitmap8* bmp, float zMin, float zScaler, int width, int height)
+ {
++#ifdef __EMSCRIPTEN__
++    // Opaque original art below the exact native table/sprite masks. Collision,
++    // depth records and source bitmap masks are never rewritten.
++    std::ifstream backing("/game_resources/ASTER-BACKING.BGRA", std::ios::binary);
++    std::vector<uint32_t> pixels(365 * 470);
++    if (backing.read(reinterpret_cast<char*>(pixels.data()), pixels.size() * 4)) {
++        cabinetBackingTexture = SDL_CreateTexture(winmain::Renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, 365, 470);
++        SDL_UpdateTexture(cabinetBackingTexture, nullptr, pixels.data(), 365 * 4);
++    }
++#endif
+ 	++memory::critical_allocation;
+ 	zscaler = zScaler;
+ 	zmin = zMin;
+@@ -55,13 +67,15 @@
+ 			SDL_TEXTUREACCESS_STREAMING,
+ 			width, height
+ 		);
+-		SDL_SetTextureBlendMode(vScreenTex, SDL_BLENDMODE_NONE);
++		SDL_SetTextureBlendMode(vScreenTex, SDL_BLENDMODE_BLEND);
+ 	}
+ 	--memory::critical_allocation;
+ }
+ 
+ void render::uninit()
+ {
++    SDL_DestroyTexture(cabinetBackingTexture);
++    cabinetBackingTexture = nullptr;
+ 	gdrv::destroy_bitmap(&vscreen);
+ 	zdrv::destroy_zmap(&zscreen);
+ 	for (auto i = many_sprites - 1; i >= 0; --i)
+@@ -639,5 +653,8 @@
  void render::PresentVScreen()
  {
  	BlitVScreen();
 -	SDL_RenderCopy(winmain::Renderer, vScreenTex, nullptr, &DestinationRect);
++    if (cabinetBackingTexture) SDL_RenderCopy(winmain::Renderer, cabinetBackingTexture, nullptr, nullptr);
 +	// The web cabinet owns the scoreboard; render only the physical table.
 +    SDL_Rect source{0, 0, pb::MainTable->Width, pb::MainTable->Height};
 +    SDL_RenderCopy(winmain::Renderer, vScreenTex, &source, nullptr);
  }
 diff --git a/SpaceCadetPinball/winmain.cpp b/SpaceCadetPinball/winmain.cpp
-index 4f78055..c12fa72 100644
 --- a/SpaceCadetPinball/winmain.cpp
 +++ b/SpaceCadetPinball/winmain.cpp
 @@ -9,6 +9,11 @@
@@ -140,7 +180,7 @@ index 4f78055..c12fa72 100644
  
  #include <functional>
  
-@@ -109,7 +114,7 @@ int winmain::WinMain(LPCSTR lpCmdLine)
+@@ -109,7 +114,7 @@
  	SDL_Window *window = SDL_CreateWindow(
  		pinball::get_rc_string(38, 0),
  		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
@@ -149,7 +189,16 @@ index 4f78055..c12fa72 100644
  		SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE);
  	MainWindow = window;
  	if (!window)
-@@ -249,6 +254,11 @@ int winmain::WinMain(LPCSTR lpCmdLine)
+@@ -128,7 +133,7 @@
+ 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Could not create renderer", SDL_GetError(), window);
+ 		return 1;
+ 	}
+-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
++	SDL_SetRenderDrawColor(renderer, 17, 31, 44, 255);
+ 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+ 
+ 	// ImGui init
+@@ -249,6 +254,11 @@
  			return;
  		}
  
@@ -161,7 +210,7 @@ index 4f78055..c12fa72 100644
  		if (has_focus)
  		{
  			if (mouse_down)
-@@ -343,201 +353,14 @@ int winmain::WinMain(LPCSTR lpCmdLine)
+@@ -343,201 +353,14 @@
  
  void winmain::RenderUi()
  {
@@ -344,8 +393,8 @@ index 4f78055..c12fa72 100644
 +    auto table = pb::MainTable;
 +    if (table) {
 +        auto message = pinball::MissTextBox && pinball::MissTextBox->Message1 ? pinball::MissTextBox->Message1->Text : "";
-+        EM_ASM({ if (Module.onCabinetState) Module.onCabinetState($0 + $1 * 1000000000, $2, $3, UTF8ToString($4), $5); },
-+            table->CurScore, table->CurScoreE9, table->BallCount, single_step, message, table->LightShowTimer == 0 && table->BallList->Get(0)->ActiveFlag);
++        EM_ASM({ if (Module.onCabinetState) Module.onCabinetState($0 + $1 * 1000000000, $2, $3, UTF8ToString($4), $5, $6); },
++            table->CurScore, table->CurScoreE9, table->BallCount, single_step, message, table->LightShowTimer == 0 && pb::game_mode == 1 && table->BallList->Get(0)->ActiveFlag && table->Plunger->CabinetBallReady, table->Plunger->Boost);
 +    }
  #endif
 -
@@ -370,7 +419,7 @@ index 4f78055..c12fa72 100644
  }
  
  int winmain::event_handler(const SDL_Event *event)
-@@ -610,6 +433,8 @@ int winmain::event_handler(const SDL_Event *event)
+@@ -610,6 +433,8 @@
  			options::toggle(Menu1::Music);
  			break;
  		case SDLK_F8:
@@ -379,7 +428,7 @@ index 4f78055..c12fa72 100644
  			if (!single_step)
  				pause();
  			options::keyboard();
-@@ -834,3 +659,21 @@ void winmain::UpdateFrameRate()
+@@ -834,3 +659,23 @@
  	UpdateToFrameRatio = static_cast<double>(ups) / fps;
  	TargetFrameTime = DurationMs(1000.0 / ups);
  }
@@ -388,16 +437,79 @@ index 4f78055..c12fa72 100644
 +// Touch and cabinet actions use the same native event handler as physical keys.
 +extern "C" EMSCRIPTEN_KEEPALIVE void cabinet_key(int code, int down)
 +{
-+    SDL_Event event{};
-+    event.type = down ? SDL_KEYDOWN : SDL_KEYUP;
++    // The cabinet has no ImGui controls. Route its commands directly to the
++    // same native gameplay functions, outside legacy GUI keyboard capture.
++    if (code == 113) { if (down) winmain::new_game(); return; }
++    if (code == 114) { if (down) winmain::pause(); return; }
++    int nativeKey;
 +    switch (code) {
-+    case 37: event.key.keysym.sym = SDLK_LEFT; break;
-+    case 39: event.key.keysym.sym = SDLK_RIGHT; break;
-+    case 32: event.key.keysym.sym = SDLK_SPACE; break;
-+    case 113: event.key.keysym.sym = SDLK_F2; break;
-+    case 114: event.key.keysym.sym = SDLK_F3; break;
++    case 37: nativeKey = SDLK_LEFT; break;
++    case 39: nativeKey = SDLK_RIGHT; break;
++    case 32: nativeKey = SDLK_SPACE; break;
 +    default: return;
 +    }
-+    winmain::event_handler(&event);
++    if (down) pb::keydown(nativeKey);
++    else pb::keyup(nativeKey);
 +}
 +#endif
+diff --git a/SpaceCadetPinball/zdrv.cpp b/SpaceCadetPinball/zdrv.cpp
+--- a/SpaceCadetPinball/zdrv.cpp
++++ b/SpaceCadetPinball/zdrv.cpp
+@@ -67,7 +67,9 @@
+ 		{
+ 			if (*dstPtrZ >= *srcPtrZ)
+ 			{
+-				*dstPtr = *srcPtr;
++                // Index-zero sprite masks are transparent, including internal
++                // cutouts. Keep the measured depth even when retaining backing.
++                if ((*srcPtr).Color) *dstPtr = *srcPtr;
+ 				*dstPtrZ = *srcPtrZ;
+ 			}
+ 			++srcPtr;
+diff --git a/SpaceCadetPinball/TPlunger.cpp b/SpaceCadetPinball/TPlunger.cpp
+--- a/SpaceCadetPinball/TPlunger.cpp
++++ b/SpaceCadetPinball/TPlunger.cpp
+@@ -38,6 +38,7 @@
+ {
+ 	if (PinballTable->TiltLockFlag)
+ 		Message(1017, 0.0);
++	if (Boost == 0.0f) CabinetBallReady = true;
+ 	coef = RandFloat() * Boost * 0.1f + Boost;
+ 	maths::basic_collision(ball, nextPosition, direction, Elasticity, Smoothness, Threshold, coef);
+ }
+@@ -79,6 +80,7 @@
+ 		}
+ 	case 1015:
+ 		{
++            CabinetBallReady = false;
+ 			auto ball = PinballTable->BallList->Get(0);
+ 			ball->Message(1024, 0.0);
+ 			ball->Position.X = PinballTable->PlungerPositionX;
+@@ -90,6 +92,7 @@
+ 			return 0;
+ 		}
+ 	case 1016:
++        CabinetBallReady = false;
+ 		if (BallFeedTimer_)
+ 			timer::kill(BallFeedTimer_);
+ 		BallFeedTimer_ = timer::set(0.95999998f, this, BallFeedTimer);
+@@ -103,6 +106,7 @@
+ 		break;
+ 	case 1024:
+ 		{
++            CabinetBallReady = false;
+ 			if (BallFeedTimer_)
+ 				timer::kill(BallFeedTimer_);
+ 			BallFeedTimer_ = 0;
+diff --git a/SpaceCadetPinball/TPlunger.h b/SpaceCadetPinball/TPlunger.h
+--- a/SpaceCadetPinball/TPlunger.h
++++ b/SpaceCadetPinball/TPlunger.h
+@@ -15,6 +15,8 @@
+ 	static void PullbackTimer(int timerId, void* caller);
+ 	static void PlungerReleasedTimer(int timerId, void* caller);
+ 
++	// Cabinet readiness observes an actual resting-head collision, not a timer.
++	bool CabinetBallReady = false;
+ 	int PullbackTimer_;
+ 	int BallFeedTimer_;
+ 	int MaxPullback;

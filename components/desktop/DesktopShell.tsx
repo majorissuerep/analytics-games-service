@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Rnd } from 'react-rnd'
 import type { DesktopPluginContext, DesktopPluginSlot } from '@analytics-games/plugin-sdk'
 import type { GameManifest } from '@/lib/engine/types'
@@ -23,48 +23,39 @@ interface DesktopShellProps {
 
 const PLUGIN_STORAGE_KEY = 'analytics-games.desktop.plugins.v1'
 
-function windowDefaults(
-  window: DesktopWindowState,
-  index: number,
-  viewport: { width: number; height: number },
-  game?: GameManifest,
-) {
-  const margin = 16
-  const taskbarHeight = 42
-  const preferred = window.kind === 'game'
-    ? {
-        x: 72 + index * 18,
-        y: 42 + index * 16,
-        width: game?.preferredWindow?.width ?? 1040,
-        height: game?.preferredWindow?.height ?? 700,
-      }
-    : { x: 150 + index * 24, y: 90 + index * 18, width: 620, height: 430 }
-  const width = Math.min(preferred.width, Math.max(320, viewport.width - margin * 2))
-  const height = Math.min(preferred.height, Math.max(240, viewport.height - taskbarHeight - margin * 2))
-  return {
-    x: Math.max(margin, Math.min(preferred.x, viewport.width - width - margin)),
-    y: Math.max(margin, Math.min(preferred.y, viewport.height - taskbarHeight - height - margin)),
-    width,
-    height,
-  }
+type WindowRect = { x: number; y: number; width: number; height: number }
+const SYSTEM_SIZES = { welcome: { width: 620, height: 430 }, help: { width: 720, height: 620 }, plugins: { width: 620, height: 520 } }
+
+function clampRect(rect: WindowRect, viewport: { width: number; height: number }): WindowRect {
+  const width = Math.min(rect.width, viewport.width)
+  const height = Math.min(rect.height, viewport.height)
+  return { width, height, x: Math.max(0, Math.min(rect.x, viewport.width - width)), y: Math.max(0, Math.min(rect.y, viewport.height - height)) }
+}
+
+function windowDefaults(window: DesktopWindowState, index: number, viewport: { width: number; height: number }, game?: GameManifest) {
+  const preferred = window.kind === 'game' ? game?.preferredWindow ?? { width: 960, height: 720 } : SYSTEM_SIZES[window.systemId ?? 'welcome']
+  return clampRect({ ...preferred, x: 72 + index * 24, y: 42 + index * 18 }, viewport)
 }
 
 export function DesktopShell({ games }: DesktopShellProps) {
   const { consent } = useAnalytics()
   const [clock, setClock] = useState('')
   const [draggingWindow, setDraggingWindow] = useState<string | null>(null)
-  const [viewport, setViewport] = useState({ width: 1024, height: 576 })
+  const [interactionCursor, setInteractionCursor] = useState('grabbing')
+  const workspaceRef = useRef<HTMLElement>(null)
+  const [viewport, setViewport] = useState({ width: 0, height: 0 })
+  const [restoredRects, setRestoredRects] = useState<Record<string, WindowRect>>({})
   const [enabledPlugins, setEnabledPlugins] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(DESKTOP_PLUGINS.map((plugin) => [plugin.manifest.id, plugin.manifest.defaultEnabled])),
   )
   const {
     windows,
     startOpen,
-    openGame,
-    openSystem,
-    closeWindow,
+    openGame: openStoredGame,
+    openSystem: openStoredSystem,
+    closeWindow: closeStoredWindow,
     minimizeWindow,
-    toggleMaximize,
+    toggleMaximize: toggleStoredMaximize,
     focusWindow,
     setStartOpen,
   } = useDesktopStore()
@@ -89,11 +80,24 @@ export function DesktopShell({ games }: DesktopShellProps) {
   }, [])
 
   useEffect(() => {
-    const updateViewport = () => setViewport({ width: window.innerWidth, height: window.innerHeight })
+    const workspace = workspaceRef.current
+    if (!workspace) return
+    const updateViewport = () => {
+      const size = { width: workspace.clientWidth, height: workspace.clientHeight }
+      setViewport(size)
+      setRestoredRects(current => {
+        const next = { ...current }
+        for (const [index, window] of useDesktopStore.getState().windows.entries()) {
+          if (!next[window.id]) next[window.id] = windowDefaults(window, index, size, window.gameId ? gamesById.get(window.gameId) : undefined)
+        }
+        return next
+      })
+    }
     updateViewport()
-    window.addEventListener('resize', updateViewport)
-    return () => window.removeEventListener('resize', updateViewport)
-  }, [])
+    const observer = new ResizeObserver(updateViewport)
+    observer.observe(workspace)
+    return () => observer.disconnect()
+  }, [gamesById])
 
   useEffect(() => {
     try {
@@ -116,7 +120,40 @@ export function DesktopShell({ games }: DesktopShellProps) {
     })
   }, [])
 
+  const openGame = (gameId: string, title: string) => {
+    if (!windows.some(window => window.id === `game:${gameId}`)) {
+      const game = gamesById.get(gameId)
+      const defaults = windowDefaults({ id: `game:${gameId}`, title, kind: 'game', gameId, minimized: false, maximized: false, zIndex: 0 }, windows.length, viewport, game)
+      setRestoredRects(current => ({ ...current, [`game:${gameId}`]: defaults }))
+    }
+    openStoredGame(gameId, title)
+  }
+  const openSystem = (systemId: 'welcome' | 'help' | 'plugins', title: string) => {
+    if (!windows.some(window => window.id === `system:${systemId}`)) {
+      const defaults = windowDefaults({ id: `system:${systemId}`, title, kind: 'system', systemId, minimized: false, maximized: false, zIndex: 0 }, windows.length, viewport)
+      setRestoredRects(current => ({ ...current, [`system:${systemId}`]: defaults }))
+    }
+    openStoredSystem(systemId, title)
+  }
+  const closeWindow = (id: string) => {
+    closeStoredWindow(id)
+    setRestoredRects(current => {
+      const next = { ...current }
+      delete next[id]
+      return next
+    })
+  }
+  const toggleMaximize = (id: string) => {
+    const target = windows.find(candidate => candidate.id === id)
+    if (target && !target.maximized) {
+      const defaults = windowDefaults(target, windows.indexOf(target), viewport, target.gameId ? gamesById.get(target.gameId) : undefined)
+      setRestoredRects(current => current[id] ? current : { ...current, [id]: defaults })
+    }
+    toggleStoredMaximize(id)
+  }
+
   const pluginContext: DesktopPluginContext = {
+    applicationActive: windows.some(window => !window.minimized && window.systemId !== 'welcome'),
     gamesCount: playableGames.length,
     games: playableGames.map(({ id, title, icon }) => ({ id, title, icon })),
     openGame: (gameId) => {
@@ -125,6 +162,8 @@ export function DesktopShell({ games }: DesktopShellProps) {
     },
     openHelp: () => openSystem('help', 'Platform Help'),
   }
+
+  const topFocusedId = windows.filter(candidate => !candidate.minimized).reduce<DesktopWindowState | undefined>((top, candidate) => !top || candidate.zIndex > top.zIndex ? candidate : top, undefined)?.id
 
   return (
     <main className="millennium-desktop" onClick={() => startOpen && setStartOpen(false)}>
@@ -179,37 +218,49 @@ export function DesktopShell({ games }: DesktopShellProps) {
         </button>
       </section>
 
-      <section className="desktop-windows" aria-live="polite">
+      <section ref={workspaceRef} className="desktop-windows" aria-live="polite">
         {windows.map((window, index) => {
-          if (window.minimized) return null
+          if (window.minimized || !viewport.width || !viewport.height) return null
           const defaults = windowDefaults(
             window,
             index,
             viewport,
             window.gameId ? gamesById.get(window.gameId) : undefined,
           )
-          const topFocusedId = [...windows]
-            .filter((candidate) => !candidate.minimized)
-            .sort((a, b) => b.zIndex - a.zIndex)[0]?.id ?? null
+          const restored = restoredRects[window.id] ?? defaults
+          const rect = window.maximized ? { x: 0, y: 0, ...viewport } : clampRect(restored, viewport)
           return (
             <Rnd
               key={window.id}
-              default={defaults}
-              size={window.maximized ? { width: '100%', height: 'calc(100% - 42px)' } : undefined}
-              position={window.maximized ? { x: 0, y: 0 } : undefined}
+              size={{ width: rect.width, height: rect.height }}
+              position={{ x: rect.x, y: rect.y }}
               disableDragging={window.maximized}
               enableResizing={!window.maximized}
-              minWidth={Math.min(window.kind === 'game' ? 560 : 360, viewport.width)}
-              minHeight={Math.min(window.kind === 'game' ? 400 : 260, viewport.height - 42)}
+              minWidth={Math.min(280, defaults.width, viewport.width)}
+              minHeight={Math.min(180, defaults.height, viewport.height)}
+              maxWidth={viewport.width}
+              maxHeight={viewport.height}
               bounds="parent"
               dragHandleClassName="title-bar"
               style={{ zIndex: window.zIndex }}
               className="desktop-rnd-window"
-              onMouseDown={() => focusWindow(window.id)}
-              onDragStart={() => setDraggingWindow(window.id)}
-              onDragStop={() => setDraggingWindow(null)}
+              onPointerDownCapture={() => focusWindow(window.id)}
+              onFocusCapture={() => focusWindow(window.id)}
+              onDragStart={() => { setInteractionCursor('grabbing'); setDraggingWindow(window.id) }}
+              onResizeStart={(event) => {
+                setInteractionCursor(event.target instanceof Element ? getComputedStyle(event.target).cursor : 'nwse-resize')
+                setDraggingWindow(window.id)
+              }}
+              onDragStop={(_, position) => {
+                setDraggingWindow(null)
+                setRestoredRects(current => ({ ...current, [window.id]: clampRect({ ...rect, x: position.x, y: position.y }, viewport) }))
+              }}
+              onResizeStop={(_, __, element, ___, position) => {
+                setDraggingWindow(null)
+                setRestoredRects(current => ({ ...current, [window.id]: clampRect({ ...position, width: element.offsetWidth, height: element.offsetHeight }, viewport) }))
+              }}
             >
-              <article className="window desktop-window">
+              <article className="window desktop-window" data-window-id={window.id} data-focused={topFocusedId === window.id}>
                 <div className="title-bar" onDoubleClick={() => toggleMaximize(window.id)}>
                   <div className="title-bar-text"><span aria-hidden>{window.kind === 'game' ? '🎮' : '🖥️'}</span> {window.title}</div>
                   <div className="title-bar-controls" onMouseDown={(event) => event.stopPropagation()}>
@@ -225,6 +276,8 @@ export function DesktopShell({ games }: DesktopShellProps) {
                     plugins={enabledPlugins}
                     setPlugin={setPlugin}
                     focused={topFocusedId === window.id}
+                    activate={() => focusWindow(window.id)}
+                    requestSize={(width, height) => setRestoredRects(current => ({ ...current, [window.id]: { ...restored, width, height } }))}
                     openGame={(game) => openGame(game.id, game.title)}
                     close={() => closeWindow(window.id)}
                   />
@@ -233,7 +286,7 @@ export function DesktopShell({ games }: DesktopShellProps) {
             </Rnd>
           )
         })}
-        {draggingWindow && <div className="desktop-drag-shield" aria-hidden data-dragging-window={draggingWindow} />}
+        {draggingWindow && <div className="desktop-drag-shield" style={{ cursor: interactionCursor }} aria-hidden data-dragging-window={draggingWindow} />}
       </section>
 
       <PluginSlot slot="desktop-overlay" enabled={enabledPlugins} context={pluginContext} />
@@ -267,6 +320,8 @@ export function DesktopShell({ games }: DesktopShellProps) {
           ))}
         </div>
         <div className="taskbar-tray">
+          <div id="desktop-assistant-launcher" />
+          <div id="desktop-privacy-launcher" />
           <PluginSlot slot="tray" enabled={enabledPlugins} context={pluginContext} />
           <span aria-hidden>🔊</span><time>{clock}</time>
         </div>
@@ -295,6 +350,8 @@ function WindowContent({
   plugins,
   setPlugin,
   focused,
+  activate,
+  requestSize,
   openGame,
   close,
 }: {
@@ -303,6 +360,8 @@ function WindowContent({
   plugins: Record<string, boolean>
   setPlugin(id: string, enabled: boolean): void
   focused: boolean
+  activate(): void
+  requestSize(width: number, height: number): void
   openGame(game: GameManifest): void
   close(): void
 }) {
@@ -322,7 +381,7 @@ function WindowContent({
         </div>
       )
     }
-    return <GameFrame game={game} onExit={close} />
+    return <GameFrame game={game} onExit={close} onActivate={activate} onRequestSize={requestSize} />
   }
 
   if (window.systemId === 'plugins') return <PluginManagerApp plugins={plugins} setPlugin={setPlugin} />

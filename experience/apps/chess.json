@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "id": "chess",
+  "vision": "docs/experience/VISION.md",
+  "request": "desktop-refinement",
+  "route": "/games/chess",
+  "preferredWindow": {
+    "width": 1000,
+    "height": 760
+  },
+  "scrollOwners": [
+    "selected setup section details",
+    "selected active-game utility details",
+    "arena replay/details within its pane"
+  ],
+  "requiredControls": [
+    "state-specific controls defined in requiredControlsByState"
+  ],
+  "states": [
+    "setup",
+    "modelLoading",
+    "humanEngine",
+    "freeHints",
+    "longHistory",
+    "onlineRoom",
+    "arena",
+    "modelSubmission",
+    "narrow"
+  ],
+  "forbidden": [
+    "opening slogan",
+    "document scrolling",
+    "720px board cap",
+    "1200px app cap",
+    "actions at end of unbounded list"
+  ],
+  "boardSizing": "min(available stage width,available stage height); narrow dock reserves reachable controls before board allocation",
+  "requiredControlsByState": {
+    "setup": [
+      "high-level section tabs",
+      "Sound",
+      "selected section primary action"
+    ],
+    "active": [
+      "Sound",
+      "New game",
+      "utility section tabs",
+      "Undo when supported",
+      "Leave or Resign appropriate to mode"
+    ],
+    "arena": [
+      "high-level section tabs",
+      "Start match when idle",
+      "Pause/Resume when active",
+      "replay navigation when match selected"
+    ],
+    "modelSubmission": [
+      "high-level section tabs",
+      "form submission action in selected details pane"
+    ]
+  }
+}

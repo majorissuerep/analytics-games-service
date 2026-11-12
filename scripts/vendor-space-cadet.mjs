@@ -12,6 +12,8 @@ async function download(url, expected) {
   return bytes
 }
 if (process.argv.includes('--verify')) {
+  const patch = await readFile(new URL('./space-cadet-cabinet.patch', import.meta.url))
+  if (hash(patch) !== provenance.engine.patchSha256) throw new Error('Native patch changed: rebuild the engine and update its provenance')
   for (const [name, artifact] of Object.entries(provenance.artifacts)) {
     const bytes = await readFile(new URL(name, root))
     if (hash(bytes) !== artifact.sha256 || bytes.length !== artifact.bytes) throw new Error(`Asset changed: ${name}`)
@@ -36,6 +38,7 @@ if (process.argv.includes('--verify')) {
   run('git', ['apply', join(repository, 'scripts/space-cadet-cabinet.patch')])
   run('python', [join(repository, 'scripts/generate-pinball-art.py'), '--check'])
   await cp(join(repository, 'public/vendor/space-cadet/PINBALL.DAT'), join(build, 'game_resources/PINBALL.DAT'))
+  await cp(join(repository, 'public/vendor/space-cadet/ASTER-BACKING.BGRA'), join(build, 'game_resources/ASTER-BACKING.BGRA'))
   for (const file of provenance.data.files.filter(file => file.name !== 'PINBALL.DAT')) {
     const bytes = await download(`https://raw.githubusercontent.com/andrewnakas/open-cadet/${provenance.data.commit}/${file.name.toLowerCase()}`, file.sha256)
     await writeFile(join(build, 'game_resources', file.name.toLowerCase()), bytes)

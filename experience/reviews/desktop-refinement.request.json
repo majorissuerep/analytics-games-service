@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "requestId": "desktop-refinement",
+  "requestSha256": "3d3016d15a1b99aa7f85c3bd2c378ab3d42f081c0ead3ec714edcfde281eb377",
+  "contractsSha256": "9ba6185fa1b370bda4ecd72939f96171a6e0b2be10063ad0555238b3646ea59a",
+  "reviewer": "experience_gate_review",
+  "authors": [
+    "root"
+  ],
+  "reviewedAt": "2026-11-11T22:25:17.472Z",
+  "verdict": "approve",
+  "challenges": [
+    "The previous tests allowed the reported failures: actual baseline Minefield has a272px board viewport with274px scroll content and a731px app inside671px iframe. The new request measures actual desktop launch and all declared scroll owners, not document width alone.",
+    "Pinball route and dynamic proof were challenged. The contract now uses the real orbit-pinball route and requires observed ball motion, pause freeze/resume, genuine scoring, drain/next-ball update, and failed-load recovery.",
+    "The claim that every app requests dimensions was broader than the initial scope. The desktop contract now names all installed games, system windows, and an explicit default for integrations without a request.",
+    "Both a 16-column Intermediate board and a 30-column Expert board exceed a 320px viewport at the declared readable 24px cell size. The request now explicitly preserves 24px cells in a discoverable bounded board-pan exception for both modes, requests larger host windows when possible, and keeps Beginner launch and the page free of accidental overflow. The mine-narrow journey must switch through both modes and reach distant cells by touch and keyboard.",
+    "Control availability must be state-specific and layout assertions must run before test auto-scroll. Chess now declares setup, active-game, arena and model-submission controls separately; candidate review must still inspect real viewport images and interactions.",
+    "Reference-led visual quality cannot be certified by CSS or a numeric beauty score. Primary-source adopt/reject choices are defined, but actual visual comparison remains a required independent candidate review, not a claim made by this request approval.",
+    "Normative workflow provenance was challenged after the initial approval: WORKFLOW.md defined gate authority but was omitted from the contract checksum. The helper now binds WORKFLOW with VISION and app contracts; operational CURRENT status remains excluded."
+  ],
+  "observations": [
+    {
+      "requirementId": "REF-01",
+      "note": "Request defines elementary task hierarchy and Zorin rounded material references, pink intent with one optional identity family, no slogans, and original app character. The visual-matrix scenario requires viewed viewport/sequence comparison. This approves the brief, not the unimplemented visual result."
+    },
+    {
+      "requirementId": "MINE-01",
+      "note": "Removed Cell size and Flag mode controls are explicit forbidden behaviors, while right-click/F/cancellable touch hold must remain usable. mine-input now includes cancellation and an induced worker failure followed by actual Retry and play."
+    },
+    {
+      "requirementId": "MINE-02",
+      "note": "mine-start covers actual 480×600 outer-window launch without document or board scrolling; mine-expert covers 70%+ revealed state and no-guess completion. mine-narrow now exercises both Intermediate and Expert at 320px, with declared bounded board panning, readable 24px cells, no page overflow, and distant-edge reveal/flag through touch and focused keyboard navigation. The measured 2px baseline defect has a direct geometry acceptance condition."
+    },
+    {
+      "requirementId": "CHESS-01",
+      "note": "No opening slogan and no app-document scrolling are explicit. Every top section, overflowed archive, and model form is exercised while high-level navigation remains anchored; only the selected details pane may scroll."
+    },
+    {
+      "requirementId": "CHESS-02",
+      "note": "Essential active actions must pass hit-testing before auto-scroll and without widening. Board size is bounded by available stage width and height rather than720px/1200px constants; growth beyond the legacy cap is tested where both axes permit."
+    },
+    {
+      "requirementId": "PIN-01",
+      "note": "Corrected route matches the actual game registry. Score and Ball are required at narrow size. Flight, scoring, physical freeze/resume, actual drain and next ball, touch-held state, no-scroll controls, and asset-failure recovery now provide observable dynamic outcomes; masked/depth/collision data remain invariant."
+    },
+    {
+      "requirementId": "SHELL-01",
+      "note": "Desktop contract now lists requests for Minefield, Chess, orbit-pinball, Paintbox, Mafia, Welcome, Help and Plugins, plus an external default. Sizing scenario checks per-axis clamp against actual workspace, taskbar accounting, restore, viewport shrink and phone minimums."
+    },
+    {
+      "requirementId": "SHELL-02",
+      "note": "The first exposed body interaction must both raise the correct window and perform its action. Repeated switching includes nested Pinball and keyboard focus; repeated already-focused activation must not churn ranks, and dragging across frames remains covered."
+    },
+    {
+      "requirementId": "GATE-01",
+      "note": "Workflow separates request, candidate promotion and deployed decision. It requires matching source/build/evidence provenance, named independent review, retained artifacts and linked failed-release decisions. Negative fixture requirements include incomplete/stale evidence and actual browser2px overflow, clipped action and broken focus guards."
+    }
+  ],
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Pinball app contract pointed at nonexistent /games/space-cadet instead of the registered game route.",
+      "resolution": "Verified corrected /games/orbit-pinball against games/orbit-pinball/manifest.ts and the working baseline browser route."
+    },
+    {
+      "id": "R2",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Every-app requested geometry promise omitted concrete Paintbox and system-window requests.",
+      "resolution": "Verified desktop requestedWindows entries for all installed games and three system apps, plus an explicit external default and expanded shell-sizing scenario."
+    },
+    {
+      "id": "R3",
+      "severity": "major",
+      "status": "resolved",
+      "description": "A score increase could pass despite unreadable Pinball dynamics; declared error/retry states lacked induced failure actions.",
+      "resolution": "Verified pinball-play adds physical freeze/resume, actual drain/next-ball update and asset failure/retry; mine-input explicitly induces worker failure then retries into playable state."
+    },
+    {
+      "id": "R4",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Unqualified Chess required-control list could demand active-game actions during setup or omit meaningful state coverage.",
+      "resolution": "Verified requiredControlsByState distinguishes setup, active-game, arena and model submission availability."
+    },
+    {
+      "id": "R5",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Changing normative WORKFLOW.md would not invalidate request-review provenance because the contract checksum omitted it.",
+      "resolution": "Verified loadContext includes WORKFLOW.md with VISION and app contracts in the checksum; reread unchanged workflow and regenerated this independent approval."
+    },
+    {
+      "id": "R6",
+      "severity": "major",
+      "status": "resolved",
+      "description": "The readable-cell narrow-screen exception covered Expert but omitted Intermediate, whose 16 columns also cannot fit a 320px viewport at 24px per cell.",
+      "resolution": "Read the updated Minefield contract, MINE-02, mine-narrow actions/expected results and risk resolution. Both larger difficulties now explicitly use the bounded board-pan fallback only under physical constraints, while Beginner and document overflow remain prohibited."
+    }
+  ]
+}

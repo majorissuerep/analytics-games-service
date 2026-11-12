@@ -9,7 +9,9 @@ python scripts/generate-pinball-art.py
 python scripts/generate-pinball-art.py --check
 ```
 
-The generator creates warm ivory enamel with rose flight paths, an original geometric spacecraft seal and Aster lettering, graphite/silver mechanical bodies and white chrome balls. The art uses a deterministic indexed material palette; it has no random seed, network or model dependency. The generator uses Pillow's bundled default font. Install the same Pillow version to reproduce font rasterization exactly (generated with Pillow 13.0.0).
+The generator creates navy enamel with restrained printed flight routes, original 4× supersampled rail paths and ramp beds, procedural cyan native lamp/bumper states, rose flippers and white chrome balls. The old oversized seal and overlapping bottom microtype are removed. Cyan belongs to native gameplay lights and bumper caps; it does not create new obstacles. Existing sprite silhouettes, native lamp states and physical fixtures retain their meaning. Palette index zero remains exactly zero. A separate original opaque architectural backing sits below the unchanged native table/sprite masks, so internal transparent holes reveal the intended physical material.
+
+The art uses a deterministic indexed material palette; it has no random seed, network or model dependency. No font/text or model dependency is used. Generated with Pillow 13.0.0.
 
 `OPEN-CADET-CC0.DAT` is the unmodified CC0 interoperability source, sourced from the Open Cadet package recorded in `../NOTICE-data.md`. Its geometry and rail/fixture structure guide alignment. The generated work replaces its floor illustration, markings, palette and bitmap materials; it is not a historical Microsoft asset. The source contains no Microsoft artwork according to its publisher.
 
@@ -17,6 +19,14 @@ All new artwork and this generator are dedicated to the public domain under CC0 
 
 The generator verifies every original bitmap header and exact index-zero mask, including all sprite dimensions and positions. Every non-art record is checked byte-for-byte, preserving physics, collision geometry, depth maps, sounds references and assembly order. It modifies 318 bitmap records and the shared palette. `--check` compares the complete generated binary with the shipped asset.
 
-Both flippers (groups 355–370, eight angles each) use distinct rose enamel with a pale chrome rim and white highlights. Their exact original masks remain unchanged. Individual resting and raised sprite previews are included as `aster-355.png`, `aster-358.png`, `aster-363.png`, and `aster-366.png`.
+Both flippers (groups 355–370, eight angles each) use smooth rose enamel with a pale chrome rim. Their exact original masks remain unchanged. Individual resting and raised sprite previews are included as `aster-355.png`, `aster-358.png`, `aster-363.png`, and `aster-366.png`.
 
-Current generated DAT SHA256: `1e2fa5236972483157b7cd1ce8e3cac6a6431842cfbda6ce230a6f8ec6c8c41e` (911260 bytes).
+Current generated DAT SHA256: `543c2d207297b9c303f3c9341c40bbbfe06cbf8e58a38f7d03e9abe2ccc1fc00` (911260 bytes).
+
+The floor/rail image is an original architectural drawing rendered at 4× and Lanczos resampled. Source RGB/luminance does not shade physical sprites; they use procedural silhouette bevels, smooth caps and directional light. Seven measured bumper backings fill behind the unchanged native animated masks. Lamp brightness classifies the native off/on states; it does not invent a new game state.
+
+`ASTER-BACKING.BGRA` is the original opaque 365×470 architectural backing (BGRA bytes). The native renderer draws it beneath the masked table texture, preserving data masks and original depth writes while giving physical cap material through internal transparent cutouts. Both DAT and backing are verified by generator `--check`.
+
+Measured rollover switch groups 520–537 have recessed lens beds and procedural faces, preserving their true collision locations and eliminating stray ghost glyphs. Actual native lamp states remain separate and light only when the engine changes them.
+
+The original nonfunctional plunger-tail pixels below table y=420 match the exact opaque stage color. The in-board physical plunger, all eight animation states, masks and depth/collision records are preserved.

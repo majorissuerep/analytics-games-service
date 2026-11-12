@@ -17,7 +17,6 @@ export interface DesktopWindowState {
 
 interface DesktopState {
   windows: DesktopWindowState[]
-  nextZ: number
   startOpen: boolean
   openGame(gameId: string, title: string): void
   openSystem(systemId: SystemWindowId, title: string): void
@@ -28,10 +27,13 @@ interface DesktopState {
   setStartOpen(open: boolean): void
 }
 
-function focus(windows: DesktopWindowState[], id: string, zIndex: number) {
-  return windows.map((window) => window.id === id
-    ? { ...window, minimized: false, zIndex }
-    : window)
+export function focus(windows: DesktopWindowState[], id: string) {
+  const target = windows.find(window => window.id === id)
+  if (!target) return windows
+  const ordered = [...windows].sort((a, b) => a.zIndex - b.zIndex)
+  if (!target.minimized && ordered.filter(window => !window.minimized).at(-1)?.id === id) return windows
+  const ids = [...ordered.filter(window => window.id !== id), target].map(window => window.id)
+  return windows.map(window => ({ ...window, minimized: window.id === id ? false : window.minimized, zIndex: ids.indexOf(window.id) + 1 }))
 }
 
 export const useDesktopStore = create<DesktopState>((set) => ({
@@ -44,7 +46,6 @@ export const useDesktopStore = create<DesktopState>((set) => ({
     maximized: false,
     zIndex: 1,
   }],
-  nextZ: 2,
   startOpen: false,
   openGame(gameId, title) {
     set((state) => {
@@ -52,7 +53,7 @@ export const useDesktopStore = create<DesktopState>((set) => ({
       const existing = state.windows.some((window) => window.id === id)
       return {
         windows: existing
-          ? focus(state.windows, id, state.nextZ)
+          ? focus(state.windows, id)
           : [...state.windows, {
             id,
             title,
@@ -60,9 +61,8 @@ export const useDesktopStore = create<DesktopState>((set) => ({
             gameId,
             minimized: false,
             maximized: false,
-            zIndex: state.nextZ,
+            zIndex: state.windows.length + 1,
           }],
-        nextZ: state.nextZ + 1,
         startOpen: false,
       }
     })
@@ -73,7 +73,7 @@ export const useDesktopStore = create<DesktopState>((set) => ({
       const existing = state.windows.some((window) => window.id === id)
       return {
         windows: existing
-          ? focus(state.windows, id, state.nextZ)
+          ? focus(state.windows, id)
           : [...state.windows, {
             id,
             title,
@@ -81,15 +81,14 @@ export const useDesktopStore = create<DesktopState>((set) => ({
             systemId,
             minimized: false,
             maximized: false,
-            zIndex: state.nextZ,
+            zIndex: state.windows.length + 1,
           }],
-        nextZ: state.nextZ + 1,
         startOpen: false,
       }
     })
   },
   closeWindow(id) {
-    set((state) => ({ windows: state.windows.filter((window) => window.id !== id) }))
+    set((state) => ({ windows: state.windows.filter((window) => window.id !== id).sort((a, b) => a.zIndex - b.zIndex).map((window, index) => ({ ...window, zIndex: index + 1 })) }))
   },
   minimizeWindow(id) {
     set((state) => ({
@@ -106,10 +105,10 @@ export const useDesktopStore = create<DesktopState>((set) => ({
     }))
   },
   focusWindow(id) {
-    set((state) => ({
-      windows: focus(state.windows, id, state.nextZ),
-      nextZ: state.nextZ + 1,
-    }))
+    set((state) => {
+      const windows = focus(state.windows, id)
+      return windows === state.windows ? state : { windows }
+    })
   },
   setStartOpen(open) {
     set({ startOpen: open })

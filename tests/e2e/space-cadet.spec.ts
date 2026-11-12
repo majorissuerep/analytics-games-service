@@ -1,4 +1,6 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type FrameLocator } from '@playwright/test'
+
+const plungerPull = (game: FrameLocator) => game.locator('canvas').evaluate(() => (window as unknown as { Module: { cabinetState: { plungerPull: number } } }).Module.cabinetState.plungerPull)
 
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => localStorage.setItem('analytics-games.analytics-consent.v1', 'denied'))
@@ -15,16 +17,21 @@ test('faithful Space Cadet engine starts, plays, pauses, supports touch controls
   await expect(game.getByLabel('Ball', { exact: true })).toHaveText('1 / 3')
   await canvas.focus()
   await page.keyboard.down('Space')
-  await page.waitForTimeout(1200)
-  await page.keyboard.up('Space')
+  try {
+    await expect.poll(() => plungerPull(game), { message: 'First ready Space must charge the native plunger' }).toBeGreaterThan(0)
+    await expect.poll(() => plungerPull(game), { timeout: 10_000, message: 'Release the scoring shot at observed full native pull' }).toBe(100)
+  } finally {
+    await page.keyboard.up('Space')
+  }
   await expect.poll(async () => Number((await game.locator('#score').innerText()).replaceAll(',', '')), { timeout: 20_000 }).toBeGreaterThan(0)
   await page.keyboard.down('ArrowLeft')
   await page.waitForTimeout(200)
   await page.keyboard.up('ArrowLeft')
   await page.keyboard.press('ArrowRight')
   await game.getByRole('button', { name: 'Pause', exact: true }).click()
-  await expect(game.getByRole('button', { name: 'Resume', exact: true })).toBeVisible()
-  await game.getByRole('button', { name: 'Resume', exact: true }).click()
+  await expect(game.locator('#pause')).toHaveAttribute('aria-label', 'Resume')
+  await game.locator('#resume-table').click()
+  await expect(game.locator('#pause')).toHaveAttribute('aria-label', 'Pause')
   await game.getByRole('button', { name: 'Sound off', exact: true }).click()
   await expect(game.getByRole('button', { name: 'Sound on', exact: true })).toHaveAttribute('aria-pressed', 'true')
   await page.reload()
@@ -54,8 +61,12 @@ test('ready-to-play cabinet has no file setup or scrolling and uses Space plus h
   const box = (await launch.boundingBox())!
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
   await page.mouse.down()
-  await page.waitForTimeout(1200)
-  await page.mouse.up()
+  try {
+    await expect.poll(() => plungerPull(game), { message: 'Pointer hold must charge the native plunger' }).toBeGreaterThan(0)
+    await expect.poll(() => plungerPull(game), { timeout: 10_000, message: 'Release the scoring shot at observed full native pull' }).toBe(100)
+  } finally {
+    await page.mouse.up()
+  }
   await expect.poll(async () => Number((await game.locator('#score').innerText()).replaceAll(',', '')), { timeout: 20_000 }).toBeGreaterThan(0)
   await page.keyboard.press('ArrowUp')
   await page.keyboard.press('ArrowDown')

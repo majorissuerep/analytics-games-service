@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "id": "minefield",
+  "vision": "docs/experience/VISION.md",
+  "request": "desktop-refinement",
+  "route": "/games/minefield",
+  "preferredWindow": {
+    "width": 480,
+    "height": 600
+  },
+  "modeWindows": {
+    "intermediate": {
+      "width": 720,
+      "height": 660
+    },
+    "expert": {
+      "width": 1120,
+      "height": 760
+    }
+  },
+  "scrollOwners": [
+    "board pan only when24px readable grid cannot fit constrained workspace"
+  ],
+  "requiredControls": [
+    "Level",
+    "New game",
+    "reachable reveal/flag/chord cells"
+  ],
+  "states": [
+    "ready",
+    "generating",
+    "active",
+    "late99",
+    "won",
+    "failed",
+    "narrowExpert",
+    "narrowIntermediate"
+  ],
+  "forbidden": [
+    "Cell size control",
+    "Flag mode toggle",
+    "slogans",
+    "beginner scrollbars",
+    "micro-overflow"
+  ],
+  "minimumCellPixels": 24,
+  "scrollSelectors": {
+    "constrainedBoard": ".minefield-board-scroll[data-scroll-owner=\"minefield-board\"][data-panning=\"true\"]"
+  }
+}

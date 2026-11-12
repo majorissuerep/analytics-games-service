@@ -17,6 +17,7 @@ export const paintboxManifest = {
     { title: 'Draw', detail: 'Drag across the canvas with mouse, pen, or touch.' },
     { title: 'Keep', detail: 'Undo mistakes or save the result as PNG.' },
   ],
+  preferredWindow: { width: 1000, height: 760 },
   status: 'live',
   integration: { kind: 'internal' },
   icon: '🎨',

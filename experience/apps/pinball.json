@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "pinball",
+  "vision": "docs/experience/VISION.md",
+  "request": "desktop-refinement",
+  "route": "/games/orbit-pinball",
+  "preferredWindow": {
+    "width": 920,
+    "height": 740
+  },
+  "scrollOwners": [],
+  "requiredControls": [
+    "New game",
+    "Pause/Resume",
+    "Sound",
+    "live Score",
+    "live Ball",
+    "touch launch/left/right"
+  ],
+  "states": [
+    "loading",
+    "ready",
+    "flying",
+    "scoring",
+    "paused",
+    "resumed",
+    "narrow",
+    "failed",
+    "drained",
+    "nextBall"
+  ],
+  "forbidden": [
+    "file import",
+    "Game Options Help menus",
+    "up/down page scroll",
+    "hidden narrow Ball counter",
+    "fake physical fixture art",
+    "emoji action glyphs"
+  ],
+  "nativeInvariants": [
+    "collision records",
+    "depth records",
+    "sprite masks",
+    "physics"
+  ]
+}

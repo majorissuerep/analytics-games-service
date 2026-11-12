@@ -3,6 +3,7 @@ import type { GameManifest } from '@/lib/engine/types'
 export const minefieldManifest = {
   id: 'minefield',
   version: 1,
+  preferredWindow: { width: 480, height: 600 },
   title: 'Minefield',
   eyebrow: 'Desktop classic',
   description: 'Clear a safe path, count nearby mines, and mark every danger tile.',
@@ -15,7 +16,7 @@ export const minefieldManifest = {
   instructions: [
     { title: 'Reveal', detail: 'Click a covered square to reveal it.' },
     { title: 'Read', detail: 'Numbers show how many mines touch that square.' },
-    { title: 'Mark', detail: 'Right-click, press F, or enable Flag mode to mark a covered square.' },
+    { title: 'Mark', detail: 'Right-click, press F, or hold a covered square to mark it.' },
   ],
   status: 'live',
   integration: { kind: 'internal' },

@@ -52,3 +52,33 @@ Limitations: native product screenshots were not inspected; direct reference pag
 At 320/390px the idle full tip covered useful lower content in other apps. It now becomes a single 106×44px **Talk to me** launcher, positioned in the desktop strip beside Privacy. The tip, surprise/help buttons and original character remain part of the desktop layout but are hidden on phone widths. Opening chat hides the launcher; closing restores focus after the launcher becomes visible. The full conversation still opens only on explicit action. Desktop tip layout and XP header are unchanged.
 
 Verified against the actual Welcome and Minefield windows at both widths, with screenshots `/tmp/pip-evidence/launcher-welcome-390.png`, `launcher-welcome-320.png`, `launcher-minefield-390.png`, and `launcher-minefield-320.png`. Visually inspected Welcome's resource footer and Minefield's board/instructions: neither is covered by a persistent tip. The launcher and Privacy remain independently usable. At 390 the chat fits x=8–382; at 320 x=8–312. Both widths open the composer and return keyboard focus to the launcher on Escape. The mobile launcher rule uses an app-owned attribute for sufficient specificity against legacy desktop positioning.
+
+### Workspace clearance correction (11 November 2026)
+
+The acceptance hit-test found the desktop tip covering Chess's lower-right Leave
+game action when maximized. The earlier phone-only compact launcher still occupied
+application space. Pip now yields all decorative guide elements whenever any game
+window is visible (including a game behind another window). A permanent, labelled
+Pip button lives in a reserved XP taskbar slot. Explicitly opening it retains the
+full useful chat, provider feedback and draft; Escape returns focus to the taskbar
+when a game owns the workspace. Minimizing all games restores desktop tips. Phones
+use taskbar access exclusively. This is actual application behavior, not a capture
+or test override. The optional plugin-context field lets other desktop plugins
+make the same considerate choice without depending on a shell store.
+
+For this correction, directly downloaded and visually inspected the official
+[elementary desktop screenshot](https://elementary.io/images/screenshots/desktop.jpg)
+and [Zorin OS 18 desktop overview](https://assets.zorincdn.com/zorin.com/images/home/hero/18.png).
+Both reserve system access in a panel/dock outside the application content; their
+menus appear through explicit invocation. Adopted that spatial distinction while
+preserving the existing XP taskbar bevels, restrained blue launcher gloss and Pip's
+warm paper conversation. Rejected copying either desktop's icons/skin. Compared
+three fixes: repositioning the tip merely moves the collision; automatic chat
+opening interrupts play; selected desktop-only decoration plus persistent taskbar
+access preserves both app controls and deliberate help.
+
+`tests/e2e/pip-clearance.spec.ts` checks actual requested/maximized Chess and
+390/320px viewports, embedding-document hit-tests of Leave game/New game, explicit
+chat access, composer focus, Escape restoration and desktop-tip return on minimize.
+Evidence and final test result are reported to the coordinator, who owns frozen
+candidate and production acceptance; this local correction alone is not promotion.

@@ -79,3 +79,26 @@
   .app-surface.pip-chat-window :is(p, button, textarea, footer, .pip-chat-messages, .pip-conversation-heading, .pip-tool-card) { color: CanvasText; background: Canvas; border-color: CanvasText; }
   .app-surface.pip-chat-window :is(button, textarea, summary):focus-visible { outline-color: Highlight; }
 }
+/* The taskbar reserves assistant access outside every application workspace. */
+.pip-taskbar-launcher {
+  min-height: 28px;
+  padding: 2px 8px;
+  border: 1px solid #125292;
+  border-radius: 4px;
+  color: white;
+  background: linear-gradient(#438fdf, #2369b6);
+  box-shadow: inset 0 1px #ffffff63;
+  font: 600 12px/1.2 Tahoma, sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.pip-taskbar-launcher:hover { background: linear-gradient(#61a5ed, #307ace); }
+.pip-taskbar-launcher:focus-visible { outline: 2px solid white; outline-offset: -4px; }
+.paperclip-assistant[data-application-active="true"] > :is(.paperclip-dismiss, .paperclip-character, .paperclip-bubble) {
+  display: none;
+}
+/* Phone access belongs in the taskbar too; no floating duplicate over the app. */
+@media (max-width: 480px) {
+  .paperclip-assistant > :is(.paperclip-dismiss, .paperclip-character, .paperclip-bubble) { display: none; }
+  .pip-taskbar-launcher { padding-inline: 5px; }
+}

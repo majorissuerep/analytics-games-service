@@ -43,7 +43,7 @@ import { formatCp, formatMoveLoss, lineQualityColor, MOVE_QUALITY_GRADIENT, MOVE
 import './chess.css'
 
 type Mode = 'setup' | 'bot' | 'local' | 'online'
-type SetupMode = 'bot' | 'online' | 'local' | 'arena'
+type SetupMode = 'bot' | 'online' | 'local' | 'arena' | 'models'
 type EngineControl = 'auto' | 'pick' | 'free'
 type OnlineAction = 'create' | 'join'
 type PendingPromotion = { from: Square; to: Square } | null
@@ -94,6 +94,7 @@ const illegalStyle: CSSProperties = {
 export function ChessGame() {
   useAppReady()
   const [mode, setMode] = useState<Mode>('setup')
+  const [utilitySection, setUtilitySection] = useState<'analysis' | 'moves'>('analysis')
   const [setupMode, setSetupMode] = useState<SetupMode>('bot')
   const [onlineAction, setOnlineAction] = useState<OnlineAction>('create')
   const [colorChoice, setColorChoice] = useState<ChessColorChoice>('white')
@@ -653,15 +654,15 @@ export function ChessGame() {
 
       {mode === 'setup' ? (
         <section className="chess-setup" aria-label="Chess setup">
-          <div className="chess-intro"><span>♞</span><div><p className="chess-kicker">THE CHESS ROOM</p><h1>Your next move.</h1><p>Play an engine, study a position, or invite someone to the board.</p></div></div>
           <nav className="chess-mode-tabs" aria-label="Game mode">
             <button aria-pressed={setupMode === 'bot'} className={setupMode === 'bot' ? 'active' : ''} onClick={() => setSetupMode('bot')}><b aria-hidden="true">♟︎</b><span>Computer<small>Versus, pick, or free</small></span></button>
             <button aria-pressed={setupMode === 'online'} className={setupMode === 'online' ? 'active' : ''} onClick={() => setSetupMode('online')}><b aria-hidden="true">♜</b><span>Online<small>Private room</small></span></button>
             <button aria-pressed={setupMode === 'local'} className={setupMode === 'local' ? 'active' : ''} onClick={() => setSetupMode('local')}><b aria-hidden="true">♚</b><span>Local<small>Same device</small></span></button>
             <button aria-pressed={setupMode === 'arena'} className={setupMode === 'arena' ? 'active' : ''} onClick={() => setSetupMode('arena')}><b aria-hidden="true">♘</b><span>Model arena<small>Match + replay</small></span></button>
+            <button aria-pressed={setupMode === 'models'} className={setupMode === 'models' ? 'active' : ''} onClick={() => setSetupMode('models')}><b aria-hidden="true">◇</b><span>Models<small>Submit + registry</small></span></button>
           </nav>
-
-          {setupMode === 'arena' ? <ModelArena models={modelOptions} /> : <div className="chess-setup-panel">
+          <div className="chess-setup-details" data-scroll-owner="chess-setup-details" aria-label="Selected section details">
+          {setupMode === 'arena' ? <ModelArena models={modelOptions} /> : setupMode === 'models' ? <ModelSubmissionPanel initiallyOpen /> : <div className="chess-setup-panel">
             <div className="chess-choice-row"><span>Play as</span><div className="chess-segmented">{(['white', 'random', 'black'] as const).map((color) => <button key={color} aria-pressed={colorChoice === color} className={colorChoice === color ? 'selected' : ''} onClick={() => setColorChoice(color)}>{color === 'white' ? '○ White' : color === 'black' ? '● Black' : '◐ Random'}</button>)}</div></div>
 
             {setupMode === 'bot' && <>
@@ -715,12 +716,11 @@ export function ChessGame() {
           </div>}
           {modelsLoading && <LoadingState scope="inline" label="Loading available chess models" />}
           {modelsError && <p role="alert">{modelsError} <button onClick={() => { setModelsLoading(true); setModelsError(''); setModelsRetry(value => value + 1) }}>Retry models</button></p>}
-          <ModelSubmissionPanel />
-          <footer className="chess-attribution">Rules: chess.js · Engines: Stockfish 18/19 + Reckless 0.9 · Board: react-chessboard</footer>
+          </div>
         </section>
       ) : (
         <section className="chess-game-layout">
-          <div className="chess-board-wrap" aria-label="Chess board" onMouseOver={(event) => {
+          <div className="chess-board-stage"><div className="chess-board-wrap" aria-label="Chess board" onMouseOver={(event) => {
             if (!hintsVisible) return
             const squareId = (event.target as HTMLElement).closest('[id^="analytics-chess-board-square-"]')?.id ?? ''
             const match = /-square-([a-h][1-8])$/.exec(squareId)
@@ -747,9 +747,12 @@ export function ChessGame() {
               boardStyle: { borderRadius: 4, boxShadow: 'none' },
               animationDurationInMs: 180,
             }} />
-          </div>
+          </div></div>
           <aside className="chess-sidebar">
             <div className="chess-status"><span className={`turn-dot ${chess.turn() === 'w' ? 'white' : 'black'}`} /><div><small>{mode === 'bot' ? engineControl === 'auto' ? `You are ${humanColor === 'w' ? 'White' : 'Black'}` : engineControl === 'pick' ? 'Both sides · engine side manual' : 'Both sides · free moves' : mode === 'local' ? 'Pass and play' : onlineColor ? `You are ${onlineColor === 'w' ? 'White' : 'Black'}` : 'Online game'}</small><h2>{status}</h2></div></div>
+            <nav className="chess-utility-tabs" aria-label="Game details"><button aria-pressed={utilitySection === 'analysis'} onClick={() => setUtilitySection('analysis')}>{hintsVisible ? 'Analysis' : 'Game'}</button><button aria-pressed={utilitySection === 'moves'} onClick={() => setUtilitySection('moves')}>Moves</button></nav>
+            <div className="chess-utility-details" data-scroll-owner="chess-utility-details" aria-label="Selected game details">
+            <div hidden={utilitySection !== 'analysis'}>
             {mode === 'bot' && <div className="chess-opponent"><span>{engineControl === 'auto' ? '♞' : engineControl === 'pick' ? '☞' : '♘'}</span><div><b>{engineControl === 'auto' ? opponentName : opponentName}</b><small>{engineControl === 'auto' ? stockfishEngineIdForRevision(modelRevision) ? `${level.label} · Skill ${level.skill}/20` : modelRevision === RECKLESS_LOCAL ? `Local engine · ${rethinkMs >= 1000 ? `${rethinkMs / 1000}s` : `${rethinkMs}ms`} think` : 'Custom model' : engineControl === 'pick' ? `Pick from ${hintLines} ranked moves` : `Live hints · ${hintLines} lines · ${rethinkMs >= 1000 ? `${rethinkMs / 1000}s` : `${rethinkMs}ms`}`}</small></div></div>}
             {mode === 'bot' && engineControl === 'auto' && ['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(modelRevision) && <EvaluationBar evaluation={evaluation} error={evaluationError || undefined} engineName={opponentName} progress={evaluationProgress} onCancel={() => evaluationAbortRef.current?.abort()} onRetry={() => setEngineRetry(value => value + 1)} />}
             {mode === 'bot' && (engineThinking || analyzing) && <LoadingState key={`${localFen}:${modelRevision}:${engineRetry}:${rethinkMs}:${hintLines}`} label={`${opponentName}: ${engineProgress?.message ?? 'Connecting to engine'}`} detail={engineProgress?.detail} onCancel={() => engineAbortRef.current?.abort()} />}
@@ -780,7 +783,8 @@ export function ChessGame() {
                 <small>{chessTimeLabel(online.timeControlId)}</small>
               </div>
             )}
-            <div className="chess-moves"><h3>Move history</h3><div>{mode === 'online' ? online?.pgn || 'Moves will appear here.' : localPgn || 'Moves will appear here.'}</div></div>
+            </div><div hidden={utilitySection !== 'moves'} className="chess-moves"><h3>Move history</h3><div>{mode === 'online' ? online?.pgn || 'Moves will appear here.' : localPgn || 'Moves will appear here.'}</div></div>
+            </div>
             <div className="chess-actions">
               {canUndo && <button className="chess-undo" onClick={undoMove} title="Undo last move">↶ Undo</button>}
               <button onClick={resetToSetup}>Leave game</button>

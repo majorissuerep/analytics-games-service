@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { captureExperience, expectActionReady } from './helpers/experience'
 
 test.beforeEach(async ({ context }, info) => {
   if (!info.title.startsWith('self-hosted analytics')) {
@@ -37,7 +38,7 @@ test('self-hosted analytics remains silent until consent and tracks the game lau
   const gameWindow = page.locator('.desktop-rnd-window').filter({
     has: page.locator('iframe[title="Paintbox"]'),
   })
-  await gameWindow.getByRole('button', { name: 'Close' }).click()
+  await gameWindow.getByRole('button', { name: 'Close', exact: true }).click()
   await expect.poll(() => trackedEvents).toContain('game_session_ended')
 })
 
@@ -49,7 +50,7 @@ test('desktop opens and closes a readable game while Pip responds', async ({ pag
   })
 
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'A good place to play.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Games', exact: true })).toBeVisible()
 
   const pip = page.getByLabel('Pip desktop guide')
   await expect(pip).toBeVisible()
@@ -66,9 +67,9 @@ test('desktop opens and closes a readable game while Pip responds', async ({ pag
   const gameWindow = page.locator('.desktop-rnd-window').filter({
     has: page.locator('iframe[title="Minefield"]'),
   })
-  await gameWindow.getByRole('button', { name: 'Close' }).click()
+  await gameWindow.getByRole('button', { name: 'Close', exact: true }).click()
   await expect(page.locator('iframe[title="Minefield"]')).toHaveCount(0)
-  await expect(page.getByRole('heading', { name: 'A good place to play.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Games', exact: true })).toBeVisible()
   expect(errors).toEqual([])
 })
 
@@ -95,7 +96,7 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   await expect(page.getByLabel('4 games installed')).toHaveCount(0)
   await counterToggle.check()
   await expect(page.getByLabel('4 games installed')).toBeVisible()
-  await pluginWindow.getByRole('button', { name: 'Close' }).click()
+  await pluginWindow.getByRole('button', { name: 'Close', exact: true }).click()
 
   await page.locator('.desktop-icon[aria-label="Open Minefield"]').dblclick()
   const minefield = page.frameLocator('iframe[title="Minefield"]')
@@ -106,7 +107,7 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   await minefield.getByLabel('Flagged cell, row 1, column 1').click({ button: 'right' })
   await minefield.getByLabel('Covered cell, row 1, column 1').click()
   await expect(minefield.locator('.minefield-cell.revealed').first()).toBeVisible()
-  await page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Minefield"]') }).getByRole('button', { name: 'Close' }).click()
+  await page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Minefield"]') }).getByRole('button', { name: 'Close', exact: true }).click()
 
   await page.locator('.desktop-icon[aria-label="Open Paintbox"]').dblclick()
   const paintbox = page.frameLocator('iframe[title="Paintbox"]')
@@ -127,7 +128,7 @@ test('desktop plugins and three isolated classic games work', async ({ page }) =
   await paintbox.getByRole('button', { name: 'Undo' }).click()
   await paintbox.getByRole('button', { name: 'Eraser' }).click()
   await expect(paintbox.getByRole('button', { name: 'Eraser' })).toHaveAttribute('aria-pressed', 'true')
-  await page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Paintbox"]') }).getByRole('button', { name: 'Close' }).click()
+  await page.locator('.desktop-rnd-window').filter({ has: page.locator('iframe[title="Paintbox"]') }).getByRole('button', { name: 'Close', exact: true }).click()
 
   expect(errors).toEqual([])
 })
@@ -223,27 +224,30 @@ test('embedded games use only the desktop window chrome', async ({ page }) => {
 
 test('Chess supports bot color selection and pass-and-play moves', async ({ page }) => {
   await page.goto('/games/chess')
+  await expect(page.getByRole('navigation', { name: 'Game mode', exact: true })).toBeVisible({ timeout: 20_000 })
   await page.getByRole('button', { name: /Black/ }).click()
   await page.getByLabel('Stockfish difficulty').selectOption('beginner')
-  await page.getByRole('button', { name: 'Play Stockfish' }).click()
+  await page.getByRole('button', { name: 'Play Stockfish 18', exact: true }).click()
   await expect(page.getByRole('heading', { name: /Black to move/ })).toBeVisible({ timeout: 15_000 })
   await page.locator('#analytics-chess-board-square-e7').click()
   await page.locator('#analytics-chess-board-square-e5').click()
+  await page.getByRole('button', { name: 'Moves', exact: true }).click()
   await expect(page.locator('.chess-moves')).not.toContainText('Moves will appear here.')
 
   await page.getByRole('button', { name: 'New game' }).click()
-  await page.locator('.chess-mode-tabs').getByRole('button', { name: /Local/ }).click()
+  await page.getByRole('navigation', { name: 'Game mode', exact: true }).getByRole('button', { name: /Local/ }).click()
   await page.getByRole('button', { name: 'Start pass-and-play' }).click()
   await page.locator('#analytics-chess-board-square-e2').click()
   await page.locator('#analytics-chess-board-square-e4').click()
   await expect(page.getByRole('heading', { name: 'Black to move' })).toBeVisible()
 })
 
-test('Chess remains usable on a narrow viewport', async ({ page }) => {
+test('Chess remains usable on a narrow viewport', async ({ page }, info) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/games/chess')
-  await expect(page.getByRole('button', { name: 'Play Stockfish' })).toBeVisible()
-  await page.locator('.chess-mode-tabs').getByRole('button', { name: /Local/ }).click()
+  await expect(page.getByRole('navigation', { name: 'Game mode', exact: true })).toBeVisible({ timeout: 20_000 })
+  await expect(page.getByRole('button', { name: 'Play Stockfish 18', exact: true })).toBeVisible()
+  await page.getByRole('navigation', { name: 'Game mode', exact: true }).getByRole('button', { name: /Local/ }).click()
   await page.getByRole('button', { name: 'Start pass-and-play' }).click()
   const board = page.getByLabel('Chess board')
   const box = await board.boundingBox()
@@ -253,33 +257,70 @@ test('Chess remains usable on a narrow viewport', async ({ page }) => {
   await page.locator('#analytics-chess-board-square-e2').click()
   await page.locator('#analytics-chess-board-square-e4').click()
   await expect(page.getByRole('heading', { name: 'Black to move' })).toBeVisible()
+  await expectActionReady(page.getByRole('button', { name: /Undo/ }))
+  await expectActionReady(page.getByRole('button', { name: 'Leave game', exact: true }))
+  await captureExperience(page, info, 'chess-resize', 'narrow-local-move', 'clamped')
 })
 
-test('Chess exposes safe custom model submission without changing built-in play', async ({ page }) => {
+test('Chess exposes safe custom model submission without changing built-in play', async ({ page }, info) => {
   await page.goto('/games/chess')
-  await page.getByRole('button', { name: /Bring your own Chess model/ }).click()
+  await expect(page.getByRole('navigation', { name: 'Game mode', exact: true })).toBeVisible({ timeout: 20_000 })
+  await page.getByRole('navigation', { name: 'Game mode', exact: true }).getByRole('button', { name: /Models/ }).click()
   await expect(page.getByText(/quarantined, scanned, and require administrator approval/)).toBeVisible()
   await expect(page.getByRole('button', { name: 'Upload package (unavailable)' })).toBeDisabled()
   await expect(page.getByLabel('Repository')).toBeVisible()
   await expect(page.getByLabel('Immutable commit SHA')).toBeVisible()
-  await page.getByRole('button', { name: 'Play Stockfish' }).click()
+  await expectActionReady(page.getByRole('button', { name: 'Submit for review', exact: true }))
+  await captureExperience(page, info, 'chess-sections', 'model-submission')
+  await page.getByRole('navigation', { name: 'Game mode', exact: true }).getByRole('button', { name: /Computer/ }).click()
+  await page.getByRole('button', { name: 'Play Stockfish 18', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'White to move' })).toBeVisible()
+})
+
+test('Chess section navigation stays anchored through long details and constrained windows', async ({ page }, info) => {
+  await page.setViewportSize({ width: 1180, height: 796 })
+  await page.goto('/games/chess')
+  await expect(page.getByRole('navigation', { name: 'Game mode', exact: true })).toBeVisible({ timeout: 20_000 })
+  for (const section of ['Computer', 'Online', 'Local', 'Model arena', 'Models']) {
+    const nav = page.getByRole('navigation', { name: 'Game mode' })
+    const tab = nav.getByRole('button').filter({ has: page.locator('span', { hasText: section }) })
+    await expectActionReady(tab)
+    await tab.click()
+    if (section === 'Model arena') await page.getByRole('button', { name: 'Saved matches', exact: true }).click()
+    const details = page.locator(section === 'Model arena' ? '.chess-match-archive' : '.chess-setup-details')
+    await details.evaluate(element => { element.scrollTop = element.scrollHeight })
+    for (const button of await nav.getByRole('button').all()) await expectActionReady(button)
+    await captureExperience(page, info, 'chess-sections', `${section}-selected-details-scrolled`)
+  }
+  for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 576 }]) {
+    await page.setViewportSize(viewport)
+    for (const button of await page.getByRole('navigation', { name: 'Game mode' }).getByRole('button').all()) await expectActionReady(button)
+    await expectActionReady(page.getByRole('button', { name: 'Submit for review', exact: true }))
+    expect(await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.scrollHeight])).toEqual([viewport.width, viewport.height])
+    await captureExperience(page, info, 'chess-sections', `model-details-${viewport.width}`, 'clamped')
+  }
 })
 
 test('Chess model arena pauses and replays durable matches', async ({ page }) => {
   await page.goto('/games/chess')
+  await expect(page.getByRole('navigation', { name: 'Game mode', exact: true })).toBeVisible({ timeout: 20_000 })
   await page.getByRole('button', { name: /Model arena/ }).click()
-  await expect(page.getByRole('heading', { name: 'Model arena' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'New model match' })).toBeVisible()
   await expect(page.getByLabel('White model')).toHaveValue('builtin-stockfish-18')
   await expect(page.getByLabel('Black model')).toHaveValue('builtin-stockfish-18')
+  const created = page.waitForResponse(response => response.url().endsWith('/api/chess-model-matches') && response.request().method() === 'POST')
   await page.getByRole('button', { name: 'Start model match' }).click()
+  const creationResponse = await created
+  expect(creationResponse.status(), await creationResponse.text()).toBe(201)
   await expect(page.getByRole('button', { name: 'Pause match' })).toBeVisible()
   await expect(page.getByText(/active.*1 plies · 3s\/turn/)).toBeVisible({ timeout: 8000 })
   await page.getByRole('button', { name: 'Pause match' }).click()
   await expect(page.getByText(/paused.*\d+ plies · 3s\/turn/)).toBeVisible()
   await expect(page.getByRole('button', { name: 'Play replay' })).toBeVisible()
   await page.reload()
+  await expect(page.getByRole('navigation', { name: 'Game mode', exact: true })).toBeVisible({ timeout: 20_000 })
   await page.getByRole('button', { name: /Model arena/ }).click()
+  await page.getByRole('button', { name: 'Saved matches', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Saved matches' })).toBeVisible()
   await expect(page.getByRole('button', { name: /Stockfish 18 vs Stockfish 18/ }).first()).toBeVisible()
 })
@@ -292,6 +333,7 @@ test('Chess password room synchronizes legal moves', async ({ browser }) => {
   const guest = await guestContext.newPage()
   try {
     await host.goto('/games/chess')
+    await expect(host.getByRole('navigation', { name: 'Game mode', exact: true })).toBeVisible({ timeout: 20_000 })
     await host.getByRole('button', { name: /Online/ }).click()
     await host.getByLabel('Display name').fill('White Host')
     await host.getByLabel(/Room password/).fill('knights')
@@ -300,6 +342,7 @@ test('Chess password room synchronizes legal moves', async ({ browser }) => {
     expect(code).toMatch(/^[A-Z2-9]{6}$/)
 
     await guest.goto('/games/chess')
+    await expect(guest.getByRole('navigation', { name: 'Game mode', exact: true })).toBeVisible({ timeout: 20_000 })
     await guest.getByRole('button', { name: /Online/ }).click()
     await guest.locator('.chess-online-tabs').getByRole('button', { name: 'Join room' }).click()
     await guest.getByLabel('Display name').fill('Black Guest')

@@ -1,3 +1,6 @@
+> Historical verification record. This is not acceptance evidence for the current
+> release. Current contracts and gates: [experience/WORKFLOW.md](experience/WORKFLOW.md).
+
 # Chess release and service UI QA
 
 Date: 2026-07-24
