@@ -262,9 +262,17 @@ export function ChessGame() {
       engineAbortRef.current?.abort()
       evaluationAbortRef.current?.abort()
     }
+    const restore = (event: PageTransitionEvent) => {
+      if (event.persisted) clearAnalysisState()
+    }
     window.addEventListener('pagehide', abort)
-    return () => { window.removeEventListener('pagehide', abort); abort() }
-  }, [])
+    window.addEventListener('pageshow', restore)
+    return () => {
+      window.removeEventListener('pagehide', abort)
+      window.removeEventListener('pageshow', restore)
+      abort()
+    }
+  }, [clearAnalysisState])
 
   /** Commit a real move onto the local board, keeping an undo snapshot first. */
   const applyMove = useCallback((move: EngineMove, painter = 'q') => {

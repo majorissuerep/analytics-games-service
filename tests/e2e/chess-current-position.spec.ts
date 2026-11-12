@@ -163,6 +163,25 @@ test('undo same FEN cancel retry reset and window close invalidate prediction ge
   await captureExperience(page, info, 'chess-lifecycle', 'closing-window-aborts-current-work')
 })
 
+test('restored cached page starts a fresh generation for the same board', async ({ page }, info) => {
+  await adversarialTransport(page)
+  const frame = await openChess(page)
+  await startFree(frame)
+  await requestCount(frame, 1)
+  await frame.locator('html').evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: true })))
+  expect((await requests(frame))[0].aborted).toBe(true)
+  await frame.locator('html').evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })))
+  await requestCount(frame, 2)
+  const pending = await requests(frame)
+  expect(pending[1].fen).toBe(pending[0].fen)
+  await deliver(frame, 0, 'OLD CACHED PAGE', false, true)
+  await expect(frame.locator('.chess-suggestion')).toHaveCount(0)
+  await captureExperience(page, info, 'chess-lifecycle', 'restored-page-fresh-loading')
+  await deliver(frame, 1, 'Current restored board')
+  await expect(frame.locator('.chess-suggestion-balance')).toContainText('Current restored board')
+  await captureExperience(page, info, 'chess-lifecycle', 'restored-page-current-result')
+})
+
 test('automatic move and evaluation cannot complete into a reset board', async ({ page }, info) => {
   await adversarialTransport(page)
   const frame = await openChess(page)

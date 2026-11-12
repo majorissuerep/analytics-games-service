@@ -86,7 +86,8 @@ describe('current request readiness', () => {
   it('rejects a missing scenario and an app with no requested dimensions', () => {
     const request = structuredClone(context.request); request.requirements[0].scenarios.push('missing-scenario')
     expect(() => validateRequest(request, apps)).toThrow('unknown missing-scenario')
-    expect(() => validateRequest(context.request, { ...apps, minefield: { ...apps.minefield, preferredWindow: null } })).toThrow('preferred outer window')
+    const appId = context.request.scope.find(id => id !== 'process' && id !== 'desktop')
+    expect(() => validateRequest(context.request, { ...apps, [appId]: { ...apps[appId], preferredWindow: null } })).toThrow('preferred outer window')
   })
   it('requires an independent challenge, current contract hash and complete observations', () => {
     const { review } = fixture()
