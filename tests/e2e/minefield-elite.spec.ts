@@ -10,8 +10,12 @@ test.beforeEach(async ({ context }) => { await context.addInitScript(() => local
 async function open(page: Page, elite = true) {
   await page.goto('/')
   const welcome = page.locator('[data-window-id="system:welcome"]:visible')
-  if (await welcome.count()) await welcome.getByRole('button', { name: 'Close', exact: true }).click()
-  await page.getByRole('button', { name: 'Open Minefield', exact: true }).dblclick()
+  // The welcome window mounts after the desktop workspace is measured.
+  // Wait for that hydrated state; an early count() can miss its later launch button.
+  await expect(welcome).toBeVisible()
+  await welcome.getByRole('button', { name: 'Close', exact: true }).click()
+  await expect(welcome).toHaveCount(0)
+  await page.locator('.desktop-icon[aria-label="Open Minefield"]:visible').dblclick()
   const frame = page.frameLocator('iframe[title="Minefield"]:visible')
   await expect(page.locator('iframe[title="Minefield"]:visible')).toHaveAttribute('aria-busy', 'false', { timeout: 30000 })
   await expect(frame.getByRole('button', { name: 'New game', exact: true })).toBeVisible()

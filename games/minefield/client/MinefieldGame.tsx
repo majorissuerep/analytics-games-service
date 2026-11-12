@@ -255,13 +255,13 @@ export function MinefieldGame() {
           </div>
         </div>
         <div className="minefield-progress"><label htmlFor="minefield-cleared">{progress}% cleared</label><progress id="minefield-cleared" max={100} value={progress} aria-label="Safe field cleared" /><span>{flags} flagged</span></div>
-        <p className="minefield-mode-help">{elite ? 'Local: 8 nearby · Echo ↕: other layer’s 3 × 3. E scans a revealed clue.' : 'Open: click or Enter · Flag: right-click, F, or hold.'}</p>
+        <p className="minefield-mode-help">{elite ? 'Local: 8 nearby · Echo: other 3×3 · E: scan.' : 'Open: click or Enter · Flag: right-click, F, or hold.'}</p>
         <div className="minefield-feedback">
-          <p className="minefield-status" role="status">{generating ? 'Preparing a verified board…' : generationError || (board.status === 'won' ? `Cleared in ${elapsed} seconds!${elite ? ` ${scans} echo scans.` : ''}` : board.status === 'lost' ? 'Mine triggered. Try again.' : elite ? 'F / right-click / hold: flag · C / Shift-click: clear local neighbors.' : 'Arrows move · matching flags + clue click clears neighbors.')}</p>
+          <p className="minefield-status" role="status">{generating ? 'Preparing a verified board…' : generationError || (board.status === 'won' ? `Cleared in ${elapsed} seconds!${elite ? ` ${scans} echo scans.` : ''}` : board.status === 'lost' ? 'Mine triggered. Try again.' : elite ? 'Flag: F / hold · Clear local: C.' : 'Arrows move · matching flags + clue click clears neighbors.')}</p>
           <button ref={explainRef} onClick={explain} disabled={!board.armed || generating || board.status !== 'playing'}>Explain move</button>
         </div>
         {generationError && <button className="minefield-retry" onClick={() => reveal(openingRef.current)}>Retry verification</button>}
-        <p className="minefield-pan-help">{panning ? 'Pan the board to explore · arrow keys follow focused squares.' : ''}</p>
+        <p className="minefield-pan-help">{panning ? 'Pan the board · arrows move focus.' : ''}</p>
       </section>
       {proofOpen && <div className="minefield-proof-backdrop" onKeyDown={event => {
         if (event.key === 'Escape') closeProof()
@@ -282,7 +282,7 @@ export function MinefieldGame() {
             {hintTarget !== undefined && <button onClick={() => { setActiveLayer(Math.floor(hintTarget / layerSize)); setFocusedCell(hintTarget); setInspectedCell(hintTarget); closeProof(hintTarget) }}>Show this cell</button>}
             {hintTarget !== undefined && analysis?.safe.includes(hintTarget) && board.cells[hintTarget].flagged && <button onClick={() => { setBoard(current => revealMinefieldCell(current.cells[hintTarget].flagged ? toggleMinefieldFlag(current, hintTarget) : current, hintTarget)); setAnalysis(null); closeProof() }}>Unflag and open</button>}
             {analysis?.scan !== undefined && hintTarget === undefined && <button onClick={() => { const index = analysis.scan!; setActiveLayer(Math.floor(index / layerSize)); setFocusedCell(index); setInspectedCell(index); closeProof(index) }}>Inspect scan location</button>}
-            <details><summary>Rules and verification</summary><p>Every layout is fixed after the first opening. Generation accepts only boards completed by local clues, the total mine count and subset subtraction. Flags are your notes and are never used as proof.</p>{elite && <p>Each local clue counts the eight neighboring cells in its own layer. Scan a revealed safe cell to learn the mine count in the aligned 3 × 3 area of the other layer. Scans are unlimited and counted, with no required minimum. A question mark means unknown. A scan reveals information, never a cell. Clicking a revealed Elite cell only selects it; C or Shift-click clears its local neighbors when flags match.</p>}<p>The opening and its same-layer neighbors are safe. Incorrect flags or opening an unproven cell can still lose. This solver is sound but incomplete; a stalled analysis does not prove guessing is required.</p></details>
+            <details><summary>Rules and verification</summary><p>Every layout is fixed after the first opening. Generation accepts only boards completed by local clues, the total mine count and subset subtraction. Flags are your notes and are never used as proof. Right-click, F or a touch hold toggles a flag.</p>{elite && <p>Each local clue counts the eight neighboring cells in its own layer. E or Scan echo on a revealed safe cell learns the mine count in the aligned 3×3 area of the other layer. Scans are unlimited and counted, with no required minimum. A question mark means unknown. A scan reveals information, never a cell. Clicking a revealed Elite cell only selects it; C or Shift-click clears its local neighbors when flags match.</p>}<p>The opening and its same-layer neighbors are safe. Incorrect flags or opening an unproven cell can still lose. This solver is sound but incomplete; a stalled analysis does not prove guessing is required.</p></details>
           </div>
         </section>
       </div>}
