@@ -7,46 +7,51 @@
   "authors": [
     "root"
   ],
-  "reviewedAt": "2026-11-12T00:32:56.541Z",
+  "reviewedAt": "2026-11-12T00:36:15.581Z",
   "verdict": "approve",
   "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
   "environment": "deployed",
   "reportSha256": "575a428cf8a583603533bc39255bddd33285e9a67298618acaf76291ecf4f762",
-  "referenceComparison": "The fresh production views preserve the previously researched Zorin OS18/elementary Code/AppCenter principles: bounded selected-detail scrolling, stable navigation, restrained rounded silver material, soft scenery behind controls and opaque domain surfaces. Pink signals intention while Minefield/Chess/Pinball keep distinct slate/olive/navy identities inside unchanged XP boundaries. Native-ready/manual and dynamic production captures were opened afresh rather than substituting candidate images. Remaining native raster polish is explicitly minor; this approval is for the recorded production configuration and scenarios, not a claim of universal perfection.",
+  "referenceComparison": "Fresh deployed views retain the reference choices assessed against Zorin OS18 and elementary Code/AppCenter: anchored navigation, bounded rounded grouping and restrained silver glass separate task content from scenery. Minefield is slate/white, Chess olive/ivory and Pinball navy/cyan with restrained pink intentions; XP frame remains. This is a new live rendering/interaction review on merged b63e82a with the same approved tree, not reuse of candidate screenshots. Production analytics-disabled configuration is explicit. Verdict supports accept with documented minor raster and recorder-attribution limitations.",
   "findings": [
     {
-      "id": "DEPLOYED-PIN-RASTER-POLISH",
+      "id": "DEP-PIN-RASTER-POLISH",
       "severity": "minor",
       "status": "open",
-      "description": "Same approved native365×470 masked raster edge roughness and faint plunger-tail silhouette remain when enlarged. Actual ball, physical fixtures, score and controls remain readable in reviewed production play; track future source-resolution polish."
+      "description": "Same inherited native365×470 target/flipper raster roughness and faint plunger-tail silhouette remain when enlarged. Observed ball/fixture/control readability is usable; no new live geometry or gameplay defect."
     },
     {
-      "id": "DEPLOYED-MANUAL-READINESS",
+      "id": "DEP-RECORDER-ATTRIBUTION",
+      "severity": "minor",
+      "status": "open",
+      "description": "The original frozen-report finalization writer could not be established from visible coordination. Root has explicitly adopted independently reverified facts in audit-root/README.txt with fresh gate/native/CI checks; all179 artifact records and live identity were also independently revalidated by this reviewer. Preserve this audit trail; do not claim known original attribution."
+    },
+    {
+      "id": "DEP-MANUAL-READINESS",
       "severity": "major",
       "status": "resolved",
-      "description": "Initial manual touch script selected an SSR control without first awaiting host readiness, and later diagnostic cleanup masked the original second attempt error. Those runs are not accepted gameplay proof.",
-      "resolution": "Retained failed logs and screenshot outside accepted captures. Explicit host aria-busy=false prerequisite produced a complete successful real-touch journey. Separate actual loading probe observed ui-loading-content intercepting pointer while busy, then real pointer selection to Intermediate256cells after readiness. Its unused route-delay hook intercepted0 requests; no slow-network claim is made."
+      "description": "Initial deployed manual touch harness did not await host readiness and selected through a loading phase; subsequent diagnostic error handling also masked its original opening error.",
+      "resolution": "Retained both failed logs; final script waits network settlement and actual iframe aria-busy=false before controls. Real pointer probe observed loader interception while busy, then valid Intermediate selection/256cells after readiness. Final true-touch sequence passes once with no launch retry; no production source change or inferred slow-network claim."
     }
   ],
   "observations": [
     {
       "requirementId": "REF-01",
-      "note": "Fresh production material comparison shows restrained rounded silver controls, clear pink selection and distinct slate Minefield, olive Chess and navy Pinball. Personally opened every frame of the cited requested comparison: Welcome, native-ready Pinball, Minefield, Chess and solid Chess. Also viewed maximized Minefield and native-ready Pinball. Solid Chess is visibly opaque; its concurrent scoped model-list loader is not mistaken for loaded engine gameplay. Production analytics is disabled: Privacy absence was explicitly asserted, while candidate/CI enabled-state focus evidence remains separately applicable. No new major visual divergence from the approved source was observed.",
+      "note": "Viewed fresh live requested Minefield/Chess/Pinball, opaque Chess, native-ready requested/maximized Pinball and useful Welcome. The six-frame requested comparison shows the same restrained glossy controls, pink intention and distinct slate/olive/navy app domains as the approved candidate. XP shell remains intact. Independently confirmed production Privacy entry is absent because analytics is disabled; enabled-state focus proof belongs to candidate/CI and is not claimed as a live production test.",
       "artifactIds": [
-        "visual-matrix-viewport-bf50b94cb398c8c7",
+        "visual-matrix-viewport-7f721a736a4ce034",
+        "visual-matrix-viewport-52513a21de98c80b",
+        "visual-matrix-viewport-3808ba4da4a45cd3",
+        "visual-matrix-viewport-68b629474c71419e",
         "visual-matrix-viewport-b5eee81498598bb8",
         "visual-matrix-viewport-15ae0c6c45702137",
-        "visual-matrix-viewport-7f721a736a4ce034",
-        "visual-matrix-viewport-28743b868db9a270",
-        "visual-matrix-viewport-52513a21de98c80b",
-        "visual-matrix-viewport-68b629474c71419e",
-        "visual-matrix-viewport-3808ba4da4a45cd3",
+        "visual-matrix-viewport-bf50b94cb398c8c7",
         "visual-matrix-sequence-84649fe9bf718142"
       ]
     },
     {
       "requirementId": "MINE-01",
-      "note": "Fresh480×600 Beginner shows Level/New game/counters/full field/help without accidental overflow; removed controls remain absent. Viewed all8 input-sequence frames including real worker failure/Retry, pending verification/Cancel/reset, chord and hold/cancel states; the81-test live run verifies transitions and no accidental reveal. The first independent script used selectOption before host readiness and failed. A corrected explicit aria-busy=false prerequisite passed, and a separate real pointer probe verified loading content blocks the frame while busy, then click+ArrowDown+Enter selects Intermediate256cells after readiness. The probe route delay intercepted0 requests, so this is actual loading/readiness proof, not induced slow-network proof. Original harness failures remain retained.",
+      "note": "Viewed live Beginner480×600 and every frame of marking, failure, generation, reset, Retry, chord and touch hold/cancel. Controls and board remain contained; removed modes stay absent; failure/progress are distinct. My initial manual harness used selectOption before waiting for host readiness and failed. Corrected harness waits aria-busy=false; a separate actual hit-test probe observed the loading overlay intercepting pointer input, then a real click+ArrowDown/Enter selected Intermediate/256 cells after readiness. Failed logs remain diagnostic. The delay hook matched zero requests, so no artificial-latency result is claimed.",
       "artifactIds": [
         "mine-start-viewport-9ad6ce2946bf6404",
         "mine-input-viewport-3772510fe1d108c6",
@@ -63,7 +68,7 @@
     },
     {
       "requirementId": "MINE-02",
-      "note": "Viewed fresh production99-mine ready→70% open→won sequence. Pale open cells, dark flags and covered slate remain separable in dense play; the automated solver completed this board from public clues. Independently dispatched actual touch events at320×640: Intermediate0→116px and Expert116→378px, zero flags/reveals and no host/app horizontal overflow. Opened all4 manual touch captures. This validates the declared constrained spatial pan and finite live gameplay scenario; it does not claim exhaustive proof of every possible seed.",
+      "note": "Viewed fresh actual99-mine ready→70%267/381→100%won sequence, with legible pale revealed cells, dark flags and slate covered cells. Public-clue play reached the win without a guessed move in this tested board. Independently performed real browser touch swipes at320×640: Intermediate0→116px, Expert116→378px, zero accidental flags/reveals and zero host/app horizontal overflow. All four before/after frames inspected. Board-only pan is intentional at these constrained widths; it is not a claim that every random seed was tested.",
       "artifactIds": [
         "mine-start-viewport-9ad6ce2946bf6404",
         "mine-expert-viewport-a97d42cbaa71a55a",
@@ -79,37 +84,39 @@
     },
     {
       "requirementId": "CHESS-01",
-      "note": "Production navigation remains anchored in the real app. Independently repeated the clearly labelled24-row GET-response archive fixture: actual wheel0→1454px;488px client/1942px content; navigation bounds/hit tests unchanged and document overflow zero. Narrow390px capture retains all5 sections and Saved matches controls. No fixture matches were written to the database. Also opened fresh real Stockfish19 arena paused6-ply and replay-playing views; source/live browser assertions prove advancement and pause/resume, whereas the fixture proves only long-list geometry.",
+      "note": "Viewed live320px Models details and independently exercised the real app with a clearly labelled24-row browser GET response fixture. Actual wheel input moved archive0→1454px; nav bounds/hit tests remained stable and document overflow stayed zero. Viewed top, bottom and narrow fixture states. No match was created by this manual fixture; it establishes long-content geometry, while live automated arena/replay checks establish real behavior. Navigation stays anchored and only selected details scroll.",
       "artifactIds": [
+        "chess-sections-viewport-ade9906d29875a18",
         "chess-sections-viewport-c6808e8bc56f024f",
         "chess-sections-viewport-0953d19988f1ff99",
         "chess-sections-viewport-1fb06e9b79495261",
-        "chess-sections-viewport-8255cde036248686",
-        "chess-sections-viewport-455751001a1a0080",
         "chess-sections-sequence-1360db75813d7ec7"
       ]
     },
     {
       "requirementId": "CHESS-02",
-      "note": "Viewed fresh exact pointer-resize960×900→1200×1100→1600×1300 sequence at1920×1400 and320px play controls: square board grows with available stage and Leave/New game stay reachable. Viewed local e4→Undo sequence, actual scoped engine waiting→recoverable failure→real analysis after Retry, and Stockfish18 selected hint. Best move is zero loss/green;−.02 and−.03 stay close in shade; fixed≤−.50 red endpoint is separate from position balance. Complete81-test live log covers other real engine responses and constrained dimensions; this observation names only images personally opened.",
+      "note": "Viewed every frame of live exact960×900→1200×1100→1600×1300 resizing at1920×1400, plus320/390/1280 constrained play. Square board grows with available stage and state-appropriate actions stay reachable. Viewed actual local move/Undo, genuine Stockfish18 response/hint, and engine waiting→failure→Retry analysis. Best move is zero loss, close losses have close colors, fixed red cutoff is≤−0.50 and position balance is separate. Broader three-engine coverage is established by the live81-case run; my direct deployed engine visual sample is Stockfish18.",
       "artifactIds": [
         "chess-play-viewport-e5ae7aa62b7e7d61",
         "chess-play-viewport-7e809de0df757105",
         "chess-resize-viewport-c0f4c0f161604cb3",
         "chess-resize-viewport-fa45bc3f5ca183a1",
         "chess-resize-viewport-11659b55cebe2812",
+        "chess-resize-viewport-edc79e36bc4384a0",
+        "chess-resize-viewport-31737adfa4abcd5b",
         "chess-resize-viewport-a1754f04d93da346",
+        "chess-play-viewport-2981edbc2c375fb0",
+        "chess-play-viewport-7be6a54513fe2c6d",
         "chess-play-viewport-d7cf2c89a2ec31a3",
         "chess-play-viewport-365831cfcbbc4cf0",
         "chess-play-viewport-9eb0748fac974cce",
-        "chess-play-viewport-7be6a54513fe2c6d",
         "chess-play-sequence-b7b29ae6f8d88789",
         "chess-resize-sequence-b81a4d9649a11cf3"
       ]
     },
     {
       "requirementId": "PIN-01",
-      "note": "Opened all13 fresh production native lifecycle frames: ready art, held left/right arrows, upper flight, pause, resumed moving ball, real score, natural drain/Ball2, feeding/plunger readiness, second flight, WASM failure and successful Retry flight. Score and ball are obvious; no menus/import controls appeared. Independently dispatched true touch at390×844: both flippers visibly held/released; first launch pull1 after117ms then actual100 before one release;2,000 real score with no relaunch. All7 touch frames opened. Fresh native payload downloads match approved JS/WASM/data hashes. Unchanged masks/checksums alone are not visual proof; actual flight/art review remains necessary. Minor enlarged native raster edges persist, with no new major readability/fixture contradiction in observed play.",
+      "note": "Viewed all13 fresh native lifecycle frames: ready, both held arrows, upper orbit, physical pause/resume,2,500 score, natural drain/26,250 Ball2, feeding, second flight and failed real asset download→Retry→2,000-point recovered flight. Score/ball and ivory ball remain readable against navy/cyan physical fixtures. Independently dispatched actual touchStart/touchEnd: both flippers respond; first launch pull1 after117ms→100, release once,2,000 points without relaunch. Viewed all seven touch frames and320px resize/pause. No menus/import/setup controls or page scrolling. Actual live JS/WASM/data hashes match promoted bytes. Residual native raster polish is the same known minor limitation.",
       "artifactIds": [
         "pinball-play-viewport-dfac2e180690d4e3",
         "pinball-play-viewport-e8bbbdcae0aa1513",
@@ -131,24 +138,28 @@
         "pinball-narrow-viewport-73003e7f9b403622",
         "pinball-narrow-viewport-48e0f27442130676",
         "pinball-narrow-viewport-5e7ce4ae7327adc6",
+        "pinball-narrow-viewport-908461fc336963ca",
+        "pinball-narrow-viewport-e292224f052209b8",
         "pinball-play-sequence-ee6cb6b3872a6e60",
         "pinball-narrow-sequence-4551a58a5d077920",
+        "pinball-narrow-sequence-a5b67073dc8c658e",
         "live-native-payloads-log"
       ]
     },
     {
       "requirementId": "SHELL-01",
-      "note": "Opened all3 frames of explicit same-app shell-sizing-sequence178: requested1000×758, maximized1280×758, restored user800×620 at1280×800. The first frame is the opening loader and proves outer geometry only; loaded requested/menu content is separately reviewed in the material captures. Window dimensions use the actual taskbar workspace once. Full live browser measurements cover all installed/system windows; no inferred geometry approval from unrelated app comparison frames.",
+      "note": "Viewed same live Chess window requested1000×758→maximized1280×758→user-restored800×620, plus390px constrained geometry. The initial requested frame shows its loading overlay: it proves outer geometry only, not a loaded app. Separate native-ready/material captures above support rendered-content review. The live suite checks the other installed/system requested dimensions and per-axis clamp. Taskbar deduction occurs once and user rectangle restoration is retained.",
       "artifactIds": [
         "shell-sizing-viewport-e0722ae5ad67440f",
         "shell-sizing-viewport-0012437914efed61",
         "shell-sizing-viewport-a2d36218c101a342",
+        "shell-sizing-viewport-10b20432d8d27a52",
         "shell-sizing-sequence-178"
       ]
     },
     {
       "requirementId": "SHELL-02",
-      "note": "Opened all9 fresh focus-sequence frames: switches1/5/10 show actual flags/reset state, keyboard focus is visible, continuous iframe drag completes, nested background Pinball first action produces real score,100 clicks preserve bounded stack, and body/keyboard activation raises Minefield. Browser assertions corroborate click delivery and state changes rather than relying on an active blue titlebar alone. No new production focus/stacking defect observed.",
+      "note": "Viewed all nine live focus frames: first-action switches1/5/10, keyboard activation, continuous iframe crossing drag, nested Pinball first-action scoring,100 clicks with stable stacking, body action and keyboard raise. First action is corroborated by actual flag changes and genuine native score, not just an active title bar. No live focus/stacking regression was observed.",
       "artifactIds": [
         "shell-focus-viewport-d2486e08671bf85e",
         "shell-focus-viewport-d77e54d306afaa33",
@@ -164,7 +175,7 @@
     },
     {
       "requirementId": "GATE-01",
-      "note": "Frozen deployed report hash matches575a428c…; independently revalidated all179 records/checksums/sidecars and fresh live identity b63e82a/tree5ce1fa3/native hashes. Read live81 first-attempt passes, postmerge CI212 units+85 browser first-attempt passes, and36 negative-gate checks. Four analytics-enabled cases remain candidate/CI evidence because live analytics is disabled, not silently passed or skipped as equivalent. Initial independent harness readiness failures remain diagnostic and were resolved with actual overlay/hit-test evidence. The separate candidate promotion is retained; this review approves the actual production environment after fresh rendered/dynamic evidence, with the native raster minor carried forward.",
+      "note": "Read all36 live-stage gate negative outcomes,81 first-attempt live browser passes, post-merge212unit/85browser passes and actual native payload verification. Independently revalidated all179 artifact records and fresh live b63e82a/tree5ce1fa3 identity/native hashes. Original report-finalization writer remains unestablished in coordination; I did not mutate the report. Coordinator explicitly adopted the preserved facts after fresh independent verification. Read audit-root/README.txt SHA256492a4b142737dabc508d7201a54b0bec7eb16b79f69a1e7329b167d5c395c3fe plus report-validation/native-payloads/gate-negative/ci-verification outputs: all checksums/time/source/coverage pass,36 tests pass again, native payloads match, and CI log matches GitHub byte-for-byte. This transparent supplement resolves acceptance-evidence trust without inventing recorder attribution. Recommend accept: no deployed major/blocker warrants hotfix or rollback.",
       "artifactIds": [
         "deployed-gate-negative-log"
       ]

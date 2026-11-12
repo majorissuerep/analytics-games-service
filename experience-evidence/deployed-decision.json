@@ -6,12 +6,12 @@
   "requestId": "desktop-refinement",
   "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
   "commit": "b63e82a0af6d5648f85c431b178914e90163dbdc",
-  "createdAt": "2026-11-12T00:33:23.364Z",
+  "createdAt": "2026-11-12T00:36:59.528Z",
   "owner": "root",
-  "rationale": "Merged b63e82a0af6d5648f85c431b178914e90163dbdc resolves to the approved source tree. All81 applicable production browser cases passed first attempt; post-merge CI passed85. Fresh manual touch, archive, layout and gameplay evidence independently passed all13 scenarios. Actual production native payload hashes match source. No open major/blocking findings; native raster-edge polish remains minor. The early manual-harness readiness concern was resolved by direct loading-overlay hit testing and actual input after readiness, with diagnostics retained.",
+  "rationale": "Merged source and actual Vercel JS/WASM/data match the promoted tree. All81 applicable live browser cases passed without retry; both pre-merge and post-merge CI passed85 cases without retry. Fresh manual touch, long archive, window geometry/focus, dense99-mine solve and native flight/pause/drain/recovery evidence passed independent deployed review. No open major/blocker remains. Native raster polish and original report-recorder attribution remain explicit minor notes; the frozen report was preserved and all179 records, CI facts and native payloads independently revalidated before adoption and acceptance.",
   "identity": {
     "url": "https://analytics-games-service.vercel.app/api/build-identity",
-    "checkedAt": "2026-11-12T00:33:23.361Z",
+    "checkedAt": "2026-11-12T00:36:59.524Z",
     "commit": "b63e82a0af6d5648f85c431b178914e90163dbdc",
     "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
     "nativeAssets": {
@@ -33,13 +33,13 @@
     },
     "review": {
       "path": "experience-evidence/deployed-review.json",
-      "sha256": "048fddf27c085594489372de688a727f81a7e891f50fa194e038ef95ca7c570c",
-      "bytes": 13162
+      "sha256": "5adaea08fad32ab1ebcaefc0e237649028ee8b28bb4271fa61be2618d582616f",
+      "bytes": 13317
     },
     "decision": {
       "path": "experience-evidence/decision.json",
-      "sha256": "7963108ecce5bd8cce562c2ec5f9955e9b89d9295606b39eb76d74aaa3edfad7",
-      "bytes": 724
+      "sha256": "3ef8d06453db7094f33812d1cb27a2512a5dd7b5ec093a06a4262c6780cd53a9",
+      "bytes": 783
     }
   }
 }

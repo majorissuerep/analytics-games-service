@@ -28,3 +28,10 @@ file checks. Workflow and command details are in scripts/experience/README.md.
 A future changed deployment identity correctly rejects replay of this historical
 live gate against the newer deployment; retained checksums certify the files that
 were reviewed for this release.
+
+Disposition: ACCEPTED by the deployed gate on 2026-11-12.
+Read experience-evidence/deployed-decision.json for the exact receipt.
+Minor findings are retained in deployed-review.json: native raster polish and an
+unresolved original report-writer attribution. The coordinator's independent
+revalidation and explicit adoption are documented in deployed/audit-root/README.txt.
+The frozen report was preserved; all acceptance facts were independently checked.
