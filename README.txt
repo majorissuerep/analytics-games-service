@@ -35,3 +35,8 @@ Minor findings are retained in deployed-review.json: native raster polish and an
 unresolved original report-writer attribution. The coordinator's independent
 revalidation and explicit adoption are documented in deployed/audit-root/README.txt.
 The frozen report was preserved; all acceptance facts were independently checked.
+
+Authoritative final evidence tag: qa-pr77-accepted-20261112.
+This supersedes the earlier qa-pr77-deployed-20261112 snapshot. The final review
+SHA256 is5adaea08fad32ab1ebcaefc0e237649028ee8b28bb4271fa61be2618d582616f;
+it includes the coordinator audit and remaining minor attribution finding.
