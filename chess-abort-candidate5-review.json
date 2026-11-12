@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "requestId": "chess-current-position",
+  "requestSha256": "f1d668069e61de816520e9f227200c119a3724dc81b5699a05afc25c9a1e0dec",
+  "contractsSha256": "82ff566aa0d2b7b3d9298f37fa629a64459739135922a54b72e0cb673bdb01de",
+  "reviewer": "chess_cancellation_review",
+  "authors": [
+    "root",
+    "chess_current_position"
+  ],
+  "reviewedAt": "2026-11-12T12:45:44.842062+00:00",
+  "verdict": "approve",
+  "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+  "environment": "candidate",
+  "reportSha256": "a282248b50c325c7d66c99a904d2f96bca06cd54ea64ece5e86d313d9284e640",
+  "referenceComparison": "Independently exercised genuine Stockfish19 Free both sides at requested1000x760,390x844 and320x640; narrow Cancel/stopped Retry, actual retry completion, rapid d4/d5/c4, current hover, Undo, Cancel/Retry and New game all completed. Opened all12 manual viewport captures, plus root current-position/live-engine frames and Auto320/390 Cancel/dual-Retry frames. Existing opaque legible board, glossy rounded pink/neutral utility surfaces and XP outer chrome remain. Anchored controls fix prior clipped Cancel/Retry; short viewport preserves roughly220px board plus visible selected-engine stage, elapsed and meter. Genuine Reckless3s Auto max-purpose320 capture12 additionally shows real Depth1/22positions detail with all4footeractions hit-testable. No blocker/major remains. This approves the bounded functional/layout correction against established appearance, not a new visual design.",
+  "challenges": [
+    "Corrected baseline same-action fixture fails e816 and passes current source; it snapshots obsolete request objects before the actual click rather than inspecting newly-created requests or relying on document listener ordering.",
+    "Candidate2 provider major resolved by exact inference-only Vercel opt-in and preregistered actual-cleanup retention; source scope tests and successful preview complement direct runtime fixtures. Private generated deployment metadata remains unavailable, and distributed HTTP timing cannot establish same-instance routing.",
+    "Candidate3 clipped Cancel and candidate4 collapsed loading feedback were both independently rejected. Candidate5 verifies actions before automatic scrolling, primary whole heading/meter and minimum192px board across requested390/320; genuine Auto320 depth detail independently confirms worst-purpose fit.",
+    "Candidate3 capture overwrite invalidated its historical evidence and withdrew its receipt; it cannot approve this release. Candidate5 uses fresh unique paths, exact build metadata and verified checksums. No frozen candidate5 evidence was mutated during review.",
+    "This approves exact candidate/report only. Retained PR artifacts and actual merged deployment identity plus fresh live acceptance remain required."
+  ],
+  "findings": [
+    {
+      "id": "CHESS-PROVIDER-CANDIDATE2",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Earlier candidate omitted Vercel cancellation opt-in and retained actual drain.",
+      "resolution": "Inference-only supportsCancellation source patterns, preregistered Next after retention and controlled true-cleanup lifecycle/route tests are present; preview EisDPbHqDDhwtVaEQZm7C8sQSLj9 succeeds."
+    },
+    {
+      "id": "CHESS-NARROW-CANCEL",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Earlier narrow current loading Cancel was clipped below detail-pane boundary.",
+      "resolution": "Inference/evaluation Cancel and Retry now occupy anchored footer; real390/320 actions pass clip/hit tests before automatic scrolling, including Moves tab and simultaneous purposes."
+    },
+    {
+      "id": "CHESS-SHORT-LOADING",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Earlier320 Auto footer left effectively no space for current loading feedback.",
+      "resolution": "Short viewport reserves276px utility height and at least192px board. Actual genuine Auto320 depth/elapsed/meter fits, with all4actions visible and hit-testable."
+    }
+  ],
+  "observations": [
+    {
+      "requirementId": "CHESS-CURRENT",
+      "note": "Synchronous accepted-action cancellation and generations suppress obsolete hints/results/progress/errors/auto moves across rapid legal moves, undo/reset same FEN, settings, close and cached-page restore. Current Free hints/hover and actual retry succeeded independently; fresh adversarial browser scenarios pass.",
+      "artifactIds": [
+        "chess-lifecycle-viewport-66ab9228621e4590",
+        "chess-lifecycle-viewport-0ab7292f3df2395e",
+        "chess-lifecycle-viewport-c79fddccaaa7a680",
+        "chess-lifecycle-viewport-c3cc433298cf846b",
+        "chess-lifecycle-viewport-a1cb91ffb5ad6f43",
+        "chess-lifecycle-viewport-df53206b9806bfd4",
+        "chess-lifecycle-viewport-9d11956a6e8ccedb",
+        "chess-lifecycle-viewport-4e4c8286f322f1b6",
+        "chess-lifecycle-viewport-1e3629edeb484dd2",
+        "current-position-viewport-9d9a31141664b305",
+        "current-position-viewport-40cd674913fa0875",
+        "current-position-viewport-722b25711f933f2b",
+        "current-position-viewport-b48f2b32502c194b",
+        "current-position-sequence-97a4ed19f28bd709",
+        "chess-lifecycle-sequence-4500064a8aedcbfb",
+        "independent-manual-log",
+        "independent-auto-real-detail-log"
+      ]
+    },
+    {
+      "requirementId": "CHESS-QUEUE",
+      "note": "Reviewed runtime code and82focused passing tests: canceled queue removal/capacity settlement is immediate under held active work; unrelated FIFO preserved; active callers reject promptly while channel drains bestmove or1s kill; startup/readiness, late child output, cleanup lifetime and warm/idle paths pass.",
+      "artifactIds": [
+        "cancellation-provider-and-gate-tests-log"
+      ]
+    },
+    {
+      "requirementId": "CHESS-TRANSPORT",
+      "note": "Request abort and independent stream cancel reach owned work; preabort and late noncooperative JSON/SSE/pending-reader cases suppress stale output and settle. Preregistered after retains actual runtime cleanup beyond prompt user failure, including delayed Reckless registration and early paths. Scoped Vercel source matching and successful preview resolve provider gap; genuine all3engines cancel/replace observations pass without claiming shared instance routing.",
+      "artifactIds": [
+        "cancellation-provider-and-gate-tests-log",
+        "current-position-browser-log",
+        "live-engine-viewport-94b803177d865a0a",
+        "live-engine-viewport-fda2f30171a6e8e7",
+        "live-engine-viewport-3eededd73325ff19",
+        "live-engine-viewport-b726ee5d93b14bae",
+        "live-engine-viewport-15815b0bd8aa0d9d",
+        "live-engine-viewport-1df73d2a3bb51af2",
+        "live-engine-sequence-72f07041e12fa650"
+      ]
+    },
+    {
+      "requirementId": "CHESS-RECOVERY",
+      "note": "Fresh actual real-engine narrow390/320 Cancel, stopped Retry and retry-completed hints pass; requested rapid moves/hover/Undo/reset remain responsive. Independently opened Auto320/390 four-action and dual-Retry states, plus genuine Reckless Auto320 actual depth detail. Engine/stage/elapsed/meter remain visible, board roughly220px and controls hit-testable before scrolling. No pageerrors; fullCI covers auto/arena gameplay regression.",
+      "artifactIds": [
+        "chess-lifecycle-viewport-66ab9228621e4590",
+        "chess-lifecycle-viewport-0ab7292f3df2395e",
+        "chess-lifecycle-viewport-c79fddccaaa7a680",
+        "chess-lifecycle-viewport-c3cc433298cf846b",
+        "chess-lifecycle-viewport-a1cb91ffb5ad6f43",
+        "chess-lifecycle-viewport-df53206b9806bfd4",
+        "chess-lifecycle-viewport-9d11956a6e8ccedb",
+        "chess-lifecycle-viewport-4e4c8286f322f1b6",
+        "chess-lifecycle-viewport-1e3629edeb484dd2",
+        "current-position-viewport-9d9a31141664b305",
+        "current-position-viewport-40cd674913fa0875",
+        "current-position-viewport-722b25711f933f2b",
+        "current-position-viewport-b48f2b32502c194b",
+        "live-engine-viewport-94b803177d865a0a",
+        "live-engine-viewport-fda2f30171a6e8e7",
+        "live-engine-viewport-3eededd73325ff19",
+        "live-engine-viewport-b726ee5d93b14bae",
+        "live-engine-viewport-15815b0bd8aa0d9d",
+        "live-engine-viewport-1df73d2a3bb51af2",
+        "current-position-sequence-97a4ed19f28bd709",
+        "chess-lifecycle-sequence-4500064a8aedcbfb",
+        "live-engine-sequence-72f07041e12fa650",
+        "current-position-browser-log",
+        "independent-manual-log",
+        "independent-auto-real-detail-log"
+      ]
+    },
+    {
+      "requirementId": "CHESS-GATE",
+      "note": "Verified frozen report/all artifact checksums against treee703527 and exact request. RequiredCI43218818618 matches e6b2b8a:250unit/99browser first-pass success with retained artifacts, Vercel preview EisDPbHqDDhwtVaEQZm7C8sQSLj9 green. All5scenarios pass. Prior rejected/invalid evidence retained as history; exact reviewed candidate may promote, actual deployment acceptance pending.",
+      "artifactIds": [
+        "required-ci-and-vercel-log"
+      ]
+    }
+  ]
+}

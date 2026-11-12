@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "stage": "promotion",
+  "verdict": "approved",
+  "requestId": "chess-current-position",
+  "requestSha256": "f1d668069e61de816520e9f227200c119a3724dc81b5699a05afc25c9a1e0dec",
+  "contractsSha256": "82ff566aa0d2b7b3d9298f37fa629a64459739135922a54b72e0cb673bdb01de",
+  "commit": "e6b2b8a4227be213139fb24fb3c0ae3927f62681",
+  "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+  "createdAt": "2026-11-12T12:46:27.501Z",
+  "reviewer": "chess_cancellation_review",
+  "identity": {
+    "url": "http://localhost:3132/api/build-identity",
+    "checkedAt": "2026-11-12T12:46:27.501Z",
+    "commit": "e6b2b8a4227be213139fb24fb3c0ae3927f62681",
+    "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+    "nativeAssets": {
+      "public/vendor/space-cadet/SpaceCadetPinball.js": "ddff8bf22ebd7c4888cd1cbbbe011c9563cff144f7a0051362f4c5fb5f0ef117",
+      "public/vendor/space-cadet/SpaceCadetPinball.wasm": "48ba94b1de0eb0e97b5db2681da93badf8e8178628465a9f1149ae0f9e2f7ef1",
+      "public/vendor/space-cadet/SpaceCadetPinball.data": "199c5fdcefd62b1965053bf47b0848e08d97830e0fe9e6ba595f8d7006d8782c"
+    }
+  },
+  "inputs": {
+    "requestReview": {
+      "path": "experience/reviews/chess-current-position.request.json",
+      "sha256": "506b4b24a33c480cdb33498ea3ba70cf5af8b8db2c3efc95eeb0399af8da46f9",
+      "bytes": 5997
+    },
+    "report": {
+      "path": "experience-evidence/chess-abort-candidate5.json",
+      "sha256": "a282248b50c325c7d66c99a904d2f96bca06cd54ea64ece5e86d313d9284e640",
+      "bytes": 66938
+    },
+    "review": {
+      "path": "experience-evidence/chess-abort-candidate5-review.json",
+      "sha256": "d2636257e20e0c22909f1081506a6daa32fe4161f1af94ea21f0f5b33a8dd623",
+      "bytes": 9171
+    }
+  }
+}
