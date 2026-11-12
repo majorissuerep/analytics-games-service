@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "stage": "promotion",
+  "verdict": "approved",
+  "requestId": "minefield-elite",
+  "requestSha256": "8074e59dfd198409e577d4344fd9247339d64661cfbd6a6565b5c73ade78cb81",
+  "contractsSha256": "6bcc1d2de9e163d0915cb4ec1ccccb30aeb7b46e761206ffbd77b0a0f5aec958",
+  "commit": "9f34d6562df541be822638d484fee8d341be6a57",
+  "tree": "b18c7c72cd0755243b3dbba76a7a68f295518d51",
+  "createdAt": "2026-11-12T11:22:00.851Z",
+  "reviewer": "minefield_review",
+  "identity": {
+    "url": "http://localhost:3132/api/build-identity",
+    "checkedAt": "2026-11-12T11:22:00.850Z",
+    "commit": "9f34d6562df541be822638d484fee8d341be6a57",
+    "tree": "b18c7c72cd0755243b3dbba76a7a68f295518d51",
+    "nativeAssets": {
+      "public/vendor/space-cadet/SpaceCadetPinball.js": "ddff8bf22ebd7c4888cd1cbbbe011c9563cff144f7a0051362f4c5fb5f0ef117",
+      "public/vendor/space-cadet/SpaceCadetPinball.wasm": "48ba94b1de0eb0e97b5db2681da93badf8e8178628465a9f1149ae0f9e2f7ef1",
+      "public/vendor/space-cadet/SpaceCadetPinball.data": "199c5fdcefd62b1965053bf47b0848e08d97830e0fe9e6ba595f8d7006d8782c"
+    }
+  },
+  "inputs": {
+    "requestReview": {
+      "path": "experience/reviews/minefield-elite.request.json",
+      "sha256": "9e4688f52588bcfcee9ed9b9188a99a56c9a434f0742edfb31b355914ad4a55a",
+      "bytes": 6866
+    },
+    "report": {
+      "path": "experience-evidence/elite-candidate4.json",
+      "sha256": "7fa41e2d88d569262ec5d349e8ec0157e1cf1fb5d7f86aef1dcdbffa7e5ac166",
+      "bytes": 93814
+    },
+    "review": {
+      "path": "experience-evidence/elite-candidate4-review.json",
+      "sha256": "e6796fa66698c010ef889eba3e7127d61b8de308e7b8a21d3e1722616960ae67",
+      "bytes": 8066
+    }
+  }
+}

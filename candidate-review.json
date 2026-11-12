@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "requestId": "minefield-elite",
+  "requestSha256": "8074e59dfd198409e577d4344fd9247339d64661cfbd6a6565b5c73ade78cb81",
+  "contractsSha256": "6bcc1d2de9e163d0915cb4ec1ccccb30aeb7b46e761206ffbd77b0a0f5aec958",
+  "reviewer": "minefield_review",
+  "authors": [
+    "root",
+    "minefield_extreme_owner"
+  ],
+  "reviewedAt": "2026-11-12T11:21:43.267Z",
+  "verdict": "approve",
+  "tree": "b18c7c72cd0755243b3dbba76a7a68f295518d51",
+  "environment": "candidate",
+  "reportSha256": "7fa41e2d88d569262ec5d349e8ec0157e1cf1fb5d7f86aef1dcdbffa7e5ac166",
+  "referenceComparison": "Directly downloaded/opened exact official elementaryCode screenshot and Zorin18hero. Observed attached toolbar/tab hierarchy, compact persistent inspector, quiet stable playfield, restrained neutral material and rounded glossy control groups translate their useful hierarchy/material into original Minefield composition. Pink intent and slate field identity are coherent; XP outer chrome remains intact. Narrow/fallback/proof views retain that hierarchy without ornamental editorial copy or per-tile glass.",
+  "findings": [
+    {
+      "id": "ELITE-PROMOTE-192",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Earlier candidates failed the192px minimum in native touch locally and CI Chrome despite ordinary local passes.",
+      "resolution": "Current9f34d656 compact functional copy yields226.765625px stage at320x640 in native-touch default/Arial/serif manual views with32pxcells and no document overflow; requiredCI90cases pass with no retry."
+    },
+    {
+      "id": "ELITE-PROMOTE-HYBRID",
+      "severity": "major",
+      "status": "resolved",
+      "description": "A canceled touch could leave suppression to swallow a following genuine mouse action.",
+      "resolution": "Current source clears stale hold on genuine new mouse pointerdown. Independent nativeCDP cancel followed by actualmouseclick selects intended source on first click; fresh regression and fullCI pass."
+    },
+    {
+      "id": "ELITE-PROMOTE-FLAKES",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Previous requiredCI reported Welcome mounting and hidden-streamed-wallpaper selector flakes.",
+      "resolution": "Current measured Welcome readiness and actual visible unique selectors retain intended assertions; requiredCI43206531792 passes90browsercases without flakes/retries."
+    }
+  ],
+  "observations": [
+    {
+      "requirementId": "MINE-LOGIC",
+      "note": "Independently audited local zero/all, global-budget and subset arithmetic plus public projection; no covered truth or player flag premise enters inference. Reviewed bounded580-view/2057-deduction oracle, privacy/contradiction and exact two-world50/50 checks,120generated samples with zero failures. Opened current-tree dense99/public-clue terminal sequence; accepted layouts remain fixed and uncertified fallbacks rejected. These samples support soundness within stated bounds, not a universal proof or complete CSP.",
+      "artifactIds": [
+        "quality-check-log",
+        "changed-browser-journeys-log",
+        "generation-benchmark-log",
+        "classic-play-viewport-2a29db9abd08f697",
+        "classic-play-viewport-4b89a83cdbaa0e44",
+        "classic-play-viewport-0ad796b1b9b30999",
+        "classic-play-sequence-7924254e0143d4dd",
+        "classic-play-sequence-d936e770aba41827"
+      ]
+    },
+    {
+      "requirementId": "MINE-EXPLAIN",
+      "note": "Performed current-tree user-facing Explain-only Elite to a real100-safe win; inspected cross/subset proof and expanded/scrolled supporting steps with actual clue values, exact residual RegionA/B coordinates/counts and conclusions. Showcell focuses the actual target, Close stays reachable and restores Explain focus. Opened current-tree misplaced-safe-flag explanation and explicit correction-to-win sequence. Information requests are clearly distinguished from safe-cell claims.",
+      "artifactIds": [
+        "changed-browser-journeys-log",
+        "classic-play-viewport-2a29db9abd08f697",
+        "classic-play-viewport-4b89a83cdbaa0e44",
+        "classic-play-viewport-0ad796b1b9b30999",
+        "classic-play-sequence-7924254e0143d4dd",
+        "classic-play-sequence-d936e770aba41827",
+        "elite-play-viewport-784aa5b1079b14d8",
+        "elite-play-viewport-0e9024bcb1415f95",
+        "elite-play-viewport-558e182cf6e8f841",
+        "elite-play-sequence-f512848ebf659f53",
+        "independent-manual-observations"
+      ]
+    },
+    {
+      "requirementId": "ELITE-RULES",
+      "note": "Completed current-tree Elite Explain-only in128actions,43total unlimited permanent scans,54+46opened=100safe, with actual cross/subset deductions. E repeated scan no-op; local0 opening with initially unknown echo; exact corner4/interior9 lens and persistent source verified. Native hold/cancel and canceledtouch-to-real-mouse selection passed. Scan count is an efficiency record, with no optimal-policy or objectively universal difficulty claim.",
+      "artifactIds": [
+        "quality-check-log",
+        "generation-benchmark-log",
+        "elite-play-viewport-784aa5b1079b14d8",
+        "elite-play-viewport-0e9024bcb1415f95",
+        "elite-play-viewport-558e182cf6e8f841",
+        "elite-play-sequence-f512848ebf659f53",
+        "independent-manual-observations"
+      ]
+    },
+    {
+      "requirementId": "ELITE-UX",
+      "note": "Opened actual current-tree requested/maximize/restore,320/390/short, material and proof captures. Coarse320x640 stage226.765625px,32pxcells, doc312x569 without overflow; Arial/sans and Georgia/serif stress variants retained226.765625px and reachable controls. Concise functional legend frees layout budget without shrinking controls. Stable opaque board, separated local/echo type, restrained pink/slate and bounded gloss are readable. Expanded proof keeps fixed Close above named scrolling; user-triggered focus pans intended cells. RequiredCI90cases also pass, resolving the earlier environment-specific failure.",
+      "artifactIds": [
+        "changed-browser-journeys-log",
+        "classic-play-viewport-2a29db9abd08f697",
+        "classic-play-viewport-4b89a83cdbaa0e44",
+        "classic-play-viewport-0ad796b1b9b30999",
+        "classic-play-sequence-7924254e0143d4dd",
+        "classic-play-sequence-d936e770aba41827",
+        "elite-layout-viewport-cc50c3c6806ee430",
+        "elite-play-viewport-784aa5b1079b14d8",
+        "elite-play-viewport-0e9024bcb1415f95",
+        "elite-play-viewport-558e182cf6e8f841",
+        "elite-layout-sequence-55dc2185ba66d461",
+        "elite-play-sequence-f512848ebf659f53",
+        "independent-manual-observations"
+      ]
+    },
+    {
+      "requirementId": "MINE-WAIT",
+      "note": "Independently induced silent worker, observed scoped indeterminate loading then10swatchdog, hit-tested visibleRetry and resumed genuine verified play. Opened paired loading/error/retry frames and read current-tree automated constructor failure/cancel/reset/stale-completion/level-change sequences. No unverified fallback, stale overwrite or stuck wait observed.",
+      "artifactIds": [
+        "generation-recovery-viewport-75cb8cc764c1cb12",
+        "generation-recovery-viewport-5c87a531323ad3e9",
+        "generation-recovery-sequence-0df9fd88959b1fb1"
+      ]
+    },
+    {
+      "requirementId": "ELITE-GATE",
+      "note": "Exact candidate9f34d656/treeb18c7c72 report and sidecars validated; all scenarios and required checks passed. Read retained requiredCI43206531792 status/full log:221units/build and90browsercases with no flakes/retries, plus8local changed journeys. Prior rejected candidate2/3 dispositions remain retained. Completed manual replay and exact scripts are retained; aborted diagnostic script-only30swaits are explicitly excluded from performance evidence. Approval covers candidate promotion; actual deployed acceptance remains a separate gate.",
+      "artifactIds": [
+        "independent-oracle-and-gates-log",
+        "required-ci-log",
+        "full-ci-log"
+      ]
+    }
+  ]
+}
