@@ -137,3 +137,9 @@ Protocol references: [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/
 and [Stockfish UCI commands](https://official-stockfish.github.io/docs/stockfish-wiki/UCI-&-Commands.html).
 The executable requirements and evidence scenarios are in
 `experience/requests/chess-current-position.json`.
+
+Vercel requires explicit per-function cancellation. The analysis and model-move
+routes opt in; unrelated mutation routes retain their original behavior. Their
+`after` lifetime is registered before streaming and awaits actual UCI channel
+cleanup, including the bounded stop timeout. Rejecting a caller alone is not
+cleanup completion. See [Vercel cancellation](https://vercel.com/docs/functions/functions-api-reference#cancel-requests).

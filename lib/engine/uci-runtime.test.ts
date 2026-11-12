@@ -196,3 +196,112 @@ describe('cancellation owns a removable job and isolated UCI channel', () => {
     runtime.dispose()
   })
 })
+
+describe('actual engine cleanup lifetime', () => {
+  it('registers before startup and settles active cleanup only after stop/bestmove releases the channel', async () => {
+    behavior.hold = 'go movetime'
+    const runtime = new UciRuntime('builtin-stockfish-18')
+    const controller = new AbortController()
+    let cleanup!: Promise<void>
+    let released = false
+    const active = runtime.search({ ...request, signal: controller.signal, onCleanup: done => {
+      expect(children).toHaveLength(0)
+      cleanup = done
+      void done.then(() => { released = true })
+    } })
+    await flush()
+    controller.abort()
+    await expect(active).rejects.toThrow()
+    expect(released).toBe(false)
+    children[0].emit('bestmove e2e4')
+    await cleanup
+    expect(released).toBe(true)
+    // The canceled job must not retain another client's subsequent search.
+    const next = runtime.search(request)
+    await flush()
+    expect(released).toBe(true)
+    children[0].emit('bestmove e2e4')
+    await next
+    runtime.dispose()
+  })
+  it('releases a canceled queue job lifetime while the active search still runs', async () => {
+    behavior.hold = 'go movetime'
+    const runtime = new UciRuntime('builtin-stockfish-18')
+    const active = runtime.search(request)
+    await flush()
+    const controller = new AbortController()
+    let cleanup!: Promise<void>
+    const queued = runtime.search({ ...request, signal: controller.signal, onCleanup: done => { cleanup = done } })
+    controller.abort()
+    await expect(queued).rejects.toThrow()
+    await cleanup
+    expect(children[0].writes.at(-1)).toContain('go movetime')
+    children[0].emit('bestmove e2e4')
+    await active
+    runtime.dispose()
+  })
+  it('releases cleanup after the one-second silent-stop kill', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    behavior.hold = 'go movetime'
+    const runtime = new UciRuntime('builtin-stockfish-18')
+    const controller = new AbortController()
+    let cleanup!: Promise<void>
+    let released = false
+    const active = runtime.search({ ...request, signal: controller.signal, onCleanup: done => { cleanup = done; void done.then(() => { released = true }) } })
+    await flush()
+    controller.abort()
+    await expect(active).rejects.toThrow()
+    await vi.advanceTimersByTimeAsync(999)
+    expect(released).toBe(false)
+    await vi.advanceTimersByTimeAsync(1)
+    await cleanup
+    expect(children[0].kill).toHaveBeenCalledOnce()
+    expect(released).toBe(true)
+    runtime.dispose()
+  })
+  it('settles cleanup for early rejected and successfully completed work', async () => {
+    const runtime = new UciRuntime('builtin-stockfish-18')
+    const cleanups: Promise<void>[] = []
+    await expect(runtime.search({ ...request, signal: AbortSignal.abort(), onCleanup: done => cleanups.push(done) })).rejects.toThrow()
+    await runtime.search({ ...request, onCleanup: done => cleanups.push(done) })
+    await Promise.all(cleanups)
+    expect(cleanups).toHaveLength(2)
+    runtime.dispose()
+  })
+})
+
+describe('cleanup lifetime on admission failures', () => {
+  it('settles cleanup and preserves a queued progress callback error', async () => {
+    behavior.hold = 'go movetime'
+    const runtime = new UciRuntime('builtin-stockfish-18')
+    const active = runtime.search(request)
+    await flush()
+    let cleanup!: Promise<void>
+    const failed = runtime.search({ ...request, onCleanup: done => { cleanup = done }, onProgress: () => { throw new Error('consumer failed') } })
+    await expect(failed).rejects.toThrow('consumer failed')
+    await cleanup
+    children[0].emit('bestmove e2e4')
+    await active
+    runtime.dispose()
+  })
+})
+
+describe('queue saturation cleanup', () => {
+  it('settles rejected capacity lifetime without waiting for admitted searches', async () => {
+    behavior.hold = 'go movetime'
+    const runtime = new UciRuntime('builtin-stockfish-18')
+    const active = runtime.search(request)
+    await flush()
+    const controllers = Array.from({ length: 7 }, () => new AbortController())
+    const queued = controllers.map(controller => runtime.search({ ...request, signal: controller.signal }))
+    const rejections = queued.map(pending => expect(pending).rejects.toThrow())
+    let cleanup!: Promise<void>
+    await expect(runtime.search({ ...request, onCleanup: done => { cleanup = done } })).rejects.toThrow('busy')
+    await cleanup
+    controllers.forEach(controller => controller.abort())
+    await Promise.all(rejections)
+    children[0].emit('bestmove e2e4')
+    await active
+    runtime.dispose()
+  })
+})

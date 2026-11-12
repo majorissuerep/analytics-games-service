@@ -11,3 +11,9 @@
 - Baseline audit: Promise-tail retains canceled queue slots; SSE consumer cancellation does not signal inference; startup and readiness cancellation delayed; move invalidation relies on effect cleanup and late client reads can escape explicit Cancel.
 - Functional delta preserves existing composition, color calibration and engine selection. References are AbortSignal, ReadableStream cancellation and UCI stop/bestmove protocol.
 - Status lives in actual request, promotion and deployed receipts. This context does not certify acceptance. Prior PR78 receipts/evidence remain on its QA tags.
+
+- Provider audit found Vercel request cancellation requires per-function opt-in.
+  The amended request requires scoped configuration and preregistered `after`
+  retention of actual engine cleanup. Prior candidate2 CI passed 97 browser/235
+  unit tests but is not promoted without provider integration. Fresh receipts
+  must use the amended request hash and final source.

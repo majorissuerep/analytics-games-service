@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+vi.mock('next/server', async importOriginal => ({ ...await importOriginal<typeof import('next/server')>(), after: vi.fn() }))
+
 vi.mock('@/lib/engine/reckless', () => ({
   recklessAvailable: vi.fn(() => true),
   analyseWithReckless: vi.fn(async () => ({
@@ -11,6 +13,7 @@ vi.mock('@/lib/engine/reckless', () => ({
   })),
 }))
 
+import { after } from 'next/server'
 import { POST } from './route'
 import { analyseWithReckless, recklessAvailable } from '@/lib/engine/reckless'
 
@@ -27,6 +30,7 @@ function post(body: unknown) {
 
 describe('POST /api/chess/analyse', () => {
   beforeEach(() => {
+    vi.mocked(after).mockClear()
     vi.mocked(analyseWithReckless).mockClear()
     vi.mocked(recklessAvailable).mockReturnValue(true)
   })
@@ -60,5 +64,31 @@ describe('POST /api/chess/analyse', () => {
     const response = await post({ fen: START_FEN })
     expect(response.status).toBe(502)
     expect(await response.json()).toMatchObject({ error: 'Reckless exited unexpectedly (code null).' })
+  })
+})
+
+
+describe('analysis route provider retention adapter', () => {
+  it('registers Next after before work and forwards the true cleanup lifetime', async () => {
+    let release!: () => void
+    const cleanup = new Promise<void>(resolve => { release = resolve })
+    vi.mocked(analyseWithReckless).mockImplementationOnce(async input => {
+      expect(after).toHaveBeenCalledOnce()
+      expect(input.signal).toBeInstanceOf(AbortSignal)
+      expect(input.onCleanup).toBeTypeOf('function')
+      input.onCleanup!(cleanup)
+      throw new Error('caller canceled before drain')
+    })
+    vi.mocked(after).mockClear()
+    const response = await post({ fen: START_FEN })
+    expect(response.status).toBe(502)
+    const retained = (vi.mocked(after).mock.calls[0][0] as () => Promise<void>)()
+    let finished = false
+    void retained.then(() => { finished = true })
+    for (let i = 0; i < 5; i++) await Promise.resolve()
+    expect(finished).toBe(false)
+    release()
+    await retained
+    expect(finished).toBe(true)
   })
 })

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { after, NextResponse } from 'next/server'
 import { Chess } from 'chess.js'
 import { z } from 'zod'
 import { analyseWithReckless, recklessAvailable } from '@/lib/engine/reckless'
@@ -31,13 +31,14 @@ export async function POST(request: Request) {
   if (legalUci.size === 0) return NextResponse.json({ error: 'No legal moves in this position' }, { status: 400 })
   if (parsed.data.revisionId === 'reckless-local' && !recklessAvailable()) return NextResponse.json({ error: 'Reckless engine binary is missing on the server' }, { status: 503 })
   try {
-    return await engineResponse(request, async (onProgress, signal) => {
+    return await engineResponse(request, async (onProgress, signal, onCleanup) => {
       const search = {
       fen: chess.fen(),
       multiPv: Math.min(parsed.data.multiPv, legalUci.size),
       moveTimeMs: parsed.data.moveTimeMs,
       onProgress,
       signal,
+      onCleanup,
     }
     const analysis = parsed.data.revisionId === 'reckless-local' ? await analyseWithReckless(search) : await analyseWithEngine(parsed.data.revisionId, search)
     return {
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
       turn: chess.turn(),
       analysis: presentAnalysis(chess.fen(), chess.turn(), analysis, legalUci),
     }
-    })
+    }, { retainCleanup: done => after(() => done) })
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Reckless analysis failed' },

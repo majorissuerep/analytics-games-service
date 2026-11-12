@@ -8,7 +8,7 @@ export const UCI_ENGINE_IDS = ['reckless-local', 'builtin-stockfish-18', 'builti
 export type UciEngineId = typeof UCI_ENGINE_IDS[number]
 export function isUciEngine(id: string): id is UciEngineId { return UCI_ENGINE_IDS.includes(id as UciEngineId) }
 
-export type EngineSearch = { fen: string; multiPv: number; moveTimeMs: number; skill?: number; history?: readonly string[]; onProgress?: ReportEngineProgress; signal?: AbortSignal }
+export type EngineSearch = { fen: string; multiPv: number; moveTimeMs: number; skill?: number; history?: readonly string[]; onProgress?: ReportEngineProgress; signal?: AbortSignal; onCleanup?: (settled: Promise<void>) => void }
 
 /** One serial UCI channel per selected engine. No process is created on import. */
 export class UciRuntime {
@@ -111,9 +111,14 @@ export class UciRuntime {
   }
 
   search(request: EngineSearch): Promise<RecklessAnalysis> {
-    if (request.signal?.aborted) return Promise.reject(new DOMException('Request cancelled', 'AbortError'))
-    if (this.queued >= 8) return Promise.reject(new Error('Engine is busy. Please retry shortly.'))
-    if (this.queued) request.onProgress?.({ stage: 'queued', message: 'Waiting for the selected engine', detail: 'Another request is using this engine.' })
+    let releaseCleanup!: () => void
+    const cleanup = new Promise<void>(resolve => { releaseCleanup = resolve })
+    try { request.onCleanup?.(cleanup) } catch (error) { releaseCleanup(); return Promise.reject(error) }
+    if (request.signal?.aborted) { releaseCleanup(); return Promise.reject(new DOMException('Request cancelled', 'AbortError')) }
+    if (this.queued >= 8) { releaseCleanup(); return Promise.reject(new Error('Engine is busy. Please retry shortly.')) }
+    try {
+      if (this.queued) request.onProgress?.({ stage: 'queued', message: 'Waiting for the selected engine', detail: 'Another request is using this engine.' })
+    } catch (error) { releaseCleanup(); return Promise.reject(error) }
     this.queued += 1
     clearTimeout(this.idle)
     return new Promise((resolve, reject) => {
@@ -128,7 +133,10 @@ export class UciRuntime {
         else resolve(result!)
       }
       const cancel = () => {
-        if (!started) this.jobs = this.jobs.filter(item => item !== job)
+        if (!started) {
+          this.jobs = this.jobs.filter(item => item !== job)
+          releaseCleanup()
+        }
         finish(new DOMException('Request cancelled', 'AbortError'))
       }
       const job = { cancel, run: async () => {
@@ -137,6 +145,7 @@ export class UciRuntime {
         let failure: unknown
         try { result = await this.runSearch(request) } catch (error) { failure = error }
         this.release()
+        releaseCleanup()
         finish(failure, result)
       } }
       request.signal?.addEventListener('abort', cancel, { once: true })

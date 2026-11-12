@@ -1,12 +1,20 @@
 import type { ReportEngineProgress } from './engine-progress'
 
 /** JSON remains the default API; browsers opt into observable work via SSE. */
-export async function engineResponse<T>(request: Request, work: (report: ReportEngineProgress, signal: AbortSignal) => Promise<T>): Promise<Response> {
+export async function engineResponse<T>(request: Request, work: (report: ReportEngineProgress, signal: AbortSignal, onCleanup: (settled: Promise<void>) => void) => Promise<T>, options: { retainCleanup?: (settled: Promise<void>) => void } = {}): Promise<Response> {
   request.signal.throwIfAborted()
+  const cleanupTasks: Promise<void>[] = []
+  let finishWork!: () => void
+  const workFinished = new Promise<void>(resolve => { finishWork = resolve })
+  // Register before work or response construction: disconnect may reclaim the invocation.
+  options.retainCleanup?.(workFinished.then(() => Promise.allSettled(cleanupTasks)).then(() => undefined))
+  const onCleanup = (settled: Promise<void>) => { cleanupTasks.push(settled.then(() => undefined, () => undefined)) }
   if (!request.headers.get('accept')?.includes('text/event-stream')) {
-    const result = await work(() => undefined, request.signal)
-    request.signal.throwIfAborted()
-    return Response.json(result)
+    try {
+      const result = await work(() => undefined, request.signal, onCleanup)
+      request.signal.throwIfAborted()
+      return Response.json(result)
+    } finally { finishWork() }
   }
   const operation = new AbortController()
   const encoder = new TextEncoder()
@@ -33,7 +41,7 @@ export async function engineResponse<T>(request: Request, work: (report: ReportE
       heartbeat = setInterval(() => { if (!closed) controller.enqueue(encoder.encode(': heartbeat\n\n')) }, 10_000)
       request.signal.addEventListener('abort', abort, { once: true })
       if (request.signal.aborted) abort()
-      void Promise.resolve().then(() => { operation.signal.throwIfAborted(); return work(progress => send('progress', progress), operation.signal) }).then(result => send('result', result)).catch(error => send('error', { error: error instanceof Error ? error.message : 'Engine request failed. Please retry.' })).finally(close)
+      void Promise.resolve().then(() => { operation.signal.throwIfAborted(); return work(progress => send('progress', progress), operation.signal, onCleanup) }).then(result => send('result', result)).catch(error => send('error', { error: error instanceof Error ? error.message : 'Engine request failed. Please retry.' })).finally(() => { finishWork(); close() })
     },
     cancel() { closed = true; cleanup() },
   })
