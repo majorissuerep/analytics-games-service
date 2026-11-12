@@ -1,17 +1,13 @@
 # Current iteration
 
-- Request: `experience/requests/minefield-elite.json`; CLI/CI pointer: `experience/current.json`.
-- Baseline/rollback: `b63e82a0af6d5648f85c431b178914e90163dbdc` (accepted PR #77).
-- Branch: `feat/minefield-extreme-elite`.
+- Request: `experience/requests/chess-current-position.json`; CLI/CI pointer: `experience/current.json`.
+- Baseline/rollback: `e816ad49f861f23e05e76f4d2d60d758475cc6c7` (accepted PR #78).
+- Branch: `fix/chess-current-position`.
 - Production: https://analytics-games-service.vercel.app
-- Candidate: http://localhost:3132; coordinator alone builds/starts servers.
-- Owner: root owns contracts, independent oracle/browser tests, integration and release.
-  `minefield_extreme_owner` (GPT6.1 Sol) owns Minefield implementation and dossier.
-  `minefield_review` independently challenges readiness and candidate/live evidence.
-- Intent: normal explainable no-guess logic; harder two-layer mode with truthful,
-  optional unlimited echo scans and nontrivial subset/cross deductions.
-- Baseline audit: no demonstrated false deduction; existing tests reuse the solver.
-  Cropped screenshot lacks full clues/budget. Wrong flags may obstruct safe opening.
-- Readiness, candidate and deployment status live in their actual receipts. This
-  context does not certify completion or acceptance. Prior PR77 evidence remains
-  on its QA tags; historical requests are evaluated at their matching source commit.
+- Candidate server/build controlled by root only; port announced after build.
+- Owner: `chess_current_position` (GPT-6.1 Sol) owns Chess client, transport and UCI runtime cancellation; root owns contracts, independent browser tests, integration and release.
+- Reviewer: `chess_cancellation_review` independently challenges readiness and actual candidate/live evidence.
+- Intent: only the current board/request generation owns predictions; abort obsolete processing and remove queued work without affecting other players.
+- Baseline audit: Promise-tail retains canceled queue slots; SSE consumer cancellation does not signal inference; startup and readiness cancellation delayed; move invalidation relies on effect cleanup and late client reads can escape explicit Cancel.
+- Functional delta preserves existing composition, color calibration and engine selection. References are AbortSignal, ReadableStream cancellation and UCI stop/bestmove protocol.
+- Status lives in actual request, promotion and deployed receipts. This context does not certify acceptance. Prior PR78 receipts/evidence remain on its QA tags.

@@ -31,13 +31,13 @@ export async function POST(request: Request) {
   if (legalUci.size === 0) return NextResponse.json({ error: 'No legal moves in this position' }, { status: 400 })
   if (parsed.data.revisionId === 'reckless-local' && !recklessAvailable()) return NextResponse.json({ error: 'Reckless engine binary is missing on the server' }, { status: 503 })
   try {
-    return await engineResponse(request, async onProgress => {
+    return await engineResponse(request, async (onProgress, signal) => {
       const search = {
       fen: chess.fen(),
       multiPv: Math.min(parsed.data.multiPv, legalUci.size),
       moveTimeMs: parsed.data.moveTimeMs,
       onProgress,
-      signal: request.signal,
+      signal,
     }
     const analysis = parsed.data.revisionId === 'reckless-local' ? await analyseWithReckless(search) : await analyseWithEngine(parsed.data.revisionId, search)
     return {

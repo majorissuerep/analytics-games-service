@@ -30,11 +30,11 @@ export async function POST(request: Request, context: { params: Promise<{ revisi
       if (replay.fen() !== chess.fen()) return NextResponse.json({ error: 'History does not match FEN' }, { status: 400 })
     }
     if (isUciEngine(revisionId)) {
-      return await engineResponse(request, async onProgress => {
+      return await engineResponse(request, async (onProgress, signal) => {
         const result = await analyseWithEngine(revisionId, {
         fen: chess.fen(), multiPv: 1, moveTimeMs: parsed.data.moveTimeMs,
         skill: parsed.data.skill, history: parsed.data.history,
-        onProgress, signal: request.signal,
+        onProgress, signal,
       })
       if (!supplied.includes(result.bestMove)) throw new Error('Engine returned an illegal move')
         return { move: result.bestMove, revisionId, durationMs: result.durationMs }
@@ -44,14 +44,14 @@ export async function POST(request: Request, context: { params: Promise<{ revisi
     if (revisionId === BUILTIN_STYLED_OPENING) {
       const turn = parsed.data.fen.split(' ')[1]
       const repertoireId = parsed.data.repertoireId ?? defaultStyledRepertoireForModelColor(turn === 'w' ? 'w' : 'b')
-      return await engineResponse(request, async onProgress => {
+      return await engineResponse(request, async (onProgress, signal) => {
         const result = await requestStyledMove({
         fen: parsed.data.fen,
         history: parsed.data.history,
         repertoireId,
         legalMoves: supplied,
         moveTimeMs: parsed.data.moveTimeMs,
-        onProgress, signal: request.signal,
+        onProgress, signal,
       })
         return { move: result.move, revisionId, repertoireId, durationMs: result.durationMs }
       })
