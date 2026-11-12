@@ -1,0 +1,14 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.evaluate: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for locator('iframe[title="Minefield"]')[22m
+
+    at /workspace/analytics-games-service/experience-evidence/deployed/manual/reviewer-touch.mjs:95:173 {
+  log: [ `  - waiting for locator('iframe[title="Minefield"]')` ],
+  name: 'TimeoutError'
+}
+
+Node.js v24.22.1

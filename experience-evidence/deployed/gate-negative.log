@@ -1,0 +1,53 @@
+$ npm run experience:test -- --reporter=verbose
+
+> analytics-games-service@0.1.0 experience:test
+> vitest run tests/experience --reporter=verbose
+
+
+ RUN  v4.1.10 /workspace/analytics-games-service
+
+ ✓ tests/experience/collect-playwright.test.mjs > Playwright capture collection > imports actual captures and ordered distinct sequences without granting passed statuses 73ms
+ ✓ tests/experience/collect-playwright.test.mjs > Playwright capture collection > does not build fake dynamics by combining different scenarios, viewports or windows 49ms
+ ✓ tests/experience/collect-playwright.test.mjs > Playwright capture collection > rejects altered bytes or declared dimensions and keeps the report unchanged 36ms
+ ✓ tests/experience/collect-playwright.test.mjs > Playwright capture collection > rejects capture from a different commit 30ms
+ ✓ tests/experience/collect-playwright.test.mjs > Playwright capture collection > rejects capture from a different tree 29ms
+ ✓ tests/experience/gates.test.mjs > current request readiness > validates the actual current request and all actual scoped app contracts 2ms
+ ✓ tests/experience/gates.test.mjs > current request readiness > rejects a requirement without expected 2ms
+ ✓ tests/experience/gates.test.mjs > current request readiness > rejects a requirement without proof 1ms
+ ✓ tests/experience/gates.test.mjs > current request readiness > rejects a missing scenario and an app with no requested dimensions 1ms
+ ✓ tests/experience/collect-playwright.test.mjs > Playwright capture collection > rejects stale time, wrong origin and stale native assets 48ms
+ ✓ tests/experience/collect-playwright.test.mjs > Playwright capture collection > resolves a null deployed tree through the verified full commit object 47ms
+ ✓ tests/experience/collect-playwright.test.mjs > Playwright capture collection > rejects unknown scenarios, incomplete metadata and missing screenshot pairs 43ms
+ ✓ tests/experience/collect-playwright.test.mjs > Playwright capture collection > rejects escaped directories/symlinks and changes to already imported metadata 64ms
+ ✓ tests/experience/collect-playwright.test.mjs > Playwright capture collection > rehashes retained sidecars and detects metadata/report mismatches at validation 41ms
+ ✓ tests/experience/gates.test.mjs > current request readiness > requires an independent challenge, current contract hash and complete observations 286ms
+ ✓ tests/experience/gates.test.mjs > current request readiness > invalidates review when only normative workflow policy changes 266ms
+ ✓ tests/experience/gates.test.mjs > candidate evidence and independent review > accepts a complete internally consistent fixture (never a product aesthetic verdict) 367ms
+ ✓ tests/experience/gates.test.mjs > candidate evidence and independent review > rejects missing requirement and scenario coverage 220ms
+ ✓ tests/experience/gates.test.mjs > candidate evidence and independent review > rejects a stale source tree in the report or a single capture 216ms
+ ✓ tests/experience/gates.test.mjs > candidate evidence and independent review > rehashes bytes, rejecting replaced evidence and stale capture timestamps 220ms
+ ✓ tests/experience/gates.test.mjs > candidate evidence and independent review > rejects path traversal and a symlink outside the evidence repository 115ms
+ ✓ tests/experience/gates.test.mjs > candidate evidence and independent review > rejects CSS/log/file-existence evidence in place of actual viewport and dynamic captures 268ms
+ ✓ tests/experience/gates.test.mjs > candidate evidence and independent review > rejects full-page images relabeled as viewport screenshots 105ms
+ ✓ tests/experience/gates.test.mjs > candidate evidence and independent review > rejects duplicate sequence frames and modified frame checksums 239ms
+ ✓ tests/experience/gates.test.mjs > candidate evidence and independent review > rejects failed automation, missing log proof, and uncovered checks 503ms
+ ✓ tests/experience/gates.test.mjs > candidate evidence and independent review > rejects self-only approval and missing observed artifact references 238ms
+ ✓ tests/experience/gates.test.mjs > candidate evidence and independent review > requires the independent reviewer to inspect every linked scenario and dynamic proof 123ms
+ ✓ tests/experience/gates.test.mjs > candidate evidence and independent review > rejects mismatched review report/tree/environment and unresolved major findings 478ms
+ ✓ tests/experience/gates.test.mjs > candidate evidence and independent review > revalidates retained promotion inputs instead of trusting an approved label 207ms
+ ✓ tests/experience/gates.test.mjs > deployment identity and explicit rollout policy > requires fresh live evidence after promotion 122ms
+ ✓ tests/experience/gates.test.mjs > deployment identity and explicit rollout policy > rejects wrong live commit and cross-origin identity 23ms
+ ✓ tests/experience/gates.test.mjs > deployment identity and explicit rollout policy > supports a different squash/release commit only when its exact tree matches 73ms
+ ✓ tests/experience/gates.test.mjs > deployment identity and explicit rollout policy > rejects a stale native asset bundle even when the deployment commit matches 69ms
+ ✓ tests/experience/gates.test.mjs > deployment identity and explicit rollout policy > accepts only passed runs; hotfix remains unaccepted and needs an owned follow-up 153ms
+ ✓ tests/experience/gates.test.mjs > deployment identity and explicit rollout policy > requires the known-good target and verified rollback smoke 133ms
+ ✓ tests/experience/gates.test.mjs > deployment identity and explicit rollout policy > validates actual rollback smoke and rejects missing app coverage or self-review 293ms
+
+ Test Files  2 passed (2)
+      Tests  36 passed (36)
+   Start at  00:27:05
+   Duration  5.14s (transform 194ms, setup 0ms, import 421ms, tests 5.19s, environment 0ms)
+
+
+
+exit=0; error=none

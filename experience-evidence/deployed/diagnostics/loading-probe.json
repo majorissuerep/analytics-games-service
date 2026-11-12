@@ -1,0 +1,14 @@
+{
+  "fixture": "Real app loading overlay and real pointer selection after readiness. A2.5s JavaScript route delay was installed but intercepted zero requests, so no induced slow-network claim is made.",
+  "delayedRequests": 0,
+  "loading": {
+    "busy": "true",
+    "hostHit": false,
+    "hitTag": "DIV",
+    "hitClass": "ui-loading-content"
+  },
+  "readyControlHit": true,
+  "actualInput": "Click native Level selector then ArrowDown Enter",
+  "selected": "intermediate",
+  "cells": 256
+}

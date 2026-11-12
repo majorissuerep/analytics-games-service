@@ -1,0 +1,31 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/deployed/browser/experience-contracts-Chess-ed9a1-ions-on-constrained-screens/chess-resize-outer-960-900.png",
+      "sha256": "9b6a6edc2e3d7cea3c20e71f8da185120600eb032ec81e298cd857d12e3ad612",
+      "bytes": 1958368,
+      "capturedAt": "2026-11-12T00:20:44.320Z",
+      "state": "outer-960-900"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/experience-contracts-Chess-ed9a1-ions-on-constrained-screens/chess-resize-outer-1200-1100.png",
+      "sha256": "5abe3f8a0843be9f48cb35958fb5745d20e0282989bf8e479f75736bd5c81ed3",
+      "bytes": 1590887,
+      "capturedAt": "2026-11-12T00:20:46.218Z",
+      "state": "outer-1200-1100"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/experience-contracts-Chess-ed9a1-ions-on-constrained-screens/chess-resize-outer-1600-1300.png",
+      "sha256": "62309bb39fee2254aaaffa9902a6660f83c5f48ec7eb20df3c8345fe53da7741",
+      "bytes": 734860,
+      "capturedAt": "2026-11-12T00:20:47.951Z",
+      "state": "outer-1600-1300"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: outer-960-900 → outer-1200-1100 → outer-1600-1300. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

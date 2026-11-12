@@ -1,0 +1,66 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-right-click-flag.png",
+      "sha256": "ed47b0020b9802e7cd049f8bc2184e76fc3b63862d3a1f0ea7a462e637fb0d5f",
+      "bytes": 166637,
+      "capturedAt": "2026-11-12T00:22:30.516Z",
+      "state": "right-click-flag"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-worker-failed.png",
+      "sha256": "c2fb7b1e98f2535d434ae2e32b4f3eb6772c5a092a7043a46e2bf50930e98b6f",
+      "bytes": 167785,
+      "capturedAt": "2026-11-12T00:22:30.849Z",
+      "state": "worker-failed"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-generating-before-reset.png",
+      "sha256": "9cce997ebc543b41179c848250fa55f00f0193cba873da9565f36c7f24fe96a7",
+      "bytes": 174570,
+      "capturedAt": "2026-11-12T00:22:31.265Z",
+      "state": "generating-before-reset"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-reset-rejects-stale-generation.png",
+      "sha256": "58fff9263f235fcf16ce74d1584af0fe22a0bf08933294ec29c79dcfad7f3123",
+      "bytes": 166482,
+      "capturedAt": "2026-11-12T00:22:34.962Z",
+      "state": "reset-rejects-stale-generation"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-retry-playable.png",
+      "sha256": "1da9e5c6815cae183e11e1fa6aabf25980bc3f125160151009f29b7c91478eed",
+      "bytes": 167779,
+      "capturedAt": "2026-11-12T00:22:38.885Z",
+      "state": "retry-playable"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-chord-opened-neighbors.png",
+      "sha256": "cc37a67133ce8dd0b38044239313397f7d329d518415487ad83700245e1b06f9",
+      "bytes": 168578,
+      "capturedAt": "2026-11-12T00:22:39.450Z",
+      "state": "chord-opened-neighbors"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-held-flag-no-reveal.png",
+      "sha256": "aa1916a7c0fb8d9d2c7d7d2c82a7537933b1d66fe09c582ee8bf8f1a3e561d05",
+      "bytes": 166751,
+      "capturedAt": "2026-11-12T00:22:40.360Z",
+      "state": "held-flag-no-reveal"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-moved-cancelled-no-mark-no-reveal.png",
+      "sha256": "feee54f8a296bb01b33b67db84d3b93445f1c6fa0039abc6273c6f003478e819",
+      "bytes": 166391,
+      "capturedAt": "2026-11-12T00:22:41.354Z",
+      "state": "moved-cancelled-no-mark-no-reveal"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: right-click-flag → worker-failed → generating-before-reset → reset-rejects-stale-generation → retry-playable → chord-opened-neighbors → held-flag-no-reveal → moved-cancelled-no-mark-no-reveal. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

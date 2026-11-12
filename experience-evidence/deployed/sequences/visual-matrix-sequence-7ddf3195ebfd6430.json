@@ -1,0 +1,38 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Minefield-requested.png",
+      "sha256": "d9b21c75f023726d734064807d28672e94e67702ed11806d364cb4f73bc7b47e",
+      "bytes": 828183,
+      "capturedAt": "2026-11-12T00:20:52.720Z",
+      "state": "Minefield-requested"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Chess-requested.png",
+      "sha256": "22761a8eb9b243b59ebd001eee2cd0419b82d387784abc375fddb00d048df904",
+      "bytes": 404242,
+      "capturedAt": "2026-11-12T00:20:54.685Z",
+      "state": "Chess-requested"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Space-Cadet-Pinball-requested.png",
+      "sha256": "e17862f4133f9729e6ef7a99545032eb4b2a7b7f59b32c0e6910d46eaba95ff3",
+      "bytes": 533000,
+      "capturedAt": "2026-11-12T00:20:58.873Z",
+      "state": "Space Cadet Pinball-requested"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-chess-solid.png",
+      "sha256": "0fe12140b8bffb239c074f840433211acbbd1e49fdea1e8afd21059b4c7f794e",
+      "bytes": 328402,
+      "capturedAt": "2026-11-12T00:21:00.262Z",
+      "state": "chess-solid"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: Minefield-requested → Chess-requested → Space Cadet Pinball-requested → chess-solid. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

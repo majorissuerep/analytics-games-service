@@ -1,0 +1,24 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/deployed/browser/experience-contracts-Chess-682f0-e-its-selected-pane-scrolls/chess-play-played-local-move.png",
+      "sha256": "1f4f5592be6b61f145987c92cbbbbe0730003e059fcddffcd52418bd548b20be",
+      "bytes": 295145,
+      "capturedAt": "2026-11-12T00:20:38.861Z",
+      "state": "played-local-move"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/experience-contracts-Chess-682f0-e-its-selected-pane-scrolls/chess-play-undo.png",
+      "sha256": "577f47e9f75caab8867e8de94419620a670daf24bca6402d51cc224ec4d1dc2d",
+      "bytes": 293948,
+      "capturedAt": "2026-11-12T00:20:39.345Z",
+      "state": "undo"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: played-local-move → undo. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

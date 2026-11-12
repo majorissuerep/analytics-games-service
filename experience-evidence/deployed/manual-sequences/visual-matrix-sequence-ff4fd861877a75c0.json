@@ -1,0 +1,38 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/deployed/manual/visual-matrix-native-ready-maximized.png",
+      "sha256": "9863a6ab9ec77696494a0e76da3ee335634b0ce5685e184a0f5d0924004a3d9f",
+      "bytes": 209994,
+      "capturedAt": "2026-11-12T00:19:20.140Z",
+      "state": "native-ready-maximized"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Minefield-maximized.png",
+      "sha256": "f02ed668701cd1f5ee9401c39f23fb0be4af1b4e5e403b175148c114672e40c2",
+      "bytes": 50328,
+      "capturedAt": "2026-11-12T00:20:53.024Z",
+      "state": "Minefield-maximized"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Chess-maximized.png",
+      "sha256": "95434e9d26ea8b34f220dc261f8eefc3ec5a25f70ce303578c19e3da97a4182f",
+      "bytes": 164440,
+      "capturedAt": "2026-11-12T00:20:55.153Z",
+      "state": "Chess-maximized"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Space-Cadet-Pinball-maximized.png",
+      "sha256": "9c27062f45cd8db3c46ae4763439f04a81b02dca28088f96cc9195ba6da0c0ff",
+      "bytes": 211377,
+      "capturedAt": "2026-11-12T00:20:59.352Z",
+      "state": "Space Cadet Pinball-maximized"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: native-ready-maximized → Minefield-maximized → Chess-maximized → Space Cadet Pinball-maximized. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

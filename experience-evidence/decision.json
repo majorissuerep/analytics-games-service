@@ -1,0 +1,9 @@
+{
+  "decision": "accept",
+  "owner": "root",
+  "rationale": "Merged b63e82a0af6d5648f85c431b178914e90163dbdc resolves to the approved source tree. All81 applicable production browser cases passed first attempt; post-merge CI passed85. Fresh manual touch, archive, layout and gameplay evidence independently passed all13 scenarios. Actual production native payload hashes match source. No open major/blocking findings; native raster-edge polish remains minor. The early manual-harness readiness concern was resolved by direct loading-overlay hit testing and actual input after readiness, with diagnostics retained.",
+  "primaryTaskUsable": true,
+  "dataRisk": false,
+  "widespreadFailure": false,
+  "recoveryFailed": false
+}

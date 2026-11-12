@@ -1,0 +1,31 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-ce44c-e-and-constrained-workspace/shell-sizing-game-chess-requested.png",
+      "sha256": "344afc56d264e10254be8414134eeddeb1a61f732ee39a64a62273b0d3f98a7b",
+      "bytes": 439952,
+      "capturedAt": "2026-11-12T00:19:10.292Z",
+      "state": "requested-clamped1000x758"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-ce44c-e-and-constrained-workspace/shell-sizing-game-chess-maximized.png",
+      "sha256": "0823d06d1ec85bcc55aada54e1b92047986aff441a368b3e77b84858a28415c2",
+      "bytes": 171519,
+      "capturedAt": "2026-11-12T00:19:10.832Z",
+      "state": "maximized1280x758"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-ce44c-e-and-constrained-workspace/shell-sizing-game-chess-user-size-restored.png",
+      "sha256": "cb5b02a19dd615a0bab7a5827bf9429831fe6697248396bdbc75b2bc917b2eeb",
+      "bytes": 782047,
+      "capturedAt": "2026-11-12T00:19:12.096Z",
+      "state": "user-size-restored800x620"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Open live Chess in1280x800; maximize and restore its requested rectangle; resize to800x620; maximize and restore the user rectangle",
+      "observed": "The live requested height clamps once to758px workspace; maximization fills1280x758; both restore cycles preserve the prior measured rectangle, with final800x620 visible"
+    }
+  ]
+}

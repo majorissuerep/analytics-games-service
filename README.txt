@@ -1,31 +1,30 @@
-PR #77 experience acceptance evidence
+PR #77 production acceptance evidence
 
-Repository: https://github.com/majorissuerep/analytics-games-service
-Request: experience/requests/desktop-refinement.json
-Candidate commit: 145ef28f571da314f9b4f3376b9318611a80eea8
-Candidate tree: 5ce1fa38c0a107c0b5173f436d5cfebac7abfafb
-CI run: https://github.com/majorissuerep/analytics-games-service/actions/runs/43123170335
+Live site: https://analytics-games-service.vercel.app
+Merged commit: b63e82a0af6d5648f85c431b178914e90163dbdc
+Approved source tree: 5ce1fa38c0a107c0b5173f436d5cfebac7abfafb
+Candidate evidence tag: qa-pr77-candidate-20261112
+Post-merge CI: https://github.com/majorissuerep/analytics-games-service/actions/runs/43125802143
 
-Extract this archive into a checkout of the candidate revision. Paths are relative
-to the repository. Reports and receipts retain SHA256 hashes for the exact files,
-viewport dimensions, capture times, build identity and native asset identity.
-Manual scripts and measurement logs are included beside their fresh captures.
-The raw browser captures and all sequence frames referenced by the report are
-included; Playwright attachment duplicates are omitted.
+The completed production browser run passed all81 applicable cases without retry.
+Production analytics is disabled; its four enabled-state cases passed in the85-case
+candidate suite and both85-case CI runs. The live report records this distinction.
+Actual downloaded native JS/WASM/data bytes match the approved source hashes.
 
-Read scripts/experience/README.md and docs/experience/WORKFLOW.md for reproduction.
-Request readiness is retained in experience/reviews/desktop-refinement.request.json.
-Candidate promotion is retained in experience-evidence/promotion.json.
-When included, deployed.json, deployed-review.json, decision.json and
-deployed-decision.json are the separate post-release acceptance record.
+Read deployed.json, deployed-review.json and deployed-decision.json together with
+promotion.json and its candidate/request inputs. Capture sidecars contain actual
+build identity, viewport, time, state and SHA256. Manual response fixtures for long
+archive and failure/recovery are explicitly labelled. The initial manual touch
+script attempted a select before readiness; retained diagnostics demonstrate that
+the real loading overlay blocked pointer input and actual selection worked after
+readiness. No induced network delay is claimed by that diagnostic probe.
 
-The CI retry-policy fixture deliberately fails its first attempt and passes its
-retry. Its probe verifies that CI still exits unsuccessfully; this is expected
-negative proof, distinct from the real browser suite, which must pass with no
-failed first attempts. Retained evidence is excluded from source lint/type/test
-discovery. Run report mutations serially; each report has one writer.
+The deployment Playwright config only adds the execution environment's inherited
+HTTPS proxy for API requests. Node24 fetch commands use --use-env-proxy. No TLS
+verification was disabled. The application source is the approved merged tree.
 
-Historical rejected candidates were not promoted. Fresh report identity and the
-independent review, rather than old screenshots or an aggregate green CI status,
-authorize this revision. A future deployment's changed identity will correctly
-reject replay of this historical live gate against that newer deployment.
+Restore this evidence over a checkout of the approved source to reproduce the
+file checks. Workflow and command details are in scripts/experience/README.md.
+A future changed deployment identity correctly rejects replay of this historical
+live gate against the newer deployment; retained checksums certify the files that
+were reviewed for this release.

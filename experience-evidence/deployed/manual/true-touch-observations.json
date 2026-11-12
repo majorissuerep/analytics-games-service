@@ -1,0 +1,102 @@
+{
+  "input": "Chrome Input.dispatchTouchEvent in hasTouch browser context",
+  "observations": [
+    {
+      "scenario": "mine-narrow",
+      "level": "intermediate",
+      "gesture": "CDP touchStart, 12 touchMove events, touchEnd",
+      "before": {
+        "left": 0,
+        "top": 0,
+        "width": 276,
+        "scrollWidth": 392
+      },
+      "after": {
+        "left": 116,
+        "top": 0,
+        "width": 276,
+        "scrollWidth": 392
+      },
+      "marks": {
+        "flags": 0,
+        "reveals": 0
+      },
+      "host": [
+        0,
+        0
+      ],
+      "app": [
+        0,
+        0
+      ]
+    },
+    {
+      "scenario": "mine-narrow",
+      "level": "expert",
+      "gesture": "CDP touchStart, 12 touchMove events, touchEnd",
+      "before": {
+        "left": 116,
+        "top": 0,
+        "width": 276,
+        "scrollWidth": 728
+      },
+      "after": {
+        "left": 378,
+        "top": 0,
+        "width": 276,
+        "scrollWidth": 728
+      },
+      "marks": {
+        "flags": 0,
+        "reveals": 0
+      },
+      "host": [
+        0,
+        0
+      ],
+      "app": [
+        0,
+        0
+      ]
+    },
+    {
+      "scenario": "pinball-narrow",
+      "control": "Left flipper",
+      "gesture": "actual touchStart/touchEnd",
+      "held": true,
+      "released": true,
+      "elapsedThroughReleasedCaptureMs": 866,
+      "firstPositivePull": null,
+      "nativePullAtRelease": null
+    },
+    {
+      "scenario": "pinball-narrow",
+      "control": "Right flipper",
+      "gesture": "actual touchStart/touchEnd",
+      "held": true,
+      "released": true,
+      "elapsedThroughReleasedCaptureMs": 861,
+      "firstPositivePull": null,
+      "nativePullAtRelease": null
+    },
+    {
+      "scenario": "pinball-narrow",
+      "control": "Hold to launch",
+      "gesture": "actual touchStart/touchEnd",
+      "held": true,
+      "released": true,
+      "elapsedThroughReleasedCaptureMs": 4741,
+      "firstPositivePull": {
+        "pull": 1,
+        "observedAfterMs": 117
+      },
+      "nativePullAtRelease": 100
+    },
+    {
+      "scenario": "pinball-narrow",
+      "score": 2000,
+      "ball": "1 / 3",
+      "relaunches": 0
+    }
+  ]
+}

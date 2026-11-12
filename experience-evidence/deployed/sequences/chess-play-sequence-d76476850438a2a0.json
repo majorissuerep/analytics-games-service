@@ -1,0 +1,73 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/deployed/browser/games-reliability-builtin--dd6a2-nd-supports-free-play-hints/chess-play-builtin-stockfish-18-genuine-response.png",
+      "sha256": "b4323ec57411f6c6db5f524d4a0bf8459c29f8b26384f7e9a52a914796c1d31b",
+      "bytes": 110176,
+      "capturedAt": "2026-11-12T00:21:17.411Z",
+      "state": "builtin-stockfish-18-genuine-response"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/games-reliability-builtin--dd6a2-nd-supports-free-play-hints/chess-play-builtin-stockfish-18-selected-hint.png",
+      "sha256": "b3f81c270a9c9b32a7748429d14de8b4cadd49583a919593ad0a8d5aa6c850c3",
+      "bytes": 152534,
+      "capturedAt": "2026-11-12T00:21:20.341Z",
+      "state": "builtin-stockfish-18-selected-hint"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/games-reliability-builtin--39cb3-nd-supports-free-play-hints/chess-play-builtin-stockfish-19-genuine-response.png",
+      "sha256": "1823a04a530f16ed16b8ac4a52935d28d354558a5e95e9765164fafa50559354",
+      "bytes": 110202,
+      "capturedAt": "2026-11-12T00:21:25.535Z",
+      "state": "builtin-stockfish-19-genuine-response"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/games-reliability-builtin--39cb3-nd-supports-free-play-hints/chess-play-builtin-stockfish-19-selected-hint.png",
+      "sha256": "af19554398258fd93fe570c0b4ef5cdf7f05d68df9f3bc440b2cbe554b9eec0d",
+      "bytes": 151071,
+      "capturedAt": "2026-11-12T00:21:29.763Z",
+      "state": "builtin-stockfish-19-selected-hint"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/games-reliability-reckless-988d3-nd-supports-free-play-hints/chess-play-reckless-local-genuine-response.png",
+      "sha256": "aa6967f47fa1920ab64f391934ebcb09971417ed7287aed03eac914f5df9a795",
+      "bytes": 110740,
+      "capturedAt": "2026-11-12T00:21:31.984Z",
+      "state": "reckless-local-genuine-response"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/games-reliability-reckless-988d3-nd-supports-free-play-hints/chess-play-reckless-local-selected-hint.png",
+      "sha256": "748104efbcacc657eda95d3fc3ab2fdc999564b0e8f9c797650cb3ed9412f129",
+      "bytes": 153763,
+      "capturedAt": "2026-11-12T00:21:34.543Z",
+      "state": "reckless-local-selected-hint"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/games-reliability-Chess-en-0be9d--preserve-reachable-actions/chess-play-engine-waiting-response.png",
+      "sha256": "56cece853c2a87ed471832ffe7fafa73b18917c6aa7f19dc5c55a736a690cb8e",
+      "bytes": 117009,
+      "capturedAt": "2026-11-12T00:22:03.492Z",
+      "state": "engine-waiting-response"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/games-reliability-Chess-en-0be9d--preserve-reachable-actions/chess-play-recoverable-engine-failure.png",
+      "sha256": "e597834849b5815ba515c9050cdd9e53e0fe147fc650fa0dbc84b4a83b34fd63",
+      "bytes": 115279,
+      "capturedAt": "2026-11-12T00:22:03.756Z",
+      "state": "recoverable-engine-failure"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/games-reliability-Chess-en-0be9d--preserve-reachable-actions/chess-play-genuine-analysis-after-retry.png",
+      "sha256": "33d09df82cae9b33ac7770209f35d4bda1a6726db314720983fbf0e349fb75be",
+      "bytes": 139959,
+      "capturedAt": "2026-11-12T00:22:05.088Z",
+      "state": "genuine-analysis-after-retry"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: builtin-stockfish-18-genuine-response → builtin-stockfish-18-selected-hint → builtin-stockfish-19-genuine-response → builtin-stockfish-19-selected-hint → reckless-local-genuine-response → reckless-local-selected-hint → engine-waiting-response → recoverable-engine-failure → genuine-analysis-after-retry. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

@@ -1,0 +1,953 @@
+$ gh run view 43125802143 --log --exit-status
+Lint, test, typecheck, build	Set up job	﻿2026-11-12T00:14:20.4660270Z Current runner version: '2.338.2'
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4688748Z ##[group]Runner Image Provisioner
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4689612Z Hosted Compute Agent
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4690193Z Version: 20261028.624
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4690944Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4691669Z Build Date: 2026-10-28T21:51:42Z
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4692428Z Worker ID: {f3b8ad1d-8159-4188-bdd2-6d721bbcfa64}
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4693145Z Region: eastus
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4693750Z Cloud: Azure
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4694331Z ##[endgroup]
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4695713Z ##[group]Operating System
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4696469Z Ubuntu
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4696993Z 26.04.1
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4697532Z LTS
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4698258Z ##[endgroup]
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4698819Z ##[group]Runner Image
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4699540Z Image: ubuntu-26.04
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4700115Z Version: 20261101.186.1
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4701308Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261101.186/images/ubuntu/Ubuntu2604-Readme.md
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4703056Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261101.186
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4704108Z ##[endgroup]
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4705272Z ##[group]GITHUB_TOKEN Permissions
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4707152Z Contents: read
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4708111Z Metadata: read
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4708762Z ##[endgroup]
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4710838Z Secret source: Actions
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4712002Z Cache mode: write
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.4712786Z Prepare workflow directory
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.5156574Z Prepare all required actions
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.5205124Z Getting action download info
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.6979908Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:20.8474246Z Download action repository 'actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:21.0112564Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+Lint, test, typecheck, build	Set up job	2026-11-12T00:14:21.3662609Z Complete job name: Lint, test, typecheck, build
+Lint, test, typecheck, build	Initialize containers	﻿2026-11-12T00:14:21.4521095Z ##[group]Checking docker version
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:21.4543386Z ##[command]/usr/bin/docker version --format '{{.Server.APIVersion}}'
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:23.4718812Z '1.54'
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:23.4737635Z Docker daemon API version: '1.54'
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:23.4738536Z ##[command]/usr/bin/docker version --format '{{.Client.APIVersion}}'
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:23.5410977Z '1.54'
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:23.5427752Z Docker client API version: '1.54'
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:23.5433969Z ##[endgroup]
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:23.5436742Z ##[group]Clean up resources from previous jobs
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:23.5442240Z ##[command]/usr/bin/docker ps --all --quiet --no-trunc --filter "label=c2d0b0"
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:23.5766601Z ##[command]/usr/bin/docker network prune --force --filter "label=c2d0b0"
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:23.5914237Z ##[endgroup]
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:23.5914652Z ##[group]Create local container network
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:23.5923706Z ##[command]/usr/bin/docker network create --label c2d0b0 github_network_dee5d9fa31f545cd930a6c7959b5379a
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:23.6421644Z 015392104a501a9f4861c02cee9427e14a8d62caca12c075e4b3954eeb61dd46
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:23.6445884Z ##[endgroup]
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:23.6470949Z ##[group]Starting postgres service container
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:23.6491624Z ##[command]/usr/bin/docker pull postgres:17-alpine@sha256:e5d2edd28b1f8d40a0a6c0c9cdc545b19b56a0d5d88f94bc11a97d970d4700d0
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:23.9915923Z docker.io/library/postgres@sha256:e5d2edd28b1f8d40a0a6c0c9cdc545b19b56a0d5d88f94bc11a97d970d4700d0: Pulling from library/postgres
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.1102712Z 253db6c496ed: Pulling fs layer
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.1104428Z 0465fcfe7974: Pulling fs layer
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.1106549Z 5c816eed2102: Pulling fs layer
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.1110083Z 4af2f594366f: Pulling fs layer
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.1110907Z 881fc932939e: Pulling fs layer
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.1112270Z a6e011ae4b07: Pulling fs layer
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.1112740Z 80bf5832b7b5: Pulling fs layer
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.1113171Z 06b8a748e903: Pulling fs layer
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.1113649Z bdfe5a2c0729: Pulling fs layer
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.1114279Z e0de8084b760: Pulling fs layer
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.1666629Z 253db6c496ed: Download complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.1669846Z 0465fcfe7974: Download complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.1675448Z 4af2f594366f: Download complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.1688440Z 5c816eed2102: Download complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.1716904Z 80bf5832b7b5: Download complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.2653130Z a6e011ae4b07: Download complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.2656178Z bdfe5a2c0729: Download complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.2658290Z 881fc932939e: Download complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.2665536Z e0de8084b760: Download complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.2667689Z 6181e1346d1c: Download complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.2672995Z c932c337cdf0: Download complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.4679348Z 4af2f594366f: Pull complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.4721823Z 80bf5832b7b5: Pull complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.4748550Z a6e011ae4b07: Pull complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.4791633Z 881fc932939e: Pull complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:24.6652847Z 06b8a748e903: Download complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:26.2546597Z 253db6c496ed: Pull complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:26.2556564Z 0465fcfe7974: Pull complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:26.2567086Z 5c816eed2102: Pull complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:26.2578677Z bdfe5a2c0729: Pull complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:26.2601091Z e0de8084b760: Pull complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:26.2614109Z 06b8a748e903: Pull complete
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:26.2616278Z Digest: sha256:e5d2edd28b1f8d40a0a6c0c9cdc545b19b56a0d5d88f94bc11a97d970d4700d0
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:26.2618591Z Status: Downloaded newer image for postgres@sha256:e5d2edd28b1f8d40a0a6c0c9cdc545b19b56a0d5d88f94bc11a97d970d4700d0
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:26.2624132Z docker.io/library/postgres:17-alpine@sha256:e5d2edd28b1f8d40a0a6c0c9cdc545b19b56a0d5d88f94bc11a97d970d4700d0
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:26.2721085Z ##[command]/usr/bin/docker create --name b4396b2a48b74e57a71f473a137af6a4_postgres17alpinesha256e5d2edd28b1f8d40a0a6c0c9cdc545b19b56a0d5d88f94bc11a97d970d4700d0_eb4ad8 --label c2d0b0 --network github_network_dee5d9fa31f545cd930a6c7959b5379a --network-alias postgres -p 5432:5432 --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10 -e "POSTGRES_USER=analytics_games" -e "POSTGRES_PASSWORD=analytics_games" -e "POSTGRES_DB=analytics_games" -e GITHUB_ACTIONS=true -e CI=true postgres:17-alpine@sha256:e5d2edd28b1f8d40a0a6c0c9cdc545b19b56a0d5d88f94bc11a97d970d4700d0
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:26.9626799Z 843a01bb7ab8f7ae1567043677c0348b75bb6327e94527845d9c830c41434161
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:26.9655833Z ##[command]/usr/bin/docker start 843a01bb7ab8f7ae1567043677c0348b75bb6327e94527845d9c830c41434161
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:28.1115507Z 843a01bb7ab8f7ae1567043677c0348b75bb6327e94527845d9c830c41434161
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:28.1141004Z ##[command]/usr/bin/docker ps --all --filter id=843a01bb7ab8f7ae1567043677c0348b75bb6327e94527845d9c830c41434161 --filter status=running --no-trunc --format "{{.ID}} {{.Status}}"
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:28.1456819Z 843a01bb7ab8f7ae1567043677c0348b75bb6327e94527845d9c830c41434161 Up 1 second (health: starting)
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:28.1483305Z ##[command]/usr/bin/docker port 843a01bb7ab8f7ae1567043677c0348b75bb6327e94527845d9c830c41434161
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:28.1633577Z 5432/tcp -> 0.0.0.0:5432
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:28.1634491Z 5432/tcp -> [::]:5432
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:28.1695854Z ##[endgroup]
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:28.1704787Z ##[group]Waiting for all services to be ready
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:28.1718943Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 843a01bb7ab8f7ae1567043677c0348b75bb6327e94527845d9c830c41434161
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:28.1881645Z starting
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:28.1943574Z postgres service is starting, waiting 2 seconds before checking again.
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:30.1950721Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 843a01bb7ab8f7ae1567043677c0348b75bb6327e94527845d9c830c41434161
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:30.2091930Z starting
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:30.2109321Z postgres service is starting, waiting 4 seconds before checking again.
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:34.5842836Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 843a01bb7ab8f7ae1567043677c0348b75bb6327e94527845d9c830c41434161
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:34.6049899Z healthy
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:34.6070179Z postgres service is healthy.
+Lint, test, typecheck, build	Initialize containers	2026-11-12T00:14:34.6070927Z ##[endgroup]
+Lint, test, typecheck, build	Checkout	﻿2026-11-12T00:14:34.6445346Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6446016Z with:
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6446239Z   persist-credentials: false
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6446544Z   repository: majorissuerep/analytics-games-service
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6449559Z   token: ***
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6449778Z   ssh-strict: true
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6449992Z   ssh-user: git
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6450212Z   clean: true
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6450433Z   sparse-checkout-cone-mode: true
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6450686Z   fetch-depth: 1
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6450881Z   fetch-tags: false
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6451091Z   show-progress: true
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6451298Z   lfs: false
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6451482Z   submodules: false
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6451688Z   set-safe-directory: true
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6451930Z   allow-unsafe-pr-checkout: false
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6452398Z env:
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6452930Z   DATABASE_URL: ***localhost:5432/analytics_games?sslmode=disable
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6453286Z   EVENT_TRACKING_ENABLED: true
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6453580Z   EVENT_WRITE_KEY: local-ci-placeholder
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6453866Z   EVENT_TRACKING_URL: http://127.0.0.1:9
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6454144Z   PLAYWRIGHT_START_SERVER: true
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6454403Z   PLAYWRIGHT_CHANNEL: chrome
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.6454632Z ##[endgroup]
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9025399Z Syncing repository: majorissuerep/analytics-games-service
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9027475Z ##[group]Getting Git version info
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9028595Z Working directory is '/home/runner/work/analytics-games-service/analytics-games-service'
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9029824Z [command]/usr/bin/git version
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9039915Z git version 2.56.0
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9060518Z ##[endgroup]
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9073318Z Temporarily overriding HOME='/home/runner/work/_temp/d598f39b-5810-4a17-ae55-fffe78864917' before making global git config changes
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9074245Z Adding repository directory to the temporary git global config as a safe directory
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9080666Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/analytics-games-service/analytics-games-service
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9145807Z Deleting the contents of '/home/runner/work/analytics-games-service/analytics-games-service'
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9149499Z ##[group]Initializing the repository
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9153997Z [command]/usr/bin/git init /home/runner/work/analytics-games-service/analytics-games-service
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9248683Z hint: Using 'master' as the name for the initial branch. This default branch name
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9249658Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9250265Z hint: to use in all of your new repositories, which will suppress this warning,
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9250717Z hint: call:
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9250931Z hint:
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9251260Z hint: 	git config --global init.defaultBranch <name>
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9251567Z hint:
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9251982Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9252668Z hint: 'development'. The just-created branch can be renamed via this command:
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9253095Z hint:
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9253307Z hint: 	git branch -m <name>
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9253700Z hint:
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9254100Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9266606Z Initialized empty Git repository in /home/runner/work/analytics-games-service/analytics-games-service/.git/
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9276669Z [command]/usr/bin/git remote add origin https://github.com/majorissuerep/analytics-games-service
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9320205Z ##[endgroup]
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9320697Z ##[group]Disabling automatic garbage collection
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9324085Z [command]/usr/bin/git config --local gc.auto 0
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9354405Z ##[endgroup]
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9354799Z ##[group]Setting up auth
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9361658Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9393678Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9824568Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:34.9856226Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:35.0121777Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:35.0153409Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:35.0420211Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:35.0459725Z ##[endgroup]
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:35.0470652Z ##[group]Fetching the repository
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:35.0471760Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +b63e82a0af6d5648f85c431b178914e90163dbdc:refs/remotes/origin/master
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:36.5344701Z From https://github.com/majorissuerep/analytics-games-service
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:36.5345361Z  * [new ref]         b63e82a0af6d5648f85c431b178914e90163dbdc -> origin/master
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:36.5356814Z ##[endgroup]
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:36.5357288Z ##[group]Determining the checkout info
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:36.5358024Z ##[endgroup]
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:36.5359706Z [command]/usr/bin/git sparse-checkout disable
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:36.5408711Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:36.5439175Z ##[group]Checking out the ref
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:36.5443424Z [command]/usr/bin/git checkout --progress --force -B master refs/remotes/origin/master
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:37.0355169Z Reset branch 'master'
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:37.0361321Z branch 'master' set up to track 'origin/master'.
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:37.0386452Z ##[endgroup]
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:37.0434716Z [command]/usr/bin/git log -1 --format=%H
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:37.0458640Z b63e82a0af6d5648f85c431b178914e90163dbdc
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:37.0468765Z ##[group]Removing auth
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:37.0472266Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:37.0503983Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:37.0784047Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:37.0807688Z http.https://github.com/.extraheader
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:37.0816841Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:37.0851861Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:37.1116251Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:37.1147972Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Lint, test, typecheck, build	Checkout	2026-11-12T00:14:37.1413626Z ##[endgroup]
+Lint, test, typecheck, build	Setup Node	﻿2026-11-12T00:14:37.1673125Z ##[group]Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.1673531Z with:
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.1673729Z   node-version: 24
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.1673929Z   cache: npm
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.1674116Z   always-auth: false
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.1674328Z   check-latest: false
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.1676999Z   token: ***
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.1677186Z env:
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.1677681Z   DATABASE_URL: ***localhost:5432/analytics_games?sslmode=disable
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.1678353Z   EVENT_TRACKING_ENABLED: true
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.1678626Z   EVENT_WRITE_KEY: local-ci-placeholder
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.1678924Z   EVENT_TRACKING_URL: http://127.0.0.1:9
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.1679213Z   PLAYWRIGHT_START_SERVER: true
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.1679469Z   PLAYWRIGHT_CHANNEL: chrome
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.1679694Z ##[endgroup]
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.3260895Z Found in cache @ /opt/hostedtoolcache/node/24.22.2/x64
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.3265045Z (node:2858) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.3266050Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:37.3268132Z ##[group]Environment details
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:40.8724278Z node: v24.22.2
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:40.8724584Z npm: 11.19.1
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:40.8724780Z yarn: 1.22.22
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:40.8725318Z ##[endgroup]
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:40.8744861Z [command]/opt/hostedtoolcache/node/24.22.2/x64/bin/npm config get cache
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:41.2100013Z /home/runner/.npm
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:41.2960237Z Cache hit for: node-cache-Linux-x64-npm-f07c2be4b148a6d7a3f52eba047631688b25555925c478771731feca60f80e53
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:41.3065399Z (node:2858) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:42.3530210Z Received 192937984 of 246150690 (78.4%), 183.6 MBs/sec
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:42.5776009Z Received 246150690 of 246150690 (100.0%), 191.3 MBs/sec
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:42.5778193Z Cache Size: ~235 MB (246150690 B)
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:42.5814127Z [command]/usr/bin/tar -xf /home/runner/work/_temp/fe816649-b16b-4d6a-955d-8f9a7219f100/cache.tzst -P -C /home/runner/work/analytics-games-service/analytics-games-service --use-compress-program unzstd
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:43.1366115Z Cache restored successfully
+Lint, test, typecheck, build	Setup Node	2026-11-12T00:14:43.1470973Z Cache restored from key: node-cache-Linux-x64-npm-f07c2be4b148a6d7a3f52eba047631688b25555925c478771731feca60f80e53
+Lint, test, typecheck, build	Install dependencies	﻿2026-11-12T00:14:43.1840789Z ##[group]Run npm ci
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:14:43.1841125Z [36;1mnpm ci[0m
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:14:43.2165562Z shell: /usr/bin/bash -e {0}
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:14:43.2165875Z env:
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:14:43.2166550Z   DATABASE_URL: ***localhost:5432/analytics_games?sslmode=disable
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:14:43.2166934Z   EVENT_TRACKING_ENABLED: true
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:14:43.2167222Z   EVENT_WRITE_KEY: local-ci-placeholder
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:14:43.2167581Z   EVENT_TRACKING_URL: http://127.0.0.1:9
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:14:43.2168266Z   PLAYWRIGHT_START_SERVER: true
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:14:43.2168548Z   PLAYWRIGHT_CHANNEL: chrome
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:14:43.2168807Z ##[endgroup]
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:15:02.0609868Z 
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:15:02.0620151Z added 487 packages, and audited 499 packages in 19s
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:15:02.0620534Z 
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:15:02.0620781Z 159 packages are looking for funding
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:15:02.0621159Z   run `npm fund` for details
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:15:02.3481793Z 
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:15:02.3482901Z 16 vulnerabilities (9 moderate, 6 high, 1 critical)
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:15:02.3483588Z 
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:15:02.3484060Z To address all issues, run:
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:15:02.3484723Z   npm audit fix
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:15:02.3485082Z 
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:15:02.3485404Z Run `npm audit` for details.
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:15:02.3493220Z npm warn install-scripts 2 packages have install scripts not yet covered by allowScripts:
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:15:02.3494242Z npm warn install-scripts   protobufjs@7.6.6 (postinstall: node scripts/postinstall)
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:15:02.3495478Z npm warn install-scripts   unrs-resolver@1.12.2 (postinstall: node postinstall.js)
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:15:02.3496075Z npm warn install-scripts
+Lint, test, typecheck, build	Install dependencies	2026-11-12T00:15:02.3496902Z npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+Lint, test, typecheck, build	Run quality gate	﻿2026-11-12T00:15:02.4958685Z ##[group]Run npm run check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.4959019Z [36;1mnpm run check[0m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.5016335Z shell: /usr/bin/bash -e {0}
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.5016610Z env:
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.5017224Z   DATABASE_URL: ***localhost:5432/analytics_games?sslmode=disable
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.5017616Z   EVENT_TRACKING_ENABLED: true
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.5018122Z   EVENT_WRITE_KEY: local-ci-placeholder
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.5018462Z   EVENT_TRACKING_URL: http://127.0.0.1:9
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.5018781Z   PLAYWRIGHT_START_SERVER: true
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.5019069Z   PLAYWRIGHT_CHANNEL: chrome
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.5019343Z ##[endgroup]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.6067399Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.6068307Z > analytics-games-service@0.1.0 check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.6069145Z > npm run lint && npm run test && npm run typecheck && npm run workspace:check && npm run build
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.6069589Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.7078456Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.7079462Z > analytics-games-service@0.1.0 lint
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.7080191Z > eslint . --max-warnings=0
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:02.7080569Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:11.1009311Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:11.1010193Z > analytics-games-service@0.1.0 test
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:11.1010625Z > vitest run
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:11.1010777Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:11.3789901Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:11.3794385Z [1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90m/home/runner/work/analytics-games-service/analytics-games-service[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:11.3795448Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:11.8139217Z  [32m✓[39m lib/engine/reckless-presentation.test.ts [2m([22m[2m18 tests[22m[2m)[22m[32m 100[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:12.0590422Z  [32m✓[39m games/chess/server.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:12.3141950Z  [32m✓[39m lib/engine/uci-runtime.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:12.5129859Z  [32m✓[39m tests/experience/collect-playwright.test.mjs [2m([22m[2m10 tests[22m[2m)[22m[33m 692[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:12.5451266Z  [32m✓[39m games/chess/client/stockfish.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:12.7727319Z  [32m✓[39m lib/pip/stream.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:12.9947617Z  [32m✓[39m lib/analytics/event-tracking-client.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 291[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:13.0384020Z  [32m✓[39m lib/chess-models/contracts.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 52[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:13.2116210Z  [32m✓[39m games/chess/client/chess-logic.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:13.2558946Z  [32m✓[39m games/chess/client/sound.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 30[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:13.4704260Z  [32m✓[39m lib/analytics/event-contract.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:13.4830518Z  [32m✓[39m lib/pip/session-store.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:13.7898963Z  [32m✓[39m app/api/analytics/events/route.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 106[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:13.8959548Z  [32m✓[39m app/api/chess/analyse/route.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 52[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:14.0958341Z  [32m✓[39m lib/engine/reckless.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:14.3290083Z  [32m✓[39m lib/chess-models/model-match.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:14.6116426Z  [32m✓[39m lib/pip/chat.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:14.8443149Z  [32m✓[39m lib/analytics/controller.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:15.1560000Z  [32m✓[39m lib/engine/client/request-engine.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 62[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:15.2109803Z  [32m✓[39m lib/chess-models/styled-runtime.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 1220[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:15.2111441Z      [33m[2m✓[22m[39m uses the bundled CPU runtime when the sidecar is not configured [33m 1168[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:15.4699875Z [90mstderr[2m | lib/pip/guardrail.test.ts[2m > [22m[2mcontent safety checks[2m > [22m[2mfails closed on HTTP errors, malformed payloads, and network exceptions
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:15.4701808Z [22m[39m[pip-guard] classifier HTTP [33m500[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:15.4707519Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:15.4708981Z  [32m✓[39m lib/pip/guardrail.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 52[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:15.4713759Z [90mstderr[2m | lib/pip/guardrail.test.ts[2m > [22m[2mcontent safety checks[2m > [22m[2mfails closed on HTTP errors, malformed payloads, and network exceptions
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:15.4715517Z [22m[39m[pip-guard] classifier schema mismatch
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:15.4716120Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:15.4717592Z [90mstderr[2m | lib/pip/guardrail.test.ts[2m > [22m[2mcontent safety checks[2m > [22m[2mfails closed on HTTP errors, malformed payloads, and network exceptions
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:15.4729627Z [22m[39m[pip-guard] classifier exception: network down
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:15.4730068Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:15.7161895Z  [32m✓[39m lib/engine/progress-response.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 38[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:15.9341815Z  [32m✓[39m lib/pip/persona.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:16.2139481Z  [32m✓[39m lib/analytics/game-events.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:16.6353676Z  [32m✓[39m lib/chess-models/styled-node-runtime.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 1217[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:16.6355038Z      [33m[2m✓[22m[39m takes the selected repertoire opening move from the bundled book [33m 1099[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:16.8233585Z  [32m✓[39m packages/game-bridge/src/index.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:17.0028272Z  [32m✓[39m games/minefield/model.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:17.1871367Z  [32m✓[39m components/desktop/store.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:17.3785427Z  [32m✓[39m tests/planning/mafia-capacity.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:17.6233034Z  [32m✓[39m lib/platform/external-game-schema.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:17.6859963Z  [32m✓[39m games/minefield/solver.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 1213[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:17.6869425Z      [33m[2m✓[22m[39m certifies random 30x16 boards with 99 mines [33m 977[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:17.7996097Z  [32m✓[39m lib/analytics/internal-relay.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 4[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:17.8775001Z  [32m✓[39m games/chess/time-control.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:17.9795851Z  [32m✓[39m games/chess/client/EvaluationBar.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:18.0649188Z  [32m✓[39m games/catalog.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:18.1759626Z  [32m✓[39m lib/analytics/room-events.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:18.3822318Z  [32m✓[39m lib/engine/server/player-capability.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 6[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:18.4169777Z  [32m✓[39m lib/engine/server/room-password.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 161[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.5539515Z  [32m✓[39m tests/experience/gates.test.mjs [2m([22m[2m26 tests[22m[2m)[22m[33m 7755[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.5554183Z      [33m[2m✓[22m[39m accepts a complete internally consistent fixture (never a product aesthetic verdict) [33m 323[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.5555809Z      [33m[2m✓[22m[39m rejects missing requirement and scenario coverage [33m 404[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.5557285Z      [33m[2m✓[22m[39m rejects a stale source tree in the report or a single capture [33m 421[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.5559080Z      [33m[2m✓[22m[39m rehashes bytes, rejecting replaced evidence and stale capture timestamps [33m 417[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.5560823Z      [33m[2m✓[22m[39m rejects CSS/log/file-existence evidence in place of actual viewport and dynamic captures [33m 528[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.5562539Z      [33m[2m✓[22m[39m rejects duplicate sequence frames and modified frame checksums [33m 519[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.5563614Z      [33m[2m✓[22m[39m rejects failed automation, missing log proof, and uncovered checks [33m 1022[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.5565239Z      [33m[2m✓[22m[39m rejects self-only approval and missing observed artifact references [33m 534[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.5566665Z      [33m[2m✓[22m[39m rejects mismatched review report/tree/environment and unresolved major findings [33m 920[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.5567631Z      [33m[2m✓[22m[39m validates actual rollback smoke and rejects missing app coverage or self-review [33m 369[2mms[22m[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.5574330Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.5582872Z [2m Test Files [22m [1m[32m39 passed[39m[22m[90m (39)[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.5584133Z [2m      Tests [22m [1m[32m212 passed[39m[22m[90m (212)[39m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.5585056Z [2m   Start at [22m 00:15:11
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.5586225Z [2m   Duration [22m 8.16s[2m (transform 950ms, setup 0ms, import 2.35s, tests 13.31s, environment 5ms)[22m
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.5586914Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.6875126Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.6875841Z > analytics-games-service@0.1.0 typecheck
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.6876354Z > tsc --noEmit
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:19.6876515Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:25.2619996Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:25.2620742Z > analytics-games-service@0.1.0 workspace:check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:25.2621265Z > turbo run check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:25.2621430Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:25.3015324Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:25.3015917Z Attention:
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:25.3016661Z Turborepo now collects completely anonymous telemetry regarding usage.
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:25.3018085Z This information is used to shape the Turborepo roadmap and prioritize features.
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:25.3019482Z You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:25.3020729Z https://turborepo.dev/docs/telemetry
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:25.3021122Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:25.3121481Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:25.3126232Z    • Packages in scope: @analytics-games/chess, @analytics-games/cosmic-forge-dev, @analytics-games/game-bridge, @analytics-games/game-shuffle, @analytics-games/minefield, @analytics-games/orbit-pinball, @analytics-games/paintbox, @analytics-games/paperclip-assistant, @analytics-games/plugin-sdk, @analytics-games/session-meter, @analytics-games/sticky-note
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:25.3130237Z    • Running check in 11 packages
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:25.3130601Z    • Remote caching disabled
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:25.3132953Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.3689209Z ##[group]@analytics-games/game-shuffle:check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.3698664Z cache miss, executing 8cd9f9a17bd5c1dc
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.3778174Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.3870224Z > @analytics-games/game-shuffle@1.0.0 check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.3938546Z > tsc --noEmit -p tsconfig.json
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.3968127Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.4028407Z ##[endgroup]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.4109040Z ##[group]@analytics-games/plugin-sdk:check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.4184678Z cache miss, executing 90e35062ef634ca3
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.4218573Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.4268673Z > @analytics-games/plugin-sdk@1.0.0 check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.4315962Z > tsc --noEmit -p tsconfig.json
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.4328674Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.4381401Z ##[endgroup]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.6637033Z ##[group]@analytics-games/orbit-pinball:check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.6699261Z cache miss, executing 7365442a96a1ee63
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.6719876Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.6774952Z > @analytics-games/orbit-pinball@1.0.0 check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.6776177Z > tsc --noEmit -p tsconfig.json
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.6776754Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.6777463Z ##[endgroup]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.8804564Z ##[group]@analytics-games/session-meter:check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.8858969Z cache miss, executing 2b113f4e4bf0abb1
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.8859642Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.8888757Z > @analytics-games/session-meter@1.0.0 check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.8918776Z > tsc --noEmit -p tsconfig.json
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.8948353Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:32.9009010Z ##[endgroup]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.2759206Z ##[group]@analytics-games/game-bridge:check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.2779147Z cache miss, executing a85523648df21298
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.2805605Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.2806489Z > @analytics-games/game-bridge@1.0.0 check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.2807350Z > tsc --noEmit -p tsconfig.json
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.2808059Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.2808776Z ##[endgroup]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.4438615Z ##[group]@analytics-games/sticky-note:check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.4452832Z cache miss, executing 0f0f8bd54ab376c4
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.4453636Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.4454137Z > @analytics-games/sticky-note@1.0.0 check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.4454963Z > tsc --noEmit -p tsconfig.json
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.4455469Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.4456143Z ##[endgroup]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.6799701Z ##[group]@analytics-games/paintbox:check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.6855601Z cache miss, executing 07238b2c5ab68620
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.6879289Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.6921956Z > @analytics-games/paintbox@1.0.0 check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.6978554Z > tsc --noEmit -p tsconfig.json
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.6983409Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.7048801Z ##[endgroup]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8261436Z ##[group]@analytics-games/cosmic-forge-dev:check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8288688Z cache miss, executing ff3676eb125b9998
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8289518Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8377378Z > @analytics-games/cosmic-forge-dev@0.0.0 check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8394405Z > node --test tools/*.node-test.mjs && node tools/validate-content.mjs
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8438211Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8502251Z ✔ the checked-in content graph is valid (36.185595ms)
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8528882Z ✔ a missing body invalidates its system and evaluation (63.424928ms)
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8548527Z ℹ tests 2
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8608719Z ℹ suites 0
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8688902Z ℹ pass 2
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8732863Z ℹ fail 0
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8750726Z ℹ cancelled 0
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8758517Z ℹ skipped 0
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8788208Z ℹ todo 0
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8808445Z ℹ duration_ms 361.683021
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8838522Z Content valid: 2 bodies, 1 system, 1 evaluation
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:33.8857994Z ##[endgroup]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:34.4133219Z ##[group]@analytics-games/minefield:check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:34.4133969Z cache miss, executing 6636867b533741cc
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:34.4134177Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:34.4134351Z > @analytics-games/minefield@1.0.0 check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:34.4134690Z > tsc --noEmit -p tsconfig.json
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:34.4134871Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:34.4135254Z ##[endgroup]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:34.4188925Z ##[group]@analytics-games/paperclip-assistant:check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:34.4193121Z cache miss, executing 1749463db3508417
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:34.4193363Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:34.4193578Z > @analytics-games/paperclip-assistant@1.0.0 check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:34.4193976Z > tsc --noEmit -p tsconfig.json
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:34.4194406Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:34.4194678Z ##[endgroup]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:35.4188441Z ##[group]@analytics-games/chess:check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:35.4188970Z cache miss, executing a50574fd45703674
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:35.4189183Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:35.4189339Z > @analytics-games/chess@1.0.0 check
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:35.4189678Z > tsc --noEmit -p tsconfig.json
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:35.4189857Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:35.4190101Z ##[endgroup]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:35.4192842Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:35.4193110Z  Tasks:    11 successful, 11 total
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:35.4193690Z Cached:    0 cached, 11 total
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:35.4194104Z   Time:    10.118s 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:35.4194320Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:35.5266229Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:35.5266942Z > analytics-games-service@0.1.0 prebuild
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:35.5267604Z > node scripts/fetch-reckless.mjs vendor/native/reckless/reckless
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:35.5268213Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:35.5627455Z [reckless] downloading https://github.com/codedeliveryservice/Reckless/releases/download/v0.9.0/reckless-linux-avx2
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:36.4040396Z [reckless] vendor/native/reckless/reckless ready (62 MiB, sha256 ok)
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:36.4326971Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:36.4327687Z > analytics-games-service@0.1.0 build
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:36.4328803Z > next build --webpack
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:36.4329138Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:36.7912028Z ▲ Next.js 16.3.1 (webpack)
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:36.8355929Z ✓ Running next.config.ts took 44ms
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:36.8359466Z ⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:36.8435505Z Attention: Next.js now collects completely anonymous telemetry regarding usage.
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:36.8436625Z This information is used to shape Next.js' roadmap and prioritize features.
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:36.8437531Z You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:36.8438495Z https://nextjs.org/telemetry
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:36.8438680Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:36.8575070Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:36.8902465Z   Creating an optimized production build ...
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:47.1260863Z ✓ Compiled successfully in 9.9s
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:47.1283124Z   Running TypeScript ...
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:52.9462323Z   Finished TypeScript in 5.8s ...
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:52.9484362Z   Collecting page data using 3 workers ...
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:54.5259297Z   Generating static pages using 3 workers (0/15) ...
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:54.5692415Z   Generating static pages using 3 workers (3/15) 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:54.8524148Z   Generating static pages using 3 workers (7/15) 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:54.8524960Z   Generating static pages using 3 workers (11/15) 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:54.8526055Z ✓ Generating static pages using 3 workers (15/15) in 327ms
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:55.0915257Z   Finalizing page optimization ...
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:15:55.0915820Z   Collecting build traces ...
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8691886Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8714310Z Route (app)
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8715127Z ┌ ƒ /
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8715591Z ├ ○ /_not-found
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8716156Z ├ ƒ /api/admin/chess-models
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8716830Z ├ ƒ /api/admin/chess-models/[modelId]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8718093Z ├ ƒ /api/admin/chess-models/[modelId]/revisions/[revisionId]/decision
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8718876Z ├ ƒ /api/analytics/events
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8719340Z ├ ƒ /api/build-identity
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8719858Z ├ ƒ /api/chess-model-matches
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8720598Z ├ ƒ /api/chess-model-matches/[matchId]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8721363Z ├ ƒ /api/chess-model-matches/[matchId]/moves
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8722106Z ├ ƒ /api/chess-model-matches/[matchId]/pause
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8722756Z ├ ƒ /api/chess-models
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8723324Z ├ ƒ /api/chess-models/[revisionId]/move
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8724029Z ├ ƒ /api/chess-models/submissions/[receiptId]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8724694Z ├ ƒ /api/chess/analyse
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8725269Z ├ ƒ /api/games/[gameId]/leaderboard
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8725833Z ├ ƒ /api/health
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8726390Z ├ ƒ /api/pip/chat
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8727474Z ├ ƒ /api/platform/games
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8728312Z ├ ƒ /api/platform/games/[gameId]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8728842Z ├ ƒ /api/rooms
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8729322Z ├ ƒ /api/rooms/[code]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8729831Z ├ ƒ /api/rooms/[code]/actions
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8730371Z ├ ƒ /api/rooms/[code]/join
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8730893Z ├ ○ /design-system
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8731277Z ├ ○ /develop
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8732189Z ├ ƒ /games/[gameId]
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8732589Z └ ○ /icon.jpg
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8732782Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8732792Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8733004Z ƒ Proxy (Middleware)
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8733223Z 
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8733566Z ○  (Static)   prerendered as static content
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8734194Z ƒ  (Dynamic)  server-rendered on demand
+Lint, test, typecheck, build	Run quality gate	2026-11-12T00:16:03.8734511Z 
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	﻿2026-11-12T00:16:04.0124257Z ##[group]Run npm run experience:contracts
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.0124685Z [36;1mnpm run experience:contracts[0m
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.0125390Z [36;1mnpm run experience:gate -- request --request experience/requests/desktop-refinement.json --review experience/reviews/desktop-refinement.request.json[0m
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.0173936Z shell: /usr/bin/bash -e {0}
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.0174194Z env:
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.0175059Z   DATABASE_URL: ***localhost:5432/analytics_games?sslmode=disable
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.0175436Z   EVENT_TRACKING_ENABLED: true
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.0175715Z   EVENT_WRITE_KEY: local-ci-placeholder
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.0176018Z   EVENT_TRACKING_URL: http://127.0.0.1:9
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.0176297Z   PLAYWRIGHT_START_SERVER: true
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.0176545Z   PLAYWRIGHT_CHANNEL: chrome
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.0176786Z ##[endgroup]
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.1259044Z 
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.1259685Z > analytics-games-service@0.1.0 experience:contracts
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.1260948Z > node scripts/experience/gate.mjs contracts --request experience/requests/desktop-refinement.json
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.1261800Z 
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.2284755Z {
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.2285271Z   "stage": "contracts",
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.2285857Z   "verdict": "valid",
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.2286379Z   "requestId": "desktop-refinement",
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.2287322Z   "requestSha256": "3d3016d15a1b99aa7f85c3bd2c378ab3d42f081c0ead3ec714edcfde281eb377",
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.2288814Z   "contractsSha256": "9ba6185fa1b370bda4ecd72939f96171a6e0b2be10063ad0555238b3646ea59a"
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.2289713Z }
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.3346765Z 
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.3348235Z > analytics-games-service@0.1.0 experience:gate
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.3349518Z > node scripts/experience/gate.mjs request --request experience/requests/desktop-refinement.json --review experience/reviews/desktop-refinement.request.json
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.3350296Z 
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.4462355Z {
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.4462764Z   "stage": "request",
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.4463132Z   "verdict": "ready",
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.4463476Z   "requestId": "desktop-refinement",
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.4463836Z   "reviewer": "experience_gate_review"
+Lint, test, typecheck, build	Validate current experience contracts and independent request review	2026-11-12T00:16:04.4464134Z }
+Lint, test, typecheck, build	Verify native Pinball source and asset provenance	﻿2026-11-12T00:16:04.4625716Z ##[group]Run node scripts/vendor-space-cadet.mjs --verify
+Lint, test, typecheck, build	Verify native Pinball source and asset provenance	2026-11-12T00:16:04.4626199Z [36;1mnode scripts/vendor-space-cadet.mjs --verify[0m
+Lint, test, typecheck, build	Verify native Pinball source and asset provenance	2026-11-12T00:16:04.4674790Z shell: /usr/bin/bash -e {0}
+Lint, test, typecheck, build	Verify native Pinball source and asset provenance	2026-11-12T00:16:04.4675051Z env:
+Lint, test, typecheck, build	Verify native Pinball source and asset provenance	2026-11-12T00:16:04.4675631Z   DATABASE_URL: ***localhost:5432/analytics_games?sslmode=disable
+Lint, test, typecheck, build	Verify native Pinball source and asset provenance	2026-11-12T00:16:04.4675997Z   EVENT_TRACKING_ENABLED: true
+Lint, test, typecheck, build	Verify native Pinball source and asset provenance	2026-11-12T00:16:04.4676276Z   EVENT_WRITE_KEY: local-ci-placeholder
+Lint, test, typecheck, build	Verify native Pinball source and asset provenance	2026-11-12T00:16:04.4676582Z   EVENT_TRACKING_URL: http://127.0.0.1:9
+Lint, test, typecheck, build	Verify native Pinball source and asset provenance	2026-11-12T00:16:04.4676877Z   PLAYWRIGHT_START_SERVER: true
+Lint, test, typecheck, build	Verify native Pinball source and asset provenance	2026-11-12T00:16:04.4677130Z   PLAYWRIGHT_CHANNEL: chrome
+Lint, test, typecheck, build	Verify native Pinball source and asset provenance	2026-11-12T00:16:04.4677370Z ##[endgroup]
+Lint, test, typecheck, build	Verify native Pinball source and asset provenance	2026-11-12T00:16:04.5252179Z Space Cadet engine and CC0 data checksums verified.
+Lint, test, typecheck, build	Install Playwright video encoder	﻿2026-11-12T00:16:04.5347473Z ##[group]Run npx playwright install ffmpeg
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:04.5348121Z [36;1mnpx playwright install ffmpeg[0m
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:04.5395131Z shell: /usr/bin/bash -e {0}
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:04.5395392Z env:
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:04.5396131Z   DATABASE_URL: ***localhost:5432/analytics_games?sslmode=disable
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:04.5396500Z   EVENT_TRACKING_ENABLED: true
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:04.5396771Z   EVENT_WRITE_KEY: local-ci-placeholder
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:04.5397079Z   EVENT_TRACKING_URL: http://127.0.0.1:9
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:04.5397372Z   PLAYWRIGHT_START_SERVER: true
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:04.5397638Z   PLAYWRIGHT_CHANNEL: chrome
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:04.5398167Z ##[endgroup]
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:05.3547205Z Downloading FFmpeg (playwright ffmpeg v1011) from https://cdn.playwright.dev/dbazure/download/playwright/builds/ffmpeg/1011/ffmpeg-linux.zip
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:06.3812191Z |                                                                                |   0% of 2.3 MiB
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:06.4240089Z |■■■■■■■■                                                                        |  10% of 2.3 MiB
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:06.4409374Z |■■■■■■■■■■■■■■■■                                                                |  20% of 2.3 MiB
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:06.4537034Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 2.3 MiB
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:06.4583321Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 2.3 MiB
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:06.4619452Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 2.3 MiB
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:06.4716680Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 2.3 MiB
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:06.4740584Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 2.3 MiB
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:06.4763191Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 2.3 MiB
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:06.4786027Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 2.3 MiB
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:06.4805942Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 2.3 MiB
+Lint, test, typecheck, build	Install Playwright video encoder	2026-11-12T00:16:06.5415317Z FFmpeg (playwright ffmpeg v1011) downloaded to /home/runner/.cache/ms-playwright/ffmpeg-1011
+Lint, test, typecheck, build	Browser regression tests with real chess engines	﻿2026-11-12T00:16:06.5809542Z ##[group]Run npx playwright test tests/e2e/platform.spec.ts tests/e2e/games-reliability.spec.ts tests/e2e/application-design.spec.ts tests/e2e/loading-feedback.spec.ts tests/e2e/catalog-roadmap.spec.ts tests/e2e/space-cadet.spec.ts tests/e2e/app-personalities.spec.ts tests/e2e/experience-contracts.spec.ts tests/e2e/desktop-experience.spec.ts tests/e2e/pinball-experience.spec.ts tests/e2e/pip-clearance.spec.ts tests/e2e/privacy-focus.spec.ts
+Lint, test, typecheck, build	Browser regression tests with real chess engines	2026-11-12T00:16:06.5812664Z [36;1mnpx playwright test tests/e2e/platform.spec.ts tests/e2e/games-reliability.spec.ts tests/e2e/application-design.spec.ts tests/e2e/loading-feedback.spec.ts tests/e2e/catalog-roadmap.spec.ts tests/e2e/space-cadet.spec.ts tests/e2e/app-personalities.spec.ts tests/e2e/experience-contracts.spec.ts tests/e2e/desktop-experience.spec.ts tests/e2e/pinball-experience.spec.ts tests/e2e/pip-clearance.spec.ts tests/e2e/privacy-focus.spec.ts[0m
+Lint, test, typecheck, build	Browser regression tests with real chess engines	2026-11-12T00:16:06.5862442Z shell: /usr/bin/bash -e {0}
+Lint, test, typecheck, build	Browser regression tests with real chess engines	2026-11-12T00:16:06.5862705Z env:
+Lint, test, typecheck, build	Browser regression tests with real chess engines	2026-11-12T00:16:06.5863331Z   DATABASE_URL: ***localhost:5432/analytics_games?sslmode=disable
+Lint, test, typecheck, build	Browser regression tests with real chess engines	2026-11-12T00:16:06.5863696Z   EVENT_TRACKING_ENABLED: true
+Lint, test, typecheck, build	Browser regression tests with real chess engines	2026-11-12T00:16:06.5863961Z   EVENT_WRITE_KEY: local-ci-placeholder
+Lint, test, typecheck, build	Browser regression tests with real chess engines	2026-11-12T00:16:06.5864260Z   EVENT_TRACKING_URL: http://127.0.0.1:9
+Lint, test, typecheck, build	Browser regression tests with real chess engines	2026-11-12T00:16:06.5864557Z   PLAYWRIGHT_START_SERVER: true
+Lint, test, typecheck, build	Browser regression tests with real chess engines	2026-11-12T00:16:06.5864816Z   PLAYWRIGHT_CHANNEL: chrome
+Lint, test, typecheck, build	Browser regression tests with real chess engines	2026-11-12T00:16:06.5865043Z ##[endgroup]
+Lint, test, typecheck, build	Browser regression tests with real chess engines	2026-11-12T00:16:09.4212491Z 
+Lint, test, typecheck, build	Browser regression tests with real chess engines	2026-11-12T00:16:09.4213223Z Running 85 tests using 1 worker
+Lint, test, typecheck, build	Browser regression tests with real chess engines	2026-11-12T00:22:17.9794742Z ················································································
+Lint, test, typecheck, build	Browser regression tests with real chess engines	2026-11-12T00:22:34.8799417Z ·····
+Lint, test, typecheck, build	Browser regression tests with real chess engines	2026-11-12T00:22:34.8840820Z ##[notice]  85 passed (6.5m)
+Lint, test, typecheck, build	Browser regression tests with real chess engines	2026-11-12T00:22:34.8848164Z   85 passed (6.5m)
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	﻿2026-11-12T00:22:35.1320909Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.1321372Z with:
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.1321685Z   name: experience-evidence-b63e82a0af6d5648f85c431b178914e90163dbdc
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.1322152Z   path: test-results/
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	playwright-report/
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	experience-evidence/
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.1322497Z   retention-days: 30
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.1322716Z   if-no-files-found: warn
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.1322944Z   compression-level: 6
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.1323158Z   overwrite: false
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.1323368Z   include-hidden-files: false
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.1323598Z env:
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.1324158Z   DATABASE_URL: ***localhost:5432/analytics_games?sslmode=disable
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.1324518Z   EVENT_TRACKING_ENABLED: true
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.1324789Z   EVENT_WRITE_KEY: local-ci-placeholder
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.1325082Z   EVENT_TRACKING_URL: http://127.0.0.1:9
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.1325358Z   PLAYWRIGHT_START_SERVER: true
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.1325608Z   PLAYWRIGHT_CHANNEL: chrome
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.1325867Z ##[endgroup]
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.3069056Z (node:13181) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.3069948Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.4045501Z Multiple search paths detected. Calculating the least common ancestor of all paths
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.4048358Z The least common ancestor is /home/runner/work/analytics-games-service/analytics-games-service. This will be the root directory of the artifact
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.4049528Z With the provided path, there will be 580 files uploaded
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.4053608Z Artifact name is valid!
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.4054377Z Root directory input is valid!
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.6092516Z Beginning upload of artifact content to blob storage
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:35.9392471Z (node:13181) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:36.1098207Z Uploaded bytes 8388608
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:36.3226904Z Uploaded bytes 16777216
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:36.6247000Z Uploaded bytes 25165824
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:36.9926040Z Uploaded bytes 33554432
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:37.1426626Z Uploaded bytes 41943040
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:37.4597305Z Uploaded bytes 50331648
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:37.7206280Z Uploaded bytes 58720256
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:37.9509293Z Uploaded bytes 67108864
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:38.1752763Z Uploaded bytes 75497472
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:38.5322671Z Uploaded bytes 83886080
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:38.7594909Z Uploaded bytes 92274688
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:39.1454720Z Uploaded bytes 100663296
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:39.4159148Z Uploaded bytes 109051904
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:39.6598556Z Uploaded bytes 117440512
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:39.9992610Z Uploaded bytes 125829120
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:40.2694251Z Uploaded bytes 134217728
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:40.6141056Z Uploaded bytes 142606336
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:40.9071716Z Uploaded bytes 150994944
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:40.9806537Z Uploaded bytes 153999162
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:40.9991074Z Finished uploading artifact content to blob storage!
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:40.9994865Z SHA256 digest of uploaded artifact zip is 3aac3e52c7ab52952e05639090bb9efd540e63d10db71ad11ca1db5dae43feb6
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:40.9996784Z Finalizing artifact upload
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:41.3529240Z Artifact experience-evidence-b63e82a0af6d5648f85c431b178914e90163dbdc.zip successfully finalized. Artifact ID 13902298884
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:41.3530522Z Artifact experience-evidence-b63e82a0af6d5648f85c431b178914e90163dbdc has been successfully uploaded! Final size is 153999162 bytes. Artifact ID is 13902298884
+Lint, test, typecheck, build	Retain viewport, sequence, video and gate evidence	2026-11-12T00:22:41.3549340Z Artifact download URL: https://github.com/majorissuerep/analytics-games-service/actions/runs/43125802143/artifacts/13902298884
+Lint, test, typecheck, build	Post Setup Node	﻿2026-11-12T00:22:41.3802432Z Post job cleanup.
+Lint, test, typecheck, build	Post Setup Node	2026-11-12T00:22:41.5104266Z (node:13217) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Lint, test, typecheck, build	Post Setup Node	2026-11-12T00:22:41.5106001Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Lint, test, typecheck, build	Post Setup Node	2026-11-12T00:22:41.5108804Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-f07c2be4b148a6d7a3f52eba047631688b25555925c478771731feca60f80e53, not saving cache.
+Lint, test, typecheck, build	Post Checkout	﻿2026-11-12T00:22:41.5299511Z Post job cleanup.
+Lint, test, typecheck, build	Post Checkout	2026-11-12T00:22:41.6249968Z [command]/usr/bin/git version
+Lint, test, typecheck, build	Post Checkout	2026-11-12T00:22:41.6295460Z git version 2.56.0
+Lint, test, typecheck, build	Post Checkout	2026-11-12T00:22:41.6339005Z Temporarily overriding HOME='/home/runner/work/_temp/8c64ad66-6499-49f8-ba27-0ca8feb8c9e0' before making global git config changes
+Lint, test, typecheck, build	Post Checkout	2026-11-12T00:22:41.6342725Z Adding repository directory to the temporary git global config as a safe directory
+Lint, test, typecheck, build	Post Checkout	2026-11-12T00:22:41.6345548Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/analytics-games-service/analytics-games-service
+Lint, test, typecheck, build	Post Checkout	2026-11-12T00:22:41.6390453Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Lint, test, typecheck, build	Post Checkout	2026-11-12T00:22:41.6433463Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Lint, test, typecheck, build	Post Checkout	2026-11-12T00:22:41.6758080Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Lint, test, typecheck, build	Post Checkout	2026-11-12T00:22:41.6796700Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Lint, test, typecheck, build	Post Checkout	2026-11-12T00:22:41.7077365Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Lint, test, typecheck, build	Post Checkout	2026-11-12T00:22:41.7113112Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Lint, test, typecheck, build	Stop containers	﻿2026-11-12T00:22:41.7505344Z Print service container logs: b4396b2a48b74e57a71f473a137af6a4_postgres17alpinesha256e5d2edd28b1f8d40a0a6c0c9cdc545b19b56a0d5d88f94bc11a97d970d4700d0_eb4ad8
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7511120Z ##[command]/usr/bin/docker logs --details 843a01bb7ab8f7ae1567043677c0348b75bb6327e94527845d9c830c41434161
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7675851Z  sh: locale: not found
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7676827Z  2026-11-12 00:14:28.562 UTC [35] WARNING:  no usable system locales were found
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7678284Z  initdb: warning: enabling "trust" authentication for local connections
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7679992Z  initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7682166Z  2026-11-12 00:14:29.379 UTC [1] LOG:  starting PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7683639Z  The files belonging to this database system will be owned by user "postgres".
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7684692Z  This user must also own the server process.
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7685178Z  
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7685678Z  The database cluster will be initialized with locale "en_US.utf8".
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7686455Z  The default database encoding has accordingly been set to "UTF8".
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7687468Z  The default text search configuration will be set to "english".
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7688191Z  
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7688518Z  Data page checksums are disabled.
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7688942Z  
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7689444Z  fixing permissions on existing directory /var/lib/postgresql/data ... ok
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7690126Z  creating subdirectories ... ok
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7690669Z  selecting dynamic shared memory implementation ... posix
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7691275Z  selecting default "max_connections" ... 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7691808Z  selecting default "shared_buffers" ... 128MB
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7692318Z  selecting default time zone ... UTC
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7692810Z  creating configuration files ... ok
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7693287Z  running bootstrap script ... ok
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7693791Z  performing post-bootstrap initialization ... ok
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7694324Z  syncing data to disk ... ok
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7694712Z  
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7695003Z  
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7695386Z  Success. You can now start the database server using:
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7695902Z  
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7696296Z      pg_ctl -D /var/lib/postgresql/data -l logfile start
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7696803Z  
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7716890Z  waiting for server to start....2026-11-12 00:14:29.109 UTC [41] LOG:  starting PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7718716Z  2026-11-12 00:14:29.109 UTC [41] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7719732Z  2026-11-12 00:14:29.112 UTC [44] LOG:  database system was shut down at 2026-11-12 00:14:29 UTC
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7720655Z  2026-11-12 00:14:29.117 UTC [41] LOG:  database system is ready to accept connections
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7721326Z   done
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7721633Z  server started
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7721969Z  CREATE DATABASE
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7722294Z  
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7722580Z  
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7723124Z  /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7723806Z  
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7724426Z  waiting for server to shut down....2026-11-12 00:14:29.259 UTC [41] LOG:  received fast shutdown request
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7725372Z  2026-11-12 00:14:29.259 UTC [41] LOG:  aborting any active transactions
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7726386Z  2026-11-12 00:14:29.262 UTC [41] LOG:  background worker "logical replication launcher" (PID 47) exited with exit code 1
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7727312Z  2026-11-12 00:14:29.263 UTC [42] LOG:  shutting down
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7728516Z  2026-11-12 00:14:29.263 UTC [42] LOG:  checkpoint starting: shutdown immediate
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7730449Z  2026-11-12 00:14:29.280 UTC [42] LOG:  checkpoint complete: wrote 926 buffers (5.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.014 s, sync=0.002 s, total=0.018 s; sync files=301, longest=0.001 s, average=0.001 s; distance=4266 kB, estimate=4266 kB; lsn=0/191E820, redo lsn=0/191E820
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7732599Z  2026-11-12 00:14:29.289 UTC [41] LOG:  database system is shut down
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7733165Z   done
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7733478Z  server stopped
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7733803Z  
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7734219Z  PostgreSQL init process complete; ready for start up.
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7734753Z  
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7735248Z  2026-11-12 00:14:29.379 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7736320Z  2026-11-12 00:14:29.379 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7737376Z  2026-11-12 00:14:29.380 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7751965Z  2026-11-12 00:14:29.383 UTC [57] LOG:  database system was shut down at 2026-11-12 00:14:29 UTC
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7753158Z  2026-11-12 00:14:29.387 UTC [1] LOG:  database system is ready to accept connections
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7754140Z  2026-11-12 00:14:33.156 UTC [67] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7755252Z  2026-11-12 00:14:38.195 UTC [74] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7756096Z  2026-11-12 00:14:43.237 UTC [81] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7756940Z  2026-11-12 00:14:48.278 UTC [88] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7757927Z  2026-11-12 00:14:53.328 UTC [95] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7758864Z  2026-11-12 00:14:58.378 UTC [102] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7759715Z  2026-11-12 00:15:03.430 UTC [110] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7760589Z  2026-11-12 00:15:08.480 UTC [117] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7761433Z  2026-11-12 00:15:13.545 UTC [124] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7762293Z  2026-11-12 00:15:18.595 UTC [130] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7763118Z  2026-11-12 00:15:23.651 UTC [137] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7763958Z  2026-11-12 00:15:28.732 UTC [144] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7764794Z  2026-11-12 00:15:33.818 UTC [152] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7765622Z  2026-11-12 00:15:38.869 UTC [158] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7766454Z  2026-11-12 00:15:43.930 UTC [165] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7767294Z  2026-11-12 00:15:48.972 UTC [172] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7768491Z  2026-11-12 00:15:54.029 UTC [179] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7769339Z  2026-11-12 00:15:59.072 UTC [186] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7770175Z  2026-11-12 00:16:04.116 UTC [194] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7771020Z  2026-11-12 00:16:09.177 UTC [202] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7771857Z  2026-11-12 00:16:14.218 UTC [209] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7772688Z  2026-11-12 00:16:19.257 UTC [216] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7773526Z  2026-11-12 00:16:24.304 UTC [225] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7774512Z  2026-11-12 00:16:27.355 UTC [218] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7775816Z  2026-11-12 00:16:27.355 UTC [218] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7777238Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7778703Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7779771Z  2026-11-12 00:16:29.343 UTC [232] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7780857Z  2026-11-12 00:16:34.393 UTC [241] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7781863Z  2026-11-12 00:16:37.236 UTC [234] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7783166Z  2026-11-12 00:16:37.236 UTC [234] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7784580Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7785842Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7786874Z  2026-11-12 00:16:39.450 UTC [249] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7787718Z  2026-11-12 00:16:44.497 UTC [256] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7789227Z  2026-11-12 00:16:44.532 UTC [217] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7790546Z  2026-11-12 00:16:44.532 UTC [217] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7792018Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7793358Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7794820Z  2026-11-12 00:16:44.665 UTC [242] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7796114Z  2026-11-12 00:16:44.665 UTC [242] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7797499Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7798959Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7800126Z  2026-11-12 00:16:45.299 UTC [258] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7801431Z  2026-11-12 00:16:45.299 UTC [258] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7802831Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7804099Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7805275Z  2026-11-12 00:16:45.426 UTC [257] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7806554Z  2026-11-12 00:16:45.426 UTC [257] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7808088Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7809360Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7810531Z  2026-11-12 00:16:45.840 UTC [260] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7811960Z  2026-11-12 00:16:45.840 UTC [260] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7813635Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7815037Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7816440Z  2026-11-12 00:16:45.959 UTC [259] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7818088Z  2026-11-12 00:16:45.959 UTC [259] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7819695Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7838221Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7839739Z  2026-11-12 00:16:46.697 UTC [262] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7841053Z  2026-11-12 00:16:46.697 UTC [262] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7842468Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7843749Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7844938Z  2026-11-12 00:16:48.175 UTC [263] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7846229Z  2026-11-12 00:16:48.175 UTC [263] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7847712Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7849140Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7850200Z  2026-11-12 00:16:49.563 UTC [271] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7851202Z  2026-11-12 00:16:49.820 UTC [272] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7852698Z  2026-11-12 00:16:49.820 UTC [272] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7854097Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7855347Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7856324Z  2026-11-12 00:16:54.616 UTC [280] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7857316Z  2026-11-12 00:16:54.819 UTC [273] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7858631Z  2026-11-12 00:16:54.819 UTC [273] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7859528Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7860278Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7860869Z  2026-11-12 00:16:59.672 UTC [289] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7861332Z  2026-11-12 00:17:04.726 UTC [296] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7861772Z  2026-11-12 00:17:09.782 UTC [304] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7862213Z  2026-11-12 00:17:14.838 UTC [311] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7862771Z  2026-11-12 00:17:15.203 UTC [281] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7863554Z  2026-11-12 00:17:15.203 UTC [281] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7864373Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7865109Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7865687Z  2026-11-12 00:17:19.935 UTC [318] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7866156Z  2026-11-12 00:17:24.989 UTC [326] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7866601Z  2026-11-12 00:17:30.035 UTC [333] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7867026Z  2026-11-12 00:17:35.090 UTC [340] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7867411Z  2026-11-12 00:17:40.142 UTC [347] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7868028Z  2026-11-12 00:17:45.197 UTC [354] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7868746Z  2026-11-12 00:17:50.242 UTC [362] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7869237Z  2026-11-12 00:17:55.303 UTC [368] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7869849Z  2026-11-12 00:18:00.348 UTC [375] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7870236Z  2026-11-12 00:18:05.411 UTC [381] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7870625Z  2026-11-12 00:18:10.472 UTC [388] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7871026Z  2026-11-12 00:18:15.514 UTC [396] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7871434Z  2026-11-12 00:18:20.578 UTC [404] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7871826Z  2026-11-12 00:18:25.632 UTC [410] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7872314Z  2026-11-12 00:18:27.854 UTC [397] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7872974Z  2026-11-12 00:18:27.854 UTC [397] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7873708Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7874363Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7874976Z  2026-11-12 00:18:28.416 UTC [389] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7875635Z  2026-11-12 00:18:28.416 UTC [389] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7876473Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7877100Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7877602Z  2026-11-12 00:18:30.685 UTC [418] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7878278Z  2026-11-12 00:18:31.908 UTC [420] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7878929Z  2026-11-12 00:18:31.908 UTC [420] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7879633Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7880261Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7880799Z  2026-11-12 00:18:35.754 UTC [427] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7881221Z  2026-11-12 00:18:40.795 UTC [435] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7881712Z  2026-11-12 00:18:41.626 UTC [419] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7882359Z  2026-11-12 00:18:41.626 UTC [419] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7883064Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7883696Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7884220Z  2026-11-12 00:18:45.847 UTC [442] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7884716Z  2026-11-12 00:18:46.338 UTC [443] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7885372Z  2026-11-12 00:18:46.338 UTC [443] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7886107Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7886756Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7887269Z  2026-11-12 00:18:50.894 UTC [451] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7887755Z  2026-11-12 00:18:52.613 UTC [452] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7888604Z  2026-11-12 00:18:52.613 UTC [452] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7889312Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7890086Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7890586Z  2026-11-12 00:18:55.946 UTC [459] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7891073Z  2026-11-12 00:18:56.606 UTC [460] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7891726Z  2026-11-12 00:18:56.606 UTC [460] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7892437Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7893068Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7893661Z  2026-11-12 00:19:00.853 UTC [461] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7894310Z  2026-11-12 00:19:00.853 UTC [461] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7895016Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7895784Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7896296Z  2026-11-12 00:19:00.987 UTC [468] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7896781Z  2026-11-12 00:19:05.344 UTC [469] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7897434Z  2026-11-12 00:19:05.344 UTC [469] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7898376Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7899026Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7899539Z  2026-11-12 00:19:06.030 UTC [476] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7900040Z  2026-11-12 00:19:06.891 UTC [477] ERROR:  relation "chess_models" does not exist at character 118
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7900696Z  2026-11-12 00:19:06.891 UTC [477] STATEMENT:  SELECT m.slug, m.display_name, m.description, r.runtime_id, r.source_type,
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7901393Z  	    r.license, r.state, r.updated_at FROM chess_models m JOIN chess_model_revisions r ON r.model_id = m.id
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7902030Z  	    WHERE m.visibility = 'public' AND m.archived = FALSE ORDER BY r.created_at DESC LIMIT 100
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7902523Z  2026-11-12 00:19:11.086 UTC [485] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7902930Z  2026-11-12 00:19:16.145 UTC [493] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7903322Z  2026-11-12 00:19:21.202 UTC [500] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7903719Z  2026-11-12 00:19:26.259 UTC [507] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7904119Z  2026-11-12 00:19:29.482 UTC [55] LOG:  checkpoint starting: time
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7904516Z  2026-11-12 00:19:31.313 UTC [515] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7904902Z  2026-11-12 00:19:36.370 UTC [522] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7905302Z  2026-11-12 00:19:41.424 UTC [528] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7906360Z  2026-11-12 00:19:44.122 UTC [55] LOG:  checkpoint complete: wrote 149 buffers (0.9%); 0 WAL file(s) added, 0 removed, 0 recycled; write=14.637 s, sync=0.002 s, total=14.640 s; sync files=106, longest=0.001 s, average=0.001 s; distance=792 kB, estimate=792 kB; lsn=0/19E48A8, redo lsn=0/19E4850
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7907404Z  2026-11-12 00:19:46.466 UTC [537] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7907961Z  2026-11-12 00:19:51.512 UTC [545] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7908371Z  2026-11-12 00:19:56.573 UTC [552] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7908911Z  2026-11-12 00:20:01.626 UTC [559] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7909304Z  2026-11-12 00:20:06.697 UTC [567] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7909686Z  2026-11-12 00:20:11.750 UTC [575] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7910085Z  2026-11-12 00:20:16.818 UTC [582] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7910474Z  2026-11-12 00:20:21.881 UTC [589] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7910865Z  2026-11-12 00:20:26.948 UTC [596] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7911250Z  2026-11-12 00:20:32.004 UTC [604] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7911639Z  2026-11-12 00:20:37.057 UTC [611] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7912032Z  2026-11-12 00:20:42.122 UTC [618] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7912416Z  2026-11-12 00:20:47.165 UTC [625] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7912807Z  2026-11-12 00:20:52.216 UTC [634] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7913198Z  2026-11-12 00:20:57.289 UTC [642] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7913597Z  2026-11-12 00:21:02.353 UTC [649] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7914102Z  2026-11-12 00:21:07.412 UTC [655] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7914563Z  2026-11-12 00:21:12.480 UTC [664] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7914956Z  2026-11-12 00:21:17.529 UTC [671] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7915355Z  2026-11-12 00:21:22.586 UTC [679] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7915756Z  2026-11-12 00:21:27.653 UTC [687] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7916339Z  2026-11-12 00:21:32.701 UTC [695] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7916745Z  2026-11-12 00:21:37.758 UTC [702] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7917154Z  2026-11-12 00:21:42.826 UTC [709] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7917552Z  2026-11-12 00:21:47.885 UTC [716] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7918148Z  2026-11-12 00:21:52.934 UTC [724] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7918545Z  2026-11-12 00:21:58.012 UTC [731] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7918944Z  2026-11-12 00:22:03.072 UTC [738] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7919333Z  2026-11-12 00:22:08.135 UTC [745] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7919723Z  2026-11-12 00:22:13.193 UTC [753] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7920107Z  2026-11-12 00:22:18.275 UTC [761] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7920498Z  2026-11-12 00:22:23.324 UTC [767] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7920886Z  2026-11-12 00:22:28.387 UTC [776] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7921275Z  2026-11-12 00:22:33.447 UTC [784] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7921664Z  2026-11-12 00:22:38.498 UTC [790] FATAL:  role "root" does not exist
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7927644Z Stop and remove container: b4396b2a48b74e57a71f473a137af6a4_postgres17alpinesha256e5d2edd28b1f8d40a0a6c0c9cdc545b19b56a0d5d88f94bc11a97d970d4700d0_eb4ad8
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.7932766Z ##[command]/usr/bin/docker rm --force 843a01bb7ab8f7ae1567043677c0348b75bb6327e94527845d9c830c41434161
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.9451939Z 843a01bb7ab8f7ae1567043677c0348b75bb6327e94527845d9c830c41434161
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.9500209Z Remove container network: github_network_dee5d9fa31f545cd930a6c7959b5379a
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:41.9506139Z ##[command]/usr/bin/docker network rm github_network_dee5d9fa31f545cd930a6c7959b5379a
+Lint, test, typecheck, build	Stop containers	2026-11-12T00:22:42.0221634Z github_network_dee5d9fa31f545cd930a6c7959b5379a
+Lint, test, typecheck, build	Complete job	﻿2026-11-12T00:22:42.0312374Z Cleaning up orphan processes
+Lint, test, typecheck, build	Complete job	2026-11-12T00:22:42.0756565Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+
+
+exit=0; error=none

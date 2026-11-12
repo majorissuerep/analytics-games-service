@@ -1,0 +1,38 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/deployed/manual/mine-narrow-touch-intermediate-before.png",
+      "sha256": "f6d7a032dc0e5945f834429ddff9a1c3f2cdb7e50342f02111dc3aefdbf72cb6",
+      "bytes": 40339,
+      "capturedAt": "2026-11-12T00:20:30.546Z",
+      "state": "touch-intermediate-before"
+    },
+    {
+      "path": "experience-evidence/deployed/manual/mine-narrow-touch-intermediate-after.png",
+      "sha256": "6aba621fe172018024a3011f9c5733afceccf0fac50e3c34a9cd08bdffbc6e17",
+      "bytes": 40309,
+      "capturedAt": "2026-11-12T00:20:31.595Z",
+      "state": "touch-intermediate-after"
+    },
+    {
+      "path": "experience-evidence/deployed/manual/mine-narrow-touch-expert-before.png",
+      "sha256": "7814e77f8443a5a9a5a5b2a6fb5cd9fd927955ebf636b9a588048406271f9aea",
+      "bytes": 40837,
+      "capturedAt": "2026-11-12T00:20:31.862Z",
+      "state": "touch-expert-before"
+    },
+    {
+      "path": "experience-evidence/deployed/manual/mine-narrow-touch-expert-after.png",
+      "sha256": "b444ef697d3b686a609bf9a4ce16a0aae2d1806e91fb5853786b99b1f8c8a7b9",
+      "bytes": 40943,
+      "capturedAt": "2026-11-12T00:20:32.919Z",
+      "state": "touch-expert-after"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: touch-intermediate-before → touch-intermediate-after → touch-expert-before → touch-expert-after. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-ready-score-and-ball.png",
+      "sha256": "66377b8152401511f9c5ae1a433dc4416dfc51651e2433ae946e8b1f6f2282d6",
+      "bytes": 160412,
+      "capturedAt": "2026-11-12T00:23:44.868Z",
+      "state": "ready-score-and-ball"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-touch-plunger-held.png",
+      "sha256": "39bdf6fe197f5205b38dfd18209f82c161ca8d18e7a12cd0942d7d0acab3fb48",
+      "bytes": 159680,
+      "capturedAt": "2026-11-12T00:23:46.558Z",
+      "state": "touch-plunger-held"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-touch-plunger-full-pull.png",
+      "sha256": "ce625c5904dcadf5dc668e506e9bddcd69ea8e76004dc18043091feb5383d079",
+      "bytes": 159771,
+      "capturedAt": "2026-11-12T00:23:51.082Z",
+      "state": "touch-plunger-full-pull"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-touch-flight-native-score.png",
+      "sha256": "5c2d00831ff78cf707a7d98ea3a8736e97396606af7d8c6d79416aca551a8b9a",
+      "bytes": 162089,
+      "capturedAt": "2026-11-12T00:23:55.542Z",
+      "state": "touch-flight-native-score"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: ready-score-and-ball → touch-plunger-held → touch-plunger-full-pull → touch-flight-native-score. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

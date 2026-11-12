@@ -1,0 +1,73 @@
+{
+  "frames": [
+    {
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-first-action-switch-1.png",
+      "sha256": "f3553ea42f869bd3c40648fed7af6c3ae8234dca933d12927288488a881d62a7",
+      "bytes": 632348,
+      "capturedAt": "2026-11-12T00:19:36.548Z",
+      "state": "first-action-switch-1"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-first-action-switch-5.png",
+      "sha256": "49d5112a960b2c4bcb98f5bc086d3d0cdd53bb0f3a27b9af340166710ad656aa",
+      "bytes": 632313,
+      "capturedAt": "2026-11-12T00:19:37.810Z",
+      "state": "first-action-switch-5"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-first-action-switch-10.png",
+      "sha256": "e791191fa513cafaaa2ef7db8d2df3ff2d54048050cf0669a9dae6410c15061f",
+      "bytes": 631956,
+      "capturedAt": "2026-11-12T00:19:39.221Z",
+      "state": "first-action-switch-10"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-keyboard-activation.png",
+      "sha256": "2db4c100035de41403789b32b227a61a390f611e39ca6980a06f172e8816efe3",
+      "bytes": 633190,
+      "capturedAt": "2026-11-12T00:19:39.757Z",
+      "state": "keyboard-activation"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-continuous-iframe-drag.png",
+      "sha256": "be53e35b953c4237bb4b50b3629e7024fd8ca7bc6d1f3539d385a265ed1d7eab",
+      "bytes": 571111,
+      "capturedAt": "2026-11-12T00:19:40.503Z",
+      "state": "continuous-iframe-drag"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-nested-canvas-first-action-played.png",
+      "sha256": "e1fe85cc86af38a18a79ec0be07f9b223044012648c765e7d9a5171d40ba1245",
+      "bytes": 581125,
+      "capturedAt": "2026-11-12T00:19:58.941Z",
+      "state": "nested-canvas-first-action-played"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-100-active-clicks-stable-stack.png",
+      "sha256": "451331b545ae394be80a02652b733ba51e45b397833dbb67d8217932ee74681f",
+      "bytes": 581632,
+      "capturedAt": "2026-11-12T00:20:11.483Z",
+      "state": "100-active-clicks-stable-stack"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/experience-contracts-backg-cb069-on-the-first-repeated-click/shell-focus-body-click-acted-and-raised.png",
+      "sha256": "9a3895669d4854739cbb9582ee7396f8db6ea98c75726da1cf09cb3c66892518",
+      "bytes": 243202,
+      "capturedAt": "2026-11-12T00:20:33.076Z",
+      "state": "body-click-acted-and-raised"
+    },
+    {
+      "path": "experience-evidence/deployed/browser/experience-contracts-backg-cb069-on-the-first-repeated-click/shell-focus-keyboard-focus-raised.png",
+      "sha256": "ab6c7979067c5b7be152f78fda3f09252419870ffa16b3ad6c0b6e5da7087ef9",
+      "bytes": 244387,
+      "capturedAt": "2026-11-12T00:20:33.545Z",
+      "state": "keyboard-focus-raised"
+    }
+  ],
+  "actions": [
+    {
+      "action": "Capture successive rendered states during the browser scenario",
+      "observed": "Recorded capture state labels: first-action-switch-1 → first-action-switch-5 → first-action-switch-10 → keyboard-activation → continuous-iframe-drag → nested-canvas-first-action-played → 100-active-clicks-stable-stack → body-click-acted-and-raised → keyboard-focus-raised. Interaction outcomes require the command result and independent observation."
+    }
+  ]
+}

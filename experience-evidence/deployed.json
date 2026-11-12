@@ -1,0 +1,4456 @@
+{
+  "schemaVersion": 1,
+  "requestId": "desktop-refinement",
+  "requestSha256": "3d3016d15a1b99aa7f85c3bd2c378ab3d42f081c0ead3ec714edcfde281eb377",
+  "contractsSha256": "9ba6185fa1b370bda4ecd72939f96171a6e0b2be10063ad0555238b3646ea59a",
+  "candidate": {
+    "commit": "b63e82a0af6d5648f85c431b178914e90163dbdc",
+    "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb"
+  },
+  "author": "root",
+  "startedAt": "2026-11-12T00:17:13.218Z",
+  "finishedAt": "2026-11-12T00:30:05.847Z",
+  "environment": {
+    "name": "deployed",
+    "url": "https://analytics-games-service.vercel.app",
+    "configuration": {
+      "analytics": "disabled in production; enabled-consent/focus coverage retained in candidate and CI",
+      "material": "glass and solid",
+      "negativeScenarios": "explicit browser route fixtures for failure/retry and long archive",
+      "ciRetryPolicy": "Retain diagnostic retry; any flaky result fails"
+    }
+  },
+  "automation": [
+    {
+      "id": "deployed-browser",
+      "command": "[\"npx\",\"playwright\",\"test\",\"tests/e2e/platform.spec.ts\",\"tests/e2e/games-reliability.spec.ts\",\"tests/e2e/application-design.spec.ts\",\"tests/e2e/loading-feedback.spec.ts\",\"tests/e2e/catalog-roadmap.spec.ts\",\"tests/e2e/space-cadet.spec.ts\",\"tests/e2e/app-personalities.spec.ts\",\"tests/e2e/experience-contracts.spec.ts\",\"tests/e2e/desktop-experience.spec.ts\",\"tests/e2e/pinball-experience.spec.ts\",\"tests/e2e/pip-clearance.spec.ts\",\"--output=experience-evidence/deployed/browser\",\"--config=experience-evidence/deployed/playwright.config.ts\",\"--grep-invert\",\"self-hosted analytics|standalone privacy stays outside\"]",
+      "status": "passed",
+      "artifactIds": [
+        "deployed-browser-log"
+      ],
+      "requirementIds": [
+        "REF-01",
+        "MINE-01",
+        "MINE-02",
+        "CHESS-01",
+        "CHESS-02",
+        "PIN-01",
+        "SHELL-01",
+        "SHELL-02",
+        "GATE-01"
+      ],
+      "scenarioIds": [
+        "visual-matrix",
+        "mine-start",
+        "mine-input",
+        "mine-expert",
+        "mine-narrow",
+        "chess-sections",
+        "chess-play",
+        "chess-resize",
+        "pinball-play",
+        "pinball-narrow",
+        "shell-sizing",
+        "shell-focus",
+        "gate-negative"
+      ]
+    },
+    {
+      "id": "deployed-gate-negative",
+      "command": "[\"npm\",\"run\",\"experience:test\",\"--\",\"--reporter=verbose\"]",
+      "status": "passed",
+      "artifactIds": [
+        "deployed-gate-negative-log"
+      ],
+      "requirementIds": [
+        "GATE-01"
+      ],
+      "scenarioIds": [
+        "gate-negative"
+      ]
+    },
+    {
+      "id": "post-merge-ci",
+      "command": "[\"gh\",\"run\",\"view\",\"43125802143\",\"--log\",\"--exit-status\"]",
+      "status": "passed",
+      "artifactIds": [
+        "post-merge-ci-log"
+      ],
+      "requirementIds": [
+        "REF-01",
+        "MINE-01",
+        "MINE-02",
+        "CHESS-01",
+        "CHESS-02",
+        "PIN-01",
+        "SHELL-01",
+        "SHELL-02",
+        "GATE-01"
+      ],
+      "scenarioIds": [
+        "visual-matrix",
+        "mine-start",
+        "mine-input",
+        "mine-expert",
+        "mine-narrow",
+        "chess-sections",
+        "chess-play",
+        "chess-resize",
+        "pinball-play",
+        "pinball-narrow",
+        "shell-sizing",
+        "shell-focus",
+        "gate-negative"
+      ]
+    },
+    {
+      "id": "live-native-payloads",
+      "command": "[\"node\",\"--use-env-proxy\",\"experience-evidence/deployed/verify-native.mjs\"]",
+      "status": "passed",
+      "artifactIds": [
+        "live-native-payloads-log"
+      ],
+      "requirementIds": [
+        "PIN-01"
+      ],
+      "scenarioIds": [
+        "pinball-play"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "deployed-browser-log",
+      "scenarioId": "visual-matrix",
+      "kind": "log",
+      "path": "experience-evidence/deployed/browser.log",
+      "sha256": "0720b3985bf8e0f60a99fcc528f8906d988604741e77ae8c7f9b2ab73e874221",
+      "bytes": 12021,
+      "capturedAt": "2026-11-12T00:25:36.149Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested then maximized",
+      "state": "command exit 0"
+    },
+    {
+      "id": "deployed-gate-negative-log",
+      "scenarioId": "gate-negative",
+      "kind": "log",
+      "path": "experience-evidence/deployed/gate-negative.log",
+      "sha256": "03c7819977d3e15ffd47b003f3c6ab8456649d104632ee62061833e92ef595cc",
+      "bytes": 5971,
+      "capturedAt": "2026-11-12T00:27:10.631Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "fixture",
+      "state": "command exit 0"
+    },
+    {
+      "id": "post-merge-ci-log",
+      "scenarioId": "visual-matrix",
+      "kind": "log",
+      "path": "experience-evidence/deployed/post-merge-ci.log",
+      "sha256": "a8500ae1210f252b47d25922d3b14f2ba37e1d5b1f5fe5224c32da36e7967ea4",
+      "bytes": 132929,
+      "capturedAt": "2026-11-12T00:27:30.519Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested then maximized",
+      "state": "command exit 0"
+    },
+    {
+      "id": "live-native-payloads-log",
+      "scenarioId": "pinball-play",
+      "kind": "log",
+      "path": "experience-evidence/deployed/live-native-payloads.log",
+      "sha256": "0b8ba8059bfa04b2ce8eee83c69297f4ecd11ee4d5e274b1ff589e7909910692",
+      "bytes": 727,
+      "capturedAt": "2026-11-12T00:28:21.392Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested920x740",
+      "state": "command exit 0"
+    },
+    {
+      "id": "chess-sections-viewport-1308a38006e95da6",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/application-design-Chess-a-0adb5--without-document-scrolling/chess-sections-models-details-1100.png",
+      "sha256": "e4c4196a8d75ce2e925d851c41dbdb4d5f5242c08a907647c0b91c88edd5107f",
+      "bytes": 76591,
+      "capturedAt": "2026-11-12T00:18:33.158Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1100,
+        "height": 800
+      },
+      "window": "standalone-embedded",
+      "state": "models-details-1100",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/application-design-Chess-a-0adb5--without-document-scrolling/chess-sections-models-details-1100.json",
+        "sha256": "7787e837d61b2ccc8f7530b66a48608203ed8e6106f97452db78ba19b5e939f9",
+        "bytes": 928
+      }
+    },
+    {
+      "id": "chess-sections-viewport-ade9906d29875a18",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/application-design-Chess-a-0adb5--without-document-scrolling/chess-sections-models-details-320.png",
+      "sha256": "63f2e64fbd0814a4e8afac5992f7a7d67e6267618432af11228b541c220d6e35",
+      "bytes": 40208,
+      "capturedAt": "2026-11-12T00:18:34.135Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "standalone-embedded",
+      "state": "models-details-320",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/application-design-Chess-a-0adb5--without-document-scrolling/chess-sections-models-details-320.json",
+        "sha256": "1b0cd00bdfc23c6139a634372b128a929d004e7dff7d49b28ea7ac0a570169d9",
+        "bytes": 926
+      }
+    },
+    {
+      "id": "chess-sections-viewport-507b34cd64485086",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/application-design-Chess-a-0adb5--without-document-scrolling/chess-sections-models-details-920.png",
+      "sha256": "dbbfbde71123ab5950788069cdeffb7cd5b3258949330817ae17bd01e8afb51b",
+      "bytes": 59743,
+      "capturedAt": "2026-11-12T00:18:32.033Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 920,
+        "height": 680
+      },
+      "window": "standalone-embedded",
+      "state": "models-details-920",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/application-design-Chess-a-0adb5--without-document-scrolling/chess-sections-models-details-920.json",
+        "sha256": "733b4dde6a8936b1af2366be732b65d6ca5e7929f3081d34c2c225508b0b7748",
+        "bytes": 926
+      }
+    },
+    {
+      "id": "shell-focus-viewport-61914de25e7b2c85",
+      "scenarioId": "shell-focus",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-100-active-clicks-stable-stack.png",
+      "sha256": "451331b545ae394be80a02652b733ba51e45b397833dbb67d8217932ee74681f",
+      "bytes": 581632,
+      "capturedAt": "2026-11-12T00:20:11.483Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "100-active-clicks-stable-stack",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-100-active-clicks-stable-stack.json",
+        "sha256": "90828e01eed18c1813d43fa7a31907ec0ee021f73c7a7f91f121208b2b2b1632",
+        "bytes": 904
+      }
+    },
+    {
+      "id": "shell-focus-viewport-74350026ca172925",
+      "scenarioId": "shell-focus",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-continuous-iframe-drag.png",
+      "sha256": "be53e35b953c4237bb4b50b3629e7024fd8ca7bc6d1f3539d385a265ed1d7eab",
+      "bytes": 571111,
+      "capturedAt": "2026-11-12T00:19:40.503Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "continuous-iframe-drag",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-continuous-iframe-drag.json",
+        "sha256": "50346a3d34c7fe5b533940d5121420bae3d7986c55045125b6356ef4939508f6",
+        "bytes": 896
+      }
+    },
+    {
+      "id": "shell-focus-viewport-d2486e08671bf85e",
+      "scenarioId": "shell-focus",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-first-action-switch-1.png",
+      "sha256": "f3553ea42f869bd3c40648fed7af6c3ae8234dca933d12927288488a881d62a7",
+      "bytes": 632348,
+      "capturedAt": "2026-11-12T00:19:36.548Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "first-action-switch-1",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-first-action-switch-1.json",
+        "sha256": "a074486cf05c305ffac0303c948ca9d2b704a89c84b49f42cfe3413186bca490",
+        "bytes": 895
+      }
+    },
+    {
+      "id": "shell-focus-viewport-3c5042eeb6acd653",
+      "scenarioId": "shell-focus",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-first-action-switch-10.png",
+      "sha256": "e791191fa513cafaaa2ef7db8d2df3ff2d54048050cf0669a9dae6410c15061f",
+      "bytes": 631956,
+      "capturedAt": "2026-11-12T00:19:39.221Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "first-action-switch-10",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-first-action-switch-10.json",
+        "sha256": "78bf6cb932b776b4a844c6d12dbafe8f27d1982d70ff6ba795d9f4eb1b6a79ab",
+        "bytes": 896
+      }
+    },
+    {
+      "id": "shell-focus-viewport-d77e54d306afaa33",
+      "scenarioId": "shell-focus",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-first-action-switch-5.png",
+      "sha256": "49d5112a960b2c4bcb98f5bc086d3d0cdd53bb0f3a27b9af340166710ad656aa",
+      "bytes": 632313,
+      "capturedAt": "2026-11-12T00:19:37.810Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "first-action-switch-5",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-first-action-switch-5.json",
+        "sha256": "49e69a50fb773275048c308554e562f37c49f4db7af08f3fb9c380f6ee64f610",
+        "bytes": 895
+      }
+    },
+    {
+      "id": "shell-focus-viewport-e4ca49e57159f632",
+      "scenarioId": "shell-focus",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-keyboard-activation.png",
+      "sha256": "2db4c100035de41403789b32b227a61a390f611e39ca6980a06f172e8816efe3",
+      "bytes": 633190,
+      "capturedAt": "2026-11-12T00:19:39.757Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "keyboard-activation",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-keyboard-activation.json",
+        "sha256": "bdc2df76ade3c47d36b9dfd7d4a2d851a43ca3e9019bfb1457e6513576fb8ebb",
+        "bytes": 893
+      }
+    },
+    {
+      "id": "shell-focus-viewport-84a517a5500ec31c",
+      "scenarioId": "shell-focus",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-nested-canvas-first-action-played.png",
+      "sha256": "e1fe85cc86af38a18a79ec0be07f9b223044012648c765e7d9a5171d40ba1245",
+      "bytes": 581125,
+      "capturedAt": "2026-11-12T00:19:58.941Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "nested-canvas-first-action-played",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-f-e4a2d-ag-and-bounded-active-stack/shell-focus-nested-canvas-first-action-played.json",
+        "sha256": "21276221aa000b5d4808ec4353ac3820535fb9f87563aa87ea9c89580b57ee61",
+        "bytes": 907
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-d7ba5d2c26835798",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-26fc8-e-and-constrained-workspace/shell-sizing-system-welcome-constrained-1280.png",
+      "sha256": "222a25999fb596ecde063f0316531a378d1248ffe109dd653f3e722eca21d563",
+      "bytes": 558535,
+      "capturedAt": "2026-11-12T00:18:54.106Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 576
+      },
+      "window": "clamped",
+      "state": "system:welcome-constrained-1280",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-26fc8-e-and-constrained-workspace/shell-sizing-system-welcome-constrained-1280.json",
+        "sha256": "3e0ad726536fbfdf72372e3ed93a03b34118b1fcf1bdc9a78193d7c677c9d874",
+        "bytes": 904
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-b7e5f48b3950fd33",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-26fc8-e-and-constrained-workspace/shell-sizing-system-welcome-constrained-390.png",
+      "sha256": "e581274f34dcf0cfe2236af402f411d585bd523e2a2c597d93a6c7cc8afa9ef9",
+      "bytes": 297248,
+      "capturedAt": "2026-11-12T00:18:54.645Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "system:welcome-constrained-390",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-26fc8-e-and-constrained-workspace/shell-sizing-system-welcome-constrained-390.json",
+        "sha256": "ce17532a4ffd5b207bf545e9f7083095806f2718408f9bee75934af705da308d",
+        "bytes": 902
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-8cebee0304b1b7d5",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-26fc8-e-and-constrained-workspace/shell-sizing-system-welcome-maximized.png",
+      "sha256": "b8aa5ad066815a6bceda584fe34202a9f7e1d4ca973574088c07214e4c9c7fc3",
+      "bytes": 176453,
+      "capturedAt": "2026-11-12T00:18:52.316Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "maximized",
+      "state": "system:welcome-maximized",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-26fc8-e-and-constrained-workspace/shell-sizing-system-welcome-maximized.json",
+        "sha256": "993466edf62cf24c227780b6987eda944d54f14246327ae64b410bab5b5f8c7d",
+        "bytes": 899
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-76174fb4ae2013ab",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-26fc8-e-and-constrained-workspace/shell-sizing-system-welcome-requested.png",
+      "sha256": "b7e1dca6e68e675902587638a9c66af4a418fe40bcfd6f18d4b15cda94609761",
+      "bytes": 899795,
+      "capturedAt": "2026-11-12T00:18:51.450Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "system:welcome-requested",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-26fc8-e-and-constrained-workspace/shell-sizing-system-welcome-requested.json",
+        "sha256": "48caf69608f3b47f19ff70fa0f4d4be5531e306a04266171044dcc181e754220",
+        "bytes": 899
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-a2084a6a51b5591a",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-26fc8-e-and-constrained-workspace/shell-sizing-system-welcome-user-size-restored.png",
+      "sha256": "930ea86956947dddba7737ec19132f853aaffe573cfd3f653267929e026a0887",
+      "bytes": 935112,
+      "capturedAt": "2026-11-12T00:18:53.385Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "restored",
+      "state": "system:welcome-user-size-restored",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-26fc8-e-and-constrained-workspace/shell-sizing-system-welcome-user-size-restored.json",
+        "sha256": "c6a6f429b1443e84d356f9e4dd756a615db00ea12fc338e361f7eebbbb93a599",
+        "bytes": 907
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-b9adbff2c32aaa70",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-60296-e-and-constrained-workspace/shell-sizing-system-plugins-constrained-1280.png",
+      "sha256": "75a55ba59e10d94faa80260c0fbce4fb9b45da75216bbc98d9849510f3969069",
+      "bytes": 564709,
+      "capturedAt": "2026-11-12T00:19:03.128Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 576
+      },
+      "window": "clamped",
+      "state": "system:plugins-constrained-1280",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-60296-e-and-constrained-workspace/shell-sizing-system-plugins-constrained-1280.json",
+        "sha256": "aa88310d3f9aced2fbc3b930f1948441684d963d8f89d8af15141dd0face7eb3",
+        "bytes": 904
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-b760ba854638bf89",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-60296-e-and-constrained-workspace/shell-sizing-system-plugins-constrained-390.png",
+      "sha256": "cde9d173a1352397e0acb5744e578bda250f959bfba657a91838faf787ff2408",
+      "bytes": 271342,
+      "capturedAt": "2026-11-12T00:19:03.433Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "system:plugins-constrained-390",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-60296-e-and-constrained-workspace/shell-sizing-system-plugins-constrained-390.json",
+        "sha256": "f246063bab987d6e2f8d1cf8d7774fb296d0b2374063af62fcce9a0521ed7012",
+        "bytes": 902
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-b38eef26119e1f7a",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-60296-e-and-constrained-workspace/shell-sizing-system-plugins-maximized.png",
+      "sha256": "d1a1023b27f73f4a311d4f63757b175592e0a3ccc41f61bd9016f24e1d32235a",
+      "bytes": 108314,
+      "capturedAt": "2026-11-12T00:19:01.594Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "maximized",
+      "state": "system:plugins-maximized",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-60296-e-and-constrained-workspace/shell-sizing-system-plugins-maximized.json",
+        "sha256": "93536775f351e11063639f260850954a3c2a63d80b72b28653f994b531f16075",
+        "bytes": 899
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-c727730db3bf0be7",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-60296-e-and-constrained-workspace/shell-sizing-system-plugins-requested.png",
+      "sha256": "6963a09208d6697d7de12f0b7651ad94ce5fc90f54dca6a959ce3e632b465331",
+      "bytes": 899652,
+      "capturedAt": "2026-11-12T00:19:01.148Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "system:plugins-requested",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-60296-e-and-constrained-workspace/shell-sizing-system-plugins-requested.json",
+        "sha256": "e1a2ac338159ac1ab634254ba68f978b657bc119e028f7c30f186d59e5b2101d",
+        "bytes": 899
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-f19b990c04cbd7d2",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-60296-e-and-constrained-workspace/shell-sizing-system-plugins-user-size-restored.png",
+      "sha256": "8c29c8cfef2766598ee58d372647308726993aaedc6d9feeb5aa796fb45515ee",
+      "bytes": 958218,
+      "capturedAt": "2026-11-12T00:19:02.589Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "restored",
+      "state": "system:plugins-user-size-restored",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-60296-e-and-constrained-workspace/shell-sizing-system-plugins-user-size-restored.json",
+        "sha256": "feb8fd1cefeed3818b4c3a351527b18abd85b02f71177fffeb2b7f2648952d3e",
+        "bytes": 907
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-3015450b0b25388f",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7ddc7-e-and-constrained-workspace/shell-sizing-game-paintbox-constrained-1280.png",
+      "sha256": "3d2c03d1c3f21f14a49b00e72823a9c47c04932ae7ae7556e9e3699366661c2a",
+      "bytes": 350432,
+      "capturedAt": "2026-11-12T00:19:25.972Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 576
+      },
+      "window": "clamped",
+      "state": "game:paintbox-constrained-1280",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7ddc7-e-and-constrained-workspace/shell-sizing-game-paintbox-constrained-1280.json",
+        "sha256": "6a8aaf25f91f9fe6ebdcb87193d7f834fd8912b4f912fcb0654bd36ee74ddb9f",
+        "bytes": 903
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-05413dd89e9c8f25",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7ddc7-e-and-constrained-workspace/shell-sizing-game-paintbox-constrained-390.png",
+      "sha256": "029d16c19725fb0f097cb63085aa903728ea3a084befa1d9d054310a4c2f0231",
+      "bytes": 171636,
+      "capturedAt": "2026-11-12T00:19:26.292Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "game:paintbox-constrained-390",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7ddc7-e-and-constrained-workspace/shell-sizing-game-paintbox-constrained-390.json",
+        "sha256": "c6b42d29e61c172230fb1015b8a2b8f9ca5773fe8b658c736f4f6495c1b6c844",
+        "bytes": 901
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-3229aab8de812703",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7ddc7-e-and-constrained-workspace/shell-sizing-game-paintbox-maximized.png",
+      "sha256": "d954c4a43adc8433e5313bd69ecb9299c8ce908de39176d2aada55793069edd3",
+      "bytes": 50789,
+      "capturedAt": "2026-11-12T00:19:24.180Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "maximized",
+      "state": "game:paintbox-maximized",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7ddc7-e-and-constrained-workspace/shell-sizing-game-paintbox-maximized.json",
+        "sha256": "4119905ecb9e9db54af427416e11367de29d0fdde100f6f94763fe08aaf73630",
+        "bytes": 898
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-dc369ac146b58e89",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7ddc7-e-and-constrained-workspace/shell-sizing-game-paintbox-requested.png",
+      "sha256": "8e3c0ebe9464896a8374f3eb1813919040a38aceee87f8b83c47528db085984c",
+      "bytes": 440470,
+      "capturedAt": "2026-11-12T00:19:23.776Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "game:paintbox-requested",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7ddc7-e-and-constrained-workspace/shell-sizing-game-paintbox-requested.json",
+        "sha256": "91470b8d25264bc2bd482d4c7899ae36522836ddcc5363f77222701cfb207b0e",
+        "bytes": 898
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-8834f8d0cce1b0d1",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7ddc7-e-and-constrained-workspace/shell-sizing-game-paintbox-user-size-restored.png",
+      "sha256": "90e3de73ac2cbf059be01d0d10b2397bcf477cf2c0893366e9f3dc391ef2e14b",
+      "bytes": 711437,
+      "capturedAt": "2026-11-12T00:19:25.440Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "restored",
+      "state": "game:paintbox-user-size-restored",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7ddc7-e-and-constrained-workspace/shell-sizing-game-paintbox-user-size-restored.json",
+        "sha256": "5160d687c02f3f87ef0d52b5ec52ec412bd1280cbcd5e868bd508c1de4310c37",
+        "bytes": 906
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-cf4a34eec477c874",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7f1c1-e-and-constrained-workspace/shell-sizing-system-help-constrained-1280.png",
+      "sha256": "c324aaf9f22692d0c062c1e5e1b6d942f7ad6ddbc5bb9b75362713b9f910b911",
+      "bytes": 475714,
+      "capturedAt": "2026-11-12T00:18:58.670Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 576
+      },
+      "window": "clamped",
+      "state": "system:help-constrained-1280",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7f1c1-e-and-constrained-workspace/shell-sizing-system-help-constrained-1280.json",
+        "sha256": "3cb49bc4a9df73a567bf5e04f1a92196813a048447bdddc37744022f4025286b",
+        "bytes": 901
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-938a44c00edaeba9",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7f1c1-e-and-constrained-workspace/shell-sizing-system-help-constrained-390.png",
+      "sha256": "88ffcff30a75b2731897c6a75e802b086bf7f1ca7be5406eb87309432ac0cced",
+      "bytes": 219583,
+      "capturedAt": "2026-11-12T00:18:58.998Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "system:help-constrained-390",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7f1c1-e-and-constrained-workspace/shell-sizing-system-help-constrained-390.json",
+        "sha256": "f885dd73560b056924e645cf93d3df21a03406ee8c63d3262587f79f074bc4e4",
+        "bytes": 899
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-e15de21fd4c0dcee",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7f1c1-e-and-constrained-workspace/shell-sizing-system-help-maximized.png",
+      "sha256": "95905713810eb817d5c1a3309eea794740bfbbb2dc942e4112fe5564e7448ebe",
+      "bytes": 122084,
+      "capturedAt": "2026-11-12T00:18:57.123Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "maximized",
+      "state": "system:help-maximized",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7f1c1-e-and-constrained-workspace/shell-sizing-system-help-maximized.json",
+        "sha256": "1615334796d531ba32354799920fdd387c5bc3bd0bf8a9152c0f0de823fc6efb",
+        "bytes": 896
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-aa6680fb3e08d97b",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7f1c1-e-and-constrained-workspace/shell-sizing-system-help-requested.png",
+      "sha256": "f8941c74df25730daac3b66a639d4f3078704d08567c737890b90c7b37d731e1",
+      "bytes": 760530,
+      "capturedAt": "2026-11-12T00:18:56.673Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "system:help-requested",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7f1c1-e-and-constrained-workspace/shell-sizing-system-help-requested.json",
+        "sha256": "0477448be8489724592cd1f083b8d95fa02a36488ae0b1878b0373245046448f",
+        "bytes": 896
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-14909ddf7eab1315",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7f1c1-e-and-constrained-workspace/shell-sizing-system-help-user-size-restored.png",
+      "sha256": "cd509696823064e363b50bb77648bc2fbd2054508767fb59e16fac7ba37776ba",
+      "bytes": 853531,
+      "capturedAt": "2026-11-12T00:18:58.078Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "restored",
+      "state": "system:help-user-size-restored",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-7f1c1-e-and-constrained-workspace/shell-sizing-system-help-user-size-restored.json",
+        "sha256": "df5c29c71de01ddd27a83a35c17c97efd8fedfd7cb0de408933d0e165fae3683",
+        "bytes": 904
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-a47c4a669fef183e",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-866ba-e-and-constrained-workspace/shell-sizing-game-orbit-pinball-constrained-1280.png",
+      "sha256": "f2a12292ff9ce6d8a0223ff3549c5a640318f2dbede86a304439a6e309f74a92",
+      "bytes": 421426,
+      "capturedAt": "2026-11-12T00:19:20.831Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 576
+      },
+      "window": "clamped",
+      "state": "game:orbit-pinball-constrained-1280",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-866ba-e-and-constrained-workspace/shell-sizing-game-orbit-pinball-constrained-1280.json",
+        "sha256": "c14f61cf6caa49b8467b5faef2a891a9dc749fe793b280f9741859328908fda5",
+        "bytes": 908
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-8f5762858211726f",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-866ba-e-and-constrained-workspace/shell-sizing-game-orbit-pinball-constrained-390.png",
+      "sha256": "70d96ee2e22c59c14c6563fad1fcb605098ecf5ac76bb2dc65eff0f701e16a07",
+      "bytes": 239090,
+      "capturedAt": "2026-11-12T00:19:21.502Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "game:orbit-pinball-constrained-390",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-866ba-e-and-constrained-workspace/shell-sizing-game-orbit-pinball-constrained-390.json",
+        "sha256": "52f7523e92260cf2ffc9b9a04998dbf2bc01e5c8e4b4afa16e1a4f35d9955a3a",
+        "bytes": 906
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-bc65857faf029e21",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-866ba-e-and-constrained-workspace/shell-sizing-game-orbit-pinball-maximized.png",
+      "sha256": "804ffda8b5ca054c0854b880315dfe2b1e9b0a0d2fbe02fa91e16ffcaa5b4025",
+      "bytes": 203447,
+      "capturedAt": "2026-11-12T00:19:16.943Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "maximized",
+      "state": "game:orbit-pinball-maximized",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-866ba-e-and-constrained-workspace/shell-sizing-game-orbit-pinball-maximized.json",
+        "sha256": "2b52706cdbaf1039e16e22067337deae9e7cb809548210a63a08dd7d458be17b",
+        "bytes": 903
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-9158908e36136305",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-866ba-e-and-constrained-workspace/shell-sizing-game-orbit-pinball-requested.png",
+      "sha256": "8e0d176ac6708840a235cf048b0db0e843400a05226f28d0fb9d54bd8b910657",
+      "bytes": 501455,
+      "capturedAt": "2026-11-12T00:19:15.648Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "game:orbit-pinball-requested",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-866ba-e-and-constrained-workspace/shell-sizing-game-orbit-pinball-requested.json",
+        "sha256": "95f19dca624d4c796f7209aaea7ed042b2204c9185ab04b7f21270713cae6c7c",
+        "bytes": 903
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-edcb0efb777c2a3e",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-866ba-e-and-constrained-workspace/shell-sizing-game-orbit-pinball-user-size-restored.png",
+      "sha256": "6294295ba4da5749a29008eae32851560a5ea803fc734b9a64cf4c05a127a98e",
+      "bytes": 787863,
+      "capturedAt": "2026-11-12T00:19:19.823Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "restored",
+      "state": "game:orbit-pinball-user-size-restored",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-866ba-e-and-constrained-workspace/shell-sizing-game-orbit-pinball-user-size-restored.json",
+        "sha256": "e6acd84714607cad0a0609c4aad9e0d295c2c49990e348630fef5a623ed4d1fd",
+        "bytes": 911
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-b8eb46fb0ea734c6",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-aa7cd-e-and-constrained-workspace/shell-sizing-game-minefield-constrained-1280.png",
+      "sha256": "08003ae4c3761b4681605018d16025627b8df4ec8f1e7040c49f7c45154eaeca",
+      "bytes": 552220,
+      "capturedAt": "2026-11-12T00:19:07.783Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 576
+      },
+      "window": "clamped",
+      "state": "game:minefield-constrained-1280",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-aa7cd-e-and-constrained-workspace/shell-sizing-game-minefield-constrained-1280.json",
+        "sha256": "ab00bf01e3663e83b2dd1ec01f738e0570bc10f156889db57d8304041f67d49a",
+        "bytes": 904
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-82bd437024d045ca",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-aa7cd-e-and-constrained-workspace/shell-sizing-game-minefield-constrained-390.png",
+      "sha256": "33dc776539dc2155068086c6877466e2503e0d65e3fe63aef743984829379665",
+      "bytes": 204662,
+      "capturedAt": "2026-11-12T00:19:08.197Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "game:minefield-constrained-390",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-aa7cd-e-and-constrained-workspace/shell-sizing-game-minefield-constrained-390.json",
+        "sha256": "564e8b1b1fd2eae5787a3a5293719af70f4c23a72bb57e83ae6a248b1d84cafc",
+        "bytes": 902
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-67153ff7eabf9cf1",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-aa7cd-e-and-constrained-workspace/shell-sizing-game-minefield-maximized.png",
+      "sha256": "849a77c92cc418662526af68206d5a6162efeb59fa405226d07fa65fc605330a",
+      "bytes": 49036,
+      "capturedAt": "2026-11-12T00:19:06.150Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "maximized",
+      "state": "game:minefield-maximized",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-aa7cd-e-and-constrained-workspace/shell-sizing-game-minefield-maximized.json",
+        "sha256": "ee33d04d116dfff18fb821eb810a761e5b5671650b3297285d58ce66a44720db",
+        "bytes": 899
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-386a6616fc45599a",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-aa7cd-e-and-constrained-workspace/shell-sizing-game-minefield-requested.png",
+      "sha256": "ee56e2ae72a6e0c7eff682bfb6d30127c4616813ba651a55ff823f540ddc0787",
+      "bytes": 896115,
+      "capturedAt": "2026-11-12T00:19:05.725Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "game:minefield-requested",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-aa7cd-e-and-constrained-workspace/shell-sizing-game-minefield-requested.json",
+        "sha256": "8b19db5016c311c3b7f5dd154e29124f065724731648686651bd445d3708c78b",
+        "bytes": 899
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-4f3faa461e7e9d7f",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-aa7cd-e-and-constrained-workspace/shell-sizing-game-minefield-user-size-restored.png",
+      "sha256": "06dd7eeb23f2fd077607db4f7c086a69ad6b0deaa314d500625b7ab8171bf92a",
+      "bytes": 917649,
+      "capturedAt": "2026-11-12T00:19:07.256Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "restored",
+      "state": "game:minefield-user-size-restored",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-aa7cd-e-and-constrained-workspace/shell-sizing-game-minefield-user-size-restored.json",
+        "sha256": "ee5c96e3ee98ff88bd98b25d9e39929847d235940b9e1ce52273c637365ccc09",
+        "bytes": 907
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-33c4436a140cf6f2",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-ce44c-e-and-constrained-workspace/shell-sizing-game-chess-constrained-1280.png",
+      "sha256": "95be7051e05e488c6c486e1fb08d34f56f26dc4a66d1ca4221e447918d87a9f6",
+      "bytes": 412004,
+      "capturedAt": "2026-11-12T00:19:12.699Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 576
+      },
+      "window": "clamped",
+      "state": "game:chess-constrained-1280",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-ce44c-e-and-constrained-workspace/shell-sizing-game-chess-constrained-1280.json",
+        "sha256": "74b51e20fc7a93d2b9c319ff582037caf7bb62dfe01eeaf36ed90ba307e498aa",
+        "bytes": 900
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-10b20432d8d27a52",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-ce44c-e-and-constrained-workspace/shell-sizing-game-chess-constrained-390.png",
+      "sha256": "4cffbacff7f9cd53c84e0bd47d4a44e12160e97c0a1182652208b3fbbe052ac9",
+      "bytes": 212806,
+      "capturedAt": "2026-11-12T00:19:13.056Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "game:chess-constrained-390",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-ce44c-e-and-constrained-workspace/shell-sizing-game-chess-constrained-390.json",
+        "sha256": "3399e236d8a64fd1e06d1a37ef87f3e5ab88de6ebd5b894d2d2c6340102a5304",
+        "bytes": 898
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-0012437914efed61",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-ce44c-e-and-constrained-workspace/shell-sizing-game-chess-maximized.png",
+      "sha256": "0823d06d1ec85bcc55aada54e1b92047986aff441a368b3e77b84858a28415c2",
+      "bytes": 171519,
+      "capturedAt": "2026-11-12T00:19:10.963Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "maximized",
+      "state": "game:chess-maximized",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-ce44c-e-and-constrained-workspace/shell-sizing-game-chess-maximized.json",
+        "sha256": "623fe81f8446597e9b54be7cf76cf67abe1c3d06c15464f4e1c395359d5bd23c",
+        "bytes": 895
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-e0722ae5ad67440f",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-ce44c-e-and-constrained-workspace/shell-sizing-game-chess-requested.png",
+      "sha256": "344afc56d264e10254be8414134eeddeb1a61f732ee39a64a62273b0d3f98a7b",
+      "bytes": 439952,
+      "capturedAt": "2026-11-12T00:19:10.412Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "game:chess-requested",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-ce44c-e-and-constrained-workspace/shell-sizing-game-chess-requested.json",
+        "sha256": "49a1baaa47d5ea279265b03e4838f82ca85c3d0cea76c5549cd870d9404e5a71",
+        "bytes": 895
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-a2d36218c101a342",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-ce44c-e-and-constrained-workspace/shell-sizing-game-chess-user-size-restored.png",
+      "sha256": "cb5b02a19dd615a0bab7a5827bf9429831fe6697248396bdbc75b2bc917b2eeb",
+      "bytes": 782047,
+      "capturedAt": "2026-11-12T00:19:12.241Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "restored",
+      "state": "game:chess-user-size-restored",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-ce44c-e-and-constrained-workspace/shell-sizing-game-chess-user-size-restored.json",
+        "sha256": "ff9819e3147ea254a3aa4b6a82dace4ee9e9751a38883851747bd2b8c675cd4f",
+        "bytes": 903
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-84d17194281ac51f",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-f18a6-e-and-constrained-workspace/shell-sizing-game-mafia-constrained-1280.png",
+      "sha256": "8a9d395815fd4b6f73ef159ab485619ee36fe78ca2a3553aa693c07248cb49ec",
+      "bytes": 437061,
+      "capturedAt": "2026-11-12T00:19:30.383Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 576
+      },
+      "window": "clamped",
+      "state": "game:mafia-constrained-1280",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-f18a6-e-and-constrained-workspace/shell-sizing-game-mafia-constrained-1280.json",
+        "sha256": "a1399a7c8b6f38532f252148df7c054a51f541932d6d2e0728055a4035ddeb3a",
+        "bytes": 900
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-4ea893f28fc52ea2",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-f18a6-e-and-constrained-workspace/shell-sizing-game-mafia-constrained-390.png",
+      "sha256": "6df6942f25da4989c7c7c58f1f1cff6cbb7bdfc01d7568e5a3cc60c27a1a125a",
+      "bytes": 198792,
+      "capturedAt": "2026-11-12T00:19:30.714Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "game:mafia-constrained-390",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-f18a6-e-and-constrained-workspace/shell-sizing-game-mafia-constrained-390.json",
+        "sha256": "e77329a9ec49d385d72a9b18c83e9edf566466987bd2ecae52552e72713cccca",
+        "bytes": 898
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-6e4853c44f339954",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-f18a6-e-and-constrained-workspace/shell-sizing-game-mafia-maximized.png",
+      "sha256": "1ae1016a20acbf2f66608742f0f11932659c7d6152756ac5a003972722e5b227",
+      "bytes": 100973,
+      "capturedAt": "2026-11-12T00:19:28.651Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "maximized",
+      "state": "game:mafia-maximized",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-f18a6-e-and-constrained-workspace/shell-sizing-game-mafia-maximized.json",
+        "sha256": "8562eaca3c8289c0660597cf80d4c6f1574fd9ecb371a3c55d0ebc722a0f3a4f",
+        "bytes": 895
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-25bf2c0154feb1a7",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-f18a6-e-and-constrained-workspace/shell-sizing-game-mafia-requested.png",
+      "sha256": "191ed838036367ce279cd53a37855e1d8cc16f9e6f80cefe37a25f2ecb233057",
+      "bytes": 685819,
+      "capturedAt": "2026-11-12T00:19:28.170Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "game:mafia-requested",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-f18a6-e-and-constrained-workspace/shell-sizing-game-mafia-requested.json",
+        "sha256": "85d54649fa63a86dd4fb9820f6ae5fe668bf5201fd855e7e88bba36c5ee027d6",
+        "bytes": 895
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-2a5e8eeed8fc7931",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-f18a6-e-and-constrained-workspace/shell-sizing-game-mafia-user-size-restored.png",
+      "sha256": "18154b099b9e4281a98b68453311975c4adcbfe32dd04ef08e9b20523f7c107f",
+      "bytes": 804007,
+      "capturedAt": "2026-11-12T00:19:29.739Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "restored",
+      "state": "game:mafia-user-size-restored",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/desktop-experience-shell-s-f18a6-e-and-constrained-workspace/shell-sizing-game-mafia-user-size-restored.json",
+        "sha256": "5852b33f94864073d0d6521476e78d992caf4ca4799ef95dda0ac0da1ed08182",
+        "bytes": 903
+      }
+    },
+    {
+      "id": "chess-play-viewport-e5ae7aa62b7e7d61",
+      "scenarioId": "chess-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-Chess-682f0-e-its-selected-pane-scrolls/chess-play-played-local-move.png",
+      "sha256": "1f4f5592be6b61f145987c92cbbbbe0730003e059fcddffcd52418bd548b20be",
+      "bytes": 295145,
+      "capturedAt": "2026-11-12T00:20:38.861Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1180,
+        "height": 796
+      },
+      "window": "requested",
+      "state": "played-local-move",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-Chess-682f0-e-its-selected-pane-scrolls/chess-play-played-local-move.json",
+        "sha256": "86a7373646098456a82bb659587181785891f63d502bc1f44d60ac2dbd82fb51",
+        "bytes": 890
+      }
+    },
+    {
+      "id": "chess-play-viewport-7e809de0df757105",
+      "scenarioId": "chess-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-Chess-682f0-e-its-selected-pane-scrolls/chess-play-undo.png",
+      "sha256": "577f47e9f75caab8867e8de94419620a670daf24bca6402d51cc224ec4d1dc2d",
+      "bytes": 293948,
+      "capturedAt": "2026-11-12T00:20:39.345Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1180,
+        "height": 796
+      },
+      "window": "requested",
+      "state": "undo",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-Chess-682f0-e-its-selected-pane-scrolls/chess-play-undo.json",
+        "sha256": "4ff3715928f3db96cca0f06238864e1de3ba9964c4b2036306393f434e403029",
+        "bytes": 877
+      }
+    },
+    {
+      "id": "chess-sections-viewport-54222e6a4e49a810",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-Chess-682f0-e-its-selected-pane-scrolls/chess-sections-models-details-scrolled.png",
+      "sha256": "0e0280be67b477effc6522c95308408ac7d342e0bced54310840d8dbdf2c7f04",
+      "bytes": 277311,
+      "capturedAt": "2026-11-12T00:20:37.386Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1180,
+        "height": 796
+      },
+      "window": "requested",
+      "state": "models-details-scrolled",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-Chess-682f0-e-its-selected-pane-scrolls/chess-sections-models-details-scrolled.json",
+        "sha256": "78ce9a188a1fc0c9c235c7762cbba58c03dff94d638815f2ad086a56baf40b44",
+        "bytes": 900
+      }
+    },
+    {
+      "id": "chess-sections-viewport-7d21dd643cf6e18c",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-Chess-682f0-e-its-selected-pane-scrolls/chess-sections-setup.png",
+      "sha256": "b542a0dafa8155d2225806322212f88ac4788d55c682a786e1e5334dbe672b83",
+      "bytes": 317831,
+      "capturedAt": "2026-11-12T00:20:36.532Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1180,
+        "height": 796
+      },
+      "window": "requested",
+      "state": "setup",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-Chess-682f0-e-its-selected-pane-scrolls/chess-sections-setup.json",
+        "sha256": "5cfc11451d391b4dd5222d784656b944b67c5888a6ce55a19298c57039648e3b",
+        "bytes": 882
+      }
+    },
+    {
+      "id": "chess-resize-viewport-edc79e36bc4384a0",
+      "scenarioId": "chess-resize",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-Chess-ed9a1-ions-on-constrained-screens/chess-resize-constrained-1280.png",
+      "sha256": "d770f1e9c9040398ea8ea556509f8e032436aa63211e5fdca1a974ae9dc7a25a",
+      "bytes": 144446,
+      "capturedAt": "2026-11-12T00:20:49.374Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 576
+      },
+      "window": "maximized",
+      "state": "constrained-1280",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-Chess-ed9a1-ions-on-constrained-screens/chess-resize-constrained-1280.json",
+        "sha256": "eb08072895bca05fefec564a88c12c58a8e1f6f4bf9848c03a40be145bd03612",
+        "bytes": 891
+      }
+    },
+    {
+      "id": "chess-resize-viewport-a1754f04d93da346",
+      "scenarioId": "chess-resize",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-Chess-ed9a1-ions-on-constrained-screens/chess-resize-constrained-320.png",
+      "sha256": "db2401b25abab78d895a939dc3084dc70d7ad523601e12e5f99b071db8485ed2",
+      "bytes": 56871,
+      "capturedAt": "2026-11-12T00:20:50.371Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "maximized",
+      "state": "constrained-320",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-Chess-ed9a1-ions-on-constrained-screens/chess-resize-constrained-320.json",
+        "sha256": "110741cc3bef9d3dc23769c6becefff84b00170b2d6b786463cd75c21ab278a6",
+        "bytes": 889
+      }
+    },
+    {
+      "id": "chess-resize-viewport-31737adfa4abcd5b",
+      "scenarioId": "chess-resize",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-Chess-ed9a1-ions-on-constrained-screens/chess-resize-constrained-390.png",
+      "sha256": "23b0ce6154e265a33107ea3ae5c93982c562e9a2aa035f6a4a295e827a1bced3",
+      "bytes": 73499,
+      "capturedAt": "2026-11-12T00:20:49.975Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "maximized",
+      "state": "constrained-390",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-Chess-ed9a1-ions-on-constrained-screens/chess-resize-constrained-390.json",
+        "sha256": "dba69f57ee271251041b9daa2950f798b556ede004abe200e79077d958886749",
+        "bytes": 889
+      }
+    },
+    {
+      "id": "chess-resize-viewport-182f19fdee0e4b90",
+      "scenarioId": "chess-resize",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-Chess-ed9a1-ions-on-constrained-screens/chess-resize-large-board.png",
+      "sha256": "be3f3e3de6192ab63aa9b48576df45e5d2bc461e39e11948e153cf3f8cc99534",
+      "bytes": 264920,
+      "capturedAt": "2026-11-12T00:20:48.923Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1920,
+        "height": 1400
+      },
+      "window": "maximized",
+      "state": "large-board",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-Chess-ed9a1-ions-on-constrained-screens/chess-resize-large-board.json",
+        "sha256": "fa801397d894553e82ead1685736941538d993a045a04ca0aee0177a13b804aa",
+        "bytes": 887
+      }
+    },
+    {
+      "id": "chess-resize-viewport-fa45bc3f5ca183a1",
+      "scenarioId": "chess-resize",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-Chess-ed9a1-ions-on-constrained-screens/chess-resize-outer-1200-1100.png",
+      "sha256": "5abe3f8a0843be9f48cb35958fb5745d20e0282989bf8e479f75736bd5c81ed3",
+      "bytes": 1590887,
+      "capturedAt": "2026-11-12T00:20:46.218Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1920,
+        "height": 1400
+      },
+      "window": "resized",
+      "state": "outer-1200-1100",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-Chess-ed9a1-ions-on-constrained-screens/chess-resize-outer-1200-1100.json",
+        "sha256": "9a0697a4d5b660ed148afb4abed2ae9a0c39f768809ea565039ccb2ee3f9e670",
+        "bytes": 889
+      }
+    },
+    {
+      "id": "chess-resize-viewport-11659b55cebe2812",
+      "scenarioId": "chess-resize",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-Chess-ed9a1-ions-on-constrained-screens/chess-resize-outer-1600-1300.png",
+      "sha256": "62309bb39fee2254aaaffa9902a6660f83c5f48ec7eb20df3c8345fe53da7741",
+      "bytes": 734860,
+      "capturedAt": "2026-11-12T00:20:47.951Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1920,
+        "height": 1400
+      },
+      "window": "resized",
+      "state": "outer-1600-1300",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-Chess-ed9a1-ions-on-constrained-screens/chess-resize-outer-1600-1300.json",
+        "sha256": "5de2bdfc2a870137023bcae86e3d025aec5e123c8154e89e084be2384c627f12",
+        "bytes": 889
+      }
+    },
+    {
+      "id": "chess-resize-viewport-c0f4c0f161604cb3",
+      "scenarioId": "chess-resize",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-Chess-ed9a1-ions-on-constrained-screens/chess-resize-outer-960-900.png",
+      "sha256": "9b6a6edc2e3d7cea3c20e71f8da185120600eb032ec81e298cd857d12e3ad612",
+      "bytes": 1958368,
+      "capturedAt": "2026-11-12T00:20:44.320Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1920,
+        "height": 1400
+      },
+      "window": "resized",
+      "state": "outer-960-900",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-Chess-ed9a1-ions-on-constrained-screens/chess-resize-outer-960-900.json",
+        "sha256": "6322c685fc0676d8512413e95d7351156b1d59afbeec6fcb9d583aaed3ca8350",
+        "bytes": 887
+      }
+    },
+    {
+      "id": "mine-expert-viewport-d31a6bdc01b8afee",
+      "scenarioId": "mine-expert",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-Minef-8d31a-erflow-and-grows-for-Expert/mine-expert-expert-ready.png",
+      "sha256": "24fe9efe7b7109e478b67f9e304e91826983d9d6fcd618e6e0bc8a12ab82cae6",
+      "bytes": 204835,
+      "capturedAt": "2026-11-12T00:20:21.760Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "expert-ready",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-Minef-8d31a-erflow-and-grows-for-Expert/mine-expert-expert-ready.json",
+        "sha256": "e95b2f379a03e4916384561598c2e9f127a3b24c8747d141f039bf8f47529a7f",
+        "bytes": 886
+      }
+    },
+    {
+      "id": "mine-narrow-viewport-f6e3967781c05d9a",
+      "scenarioId": "mine-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-Minef-8d31a-erflow-and-grows-for-Expert/mine-narrow-expert-panned-to-edge.png",
+      "sha256": "1ab089aac6088afe55caa7cfadf89d23f4ba9c9e85e6c942a6802d027f2a0720",
+      "bytes": 40170,
+      "capturedAt": "2026-11-12T00:20:22.675Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "clamped",
+      "state": "expert-panned-to-edge",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-Minef-8d31a-erflow-and-grows-for-Expert/mine-narrow-expert-panned-to-edge.json",
+        "sha256": "d7cf65b7e1e63c0bfb0b3a2127a4cba0014984670b50058971a6eea54a8e37d4",
+        "bytes": 892
+      }
+    },
+    {
+      "id": "mine-start-viewport-9ad6ce2946bf6404",
+      "scenarioId": "mine-start",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-Minef-8d31a-erflow-and-grows-for-Expert/mine-start-beginner-ready.png",
+      "sha256": "d936b217b27da9239dce8aeabde48b9f5cdbbcbc27aac20ba7e1611f6df85e89",
+      "bytes": 828186,
+      "capturedAt": "2026-11-12T00:20:21.298Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "beginner-ready",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-Minef-8d31a-erflow-and-grows-for-Expert/mine-start-beginner-ready.json",
+        "sha256": "c03f9ed8875c86c3e6e8936b06ef5ca096aa763c83f8eed1151cbe9f163e43c8",
+        "bytes": 887
+      }
+    },
+    {
+      "id": "shell-focus-viewport-75bb32ce1fd668c8",
+      "scenarioId": "shell-focus",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-backg-cb069-on-the-first-repeated-click/shell-focus-body-click-acted-and-raised.png",
+      "sha256": "9a3895669d4854739cbb9582ee7396f8db6ea98c75726da1cf09cb3c66892518",
+      "bytes": 243202,
+      "capturedAt": "2026-11-12T00:20:33.076Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "body-click-acted-and-raised",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-backg-cb069-on-the-first-repeated-click/shell-focus-body-click-acted-and-raised.json",
+        "sha256": "ad1851ecf6036739b9f3002dfbe9e2ff7f283cf50a57ff88bc5f9170c00a8c6d",
+        "bytes": 901
+      }
+    },
+    {
+      "id": "shell-focus-viewport-5ba2d38cbac821c9",
+      "scenarioId": "shell-focus",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-backg-cb069-on-the-first-repeated-click/shell-focus-keyboard-focus-raised.png",
+      "sha256": "ab6c7979067c5b7be152f78fda3f09252419870ffa16b3ad6c0b6e5da7087ef9",
+      "bytes": 244387,
+      "capturedAt": "2026-11-12T00:20:33.545Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "keyboard-focus-raised",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-backg-cb069-on-the-first-repeated-click/shell-focus-keyboard-focus-raised.json",
+        "sha256": "f4077183726b688e47aaec3f480665741dfdd2dde091b577bd2ba96fa8c7fd58",
+        "bytes": 895
+      }
+    },
+    {
+      "id": "visual-matrix-viewport-26449f14e6e2b2dd",
+      "scenarioId": "visual-matrix",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Chess-maximized.png",
+      "sha256": "95434e9d26ea8b34f220dc261f8eefc3ec5a25f70ce303578c19e3da97a4182f",
+      "bytes": 164440,
+      "capturedAt": "2026-11-12T00:20:55.153Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "maximized",
+      "state": "Chess-maximized",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Chess-maximized.json",
+        "sha256": "48dd17faea7a9b54bfbc5d9a1b1fa8310c6fcc147a5fe3dd16c13f86a3689f52",
+        "bytes": 891
+      }
+    },
+    {
+      "id": "visual-matrix-viewport-52513a21de98c80b",
+      "scenarioId": "visual-matrix",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Chess-requested.png",
+      "sha256": "22761a8eb9b243b59ebd001eee2cd0419b82d387784abc375fddb00d048df904",
+      "bytes": 404242,
+      "capturedAt": "2026-11-12T00:20:54.685Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "Chess-requested",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Chess-requested.json",
+        "sha256": "5ddbf63e6387afc78ffd630f3cba94be934116774acab25f7967845a554b5d11",
+        "bytes": 891
+      }
+    },
+    {
+      "id": "visual-matrix-viewport-28743b868db9a270",
+      "scenarioId": "visual-matrix",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Minefield-maximized.png",
+      "sha256": "f02ed668701cd1f5ee9401c39f23fb0be4af1b4e5e403b175148c114672e40c2",
+      "bytes": 50328,
+      "capturedAt": "2026-11-12T00:20:53.024Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "maximized",
+      "state": "Minefield-maximized",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Minefield-maximized.json",
+        "sha256": "09f0874143c2561650fcd5d71aea6ddf2b3c1daad6e2d673d8444fd9bc5eff95",
+        "bytes": 895
+      }
+    },
+    {
+      "id": "visual-matrix-viewport-7f721a736a4ce034",
+      "scenarioId": "visual-matrix",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Minefield-requested.png",
+      "sha256": "d9b21c75f023726d734064807d28672e94e67702ed11806d364cb4f73bc7b47e",
+      "bytes": 828183,
+      "capturedAt": "2026-11-12T00:20:52.720Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "Minefield-requested",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Minefield-requested.json",
+        "sha256": "6bedcdf3d85fe9cec6a8a8db7ffb4f92e9c26b166891e7cc5ce7ec3d4188b671",
+        "bytes": 895
+      }
+    },
+    {
+      "id": "visual-matrix-viewport-b8658f6821173be0",
+      "scenarioId": "visual-matrix",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Space-Cadet-Pinball-maximized.png",
+      "sha256": "9c27062f45cd8db3c46ae4763439f04a81b02dca28088f96cc9195ba6da0c0ff",
+      "bytes": 211377,
+      "capturedAt": "2026-11-12T00:20:59.352Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "maximized",
+      "state": "Space Cadet Pinball-maximized",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Space-Cadet-Pinball-maximized.json",
+        "sha256": "1748f8d4f69546b935a44348f61cb30c062ce07831835b90a9b7df4483ce1c8c",
+        "bytes": 905
+      }
+    },
+    {
+      "id": "visual-matrix-viewport-3808ba4da4a45cd3",
+      "scenarioId": "visual-matrix",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Space-Cadet-Pinball-requested.png",
+      "sha256": "e17862f4133f9729e6ef7a99545032eb4b2a7b7f59b32c0e6910d46eaba95ff3",
+      "bytes": 533000,
+      "capturedAt": "2026-11-12T00:20:58.873Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "Space Cadet Pinball-requested",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-Space-Cadet-Pinball-requested.json",
+        "sha256": "b8b5b161bd1a2e273f11b2f45e65c2e3f25a76cd6bfa6218a57efde42fed08f0",
+        "bytes": 905
+      }
+    },
+    {
+      "id": "visual-matrix-viewport-68b629474c71419e",
+      "scenarioId": "visual-matrix",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-chess-solid.png",
+      "sha256": "0fe12140b8bffb239c074f840433211acbbd1e49fdea1e8afd21059b4c7f794e",
+      "bytes": 328402,
+      "capturedAt": "2026-11-12T00:21:00.262Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "chess-solid",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-refer-856f3-lossy-and-solid-app-windows/visual-matrix-chess-solid.json",
+        "sha256": "c38d420c564b7bd57cd8fe0e684fd048e4519836bbd7d0eb19d7dbc3449624da",
+        "bytes": 887
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-3952e4bdb7e1913b",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-reque-731c1-to-actual-taskbar-workspace/shell-sizing-clamped-1280.png",
+      "sha256": "ef33227cc01ec68d60c7412cc2ec155aea90d7302ee489b6ff30416b359c8306",
+      "bytes": 491174,
+      "capturedAt": "2026-11-12T00:20:26.108Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 576
+      },
+      "window": "clamped",
+      "state": "clamped-1280",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-reque-731c1-to-actual-taskbar-workspace/shell-sizing-clamped-1280.json",
+        "sha256": "37c65a76da47ac4aa564cd0f9e425e915b52fda0589448ac6453c3fdf2a9898e",
+        "bytes": 885
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-bb17c5e483a1656a",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-reque-731c1-to-actual-taskbar-workspace/shell-sizing-clamped-390.png",
+      "sha256": "0ac1325124d3c5a005255db5fc381f39753ce5afa5a2fc9a23115d397ad13906",
+      "bytes": 157243,
+      "capturedAt": "2026-11-12T00:20:26.451Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "clamped-390",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-reque-731c1-to-actual-taskbar-workspace/shell-sizing-clamped-390.json",
+        "sha256": "db847a3795084df59569b33a00fbf307d3a2cc51ed5b9d0bd2d4009144a73561",
+        "bytes": 883
+      }
+    },
+    {
+      "id": "shell-sizing-viewport-87f7eeafb3ab2069",
+      "scenarioId": "shell-sizing",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/experience-contracts-reque-731c1-to-actual-taskbar-workspace/shell-sizing-maximized.png",
+      "sha256": "1bd2faf750dbcb3035efac23d42868b8f4056058d361da770b9e9fe1e0327bd6",
+      "bytes": 50311,
+      "capturedAt": "2026-11-12T00:20:25.590Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "maximized",
+      "state": "maximized",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/experience-contracts-reque-731c1-to-actual-taskbar-workspace/shell-sizing-maximized.json",
+        "sha256": "52570269fb6708e7bfc462d34230e2f38343fc92bc81788eb64a4f249cc04b51",
+        "bytes": 884
+      }
+    },
+    {
+      "id": "mine-expert-viewport-0550ce092c26b84c",
+      "scenarioId": "mine-expert",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-99-mine--108e8--entirely-from-public-clues/mine-expert-late99-267-of381.png",
+      "sha256": "1fb59494d73169b59d7d3deac51a15fbcf6e7e6d71e86346a14b1468c65204a8",
+      "bytes": 760258,
+      "capturedAt": "2026-11-12T00:22:20.083Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "window": "requested-expert1120x760",
+      "state": "late99-267-of381",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-99-mine--108e8--entirely-from-public-clues/mine-expert-late99-267-of381.json",
+        "sha256": "0f029b6822df2722f11aa3a2fd6f44a7e2096d884abf112347ebcb0e7f62f069",
+        "bytes": 906
+      }
+    },
+    {
+      "id": "mine-expert-viewport-a97d42cbaa71a55a",
+      "scenarioId": "mine-expert",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-99-mine--108e8--entirely-from-public-clues/mine-expert-ready.png",
+      "sha256": "583f621ec7f47987d5fcc1217d63ceed3eb3d6b58ea6a44e0a19fe3e3d6bb969",
+      "bytes": 741902,
+      "capturedAt": "2026-11-12T00:22:07.630Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "window": "requested-expert1120x760",
+      "state": "ready",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-99-mine--108e8--entirely-from-public-clues/mine-expert-ready.json",
+        "sha256": "e745c42da994b9fb7f58b836e949251856fdf410002675232b41e14c7a7873e0",
+        "bytes": 895
+      }
+    },
+    {
+      "id": "mine-expert-viewport-6776a19fda6db38d",
+      "scenarioId": "mine-expert",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-99-mine--108e8--entirely-from-public-clues/mine-expert-won.png",
+      "sha256": "f5fa6ca8a81e7a1e16eb6b9d7b6b1004285ed216124f1ebaf5363c723efb9084",
+      "bytes": 760886,
+      "capturedAt": "2026-11-12T00:22:26.844Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "window": "requested-expert1120x760",
+      "state": "won",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-99-mine--108e8--entirely-from-public-clues/mine-expert-won.json",
+        "sha256": "07e124e9167199061618813f8e3cba78bec3fa0649dad318c204d9f203546f32",
+        "bytes": 893
+      }
+    },
+    {
+      "id": "chess-play-viewport-d7cf2c89a2ec31a3",
+      "scenarioId": "chess-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-Chess-en-0be9d--preserve-reachable-actions/chess-play-engine-waiting-response.png",
+      "sha256": "56cece853c2a87ed471832ffe7fafa73b18917c6aa7f19dc5c55a736a690cb8e",
+      "bytes": 117009,
+      "capturedAt": "2026-11-12T00:22:03.492Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "engine-waiting-response",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-Chess-en-0be9d--preserve-reachable-actions/chess-play-engine-waiting-response.json",
+        "sha256": "1b70ef9ebc98ff102a71b4a0aa5a3831c651cf3af1b8392ca550a2e9d5d3db1a",
+        "bytes": 907
+      }
+    },
+    {
+      "id": "chess-play-viewport-9eb0748fac974cce",
+      "scenarioId": "chess-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-Chess-en-0be9d--preserve-reachable-actions/chess-play-genuine-analysis-after-retry.png",
+      "sha256": "33d09df82cae9b33ac7770209f35d4bda1a6726db314720983fbf0e349fb75be",
+      "bytes": 139959,
+      "capturedAt": "2026-11-12T00:22:05.088Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "genuine-analysis-after-retry",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-Chess-en-0be9d--preserve-reachable-actions/chess-play-genuine-analysis-after-retry.json",
+        "sha256": "24aa8fad63f20255f49d011ff4e3f96a04c86b6049bd8124112a4f5b472237f7",
+        "bytes": 912
+      }
+    },
+    {
+      "id": "chess-play-viewport-365831cfcbbc4cf0",
+      "scenarioId": "chess-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-Chess-en-0be9d--preserve-reachable-actions/chess-play-recoverable-engine-failure.png",
+      "sha256": "e597834849b5815ba515c9050cdd9e53e0fe147fc650fa0dbc84b4a83b34fd63",
+      "bytes": 115279,
+      "capturedAt": "2026-11-12T00:22:03.756Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "recoverable-engine-failure",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-Chess-en-0be9d--preserve-reachable-actions/chess-play-recoverable-engine-failure.json",
+        "sha256": "5fb68db80bc4eedbb7927c50e69c563a557c503212f955a84d20a76449660952",
+        "bytes": 910
+      }
+    },
+    {
+      "id": "mine-input-viewport-aa65415e6a221e5b",
+      "scenarioId": "mine-input",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-chord-opened-neighbors.png",
+      "sha256": "cc37a67133ce8dd0b38044239313397f7d329d518415487ad83700245e1b06f9",
+      "bytes": 168578,
+      "capturedAt": "2026-11-12T00:22:39.450Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped-request",
+      "state": "chord-opened-neighbors",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-chord-opened-neighbors.json",
+        "sha256": "c5a364729dcc038bbe5018427480adb6a7a84b93b288a6c4bb57141975002bd0",
+        "bytes": 900
+      }
+    },
+    {
+      "id": "mine-input-viewport-cbf60c68e1fb693c",
+      "scenarioId": "mine-input",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-generating-before-reset.png",
+      "sha256": "9cce997ebc543b41179c848250fa55f00f0193cba873da9565f36c7f24fe96a7",
+      "bytes": 174570,
+      "capturedAt": "2026-11-12T00:22:31.265Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped-request",
+      "state": "generating-before-reset",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-generating-before-reset.json",
+        "sha256": "8207cf4c500cf168f3f1c0714ae230e624be71aab26d0a6be6477d246aecf9a5",
+        "bytes": 901
+      }
+    },
+    {
+      "id": "mine-input-viewport-70653b60b3e04a13",
+      "scenarioId": "mine-input",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-held-flag-no-reveal.png",
+      "sha256": "aa1916a7c0fb8d9d2c7d7d2c82a7537933b1d66fe09c582ee8bf8f1a3e561d05",
+      "bytes": 166751,
+      "capturedAt": "2026-11-12T00:22:40.360Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped-request",
+      "state": "held-flag-no-reveal",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-held-flag-no-reveal.json",
+        "sha256": "0defba49a1faa1d94af5de59f8ae44cb634358a71922529db06a94881c9f5d7c",
+        "bytes": 897
+      }
+    },
+    {
+      "id": "mine-input-viewport-36ece548fdc5e09e",
+      "scenarioId": "mine-input",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-moved-cancelled-no-mark-no-reveal.png",
+      "sha256": "feee54f8a296bb01b33b67db84d3b93445f1c6fa0039abc6273c6f003478e819",
+      "bytes": 166391,
+      "capturedAt": "2026-11-12T00:22:41.354Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped-request",
+      "state": "moved-cancelled-no-mark-no-reveal",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-moved-cancelled-no-mark-no-reveal.json",
+        "sha256": "117823cdffd1357a2ff94b9bc127eb734fcf72d5f922c057292877e00811953b",
+        "bytes": 911
+      }
+    },
+    {
+      "id": "mine-input-viewport-e53fa67bab638e80",
+      "scenarioId": "mine-input",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-reset-rejects-stale-generation.png",
+      "sha256": "58fff9263f235fcf16ce74d1584af0fe22a0bf08933294ec29c79dcfad7f3123",
+      "bytes": 166482,
+      "capturedAt": "2026-11-12T00:22:34.962Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped-request",
+      "state": "reset-rejects-stale-generation",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-reset-rejects-stale-generation.json",
+        "sha256": "aa64785649057bd9a7c7605f2c2dc0933584ef5279b8d9d6b437686a184936f0",
+        "bytes": 908
+      }
+    },
+    {
+      "id": "mine-input-viewport-755b8066a7dccaec",
+      "scenarioId": "mine-input",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-retry-playable.png",
+      "sha256": "1da9e5c6815cae183e11e1fa6aabf25980bc3f125160151009f29b7c91478eed",
+      "bytes": 167779,
+      "capturedAt": "2026-11-12T00:22:38.885Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped-request",
+      "state": "retry-playable",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-retry-playable.json",
+        "sha256": "9785e937c97ac852cae004fa046b0ef908016ab36c20cf3522167952eadcc631",
+        "bytes": 892
+      }
+    },
+    {
+      "id": "mine-input-viewport-3772510fe1d108c6",
+      "scenarioId": "mine-input",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-right-click-flag.png",
+      "sha256": "ed47b0020b9802e7cd049f8bc2184e76fc3b63862d3a1f0ea7a462e637fb0d5f",
+      "bytes": 166637,
+      "capturedAt": "2026-11-12T00:22:30.516Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped-request",
+      "state": "right-click-flag",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-right-click-flag.json",
+        "sha256": "9e830d310c5c48d9f707e6f8a25f217ad604468600408d7e81964e37ecd3f3e1",
+        "bytes": 894
+      }
+    },
+    {
+      "id": "mine-input-viewport-b223c80dbb8d1be4",
+      "scenarioId": "mine-input",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-worker-failed.png",
+      "sha256": "c2fb7b1e98f2535d434ae2e32b4f3eb6772c5a092a7043a46e2bf50930e98b6f",
+      "bytes": 167785,
+      "capturedAt": "2026-11-12T00:22:30.849Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped-request",
+      "state": "worker-failed",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-11461-on-reset-and-Retry-distinct/mine-input-worker-failed.json",
+        "sha256": "dc9020b4fabfa6a41c5e2c0d1030d63adb2b1f4c2f10ae2802911ea3230dde0b",
+        "bytes": 891
+      }
+    },
+    {
+      "id": "mine-narrow-viewport-3f8d5550d7c7405e",
+      "scenarioId": "mine-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-35b90-n-only-their-readable-board/mine-narrow-expert-edge-reveal.png",
+      "sha256": "188d24a45b084f744074d9e41dfcb392d79b2d731f74309d9651f0e9770050a3",
+      "bytes": 41284,
+      "capturedAt": "2026-11-12T00:22:45.380Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "workspace-clamped",
+      "state": "expert-edge-reveal",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-35b90-n-only-their-readable-board/mine-narrow-expert-edge-reveal.json",
+        "sha256": "0a716ff3567a17d3c151c8f8f1836ba13f1a25c86ac6819f38ea410d379becf5",
+        "bytes": 899
+      }
+    },
+    {
+      "id": "mine-narrow-viewport-17985293ecc4673a",
+      "scenarioId": "mine-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-35b90-n-only-their-readable-board/mine-narrow-intermediate-edge-reveal.png",
+      "sha256": "d776e5f010befb558e30f866938f7e9bc522dcd5dcba12736a73d9ea79da4b83",
+      "bytes": 41214,
+      "capturedAt": "2026-11-12T00:22:44.309Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "workspace-clamped",
+      "state": "intermediate-edge-reveal",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-Minefiel-35b90-n-only-their-readable-board/mine-narrow-intermediate-edge-reveal.json",
+        "sha256": "183ad290eeacd7f0ae3f9af723b0dc3996872899600c5c8865d34520bdb5596b",
+        "bytes": 905
+      }
+    },
+    {
+      "id": "chess-sections-viewport-c39a32b08a08d675",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-arena-bu-7dff2-advances-pauses-and-resumes/chess-sections-builtin-styled-opening-arena-paused.png",
+      "sha256": "f424d901ad9ff6675cd198ac77e5ec188b010fbe2b61cfcf6b72bd50286051ee",
+      "bytes": 106113,
+      "capturedAt": "2026-11-12T00:21:58.779Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "builtin-styled-opening-arena-paused",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-arena-bu-7dff2-advances-pauses-and-resumes/chess-sections-builtin-styled-opening-arena-paused.json",
+        "sha256": "985efa2a68c7c2d194362db7821a4f8f8f8a5fa8dcff7fb203f60610d0c32ab7",
+        "bytes": 923
+      }
+    },
+    {
+      "id": "chess-sections-viewport-875a57c37099a6ea",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-arena-bu-7dff2-advances-pauses-and-resumes/chess-sections-builtin-styled-opening-durable-archive.png",
+      "sha256": "ad7543fcf6c713bb5698fc5b4d8e1bc6ac8bd28fa3b83573f47164b1c9b20f49",
+      "bytes": 88372,
+      "capturedAt": "2026-11-12T00:22:01.813Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "builtin-styled-opening-durable-archive",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-arena-bu-7dff2-advances-pauses-and-resumes/chess-sections-builtin-styled-opening-durable-archive.json",
+        "sha256": "e124897ea1fce6d5c51c6f2390caccc8e93248f6a0b315de21ae40629c99a476",
+        "bytes": 926
+      }
+    },
+    {
+      "id": "chess-sections-viewport-df1e6c6387f9fb5a",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-arena-bu-7dff2-advances-pauses-and-resumes/chess-sections-builtin-styled-opening-replay-playing.png",
+      "sha256": "fb52f11cd4e886b5419c96263bdae9fdc6351a436e90ec12573da3fc020fe000",
+      "bytes": 104686,
+      "capturedAt": "2026-11-12T00:21:59.219Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "builtin-styled-opening-replay-playing",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-arena-bu-7dff2-advances-pauses-and-resumes/chess-sections-builtin-styled-opening-replay-playing.json",
+        "sha256": "cbd4e7d674ce9c38f04fa9de02a9321680be5bea16f64d0a5288d51294e64872",
+        "bytes": 925
+      }
+    },
+    {
+      "id": "chess-sections-viewport-8255cde036248686",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-arena-bu-a1a33-advances-pauses-and-resumes/chess-sections-builtin-stockfish-19-arena-paused.png",
+      "sha256": "2fbeb9d386cd05f867d0ef83bedc6c54bf5f8d678c9673976560f2efe020eaad",
+      "bytes": 105574,
+      "capturedAt": "2026-11-12T00:21:45.905Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "builtin-stockfish-19-arena-paused",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-arena-bu-a1a33-advances-pauses-and-resumes/chess-sections-builtin-stockfish-19-arena-paused.json",
+        "sha256": "9cfa356236eddfe86a85e4044f247c2381319670d3c4116ad05121a7b924039b",
+        "bytes": 921
+      }
+    },
+    {
+      "id": "chess-sections-viewport-56d2291befe847e4",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-arena-bu-a1a33-advances-pauses-and-resumes/chess-sections-builtin-stockfish-19-durable-archive.png",
+      "sha256": "a19d2ffaf0ccb8b2b360829b5a88cc915e19f86a04b722c0044ee828a37993b4",
+      "bytes": 88152,
+      "capturedAt": "2026-11-12T00:21:49.477Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "builtin-stockfish-19-durable-archive",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-arena-bu-a1a33-advances-pauses-and-resumes/chess-sections-builtin-stockfish-19-durable-archive.json",
+        "sha256": "2d482dd233f8cba0e9bb1752cd3ded06b383e398ac9c634f8e5175a1b5b129a8",
+        "bytes": 924
+      }
+    },
+    {
+      "id": "chess-sections-viewport-455751001a1a0080",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-arena-bu-a1a33-advances-pauses-and-resumes/chess-sections-builtin-stockfish-19-replay-playing.png",
+      "sha256": "5f169accd29eb4370fbe58c1ff01eb8edface7ae5dec2913149d77e178218464",
+      "bytes": 103415,
+      "capturedAt": "2026-11-12T00:21:46.339Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "builtin-stockfish-19-replay-playing",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-arena-bu-a1a33-advances-pauses-and-resumes/chess-sections-builtin-stockfish-19-replay-playing.json",
+        "sha256": "6615abb0c61e4b928be278016bc0d88deb178d1c734fae52687581c641b7c923",
+        "bytes": 923
+      }
+    },
+    {
+      "id": "chess-play-viewport-51eb3d4c95e117fe",
+      "scenarioId": "chess-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-builtin--39cb3-nd-supports-free-play-hints/chess-play-builtin-stockfish-19-genuine-response.png",
+      "sha256": "1823a04a530f16ed16b8ac4a52935d28d354558a5e95e9765164fafa50559354",
+      "bytes": 110202,
+      "capturedAt": "2026-11-12T00:21:25.535Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "builtin-stockfish-19-genuine-response",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-builtin--39cb3-nd-supports-free-play-hints/chess-play-builtin-stockfish-19-genuine-response.json",
+        "sha256": "e5687c3a70de7fd95db55054818271f3b88a1354a0ff4d3e2e199b1181506d3b",
+        "bytes": 921
+      }
+    },
+    {
+      "id": "chess-play-viewport-1349a90e5530b6fe",
+      "scenarioId": "chess-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-builtin--39cb3-nd-supports-free-play-hints/chess-play-builtin-stockfish-19-selected-hint.png",
+      "sha256": "af19554398258fd93fe570c0b4ef5cdf7f05d68df9f3bc440b2cbe554b9eec0d",
+      "bytes": 151071,
+      "capturedAt": "2026-11-12T00:21:29.763Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "builtin-stockfish-19-selected-hint",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-builtin--39cb3-nd-supports-free-play-hints/chess-play-builtin-stockfish-19-selected-hint.json",
+        "sha256": "d45afce37370a83f90e62a59201c6dc4c1429d633492801662295239c89e7d82",
+        "bytes": 918
+      }
+    },
+    {
+      "id": "chess-play-viewport-2981edbc2c375fb0",
+      "scenarioId": "chess-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-builtin--dd6a2-nd-supports-free-play-hints/chess-play-builtin-stockfish-18-genuine-response.png",
+      "sha256": "b4323ec57411f6c6db5f524d4a0bf8459c29f8b26384f7e9a52a914796c1d31b",
+      "bytes": 110176,
+      "capturedAt": "2026-11-12T00:21:17.411Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "builtin-stockfish-18-genuine-response",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-builtin--dd6a2-nd-supports-free-play-hints/chess-play-builtin-stockfish-18-genuine-response.json",
+        "sha256": "c776a6d6cb5a2f7947c6082802618d659b2f215ac7334048c1e7ed8f81efdeef",
+        "bytes": 921
+      }
+    },
+    {
+      "id": "chess-play-viewport-7be6a54513fe2c6d",
+      "scenarioId": "chess-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-builtin--dd6a2-nd-supports-free-play-hints/chess-play-builtin-stockfish-18-selected-hint.png",
+      "sha256": "b3f81c270a9c9b32a7748429d14de8b4cadd49583a919593ad0a8d5aa6c850c3",
+      "bytes": 152534,
+      "capturedAt": "2026-11-12T00:21:20.341Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "builtin-stockfish-18-selected-hint",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-builtin--dd6a2-nd-supports-free-play-hints/chess-play-builtin-stockfish-18-selected-hint.json",
+        "sha256": "81c9550375af2cff6807cedce046a7a6f5b42caec9a416e765359715f3eb6623",
+        "bytes": 918
+      }
+    },
+    {
+      "id": "chess-play-viewport-c250cb8bc3875f48",
+      "scenarioId": "chess-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-reckless-988d3-nd-supports-free-play-hints/chess-play-reckless-local-genuine-response.png",
+      "sha256": "aa6967f47fa1920ab64f391934ebcb09971417ed7287aed03eac914f5df9a795",
+      "bytes": 110740,
+      "capturedAt": "2026-11-12T00:21:31.984Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "reckless-local-genuine-response",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-reckless-988d3-nd-supports-free-play-hints/chess-play-reckless-local-genuine-response.json",
+        "sha256": "43929967bd078e1cf900e97e78ef7139ecef6e99c8f361c5228f1067d788151c",
+        "bytes": 915
+      }
+    },
+    {
+      "id": "chess-play-viewport-516d2b301d0818cd",
+      "scenarioId": "chess-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/games-reliability-reckless-988d3-nd-supports-free-play-hints/chess-play-reckless-local-selected-hint.png",
+      "sha256": "748104efbcacc657eda95d3fc3ab2fdc999564b0e8f9c797650cb3ed9412f129",
+      "bytes": 153763,
+      "capturedAt": "2026-11-12T00:21:34.543Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "reckless-local-selected-hint",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/games-reliability-reckless-988d3-nd-supports-free-play-hints/chess-play-reckless-local-selected-hint.json",
+        "sha256": "a3923c8d0919077c9bb73fe26937b902ba78c9a501dcc501298decbc9ab4a3a1",
+        "bytes": 912
+      }
+    },
+    {
+      "id": "pinball-narrow-viewport-908461fc336963ca",
+      "scenarioId": "pinball-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-live-resize-320.png",
+      "sha256": "86dcf952e982df9e1e298f20e14db8bd1a963da6b8ac4281191d6175a3f52a5e",
+      "bytes": 106356,
+      "capturedAt": "2026-11-12T00:23:56.042Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "clamped",
+      "state": "live-resize-320",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-live-resize-320.json",
+        "sha256": "f7a968a6fa47a577736764ccf75be6eba8620fd95c2e2ac53489d1eadde6589f",
+        "bytes": 889
+      }
+    },
+    {
+      "id": "pinball-narrow-viewport-e292224f052209b8",
+      "scenarioId": "pinball-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-paused-320.png",
+      "sha256": "0fb86691ec9b616842b04b57fb4409bb5353406a61d9aa2cffd2709ba8b074af",
+      "bytes": 72070,
+      "capturedAt": "2026-11-12T00:23:56.493Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "clamped",
+      "state": "paused-320",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-paused-320.json",
+        "sha256": "f65eac8fceae60748cc0a06ca9ef4367fcb1a84c1ef5c1707741d2349fdb7d15",
+        "bytes": 884
+      }
+    },
+    {
+      "id": "pinball-narrow-viewport-201c61b1bcda5cee",
+      "scenarioId": "pinball-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-ready-score-and-ball.png",
+      "sha256": "66377b8152401511f9c5ae1a433dc4416dfc51651e2433ae946e8b1f6f2282d6",
+      "bytes": 160412,
+      "capturedAt": "2026-11-12T00:23:44.868Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "ready-score-and-ball",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-ready-score-and-ball.json",
+        "sha256": "d37a9c5f469811c383e253e4ca6580ae6de133eb77a51231f74570541c436834",
+        "bytes": 894
+      }
+    },
+    {
+      "id": "pinball-narrow-viewport-02e935e2ee2439c7",
+      "scenarioId": "pinball-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-touch-flight-native-score.png",
+      "sha256": "5c2d00831ff78cf707a7d98ea3a8736e97396606af7d8c6d79416aca551a8b9a",
+      "bytes": 162089,
+      "capturedAt": "2026-11-12T00:23:55.542Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "touch-flight-native-score",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-touch-flight-native-score.json",
+        "sha256": "d33836b0995d95eea0619b3c74127dff6e9e0dcc417a57cb04ce47090ee065e6",
+        "bytes": 899
+      }
+    },
+    {
+      "id": "pinball-narrow-viewport-d5880e1e50a6be2a",
+      "scenarioId": "pinball-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-touch-plunger-full-pull.png",
+      "sha256": "ce625c5904dcadf5dc668e506e9bddcd69ea8e76004dc18043091feb5383d079",
+      "bytes": 159771,
+      "capturedAt": "2026-11-12T00:23:51.082Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "touch-plunger-full-pull",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-touch-plunger-full-pull.json",
+        "sha256": "6e2c79258f200dfeed8864ddd3b377cacf209b3834491b376ce1a275ab5baf9c",
+        "bytes": 897
+      }
+    },
+    {
+      "id": "pinball-narrow-viewport-35ae56394e43c78f",
+      "scenarioId": "pinball-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-touch-plunger-held.png",
+      "sha256": "39bdf6fe197f5205b38dfd18209f82c161ca8d18e7a12cd0942d7d0acab3fb48",
+      "bytes": 159680,
+      "capturedAt": "2026-11-12T00:23:46.558Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "touch-plunger-held",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-04663-pause-and-no-page-scrolling/pinball-narrow-touch-plunger-held.json",
+        "sha256": "ddbae679537853e2d02d3b79af0234246b428003b835486e3ac9b072a15814a5",
+        "bytes": 892
+      }
+    },
+    {
+      "id": "pinball-play-viewport-12a27b318b70669f",
+      "scenarioId": "pinball-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-607e1-turns-to-a-playable-cabinet/pinball-play-real-asset-failure-retry.png",
+      "sha256": "0a078aa642a66e5f70c3f997f4dace27f3ec467ac4e35fa75536597cdf9170e3",
+      "bytes": 43723,
+      "capturedAt": "2026-11-12T00:23:58.887Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "real-asset-failure-retry",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-607e1-turns-to-a-playable-cabinet/pinball-play-real-asset-failure-retry.json",
+        "sha256": "c9339c4ac98d142fe7281691205f02614b08137371aab428860a82b9aec700c9",
+        "bytes": 918
+      }
+    },
+    {
+      "id": "pinball-play-viewport-70fce6c246b71a79",
+      "scenarioId": "pinball-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-607e1-turns-to-a-playable-cabinet/pinball-play-retry-recovered-real-flight.png",
+      "sha256": "42d845d250dbf010503dc913c57e7e710813387b10361af383ea3184265bde72",
+      "bytes": 224070,
+      "capturedAt": "2026-11-12T00:24:11.077Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "retry-recovered-real-flight",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-607e1-turns-to-a-playable-cabinet/pinball-play-retry-recovered-real-flight.json",
+        "sha256": "ba72697a584bd1759b01e67c4368603bb56164a0ecb7e55d5f6124e1aebe7fa3",
+        "bytes": 921
+      }
+    },
+    {
+      "id": "pinball-play-viewport-e8bbbdcae0aa1513",
+      "scenarioId": "pinball-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-ArrowLeft-held.png",
+      "sha256": "d7c1ad7bd392104d3284ee3f1b744e1a47de961d50e1e660e748f81c76c3ce13",
+      "bytes": 569824,
+      "capturedAt": "2026-11-12T00:23:04.954Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "ArrowLeft-held",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-ArrowLeft-held.json",
+        "sha256": "e0cc2711da964fce564c1b69f72ac6dd6b463fe469f2f752cd3f3ed3dfd69920",
+        "bytes": 889
+      }
+    },
+    {
+      "id": "pinball-play-viewport-99bf38b4e93ffd25",
+      "scenarioId": "pinball-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-ArrowRight-held.png",
+      "sha256": "031bc8c22b3fb66d2bc94a0c945bb04f24d66c2e341118bfa907bbf69a23edc7",
+      "bytes": 570404,
+      "capturedAt": "2026-11-12T00:23:05.796Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "ArrowRight-held",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-ArrowRight-held.json",
+        "sha256": "0cb9f9ca938686111a623b2aa320b3d3a65ac384ea652d87ec0d441d21c3cb89",
+        "bytes": 890
+      }
+    },
+    {
+      "id": "pinball-play-viewport-259569d49bcc3263",
+      "scenarioId": "pinball-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-drain-observation-1-ball-23-score-26250.png",
+      "sha256": "3b24ea4aea57318f36dd1f7f2415665e6ff18153bea1de659513a7217878985d",
+      "bytes": 570472,
+      "capturedAt": "2026-11-12T00:23:26.146Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "drain-observation-1-ball-23-score-26250",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-drain-observation-1-ball-23-score-26250.json",
+        "sha256": "6c9e15aa8daa886b973cc12dae5cc47bf91a798c0864ff32a391be32b4559421",
+        "bytes": 914
+      }
+    },
+    {
+      "id": "pinball-play-viewport-0d92e3e1239fc7a2",
+      "scenarioId": "pinball-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-first-ball-upper-orbit.png",
+      "sha256": "ebd7e0c3eae8a582830466c841fb5acba2712c899aa4709db4ed1e7255432b6b",
+      "bytes": 570994,
+      "capturedAt": "2026-11-12T00:23:11.175Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "first-ball-upper-orbit",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-first-ball-upper-orbit.json",
+        "sha256": "f8f4648378b75fccb8d80ed01b8fcee04a2d34cda86898d03ffcd5bdcb7978fb",
+        "bytes": 897
+      }
+    },
+    {
+      "id": "pinball-play-viewport-758197ab63dc370a",
+      "scenarioId": "pinball-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-genuine-native-score.png",
+      "sha256": "7d6fb7be1defbf7ab6b0b11631cc1a436327f7ed933b699cd17c73716c42de55",
+      "bytes": 570861,
+      "capturedAt": "2026-11-12T00:23:17.080Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "genuine-native-score",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-genuine-native-score.json",
+        "sha256": "0a4ccc59fdfc3f7d38559bb82c08732f066e21768560e6f5c190b653c31340bd",
+        "bytes": 895
+      }
+    },
+    {
+      "id": "pinball-play-viewport-017b4a434a642459",
+      "scenarioId": "pinball-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-natural-drain-next-ball-counter.png",
+      "sha256": "606197ffe06ed8fcc70150420dd6d687672e7a517f70c4184a747f475311e97f",
+      "bytes": 570417,
+      "capturedAt": "2026-11-12T00:23:26.777Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "natural-drain-next-ball-counter",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-natural-drain-next-ball-counter.json",
+        "sha256": "cf1253076a13aa7d169d10aed06ff172b8628b5e43b5adffabb6e08225c6612e",
+        "bytes": 906
+      }
+    },
+    {
+      "id": "pinball-play-viewport-5c552ea637809001",
+      "scenarioId": "pinball-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-next-ball-fed-at-plunger.png",
+      "sha256": "be9e2146a61947ffb3a966c941e43c6782bc1379d5b02334ab88c0e0208f8932",
+      "bytes": 571332,
+      "capturedAt": "2026-11-12T00:23:33.331Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "next-ball-fed-at-plunger",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-next-ball-fed-at-plunger.json",
+        "sha256": "e389c2cc28711a15a451ec4aecbd733567803b7f404790d212271777b83653bf",
+        "bytes": 899
+      }
+    },
+    {
+      "id": "pinball-play-viewport-4d801b4ace907862",
+      "scenarioId": "pinball-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-paused-in-flight.png",
+      "sha256": "aadd85e9a211e5a6ba6c05891a779df1560ded7909a516149f0fcd1ce994e88f",
+      "bytes": 492274,
+      "capturedAt": "2026-11-12T00:23:11.772Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "paused-in-flight",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-paused-in-flight.json",
+        "sha256": "a8e5a9fd6e3a93ea284bacbc70e3b6ed2df38406c8f08112df6d0962d84a6c6d",
+        "bytes": 891
+      }
+    },
+    {
+      "id": "pinball-play-viewport-dfac2e180690d4e3",
+      "scenarioId": "pinball-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-ready-original-art.png",
+      "sha256": "d09fae58bf3cc394ac825464eda2a115a70f3ccc169f69a53a67805a564dad0f",
+      "bytes": 570287,
+      "capturedAt": "2026-11-12T00:23:04.211Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "ready-original-art",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-ready-original-art.json",
+        "sha256": "57b60bb3f183c58f1ef2cee624c0ffba4116d391dc051122b6167078983d3692",
+        "bytes": 893
+      }
+    },
+    {
+      "id": "pinball-play-viewport-b97b5e4b9467b5bb",
+      "scenarioId": "pinball-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-resumed-moving-ball.png",
+      "sha256": "90dc4d6531e8af63dc68e5ece7629eb4616168026b8d61a82fed5b1e5b046682",
+      "bytes": 570302,
+      "capturedAt": "2026-11-12T00:23:14.722Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "resumed-moving-ball",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-resumed-moving-ball.json",
+        "sha256": "683577ba4f42cf5a799e76381feee93fa842eb1916086efe3c7763263bffe021",
+        "bytes": 894
+      }
+    },
+    {
+      "id": "pinball-play-viewport-09ae12962029162d",
+      "scenarioId": "pinball-play",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-second-ball-real-flight.png",
+      "sha256": "cb066b94be691805666de5aafa0f46916ba85e88af9bfba949b69e84167cacec",
+      "bytes": 572193,
+      "capturedAt": "2026-11-12T00:23:39.461Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "second-ball-real-flight",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/pinball-experience-pinball-e7ab6-ight-in-requested-XP-window/pinball-play-second-ball-real-flight.json",
+        "sha256": "ee831272501f65a49fe66d4a602abfff82e8fae75e9c225ce7dc1625560bac45",
+        "bytes": 898
+      }
+    },
+    {
+      "id": "chess-sections-viewport-5480495338abc207",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/platform-Chess-exposes-saf-5ee32-hout-changing-built-in-play/chess-sections-model-submission.png",
+      "sha256": "e228fe1b020091c28472f0ce82edd87041a08489c25c06e32ebb461157f90112",
+      "bytes": 86112,
+      "capturedAt": "2026-11-12T00:24:43.089Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "model-submission",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/platform-Chess-exposes-saf-5ee32-hout-changing-built-in-play/chess-sections-model-submission.json",
+        "sha256": "330f8fb2f7ee05b355c22ce6ab1e3eb6ab98583525cc76e9ef854e95a7d86e0c",
+        "bytes": 904
+      }
+    },
+    {
+      "id": "chess-resize-viewport-8b29a97d3a677666",
+      "scenarioId": "chess-resize",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/platform-Chess-remains-usable-on-a-narrow-viewport/chess-resize-narrow-local-move.png",
+      "sha256": "35dbab7e2ecab9b42e1839e2909c3e8147f539c07e4d5630edae58f4fb92b0b5",
+      "bytes": 60292,
+      "capturedAt": "2026-11-12T00:24:41.643Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "narrow-local-move",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/platform-Chess-remains-usable-on-a-narrow-viewport/chess-resize-narrow-local-move.json",
+        "sha256": "c14d32e0ea7b654c5ab09f1c3c2947790c30ea842d90f2e0cbb410cfecf9f9a4",
+        "bytes": 900
+      }
+    },
+    {
+      "id": "chess-sections-viewport-e27764c25f73e43c",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-Computer-selected-details-scrolled.png",
+      "sha256": "dd932660c38616aafae52553862f1fd99891ba9d285d2366d3a6ec4a08e72170",
+      "bytes": 116821,
+      "capturedAt": "2026-11-12T00:24:44.612Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1180,
+        "height": 796
+      },
+      "window": "requested",
+      "state": "Computer-selected-details-scrolled",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-Computer-selected-details-scrolled.json",
+        "sha256": "248a5404e34238b68726202047d11041a0db2dbb2109a2378bfe64b5cee9329c",
+        "bytes": 922
+      }
+    },
+    {
+      "id": "chess-sections-viewport-191e87cec62fcb70",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-Local-selected-details-scrolled.png",
+      "sha256": "ed49b6035892ab6616c3ee28ba96e8f6da4a9ac0153ab88bda2c16d1c67295fb",
+      "bytes": 120049,
+      "capturedAt": "2026-11-12T00:24:45.802Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1180,
+        "height": 796
+      },
+      "window": "requested",
+      "state": "Local-selected-details-scrolled",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-Local-selected-details-scrolled.json",
+        "sha256": "5f937c74454d96b3494e0eaef2e6e2205030e3aa252ff3d1a0a918ec2086d5b3",
+        "bytes": 919
+      }
+    },
+    {
+      "id": "chess-sections-viewport-97eef2e4158ffe94",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-Model-arena-selected-details-scrolled.png",
+      "sha256": "57767128bfbe4d4586dcb0a5917c372cf04fc4df3124ea05584ef897881f7b75",
+      "bytes": 94231,
+      "capturedAt": "2026-11-12T00:24:46.367Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1180,
+        "height": 796
+      },
+      "window": "requested",
+      "state": "Model arena-selected-details-scrolled",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-Model-arena-selected-details-scrolled.json",
+        "sha256": "c5df98c00562ffbe9e8aed4c0a319ae017772bb94cdc18da5125f98a391ff983",
+        "bytes": 925
+      }
+    },
+    {
+      "id": "chess-sections-viewport-d7664138c684c2ab",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-Models-selected-details-scrolled.png",
+      "sha256": "9d4c006a3aaca849f98bd80928c1142c4441158022f78b41f51b7643a568f36e",
+      "bytes": 85061,
+      "capturedAt": "2026-11-12T00:24:46.977Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1180,
+        "height": 796
+      },
+      "window": "requested",
+      "state": "Models-selected-details-scrolled",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-Models-selected-details-scrolled.json",
+        "sha256": "a70b73a83025697d00eceeb96e87d068e0e4b62e322b9126acd78cde668f6c99",
+        "bytes": 920
+      }
+    },
+    {
+      "id": "chess-sections-viewport-2daa50d85188eeb6",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-Online-selected-details-scrolled.png",
+      "sha256": "c6fb2ea7956630b51bba0c3e97bbd4d7358615b2de6a8d145167b04f85db8726",
+      "bytes": 105966,
+      "capturedAt": "2026-11-12T00:24:45.189Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1180,
+        "height": 796
+      },
+      "window": "requested",
+      "state": "Online-selected-details-scrolled",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-Online-selected-details-scrolled.json",
+        "sha256": "23de4ee066b27b185328eed22c0656e9ddb3ecf66de89a10b3f0d9d52d8b0889",
+        "bytes": 920
+      }
+    },
+    {
+      "id": "chess-sections-viewport-fe60852b192c555c",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-model-details-1280.png",
+      "sha256": "fc6a307f13da624b1e7915b8b71e430b10e2f563b1a9f9e9969a9eba41c2a4ca",
+      "bytes": 61904,
+      "capturedAt": "2026-11-12T00:24:47.886Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 576
+      },
+      "window": "clamped",
+      "state": "model-details-1280",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-model-details-1280.json",
+        "sha256": "5f9f5b6280766260b309aeb3652eb861abd05044a355bb167c5af68928e944d1",
+        "bytes": 904
+      }
+    },
+    {
+      "id": "chess-sections-viewport-f103b9cfbbec3403",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-model-details-390.png",
+      "sha256": "56b5fb5f5b30b262ace1b7d80fa54412201cd7a107c90e36260db5c2b18a368d",
+      "bytes": 59626,
+      "capturedAt": "2026-11-12T00:24:47.355Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "model-details-390",
+      "capture": {
+        "path": "experience-evidence/deployed/browser/platform-Chess-section-nav-eb797-ils-and-constrained-windows/chess-sections-model-details-390.json",
+        "sha256": "67ece5743e15646c71014c3fb89db6fd7afb0a502f28f193b3a2af7bd9aee867",
+        "bytes": 902
+      }
+    },
+    {
+      "id": "shell-focus-sequence-4428d54d2bfe1c5a",
+      "scenarioId": "shell-focus",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/shell-focus-sequence-4428d54d2bfe1c5a.json",
+      "sha256": "89a2ce7e14244e3a17b3bc8d80a67bdc598cbc8d8883fd6ad5667baa498510c2",
+      "bytes": 3815,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "first-action-switch-1 → first-action-switch-5 → first-action-switch-10 → keyboard-activation → continuous-iframe-drag → nested-canvas-first-action-played → 100-active-clicks-stable-stack → body-click-acted-and-raised → keyboard-focus-raised"
+    },
+    {
+      "id": "shell-sizing-sequence-dca431704da058db",
+      "scenarioId": "shell-sizing",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/shell-sizing-sequence-dca431704da058db.json",
+      "sha256": "852f9eae0cd589d15ab8a0591ab42de281e02984e7fc9b8a948037a1da26c002",
+      "bytes": 3932,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 576
+      },
+      "window": "clamped",
+      "state": "system:welcome-constrained-1280 → system:help-constrained-1280 → system:plugins-constrained-1280 → game:minefield-constrained-1280 → game:chess-constrained-1280 → game:orbit-pinball-constrained-1280 → game:paintbox-constrained-1280 → game:mafia-constrained-1280 → clamped-1280"
+    },
+    {
+      "id": "shell-sizing-sequence-41b270662cfb9e55",
+      "scenarioId": "shell-sizing",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/shell-sizing-sequence-41b270662cfb9e55.json",
+      "sha256": "f2ed022526d8856256524a3795c9b16b8934cd223326f677b9f78029c0593471",
+      "bytes": 3905,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "system:welcome-constrained-390 → system:help-constrained-390 → system:plugins-constrained-390 → game:minefield-constrained-390 → game:chess-constrained-390 → game:orbit-pinball-constrained-390 → game:paintbox-constrained-390 → game:mafia-constrained-390 → clamped-390"
+    },
+    {
+      "id": "shell-sizing-sequence-c4804c6d78b940e8",
+      "scenarioId": "shell-sizing",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/shell-sizing-sequence-c4804c6d78b940e8.json",
+      "sha256": "8922066584f42526b0cbde10d790d8976d9934a11b978130771d21cd11b5c271",
+      "bytes": 3752,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "maximized",
+      "state": "system:welcome-maximized → system:help-maximized → system:plugins-maximized → game:minefield-maximized → game:chess-maximized → game:orbit-pinball-maximized → game:paintbox-maximized → game:mafia-maximized → maximized"
+    },
+    {
+      "id": "shell-sizing-sequence-d32f58b8c7218166",
+      "scenarioId": "shell-sizing",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/shell-sizing-sequence-d32f58b8c7218166.json",
+      "sha256": "6c2041caa289606da80ec6293631e9fd8dad34568e06485b1eacd281a4d2db5e",
+      "bytes": 3404,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "system:welcome-requested → system:help-requested → system:plugins-requested → game:minefield-requested → game:chess-requested → game:orbit-pinball-requested → game:paintbox-requested → game:mafia-requested"
+    },
+    {
+      "id": "shell-sizing-sequence-baa0221399a4ac9e",
+      "scenarioId": "shell-sizing",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/shell-sizing-sequence-baa0221399a4ac9e.json",
+      "sha256": "11731c2911b1330143d124a564ac67cdf3d6083152a2ce067b09cee70ff7157d",
+      "bytes": 3620,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "restored",
+      "state": "system:welcome-user-size-restored → system:help-user-size-restored → system:plugins-user-size-restored → game:minefield-user-size-restored → game:chess-user-size-restored → game:orbit-pinball-user-size-restored → game:paintbox-user-size-restored → game:mafia-user-size-restored"
+    },
+    {
+      "id": "chess-play-sequence-b7b29ae6f8d88789",
+      "scenarioId": "chess-play",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/chess-play-sequence-b7b29ae6f8d88789.json",
+      "sha256": "2675b800e4d95be9eb3d927a986914ce223c213a92f07eab1a7ee1658330ec98",
+      "bytes": 967,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1180,
+        "height": 796
+      },
+      "window": "requested",
+      "state": "played-local-move → undo"
+    },
+    {
+      "id": "chess-sections-sequence-e693bd3b8fcf44d7",
+      "scenarioId": "chess-sections",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/chess-sections-sequence-e693bd3b8fcf44d7.json",
+      "sha256": "9b019cd57ca1d8cc2cfb29858334007e0382f1095d9490bacb57e41d5f7f4ab0",
+      "bytes": 3122,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1180,
+        "height": 796
+      },
+      "window": "requested",
+      "state": "setup → models-details-scrolled → Computer-selected-details-scrolled → Online-selected-details-scrolled → Local-selected-details-scrolled → Model arena-selected-details-scrolled → Models-selected-details-scrolled"
+    },
+    {
+      "id": "chess-resize-sequence-b81a4d9649a11cf3",
+      "scenarioId": "chess-resize",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/chess-resize-sequence-b81a4d9649a11cf3.json",
+      "sha256": "e1adaa1d127e1ffee77de05b0dfcc8fd4f0fdae332b7c78017952f08bdbbd909",
+      "bytes": 1363,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1920,
+        "height": 1400
+      },
+      "window": "resized",
+      "state": "outer-960-900 → outer-1200-1100 → outer-1600-1300"
+    },
+    {
+      "id": "visual-matrix-sequence-b74418b5a6fb01aa",
+      "scenarioId": "visual-matrix",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/visual-matrix-sequence-b74418b5a6fb01aa.json",
+      "sha256": "18f67133a73a90a2aa95ce42d44767ec7ee151737233a12c8c896ea5e17da9f5",
+      "bytes": 1423,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "maximized",
+      "state": "Minefield-maximized → Chess-maximized → Space Cadet Pinball-maximized"
+    },
+    {
+      "id": "visual-matrix-sequence-7ddf3195ebfd6430",
+      "scenarioId": "visual-matrix",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/visual-matrix-sequence-7ddf3195ebfd6430.json",
+      "sha256": "a3f3451daaf7183764c051fdc868f6cc0d415ec5cad6017d25872fdaf0fe62ad",
+      "bytes": 1782,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "Minefield-requested → Chess-requested → Space Cadet Pinball-requested → chess-solid"
+    },
+    {
+      "id": "mine-expert-sequence-4d7f9b6233e4abb5",
+      "scenarioId": "mine-expert",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/mine-expert-sequence-4d7f9b6233e4abb5.json",
+      "sha256": "0a6cbe44ab4202cae08429b5df14cb0c186b255077b021cf599970f2b33540d7",
+      "bytes": 1301,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "window": "requested-expert1120x760",
+      "state": "ready → late99-267-of381 → won"
+    },
+    {
+      "id": "chess-play-sequence-d76476850438a2a0",
+      "scenarioId": "chess-play",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/chess-play-sequence-d76476850438a2a0.json",
+      "sha256": "d949fde3ddf5f87f3bbb8c9bed43320ed8df488ca9eae39581e1500942b2c51b",
+      "bytes": 3992,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "builtin-stockfish-18-genuine-response → builtin-stockfish-18-selected-hint → builtin-stockfish-19-genuine-response → builtin-stockfish-19-selected-hint → reckless-local-genuine-response → reckless-local-selected-hint → engine-waiting-response → recoverable-engine-failure → genuine-analysis-after-retry"
+    },
+    {
+      "id": "mine-input-sequence-f65d8d74e9090446",
+      "scenarioId": "mine-input",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/mine-input-sequence-f65d8d74e9090446.json",
+      "sha256": "20516c5835b73c0449d4703032f0f49e3282f918a12f6f8650522d3e80a2651e",
+      "bytes": 3346,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped-request",
+      "state": "right-click-flag → worker-failed → generating-before-reset → reset-rejects-stale-generation → retry-playable → chord-opened-neighbors → held-flag-no-reveal → moved-cancelled-no-mark-no-reveal"
+    },
+    {
+      "id": "mine-narrow-sequence-faa97228c8ee7302",
+      "scenarioId": "mine-narrow",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/mine-narrow-sequence-faa97228c8ee7302.json",
+      "sha256": "b7d8eb6436865011290abdb7579690b05847b958abe74fb67315c6242a268941",
+      "bytes": 1030,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "workspace-clamped",
+      "state": "intermediate-edge-reveal → expert-edge-reveal"
+    },
+    {
+      "id": "chess-sections-sequence-9af9df19c2f208e9",
+      "scenarioId": "chess-sections",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/chess-sections-sequence-9af9df19c2f208e9.json",
+      "sha256": "d21f4ee2a5b2a73c3af11a1956035e0e3e3c8bf2c83648e252b8d9fa97779cb5",
+      "bytes": 3229,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "window": "requested",
+      "state": "builtin-stockfish-19-arena-paused → builtin-stockfish-19-replay-playing → builtin-stockfish-19-durable-archive → builtin-styled-opening-arena-paused → builtin-styled-opening-replay-playing → builtin-styled-opening-durable-archive → model-submission"
+    },
+    {
+      "id": "pinball-narrow-sequence-a5b67073dc8c658e",
+      "scenarioId": "pinball-narrow",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/pinball-narrow-sequence-a5b67073dc8c658e.json",
+      "sha256": "5c7d8fd1da05f23e2aaab41311391002f183677ba81610420b90dc7fcb6b8229",
+      "bytes": 986,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "clamped",
+      "state": "live-resize-320 → paused-320"
+    },
+    {
+      "id": "pinball-narrow-sequence-4d62b0d6c2f04761",
+      "scenarioId": "pinball-narrow",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/pinball-narrow-sequence-4d62b0d6c2f04761.json",
+      "sha256": "920746a036bc58390d7430cf7cd0eda299cf4c353a10b317e4633e5a0108b23b",
+      "bytes": 1822,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "ready-score-and-ball → touch-plunger-held → touch-plunger-full-pull → touch-flight-native-score"
+    },
+    {
+      "id": "pinball-play-sequence-ee6cb6b3872a6e60",
+      "scenarioId": "pinball-play",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/sequences/pinball-play-sequence-ee6cb6b3872a6e60.json",
+      "sha256": "7c007aa959e86dda3a4c3c09f94fed5382ce22216b01488ece23895510a8cc37",
+      "bytes": 5347,
+      "capturedAt": "2026-11-12T00:28:36.159Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 844
+      },
+      "window": "requested",
+      "state": "ready-original-art → ArrowLeft-held → ArrowRight-held → first-ball-upper-orbit → paused-in-flight → resumed-moving-ball → genuine-native-score → drain-observation-1-ball-23-score-26250 → natural-drain-next-ball-counter → next-ball-fed-at-plunger → second-ball-real-flight → real-asset-failure-retry → retry-recovered-real-flight"
+    },
+    {
+      "id": "chess-sections-viewport-1fb06e9b79495261",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/manual/chess-sections-fixture-archive24-narrow.png",
+      "sha256": "f7c51bd1b5762ca1a481fcdb49112812d0c20efd561209d11dde9e7fade2d4cc",
+      "bytes": 123646,
+      "capturedAt": "2026-11-12T00:18:36.237Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "fixture-long-archive-clamped",
+      "state": "fixture-archive24-narrow",
+      "capture": {
+        "path": "experience-evidence/deployed/manual/chess-sections-fixture-archive24-narrow.json",
+        "sha256": "fe833b3e452262a005bcbb82a4882a74e10b489eb9d37d50d239a39a1a53787b",
+        "bytes": 919
+      }
+    },
+    {
+      "id": "chess-sections-viewport-c6808e8bc56f024f",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/manual/chess-sections-fixture-archive24-top.png",
+      "sha256": "29466d023415ea6238e7e417398ff0b39e7de85f601a5a5d2bd21f228d21563b",
+      "bytes": 298243,
+      "capturedAt": "2026-11-12T00:18:35.138Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1180,
+        "height": 796
+      },
+      "window": "fixture-long-archive",
+      "state": "fixture-archive24-top",
+      "capture": {
+        "path": "experience-evidence/deployed/manual/chess-sections-fixture-archive24-top.json",
+        "sha256": "4c3bfd1f69b3d27da7509c6fd5068ab8beade5f08c3755c86cde8bbaddcc9b4f",
+        "bytes": 909
+      }
+    },
+    {
+      "id": "chess-sections-viewport-0953d19988f1ff99",
+      "scenarioId": "chess-sections",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/manual/chess-sections-fixture-archive24-wheel-bottom.png",
+      "sha256": "c02151343e88a0c30b8bf7cb44bb1cbbb2ec7a485502a4b0ef207b9a777adc77",
+      "bytes": 293694,
+      "capturedAt": "2026-11-12T00:18:35.946Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1180,
+        "height": 796
+      },
+      "window": "fixture-long-archive",
+      "state": "fixture-archive24-wheel-bottom",
+      "capture": {
+        "path": "experience-evidence/deployed/manual/chess-sections-fixture-archive24-wheel-bottom.json",
+        "sha256": "13e373f9db87bc09561d717a5f661435fb14ab1271ca39798991a5c948303a30",
+        "bytes": 918
+      }
+    },
+    {
+      "id": "mine-narrow-viewport-a942425f409fb371",
+      "scenarioId": "mine-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/manual/mine-narrow-touch-expert-after.png",
+      "sha256": "b444ef697d3b686a609bf9a4ce16a0aae2d1806e91fb5853786b99b1f8c8a7b9",
+      "bytes": 40943,
+      "capturedAt": "2026-11-12T00:20:32.919Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "touch-pan",
+      "state": "touch-expert-after",
+      "capture": {
+        "path": "experience-evidence/deployed/manual/mine-narrow-touch-expert-after.json",
+        "sha256": "af7a69d54f45e98fbe381bf9479fcbefaff030ac9ef606e53dc062ac933fbd0a",
+        "bytes": 891
+      }
+    },
+    {
+      "id": "mine-narrow-viewport-44122f11cffa7dc6",
+      "scenarioId": "mine-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/manual/mine-narrow-touch-expert-before.png",
+      "sha256": "7814e77f8443a5a9a5a5b2a6fb5cd9fd927955ebf636b9a588048406271f9aea",
+      "bytes": 40837,
+      "capturedAt": "2026-11-12T00:20:31.862Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "touch-pan",
+      "state": "touch-expert-before",
+      "capture": {
+        "path": "experience-evidence/deployed/manual/mine-narrow-touch-expert-before.json",
+        "sha256": "794be68b4d5ba4179b779516f37cef01dc24db5730e8bc228b2d4c2fdaca0f00",
+        "bytes": 892
+      }
+    },
+    {
+      "id": "mine-narrow-viewport-26f43ce61314a7b9",
+      "scenarioId": "mine-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/manual/mine-narrow-touch-intermediate-after.png",
+      "sha256": "6aba621fe172018024a3011f9c5733afceccf0fac50e3c34a9cd08bdffbc6e17",
+      "bytes": 40309,
+      "capturedAt": "2026-11-12T00:20:31.595Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "touch-pan",
+      "state": "touch-intermediate-after",
+      "capture": {
+        "path": "experience-evidence/deployed/manual/mine-narrow-touch-intermediate-after.json",
+        "sha256": "a12c48ce0563ae92ade6c816d57cb2c2565f5b588e5eb36ee2f5d557d5f228c6",
+        "bytes": 897
+      }
+    },
+    {
+      "id": "mine-narrow-viewport-892ee9f378927f5a",
+      "scenarioId": "mine-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/manual/mine-narrow-touch-intermediate-before.png",
+      "sha256": "f6d7a032dc0e5945f834429ddff9a1c3f2cdb7e50342f02111dc3aefdbf72cb6",
+      "bytes": 40339,
+      "capturedAt": "2026-11-12T00:20:30.546Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "touch-pan",
+      "state": "touch-intermediate-before",
+      "capture": {
+        "path": "experience-evidence/deployed/manual/mine-narrow-touch-intermediate-before.json",
+        "sha256": "cec9cdb0b94b0bf729ddafedfcc91b701ff0e2926f73c237c3bfd500fcced6ef",
+        "bytes": 898
+      }
+    },
+    {
+      "id": "pinball-narrow-viewport-73003e7f9b403622",
+      "scenarioId": "pinball-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/manual/pinball-narrow-true-touch-launch-held.png",
+      "sha256": "629f563d30c29a8acfb7549df9034377a9937bed345cc5062dccc51012fc4e3d",
+      "bytes": 168956,
+      "capturedAt": "2026-11-12T00:20:43.037Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "touch-clamped",
+      "state": "true-touch-launch-held",
+      "capture": {
+        "path": "experience-evidence/deployed/manual/pinball-narrow-true-touch-launch-held.json",
+        "sha256": "4fb6ef1d24b2e6e37f547a911f6ce618b033e351ecad20905dc2f1bc0ddc761d",
+        "bytes": 902
+      }
+    },
+    {
+      "id": "pinball-narrow-viewport-48e0f27442130676",
+      "scenarioId": "pinball-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/manual/pinball-narrow-true-touch-launch-released.png",
+      "sha256": "08108abfc5064eb51b3db3ccb6c0a67f9d2c61d608749ba4bd9cd5c023a63ef9",
+      "bytes": 169572,
+      "capturedAt": "2026-11-12T00:20:43.609Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "touch-clamped",
+      "state": "true-touch-launch-released",
+      "capture": {
+        "path": "experience-evidence/deployed/manual/pinball-narrow-true-touch-launch-released.json",
+        "sha256": "7a9344e0d58ec8bec853fc39e6e3e9ec23b33980a97334175725ecebcfd1b973",
+        "bytes": 906
+      }
+    },
+    {
+      "id": "pinball-narrow-viewport-79992218b0dfc632",
+      "scenarioId": "pinball-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/manual/pinball-narrow-true-touch-left-held.png",
+      "sha256": "56eb37e7e91462301f3aedc08353c057a52a7713e36f45dcf8c5f0af7d63a181",
+      "bytes": 169655,
+      "capturedAt": "2026-11-12T00:20:37.481Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "touch-clamped",
+      "state": "true-touch-left-held",
+      "capture": {
+        "path": "experience-evidence/deployed/manual/pinball-narrow-true-touch-left-held.json",
+        "sha256": "60e123eb5eed34824d261817e3ccf6f381eecd545099d93c3bdb6c894b504060",
+        "bytes": 900
+      }
+    },
+    {
+      "id": "pinball-narrow-viewport-f558e91d15c048e0",
+      "scenarioId": "pinball-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/manual/pinball-narrow-true-touch-left-released.png",
+      "sha256": "68487d788c04b0f480730010326328e449cec6d76512560667cfb09489bac253",
+      "bytes": 169727,
+      "capturedAt": "2026-11-12T00:20:37.923Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "touch-clamped",
+      "state": "true-touch-left-released",
+      "capture": {
+        "path": "experience-evidence/deployed/manual/pinball-narrow-true-touch-left-released.json",
+        "sha256": "d5d11f9ba61da2ddc48997020793fa978b64d05d98a0dce3540270604679e2a1",
+        "bytes": 904
+      }
+    },
+    {
+      "id": "pinball-narrow-viewport-5e7ce4ae7327adc6",
+      "scenarioId": "pinball-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/manual/pinball-narrow-true-touch-live-score.png",
+      "sha256": "6a0d312589a4fcfc595a4743f7926441f48674b9f2c98e31d86877603df454d0",
+      "bytes": 171233,
+      "capturedAt": "2026-11-12T00:20:46.060Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "touch-clamped",
+      "state": "true-touch-live-score",
+      "capture": {
+        "path": "experience-evidence/deployed/manual/pinball-narrow-true-touch-live-score.json",
+        "sha256": "9d6606ca27de6cb2ba3ea765da19bda092b24c1f4b406647f351379214ffe178",
+        "bytes": 901
+      }
+    },
+    {
+      "id": "pinball-narrow-viewport-24b37646ffa931d8",
+      "scenarioId": "pinball-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/manual/pinball-narrow-true-touch-right-held.png",
+      "sha256": "117fbd112fae9bfdecb25e341762cbe48ee2178370c3c48b4f8db8487cf415f7",
+      "bytes": 170025,
+      "capturedAt": "2026-11-12T00:20:38.413Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "touch-clamped",
+      "state": "true-touch-right-held",
+      "capture": {
+        "path": "experience-evidence/deployed/manual/pinball-narrow-true-touch-right-held.json",
+        "sha256": "aa79352783af8f61b5eda7c84bde888077eec4d0a0257af3afd0a33f08dd0a98",
+        "bytes": 901
+      }
+    },
+    {
+      "id": "pinball-narrow-viewport-bb30379e6575e68a",
+      "scenarioId": "pinball-narrow",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/manual/pinball-narrow-true-touch-right-released.png",
+      "sha256": "c47760043a90a2a646e3fb72711d58ee24f0e1ddd380f4282d808baa8673427c",
+      "bytes": 169742,
+      "capturedAt": "2026-11-12T00:20:38.829Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "touch-clamped",
+      "state": "true-touch-right-released",
+      "capture": {
+        "path": "experience-evidence/deployed/manual/pinball-narrow-true-touch-right-released.json",
+        "sha256": "3b8e8c439d3d3b6c45a79b94a74040f87081d1200529779aeb520d87c1e0064e",
+        "bytes": 905
+      }
+    },
+    {
+      "id": "visual-matrix-viewport-15ae0c6c45702137",
+      "scenarioId": "visual-matrix",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/manual/visual-matrix-native-ready-maximized.png",
+      "sha256": "9863a6ab9ec77696494a0e76da3ee335634b0ce5685e184a0f5d0924004a3d9f",
+      "bytes": 209994,
+      "capturedAt": "2026-11-12T00:19:20.140Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "maximized",
+      "state": "native-ready-maximized",
+      "capture": {
+        "path": "experience-evidence/deployed/manual/visual-matrix-native-ready-maximized.json",
+        "sha256": "f50a1a2ccd13b654c9334f49e9943ecc3f71a798181f778d068568b4314b1182",
+        "bytes": 898
+      }
+    },
+    {
+      "id": "visual-matrix-viewport-b5eee81498598bb8",
+      "scenarioId": "visual-matrix",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/manual/visual-matrix-native-ready-requested.png",
+      "sha256": "5929673107fba8673f4f0bc50b7893568d8307673ba683b3ad7258ecec02f873",
+      "bytes": 534716,
+      "capturedAt": "2026-11-12T00:19:19.252Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "native-ready-requested",
+      "capture": {
+        "path": "experience-evidence/deployed/manual/visual-matrix-native-ready-requested.json",
+        "sha256": "8c0245e89a31780731014d48be6e66706e881da956a807aee86277b0e9e0a6a4",
+        "bytes": 898
+      }
+    },
+    {
+      "id": "visual-matrix-viewport-bf50b94cb398c8c7",
+      "scenarioId": "visual-matrix",
+      "kind": "viewport",
+      "path": "experience-evidence/deployed/manual/visual-matrix-welcome-task-first.png",
+      "sha256": "212386186af8783086970af7269013d882eb0d6ab959156854cc12490e65fa88",
+      "bytes": 921460,
+      "capturedAt": "2026-11-12T00:18:23.706Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "welcome-task-first",
+      "capture": {
+        "path": "experience-evidence/deployed/manual/visual-matrix-welcome-task-first.json",
+        "sha256": "542041c0e37f549ba3b9f16afd48614878b4a0e69ad8702c47dc2c29aa9de2e9",
+        "bytes": 894
+      }
+    },
+    {
+      "id": "visual-matrix-sequence-ff4fd861877a75c0",
+      "scenarioId": "visual-matrix",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/manual-sequences/visual-matrix-sequence-ff4fd861877a75c0.json",
+      "sha256": "786b60ef8fd57f6e88ec575379edc8480c9f539da73c42f4f05b98ba4f8a1ba0",
+      "bytes": 1752,
+      "capturedAt": "2026-11-12T00:28:44.500Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "maximized",
+      "state": "native-ready-maximized → Minefield-maximized → Chess-maximized → Space Cadet Pinball-maximized"
+    },
+    {
+      "id": "visual-matrix-sequence-84649fe9bf718142",
+      "scenarioId": "visual-matrix",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/manual-sequences/visual-matrix-sequence-84649fe9bf718142.json",
+      "sha256": "3c8dad9e93b6b33e83dba5dc7ec0a74ccfed4ed90f1ecbc0a378b3ae41e04ff1",
+      "bytes": 2428,
+      "capturedAt": "2026-11-12T00:28:44.500Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested",
+      "state": "welcome-task-first → native-ready-requested → Minefield-requested → Chess-requested → Space Cadet Pinball-requested → chess-solid"
+    },
+    {
+      "id": "chess-sections-sequence-1360db75813d7ec7",
+      "scenarioId": "chess-sections",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/manual-sequences/chess-sections-sequence-1360db75813d7ec7.json",
+      "sha256": "549b389f5d6af8f8189ded47c944a8a9e1f2fe14fabf664915da124d3abdc313",
+      "bytes": 941,
+      "capturedAt": "2026-11-12T00:28:44.500Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1180,
+        "height": 796
+      },
+      "window": "fixture-long-archive",
+      "state": "fixture-archive24-top → fixture-archive24-wheel-bottom"
+    },
+    {
+      "id": "mine-narrow-sequence-5d73911e919497a8",
+      "scenarioId": "mine-narrow",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/manual-sequences/mine-narrow-sequence-5d73911e919497a8.json",
+      "sha256": "76226f53fe20f3f20150a8f0bee8602328c817ec81fb8f46b5f998e3e2b53991",
+      "bytes": 1558,
+      "capturedAt": "2026-11-12T00:28:44.500Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "touch-pan",
+      "state": "touch-intermediate-before → touch-intermediate-after → touch-expert-before → touch-expert-after"
+    },
+    {
+      "id": "pinball-narrow-sequence-4551a58a5d077920",
+      "scenarioId": "pinball-narrow",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/manual-sequences/pinball-narrow-sequence-4551a58a5d077920.json",
+      "sha256": "15ff523569d74f2112775fe2b3d3fa2c4388b3adcc0622926086ba093d547e2d",
+      "bytes": 2585,
+      "capturedAt": "2026-11-12T00:28:44.500Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "touch-clamped",
+      "state": "true-touch-left-held → true-touch-left-released → true-touch-right-held → true-touch-right-released → true-touch-launch-held → true-touch-launch-released → true-touch-live-score"
+    },
+    {
+      "id": "shell-sizing-sequence-178",
+      "scenarioId": "shell-sizing",
+      "kind": "sequence",
+      "path": "experience-evidence/deployed/chess-window-geometry.sequence.json",
+      "sha256": "b580503e97a0738fa4372f67b4e9563314ced37974ec313b8da5a930df4618bd",
+      "bytes": 1487,
+      "capturedAt": "2026-11-12T00:29:03.097Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "requested-maximized-restored",
+      "state": "requested-clamped1000x758 → maximized1280x758 → user-size-restored800x620"
+    },
+    {
+      "id": "mine-input-log-179",
+      "scenarioId": "mine-input",
+      "kind": "log",
+      "path": "experience-evidence/deployed/diagnostics/loading-probe.log",
+      "sha256": "37c6a15230f0f31a3b51e4437fa04bea7104ff84597a037e914ff8e471e0776b",
+      "bytes": 329,
+      "capturedAt": "2026-11-12T00:21:43.062Z",
+      "tree": "5ce1fa38c0a107c0b5173f436d5cfebac7abfafb",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "clamped request",
+      "state": "Manual-harness readiness concern resolved by actual loading-overlay hit test and real selector input after readiness"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "REF-01",
+      "status": "passed",
+      "scenarioIds": [
+        "visual-matrix"
+      ],
+      "artifactIds": [
+        "deployed-browser-log",
+        "post-merge-ci-log",
+        "visual-matrix-viewport-26449f14e6e2b2dd",
+        "visual-matrix-viewport-52513a21de98c80b",
+        "visual-matrix-viewport-28743b868db9a270",
+        "visual-matrix-viewport-7f721a736a4ce034",
+        "visual-matrix-viewport-b8658f6821173be0",
+        "visual-matrix-viewport-3808ba4da4a45cd3",
+        "visual-matrix-viewport-68b629474c71419e",
+        "visual-matrix-sequence-b74418b5a6fb01aa",
+        "visual-matrix-sequence-7ddf3195ebfd6430",
+        "visual-matrix-viewport-15ae0c6c45702137",
+        "visual-matrix-viewport-b5eee81498598bb8",
+        "visual-matrix-viewport-bf50b94cb398c8c7",
+        "visual-matrix-sequence-ff4fd861877a75c0",
+        "visual-matrix-sequence-84649fe9bf718142"
+      ]
+    },
+    {
+      "id": "MINE-01",
+      "status": "passed",
+      "scenarioIds": [
+        "mine-start",
+        "mine-input"
+      ],
+      "artifactIds": [
+        "mine-start-viewport-9ad6ce2946bf6404",
+        "mine-input-viewport-aa65415e6a221e5b",
+        "mine-input-viewport-cbf60c68e1fb693c",
+        "mine-input-viewport-70653b60b3e04a13",
+        "mine-input-viewport-36ece548fdc5e09e",
+        "mine-input-viewport-e53fa67bab638e80",
+        "mine-input-viewport-755b8066a7dccaec",
+        "mine-input-viewport-3772510fe1d108c6",
+        "mine-input-viewport-b223c80dbb8d1be4",
+        "mine-input-sequence-f65d8d74e9090446",
+        "mine-input-log-179"
+      ]
+    },
+    {
+      "id": "MINE-02",
+      "status": "passed",
+      "scenarioIds": [
+        "mine-start",
+        "mine-expert",
+        "mine-narrow"
+      ],
+      "artifactIds": [
+        "mine-expert-viewport-d31a6bdc01b8afee",
+        "mine-narrow-viewport-f6e3967781c05d9a",
+        "mine-start-viewport-9ad6ce2946bf6404",
+        "mine-expert-viewport-0550ce092c26b84c",
+        "mine-expert-viewport-a97d42cbaa71a55a",
+        "mine-expert-viewport-6776a19fda6db38d",
+        "mine-narrow-viewport-3f8d5550d7c7405e",
+        "mine-narrow-viewport-17985293ecc4673a",
+        "mine-expert-sequence-4d7f9b6233e4abb5",
+        "mine-narrow-sequence-faa97228c8ee7302",
+        "mine-narrow-viewport-a942425f409fb371",
+        "mine-narrow-viewport-44122f11cffa7dc6",
+        "mine-narrow-viewport-26f43ce61314a7b9",
+        "mine-narrow-viewport-892ee9f378927f5a",
+        "mine-narrow-sequence-5d73911e919497a8"
+      ]
+    },
+    {
+      "id": "CHESS-01",
+      "status": "passed",
+      "scenarioIds": [
+        "chess-sections"
+      ],
+      "artifactIds": [
+        "chess-sections-viewport-1308a38006e95da6",
+        "chess-sections-viewport-ade9906d29875a18",
+        "chess-sections-viewport-507b34cd64485086",
+        "chess-sections-viewport-54222e6a4e49a810",
+        "chess-sections-viewport-7d21dd643cf6e18c",
+        "chess-sections-viewport-c39a32b08a08d675",
+        "chess-sections-viewport-875a57c37099a6ea",
+        "chess-sections-viewport-df1e6c6387f9fb5a",
+        "chess-sections-viewport-8255cde036248686",
+        "chess-sections-viewport-56d2291befe847e4",
+        "chess-sections-viewport-455751001a1a0080",
+        "chess-sections-viewport-5480495338abc207",
+        "chess-sections-viewport-e27764c25f73e43c",
+        "chess-sections-viewport-191e87cec62fcb70",
+        "chess-sections-viewport-97eef2e4158ffe94",
+        "chess-sections-viewport-d7664138c684c2ab",
+        "chess-sections-viewport-2daa50d85188eeb6",
+        "chess-sections-viewport-fe60852b192c555c",
+        "chess-sections-viewport-f103b9cfbbec3403",
+        "chess-sections-sequence-e693bd3b8fcf44d7",
+        "chess-sections-sequence-9af9df19c2f208e9",
+        "chess-sections-viewport-1fb06e9b79495261",
+        "chess-sections-viewport-c6808e8bc56f024f",
+        "chess-sections-viewport-0953d19988f1ff99",
+        "chess-sections-sequence-1360db75813d7ec7"
+      ]
+    },
+    {
+      "id": "CHESS-02",
+      "status": "passed",
+      "scenarioIds": [
+        "chess-play",
+        "chess-resize"
+      ],
+      "artifactIds": [
+        "chess-play-viewport-e5ae7aa62b7e7d61",
+        "chess-play-viewport-7e809de0df757105",
+        "chess-resize-viewport-edc79e36bc4384a0",
+        "chess-resize-viewport-a1754f04d93da346",
+        "chess-resize-viewport-31737adfa4abcd5b",
+        "chess-resize-viewport-182f19fdee0e4b90",
+        "chess-resize-viewport-fa45bc3f5ca183a1",
+        "chess-resize-viewport-11659b55cebe2812",
+        "chess-resize-viewport-c0f4c0f161604cb3",
+        "chess-play-viewport-d7cf2c89a2ec31a3",
+        "chess-play-viewport-9eb0748fac974cce",
+        "chess-play-viewport-365831cfcbbc4cf0",
+        "chess-play-viewport-51eb3d4c95e117fe",
+        "chess-play-viewport-1349a90e5530b6fe",
+        "chess-play-viewport-2981edbc2c375fb0",
+        "chess-play-viewport-7be6a54513fe2c6d",
+        "chess-play-viewport-c250cb8bc3875f48",
+        "chess-play-viewport-516d2b301d0818cd",
+        "chess-resize-viewport-8b29a97d3a677666",
+        "chess-play-sequence-b7b29ae6f8d88789",
+        "chess-resize-sequence-b81a4d9649a11cf3",
+        "chess-play-sequence-d76476850438a2a0"
+      ]
+    },
+    {
+      "id": "PIN-01",
+      "status": "passed",
+      "scenarioIds": [
+        "pinball-play",
+        "pinball-narrow"
+      ],
+      "artifactIds": [
+        "live-native-payloads-log",
+        "pinball-narrow-viewport-908461fc336963ca",
+        "pinball-narrow-viewport-e292224f052209b8",
+        "pinball-narrow-viewport-201c61b1bcda5cee",
+        "pinball-narrow-viewport-02e935e2ee2439c7",
+        "pinball-narrow-viewport-d5880e1e50a6be2a",
+        "pinball-narrow-viewport-35ae56394e43c78f",
+        "pinball-play-viewport-12a27b318b70669f",
+        "pinball-play-viewport-70fce6c246b71a79",
+        "pinball-play-viewport-e8bbbdcae0aa1513",
+        "pinball-play-viewport-99bf38b4e93ffd25",
+        "pinball-play-viewport-259569d49bcc3263",
+        "pinball-play-viewport-0d92e3e1239fc7a2",
+        "pinball-play-viewport-758197ab63dc370a",
+        "pinball-play-viewport-017b4a434a642459",
+        "pinball-play-viewport-5c552ea637809001",
+        "pinball-play-viewport-4d801b4ace907862",
+        "pinball-play-viewport-dfac2e180690d4e3",
+        "pinball-play-viewport-b97b5e4b9467b5bb",
+        "pinball-play-viewport-09ae12962029162d",
+        "pinball-narrow-sequence-a5b67073dc8c658e",
+        "pinball-narrow-sequence-4d62b0d6c2f04761",
+        "pinball-play-sequence-ee6cb6b3872a6e60",
+        "pinball-narrow-viewport-73003e7f9b403622",
+        "pinball-narrow-viewport-48e0f27442130676",
+        "pinball-narrow-viewport-79992218b0dfc632",
+        "pinball-narrow-viewport-f558e91d15c048e0",
+        "pinball-narrow-viewport-5e7ce4ae7327adc6",
+        "pinball-narrow-viewport-24b37646ffa931d8",
+        "pinball-narrow-viewport-bb30379e6575e68a",
+        "pinball-narrow-sequence-4551a58a5d077920"
+      ]
+    },
+    {
+      "id": "SHELL-01",
+      "status": "passed",
+      "scenarioIds": [
+        "shell-sizing"
+      ],
+      "artifactIds": [
+        "shell-sizing-viewport-d7ba5d2c26835798",
+        "shell-sizing-viewport-b7e5f48b3950fd33",
+        "shell-sizing-viewport-8cebee0304b1b7d5",
+        "shell-sizing-viewport-76174fb4ae2013ab",
+        "shell-sizing-viewport-a2084a6a51b5591a",
+        "shell-sizing-viewport-b9adbff2c32aaa70",
+        "shell-sizing-viewport-b760ba854638bf89",
+        "shell-sizing-viewport-b38eef26119e1f7a",
+        "shell-sizing-viewport-c727730db3bf0be7",
+        "shell-sizing-viewport-f19b990c04cbd7d2",
+        "shell-sizing-viewport-3015450b0b25388f",
+        "shell-sizing-viewport-05413dd89e9c8f25",
+        "shell-sizing-viewport-3229aab8de812703",
+        "shell-sizing-viewport-dc369ac146b58e89",
+        "shell-sizing-viewport-8834f8d0cce1b0d1",
+        "shell-sizing-viewport-cf4a34eec477c874",
+        "shell-sizing-viewport-938a44c00edaeba9",
+        "shell-sizing-viewport-e15de21fd4c0dcee",
+        "shell-sizing-viewport-aa6680fb3e08d97b",
+        "shell-sizing-viewport-14909ddf7eab1315",
+        "shell-sizing-viewport-a47c4a669fef183e",
+        "shell-sizing-viewport-8f5762858211726f",
+        "shell-sizing-viewport-bc65857faf029e21",
+        "shell-sizing-viewport-9158908e36136305",
+        "shell-sizing-viewport-edcb0efb777c2a3e",
+        "shell-sizing-viewport-b8eb46fb0ea734c6",
+        "shell-sizing-viewport-82bd437024d045ca",
+        "shell-sizing-viewport-67153ff7eabf9cf1",
+        "shell-sizing-viewport-386a6616fc45599a",
+        "shell-sizing-viewport-4f3faa461e7e9d7f",
+        "shell-sizing-viewport-33c4436a140cf6f2",
+        "shell-sizing-viewport-10b20432d8d27a52",
+        "shell-sizing-viewport-0012437914efed61",
+        "shell-sizing-viewport-e0722ae5ad67440f",
+        "shell-sizing-viewport-a2d36218c101a342",
+        "shell-sizing-viewport-84d17194281ac51f",
+        "shell-sizing-viewport-4ea893f28fc52ea2",
+        "shell-sizing-viewport-6e4853c44f339954",
+        "shell-sizing-viewport-25bf2c0154feb1a7",
+        "shell-sizing-viewport-2a5e8eeed8fc7931",
+        "shell-sizing-viewport-3952e4bdb7e1913b",
+        "shell-sizing-viewport-bb17c5e483a1656a",
+        "shell-sizing-viewport-87f7eeafb3ab2069",
+        "shell-sizing-sequence-dca431704da058db",
+        "shell-sizing-sequence-41b270662cfb9e55",
+        "shell-sizing-sequence-c4804c6d78b940e8",
+        "shell-sizing-sequence-d32f58b8c7218166",
+        "shell-sizing-sequence-baa0221399a4ac9e",
+        "shell-sizing-sequence-178"
+      ]
+    },
+    {
+      "id": "SHELL-02",
+      "status": "passed",
+      "scenarioIds": [
+        "shell-focus"
+      ],
+      "artifactIds": [
+        "shell-focus-viewport-61914de25e7b2c85",
+        "shell-focus-viewport-74350026ca172925",
+        "shell-focus-viewport-d2486e08671bf85e",
+        "shell-focus-viewport-3c5042eeb6acd653",
+        "shell-focus-viewport-d77e54d306afaa33",
+        "shell-focus-viewport-e4ca49e57159f632",
+        "shell-focus-viewport-84a517a5500ec31c",
+        "shell-focus-viewport-75bb32ce1fd668c8",
+        "shell-focus-viewport-5ba2d38cbac821c9",
+        "shell-focus-sequence-4428d54d2bfe1c5a"
+      ]
+    },
+    {
+      "id": "GATE-01",
+      "status": "passed",
+      "scenarioIds": [
+        "gate-negative"
+      ],
+      "artifactIds": [
+        "deployed-gate-negative-log"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "visual-matrix",
+      "status": "passed",
+      "artifactIds": [
+        "deployed-browser-log",
+        "post-merge-ci-log",
+        "visual-matrix-viewport-26449f14e6e2b2dd",
+        "visual-matrix-viewport-52513a21de98c80b",
+        "visual-matrix-viewport-28743b868db9a270",
+        "visual-matrix-viewport-7f721a736a4ce034",
+        "visual-matrix-viewport-b8658f6821173be0",
+        "visual-matrix-viewport-3808ba4da4a45cd3",
+        "visual-matrix-viewport-68b629474c71419e",
+        "visual-matrix-sequence-b74418b5a6fb01aa",
+        "visual-matrix-sequence-7ddf3195ebfd6430",
+        "visual-matrix-viewport-15ae0c6c45702137",
+        "visual-matrix-viewport-b5eee81498598bb8",
+        "visual-matrix-viewport-bf50b94cb398c8c7",
+        "visual-matrix-sequence-ff4fd861877a75c0",
+        "visual-matrix-sequence-84649fe9bf718142"
+      ],
+      "observed": "Fresh production requested/maximized Minefield, Chess and native-ready Pinball, constrained layouts, glass/solid preference and useful Welcome labels were captured and viewed. App character, restrained rounded controls and XP chrome match the approved source. Production analytics is disabled and Privacy is absent, confirmed in the live configuration observation; enabled-state tests remain candidate/CI evidence."
+    },
+    {
+      "id": "mine-start",
+      "status": "passed",
+      "artifactIds": [
+        "mine-start-viewport-9ad6ce2946bf6404"
+      ],
+      "observed": "Beginner opened at480x600 with no document or board overflow. Level, New game, board and status were visible and hit-testable; Cell size and Flag mode controls were absent."
+    },
+    {
+      "id": "mine-input",
+      "status": "passed",
+      "artifactIds": [
+        "mine-input-viewport-aa65415e6a221e5b",
+        "mine-input-viewport-cbf60c68e1fb693c",
+        "mine-input-viewport-70653b60b3e04a13",
+        "mine-input-viewport-36ece548fdc5e09e",
+        "mine-input-viewport-e53fa67bab638e80",
+        "mine-input-viewport-755b8066a7dccaec",
+        "mine-input-viewport-3772510fe1d108c6",
+        "mine-input-viewport-b223c80dbb8d1be4",
+        "mine-input-sequence-f65d8d74e9090446",
+        "mine-input-log-179"
+      ],
+      "observed": "Live reveal, right-click/F marking, chord, touch hold/cancel, pending-generation reset and induced worker failure/Retry passed. An initial manual script selected before host readiness; direct hit testing confirmed the real loading overlay blocks pointer input while aria-busy=true. After readiness, actual click+ArrowDown/Enter changed Level to256 Intermediate cells. The unused delay hook matched zero requests, so no induced slow-network claim is made. Diagnostic and failed harness logs are retained."
+    },
+    {
+      "id": "mine-expert",
+      "status": "passed",
+      "artifactIds": [
+        "mine-expert-viewport-d31a6bdc01b8afee",
+        "mine-expert-viewport-0550ce092c26b84c",
+        "mine-expert-viewport-a97d42cbaa71a55a",
+        "mine-expert-viewport-6776a19fda6db38d",
+        "mine-expert-sequence-4d7f9b6233e4abb5"
+      ],
+      "observed": "Expert requested1120x760, fit the desktop and reached over70% revealed before winning using only public clues. Dense open/covered/flag states remained distinct; no guessing or accidental desktop overflow was required."
+    },
+    {
+      "id": "mine-narrow",
+      "status": "passed",
+      "artifactIds": [
+        "mine-narrow-viewport-f6e3967781c05d9a",
+        "mine-narrow-viewport-3f8d5550d7c7405e",
+        "mine-narrow-viewport-17985293ecc4673a",
+        "mine-narrow-sequence-faa97228c8ee7302",
+        "mine-narrow-viewport-a942425f409fb371",
+        "mine-narrow-viewport-44122f11cffa7dc6",
+        "mine-narrow-viewport-26f43ce61314a7b9",
+        "mine-narrow-viewport-892ee9f378927f5a",
+        "mine-narrow-sequence-5d73911e919497a8"
+      ],
+      "observed": "At320x640 Intermediate/Expert retained24px cells with the board as the sole spatial pan area. Keyboard reached and used distant cells. Actual live touch moved Intermediate0→116px and Expert116→378px with no accidental flags/reveals or page overflow."
+    },
+    {
+      "id": "chess-sections",
+      "status": "passed",
+      "artifactIds": [
+        "chess-sections-viewport-1308a38006e95da6",
+        "chess-sections-viewport-ade9906d29875a18",
+        "chess-sections-viewport-507b34cd64485086",
+        "chess-sections-viewport-54222e6a4e49a810",
+        "chess-sections-viewport-7d21dd643cf6e18c",
+        "chess-sections-viewport-c39a32b08a08d675",
+        "chess-sections-viewport-875a57c37099a6ea",
+        "chess-sections-viewport-df1e6c6387f9fb5a",
+        "chess-sections-viewport-8255cde036248686",
+        "chess-sections-viewport-56d2291befe847e4",
+        "chess-sections-viewport-455751001a1a0080",
+        "chess-sections-viewport-5480495338abc207",
+        "chess-sections-viewport-e27764c25f73e43c",
+        "chess-sections-viewport-191e87cec62fcb70",
+        "chess-sections-viewport-97eef2e4158ffe94",
+        "chess-sections-viewport-d7664138c684c2ab",
+        "chess-sections-viewport-2daa50d85188eeb6",
+        "chess-sections-viewport-fe60852b192c555c",
+        "chess-sections-viewport-f103b9cfbbec3403",
+        "chess-sections-sequence-e693bd3b8fcf44d7",
+        "chess-sections-sequence-9af9df19c2f208e9",
+        "chess-sections-viewport-1fb06e9b79495261",
+        "chess-sections-viewport-c6808e8bc56f024f",
+        "chess-sections-viewport-0953d19988f1ff99",
+        "chess-sections-sequence-1360db75813d7ec7"
+      ],
+      "observed": "Computer, Online, Local, Model arena, Models and Saved matches remained reachable with anchored navigation and selected-detail scrolling. A labelled24-row browser-response archive fixture genuinely wheel-scrolled0→1454px; nav bounds and hit tests stayed stable, including narrow layout. The fixture made no database writes."
+    },
+    {
+      "id": "chess-play",
+      "status": "passed",
+      "artifactIds": [
+        "chess-play-viewport-e5ae7aa62b7e7d61",
+        "chess-play-viewport-7e809de0df757105",
+        "chess-play-viewport-d7cf2c89a2ec31a3",
+        "chess-play-viewport-9eb0748fac974cce",
+        "chess-play-viewport-365831cfcbbc4cf0",
+        "chess-play-viewport-51eb3d4c95e117fe",
+        "chess-play-viewport-1349a90e5530b6fe",
+        "chess-play-viewport-2981edbc2c375fb0",
+        "chess-play-viewport-7be6a54513fe2c6d",
+        "chess-play-viewport-c250cb8bc3875f48",
+        "chess-play-viewport-516d2b301d0818cd",
+        "chess-play-sequence-b7b29ae6f8d88789",
+        "chess-play-sequence-d76476850438a2a0"
+      ],
+      "observed": "Genuine Stockfish18, Stockfish19 and Reckless responses/free hints passed with reachable actions. Move quality used fixed zero-based loss and half-pawn red cutoff, matching board colors; Undo, Leave and New game, waiting/error/Retry, arena advancement/pause/resume and replay were exercised."
+    },
+    {
+      "id": "chess-resize",
+      "status": "passed",
+      "artifactIds": [
+        "chess-resize-viewport-edc79e36bc4384a0",
+        "chess-resize-viewport-a1754f04d93da346",
+        "chess-resize-viewport-31737adfa4abcd5b",
+        "chess-resize-viewport-182f19fdee0e4b90",
+        "chess-resize-viewport-fa45bc3f5ca183a1",
+        "chess-resize-viewport-11659b55cebe2812",
+        "chess-resize-viewport-c0f4c0f161604cb3",
+        "chess-resize-viewport-8b29a97d3a677666",
+        "chess-resize-sequence-b81a4d9649a11cf3"
+      ],
+      "observed": "Real pointer resizing achieved960x900,1200x1100 and1600x1300 at1920x1400. Board stayed square, filled its limiting stage axis and grew beyond legacy caps. At1280x576,390x844 and320x640, actions stayed visible/hit-testable without document overflow."
+    },
+    {
+      "id": "pinball-play",
+      "status": "passed",
+      "artifactIds": [
+        "live-native-payloads-log",
+        "pinball-play-viewport-12a27b318b70669f",
+        "pinball-play-viewport-70fce6c246b71a79",
+        "pinball-play-viewport-e8bbbdcae0aa1513",
+        "pinball-play-viewport-99bf38b4e93ffd25",
+        "pinball-play-viewport-259569d49bcc3263",
+        "pinball-play-viewport-0d92e3e1239fc7a2",
+        "pinball-play-viewport-758197ab63dc370a",
+        "pinball-play-viewport-017b4a434a642459",
+        "pinball-play-viewport-5c552ea637809001",
+        "pinball-play-viewport-4d801b4ace907862",
+        "pinball-play-viewport-dfac2e180690d4e3",
+        "pinball-play-viewport-b97b5e4b9467b5bb",
+        "pinball-play-viewport-09ae12962029162d",
+        "pinball-play-sequence-ee6cb6b3872a6e60"
+      ],
+      "observed": "Live native readiness, accepted Space charging to measured pull100, genuine scores, flippers, in-flight pause/frozen motion/resume, natural drain/next-ball and failed WASM download→Retry→scored play all passed. Menus/import setup and page scrolling were absent. Downloaded production JS/WASM/data bytes independently matched all three committed SHA256 hashes and the live build identity."
+    },
+    {
+      "id": "pinball-narrow",
+      "status": "passed",
+      "artifactIds": [
+        "pinball-narrow-viewport-908461fc336963ca",
+        "pinball-narrow-viewport-e292224f052209b8",
+        "pinball-narrow-viewport-201c61b1bcda5cee",
+        "pinball-narrow-viewport-02e935e2ee2439c7",
+        "pinball-narrow-viewport-d5880e1e50a6be2a",
+        "pinball-narrow-viewport-35ae56394e43c78f",
+        "pinball-narrow-sequence-a5b67073dc8c658e",
+        "pinball-narrow-sequence-4d62b0d6c2f04761",
+        "pinball-narrow-viewport-73003e7f9b403622",
+        "pinball-narrow-viewport-48e0f27442130676",
+        "pinball-narrow-viewport-79992218b0dfc632",
+        "pinball-narrow-viewport-f558e91d15c048e0",
+        "pinball-narrow-viewport-5e7ce4ae7327adc6",
+        "pinball-narrow-viewport-24b37646ffa931d8",
+        "pinball-narrow-viewport-bb30379e6575e68a",
+        "pinball-narrow-sequence-4551a58a5d077920"
+      ],
+      "observed": "At390x844 and320x640 live score, ball, whole undistorted table and controls remained visible while playing/resizing/paused. Actual touch held/released both flippers; native pull1→100, one release scored2000 without relaunch or page scrolling."
+    },
+    {
+      "id": "shell-sizing",
+      "status": "passed",
+      "artifactIds": [
+        "shell-sizing-viewport-d7ba5d2c26835798",
+        "shell-sizing-viewport-b7e5f48b3950fd33",
+        "shell-sizing-viewport-8cebee0304b1b7d5",
+        "shell-sizing-viewport-76174fb4ae2013ab",
+        "shell-sizing-viewport-a2084a6a51b5591a",
+        "shell-sizing-viewport-b9adbff2c32aaa70",
+        "shell-sizing-viewport-b760ba854638bf89",
+        "shell-sizing-viewport-b38eef26119e1f7a",
+        "shell-sizing-viewport-c727730db3bf0be7",
+        "shell-sizing-viewport-f19b990c04cbd7d2",
+        "shell-sizing-viewport-3015450b0b25388f",
+        "shell-sizing-viewport-05413dd89e9c8f25",
+        "shell-sizing-viewport-3229aab8de812703",
+        "shell-sizing-viewport-dc369ac146b58e89",
+        "shell-sizing-viewport-8834f8d0cce1b0d1",
+        "shell-sizing-viewport-cf4a34eec477c874",
+        "shell-sizing-viewport-938a44c00edaeba9",
+        "shell-sizing-viewport-e15de21fd4c0dcee",
+        "shell-sizing-viewport-aa6680fb3e08d97b",
+        "shell-sizing-viewport-14909ddf7eab1315",
+        "shell-sizing-viewport-a47c4a669fef183e",
+        "shell-sizing-viewport-8f5762858211726f",
+        "shell-sizing-viewport-bc65857faf029e21",
+        "shell-sizing-viewport-9158908e36136305",
+        "shell-sizing-viewport-edcb0efb777c2a3e",
+        "shell-sizing-viewport-b8eb46fb0ea734c6",
+        "shell-sizing-viewport-82bd437024d045ca",
+        "shell-sizing-viewport-67153ff7eabf9cf1",
+        "shell-sizing-viewport-386a6616fc45599a",
+        "shell-sizing-viewport-4f3faa461e7e9d7f",
+        "shell-sizing-viewport-33c4436a140cf6f2",
+        "shell-sizing-viewport-10b20432d8d27a52",
+        "shell-sizing-viewport-0012437914efed61",
+        "shell-sizing-viewport-e0722ae5ad67440f",
+        "shell-sizing-viewport-a2d36218c101a342",
+        "shell-sizing-viewport-84d17194281ac51f",
+        "shell-sizing-viewport-4ea893f28fc52ea2",
+        "shell-sizing-viewport-6e4853c44f339954",
+        "shell-sizing-viewport-25bf2c0154feb1a7",
+        "shell-sizing-viewport-2a5e8eeed8fc7931",
+        "shell-sizing-viewport-3952e4bdb7e1913b",
+        "shell-sizing-viewport-bb17c5e483a1656a",
+        "shell-sizing-viewport-87f7eeafb3ab2069",
+        "shell-sizing-sequence-dca431704da058db",
+        "shell-sizing-sequence-41b270662cfb9e55",
+        "shell-sizing-sequence-c4804c6d78b940e8",
+        "shell-sizing-sequence-d32f58b8c7218166",
+        "shell-sizing-sequence-baa0221399a4ac9e",
+        "shell-sizing-sequence-178"
+      ],
+      "observed": "All installed games and Welcome/Help/Plugins matched per-axis requested/workspace clamps. Maximize/restore and user sizes survived viewport shrink/return. Explicit Chess sequence shows1000x758 request,1280x758 maximization and800x620 user-size restoration in the same1280x800 viewport."
+    },
+    {
+      "id": "shell-focus",
+      "status": "passed",
+      "artifactIds": [
+        "shell-focus-viewport-61914de25e7b2c85",
+        "shell-focus-viewport-74350026ca172925",
+        "shell-focus-viewport-d2486e08671bf85e",
+        "shell-focus-viewport-3c5042eeb6acd653",
+        "shell-focus-viewport-d77e54d306afaa33",
+        "shell-focus-viewport-e4ca49e57159f632",
+        "shell-focus-viewport-84a517a5500ec31c",
+        "shell-focus-viewport-75bb32ce1fd668c8",
+        "shell-focus-viewport-5ba2d38cbac821c9",
+        "shell-focus-sequence-4428d54d2bfe1c5a"
+      ],
+      "observed": "Ten repeated exposed-body actions raised and acted on the first click; keyboard focus, nested Pinball canvas, genuine play and keyboard Resume passed. Drag remained continuous across frames;100 clicks on the active window left stacking bounded/stable."
+    },
+    {
+      "id": "gate-negative",
+      "status": "passed",
+      "artifactIds": [
+        "deployed-gate-negative-log"
+      ],
+      "observed": "All36 gate tests passed on the approved source. Live browser acceptance helpers rejected injected2px overflow, clipped actions and broken focus.81 applicable production cases passed first attempt, and post-merge CI passed all85 with flaky-pass rejection enabled. Deployed identity resolves the merged commit to the promoted source tree; native payload bytes match. Enabled-analytics tests were excluded from this disabled-analytics deployment and remain covered by candidate and both CI runs."
+    }
+  ],
+  "deployment": {
+    "commit": "b63e82a0af6d5648f85c431b178914e90163dbdc",
+    "identityUrl": "https://analytics-games-service.vercel.app/api/build-identity",
+    "identityVerifiedAt": "2026-11-12T00:17:13.218Z"
+  }
+}
