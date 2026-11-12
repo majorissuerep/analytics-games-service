@@ -5,7 +5,7 @@ import { presentAnalysis } from '../../lib/engine/reckless-presentation'
 
 type Pending = { fen: string; url: string; aborted: boolean; settled: boolean; previousAborted: boolean; resolve: (response: Response) => void }
 declare global {
-  interface Window { chessCancellationFixture?: { requests: Pending[]; clickStates: boolean[] }; chessCancellationEvents?: string[] }
+  interface Window { chessCancellationFixture?: { requests: Pending[] }; chessCancellationEvents?: string[] }
 }
 
 test.beforeEach(async ({ context }) => {
@@ -15,12 +15,9 @@ test.beforeEach(async ({ context }) => {
 async function adversarialTransport(page: Page) {
   await page.addInitScript(() => {
     const original = window.fetch.bind(window)
-    const state = window.chessCancellationFixture = { requests: [] as Pending[], clickStates: [] as boolean[] }
+    const state = window.chessCancellationFixture = { requests: [] as Pending[] }
     window.chessCancellationEvents = []
     window.addEventListener('message', event => { if (event.origin === location.origin && event.data?.kind === 'chess-fixture-abort') window.chessCancellationEvents?.push(event.data.url) })
-    document.addEventListener('click', event => {
-      if ((event.target as Element).closest?.('#analytics-chess-board-square-e4')) state.clickStates.push(state.requests.at(-1)?.aborted ?? false)
-    })
     window.fetch = (input, init) => {
       const url = String(input)
       if (!url.endsWith('/api/chess/analyse') && !/\/api\/chess-models\/[^/]+\/move$/.test(url)) return original(input, init)
@@ -81,10 +78,15 @@ test('only current predictions survive rapid free moves and late buffered respon
   await startFree(frame)
   await requestCount(frame, 1)
   await captureExperience(page, info, 'current-position', 'initial-current-loading')
-  await move(frame, 'e2', 'e4')
+  await frame.locator('#analytics-chess-board-square-e2').click()
+  const abortedWithinAction = await frame.locator('#analytics-chess-board-square-e4').evaluate(element => {
+    const before = window.chessCancellationFixture!.requests.filter(item => !item.aborted && !item.settled)
+    ;(element as HTMLElement).click()
+    return before.length > 0 && before.every(item => item.aborted)
+  })
+  expect(abortedWithinAction, 'accepted move aborts prior work within the same action').toBe(true)
   await requestCount(frame, 2)
   expect((await requests(frame))[0].aborted).toBe(true)
-  expect(await frame.locator('html').evaluate(() => window.chessCancellationFixture!.clickStates)).toEqual([true])
   await move(frame, 'e7', 'e5')
   await move(frame, 'g1', 'f3')
   await requestCount(frame, 4)
