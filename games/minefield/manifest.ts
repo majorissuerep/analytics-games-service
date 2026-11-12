@@ -14,8 +14,7 @@ export const minefieldManifest = {
   estimatedMinutes: '3–12 min',
   tags: ['solo', 'logic', 'classic'],
   instructions: [
-    { title: 'Reveal', detail: 'Click or press Enter. Local numbers count touching mines; the first opening and its local neighbors are safe.' },
-    { title: 'Mark', detail: 'Right-click, press F, or hold a covered square to mark it.' },
+    { title: 'Reveal and mark', detail: 'Click or Enter opens; right-click, F, or hold marks. Local numbers count touching mines. The first opening and its local neighbors are safe.' },
     { title: 'Explain', detail: 'Explain move shows visible clue values, regions and supporting deductions. Flags are notes, never proof.' },
     { title: 'Extreme Elite', detail: 'Two 8×8 layers, 28 mines. E or Scan echo on a revealed clue counts the other layer’s aligned 3×3. Scans are unlimited and counted. C or Shift-click clears local neighbors.' },
   ],
