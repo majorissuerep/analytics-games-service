@@ -663,6 +663,10 @@ export function ChessGame() {
     ? [{ startSquare: hoverLine.uci.slice(0, 2), endSquare: hoverLine.uci.slice(2, 4), color: lineQualityColor(hoverLine) }]
     : []
 
+  const enginePending = mode === 'bot' && (engineThinking || analyzing)
+  const showEvaluation = mode === 'bot' && engineControl === 'auto' && ['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(modelRevision)
+  const evaluationPending = showEvaluation && !evaluation && !evaluationError
+
   return (
     <main className="app-surface chess-app">
       <header className="chess-toolbar">
@@ -782,8 +786,9 @@ export function ChessGame() {
             <div className="chess-utility-details" data-scroll-owner="chess-utility-details" aria-label="Selected game details">
             <div hidden={utilitySection !== 'analysis'}>
             {mode === 'bot' && <div className="chess-opponent"><span>{engineControl === 'auto' ? '♞' : engineControl === 'pick' ? '☞' : '♘'}</span><div><b>{engineControl === 'auto' ? opponentName : opponentName}</b><small>{engineControl === 'auto' ? stockfishEngineIdForRevision(modelRevision) ? `${level.label} · Skill ${level.skill}/20` : modelRevision === RECKLESS_LOCAL ? `Local engine · ${rethinkMs >= 1000 ? `${rethinkMs / 1000}s` : `${rethinkMs}ms`} think` : 'Custom model' : engineControl === 'pick' ? `Pick from ${hintLines} ranked moves` : `Live hints · ${hintLines} lines · ${rethinkMs >= 1000 ? `${rethinkMs / 1000}s` : `${rethinkMs}ms`}`}</small></div></div>}
-            {mode === 'bot' && engineControl === 'auto' && ['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(modelRevision) && <EvaluationBar evaluation={evaluation} error={evaluationError || undefined} engineName={opponentName} progress={evaluationProgress} onCancel={() => { evaluationAbortRef.current?.abort(); setEvaluationProgress(null); setEvaluationError('Engine request stopped. Retry when ready.') }} onRetry={() => { clearAnalysisState(); setEngineRetry(value => value + 1) }} />}
-            {mode === 'bot' && (engineThinking || analyzing) && <LoadingState key={`${localFen}:${modelRevision}:${engineRetry}:${rethinkMs}:${hintLines}`} label={`${opponentName}: ${engineProgress?.message ?? 'Connecting to engine'}`} detail={engineProgress?.detail} onCancel={() => engineAbortRef.current?.abort()} />}
+            {enginePending && <div className="chess-engine-loading"><LoadingState key={`${localFen}:${modelRevision}:${engineRetry}:${rethinkMs}:${hintLines}`} label={`${opponentName}: ${engineProgress?.message ?? 'Connecting to engine'}`} detail={engineProgress?.detail} /></div>}
+            {engineError && <p className="chess-notice" role="alert">{engineError}</p>}
+            {showEvaluation && <EvaluationBar evaluation={evaluation} error={evaluationError || undefined} engineName={opponentName} progress={evaluationProgress} />}
             {hintsVisible && suggestions && <div className="chess-suggestions" role="group" aria-label="Engine move suggestions">
               <div className="chess-suggestion-balance"><span>Position balance</span><b>{suggestionBalance}</b></div>
               <div className="chess-quality-heading"><b>Move quality</b><span>Loss vs best · pawns</span></div>
@@ -801,7 +806,6 @@ export function ChessGame() {
               </div>
               <div className="chess-suggestion-hint">Best = 0.00 and green. Up to −0.10 stays greenish; −0.50 or worse is red. Position balance is separate. Mate changes are labeled, not converted to pawns. {engineControl === 'pick' ? 'Hover to preview; click a row to play.' : 'Play any move or click a hint.'}</div>
             </div>}
-            {engineError && <p className="chess-notice" role="alert">{engineError} <button onClick={() => { clearAnalysisState(); setEngineRetry(value => value + 1) }}>Retry</button></p>}
             {mode === 'online' && roomClient.activity && <LoadingState label={roomClient.activity} />}
             {mode === 'online' && roomClient.room && <div className="chess-room-panel"><small>ROOM CODE</small><div><strong>{roomClient.room.code}</strong><button onClick={() => void navigator.clipboard.writeText(roomClient.room?.code ?? '')}>Copy</button></div><p>{roomClient.room.players.map((player) => player.name).join('  vs  ')}</p>{online?.phase === 'lobby' && roomClient.room.hostId === playerId && <button className="chess-primary" disabled={roomClient.room.players.length !== 2 || roomClient.pending} onClick={() => void roomClient.dispatch({ type: 'chess.start', hostColor: colorChoice, timeControlId })}>{roomClient.room.players.length === 2 ? 'Start match' : 'Waiting for opponent…'}</button>}</div>}
             {mode === 'online' && online?.timeControlId && (
@@ -814,6 +818,10 @@ export function ChessGame() {
             </div><div hidden={utilitySection !== 'moves'} className="chess-moves"><h3>Move history</h3><div>{mode === 'online' ? online?.pgn || 'Moves will appear here.' : localPgn || 'Moves will appear here.'}</div></div>
             </div>
             <div className="chess-actions">
+              {enginePending && <button onClick={() => engineAbortRef.current?.abort()}>Cancel</button>}
+              {evaluationPending && <button onClick={() => { evaluationAbortRef.current?.abort(); setEvaluationProgress(null); setEvaluationError('Engine request stopped. Retry when ready.') }}>Cancel evaluation</button>}
+              {engineError && <button onClick={() => { clearAnalysisState(); setEngineRetry(value => value + 1) }}>Retry</button>}
+              {showEvaluation && evaluationError && <button onClick={() => { clearAnalysisState(); setEngineRetry(value => value + 1) }}>Retry evaluation</button>}
               {canUndo && <button className="chess-undo" onClick={undoMove} title="Undo last move">↶ Undo</button>}
               <button onClick={resetToSetup}>Leave game</button>
               {mode === 'online' && online?.phase === 'active' && <button className="danger" onClick={() => void roomClient.dispatch({ type: 'chess.resign' })}>Resign</button>}

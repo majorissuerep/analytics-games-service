@@ -114,6 +114,7 @@ test('only current predictions survive rapid free moves and late buffered respon
   await expect(frame.getByRole('heading', { name: 'White to move' })).toBeVisible()
   await page.setViewportSize({ width: 390, height: 844 })
   await expectActionReady(frame.getByRole('button', { name: 'New game', exact: true }))
+  await expectActionReady(frame.getByRole('button', { name: 'Cancel', exact: true }))
   await expectActionReady(frame.getByRole('button', { name: 'Leave game', exact: true }))
   await expect.poll(() => overflowIssues(frame.locator('.chess-app'), { allow: ['chess-utility-details'] })).toEqual([])
   await captureExperience(page, info, 'current-position', 'current-loading-narrow', 'clamped')
@@ -164,6 +165,54 @@ test('undo same FEN cancel retry reset and window close invalidate prediction ge
   await expect.poll(() => page.evaluate(() => window.chessCancellationEvents!.length)).toBeGreaterThan(before)
   await captureExperience(page, info, 'chess-lifecycle', 'closing-window-aborts-current-work')
 })
+
+for (const control of ['free', 'auto'] as const) {
+  test(`${control} recovery actions remain reachable at requested and narrow sizes`, async ({ page }, info) => {
+    await adversarialTransport(page)
+    const frame = await openChess(page)
+    if (control === 'free') {
+      await startFree(frame)
+      await requestCount(frame, 1)
+      await move(frame, 'e2', 'e4')
+      await requestCount(frame, 2)
+    } else {
+      await frame.locator('.chess-primary').filter({ hasText: /^Play / }).click()
+      await expect.poll(async () => (await requests(frame)).some(r => r.url.endsWith('/analyse'))).toBe(true)
+      await move(frame, 'e2', 'e4')
+      await expect.poll(async () => (await requests(frame)).some(r => r.url.endsWith('/move'))).toBe(true)
+      const moveIndex = (await requests(frame)).findIndex(r => r.url.endsWith('/move'))
+      await deliver(frame, moveIndex)
+      await expect(frame.getByRole('heading', { name: 'White to move' })).toBeVisible()
+      await move(frame, 'g1', 'f3')
+      await expect.poll(async () => (await requests(frame)).filter(r => !r.aborted && !r.settled).length).toBe(2)
+    }
+    const ready = async (names: string[]) => {
+      for (const name of names) await expectActionReady(frame.getByRole('button', { name, exact: true }))
+      await expect.poll(() => overflowIssues(frame.locator('.chess-app'), { allow: ['chess-utility-details'] })).toEqual([])
+    }
+    for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 }, { width: 320, height: 640 }]) {
+      await page.setViewportSize(viewport)
+      await ready(['New game', 'Cancel', '↶ Undo', 'Leave game', ...(control === 'auto' ? ['Cancel evaluation'] : [])])
+      await captureExperience(page, info, 'chess-lifecycle', `${control}-cancel-reachable-${viewport.width}`, viewport.width < 1000 ? 'clamped' : 'requested')
+    }
+    await frame.getByRole('button', { name: 'Moves', exact: true }).click()
+    await ready(['Cancel', ...(control === 'auto' ? ['Cancel evaluation'] : [])])
+    await frame.getByRole('button', { name: 'Cancel', exact: true }).click()
+    if (control === 'auto') await frame.getByRole('button', { name: 'Cancel evaluation', exact: true }).click()
+    await expect.poll(async () => (await requests(frame)).filter(r => !r.settled).every(r => r.aborted)).toBe(true)
+    for (const viewport of [{ width: 320, height: 640 }, { width: 390, height: 844 }, { width: 1280, height: 900 }]) {
+      await page.setViewportSize(viewport)
+      await ready(['New game', 'Retry', '↶ Undo', 'Leave game', ...(control === 'auto' ? ['Retry evaluation'] : [])])
+      await captureExperience(page, info, 'chess-lifecycle', `${control}-retry-reachable-${viewport.width}`, viewport.width < 1000 ? 'clamped' : 'requested')
+    }
+    const beforeRetry = (await requests(frame)).length
+    await frame.getByRole('button', { name: control === 'auto' ? 'Retry evaluation' : 'Retry', exact: true }).click()
+    await expect.poll(async () => (await requests(frame)).length).toBeGreaterThan(beforeRetry)
+    await ready(['Cancel', ...(control === 'auto' ? ['Cancel evaluation'] : [])])
+    await frame.getByRole('button', { name: 'Leave game', exact: true }).click()
+    expect((await requests(frame)).filter(r => !r.settled).every(r => r.aborted)).toBe(true)
+  })
+}
 
 test('restored cached page starts a fresh generation for the same board', async ({ page }, info) => {
   await adversarialTransport(page)

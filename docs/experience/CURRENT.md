@@ -17,3 +17,10 @@
   retention of actual engine cleanup. Prior candidate2 CI passed 97 browser/235
   unit tests but is not promoted without provider integration. Fresh receipts
   must use the amended request hash and final source.
+
+- Final candidate3 review found narrow loading Cancel clipped below the detail pane.
+  Promotion was withdrawn before merge. Inference/evaluation Cancel and Retry now
+  use the anchored action footer; fresh candidate4 must hit-test requested,
+  390×844 and 320×640 dynamic states before scrolling, including Moves and
+  simultaneous automatic move/evaluation controls. Frozen evidence may never be
+  overwritten by a diagnostic rerun; use unique capture directories.
