@@ -193,6 +193,10 @@ for (const control of ['free', 'auto'] as const) {
     for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 }, { width: 320, height: 640 }]) {
       await page.setViewportSize(viewport)
       await ready(['New game', 'Cancel', '↶ Undo', 'Leave game', ...(control === 'auto' ? ['Cancel evaluation'] : [])])
+      await expectActionReady(frame.locator('.chess-engine-loading .ui-loading-heading'))
+      await expectActionReady(frame.locator('.chess-engine-loading [role=progressbar]'))
+      const board = await frame.locator('.chess-board-wrap').boundingBox()
+      expect(Math.min(board!.width, board!.height), 'Readable board remains at least192px').toBeGreaterThanOrEqual(192)
       await captureExperience(page, info, 'chess-lifecycle', `${control}-cancel-reachable-${viewport.width}`, viewport.width < 1000 ? 'clamped' : 'requested')
     }
     await frame.getByRole('button', { name: 'Moves', exact: true }).click()

@@ -665,7 +665,7 @@ export function ChessGame() {
 
   const enginePending = mode === 'bot' && (engineThinking || analyzing)
   const showEvaluation = mode === 'bot' && engineControl === 'auto' && ['builtin-stockfish-18', 'builtin-stockfish-19', RECKLESS_LOCAL].includes(modelRevision)
-  const evaluationPending = showEvaluation && !evaluation && !evaluationError
+  const evaluationPending = showEvaluation && !localResult && !evaluation && !evaluationError
 
   return (
     <main className="app-surface chess-app">
