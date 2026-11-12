@@ -30,7 +30,7 @@ function addArtifact(root, report, context, flags) {
 
 export async function runEvidence(argv) {
   const { command, flags, root } = options(argv)
-  const requestPath = flags.request ?? 'experience/requests/desktop-refinement.json'
+  const requestPath = flags.request
   const context = loadContext(root, requestPath)
   if (command === 'context') return { requestId: context.request.id, requestSha256: context.requestSha256, contractsSha256: context.contractsSha256, candidate: currentCandidate(root) }
   if (command === 'init') {

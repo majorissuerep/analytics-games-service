@@ -10,7 +10,7 @@ import { verifyPromotion } from '../../scripts/experience/gate.mjs'
 import { currentCandidate, git, probeIdentity } from '../../scripts/experience/runtime.mjs'
 
 const repository = process.cwd()
-const context = loadContext(repository, 'experience/requests/desktop-refinement.json')
+const context = loadContext(repository)
 const apps = Object.fromEntries(context.request.scope.filter(id => id !== 'process').map(id => [id, JSON.parse(readFileSync(join(repository, `experience/apps/${id}.json`), 'utf8'))]))
 const directories = []
 const tree = 'a'.repeat(40), commit = 'b'.repeat(40)
@@ -78,7 +78,7 @@ function fixture() {
 }
 
 describe('current request readiness', () => {
-  it('validates the actual current request and all actual scoped app contracts', () => expect(validateRequest(context.request, apps).id).toBe('desktop-refinement'))
+  it('validates the actual current request and all actual scoped app contracts', () => expect(validateRequest(context.request, apps).id).toBe(context.request.id))
   it.each(['expected', 'proof'])('rejects a requirement without %s', key => {
     const request = structuredClone(context.request); delete request.requirements[0][key]
     expect(() => validateRequest(request, apps)).toThrow(key)
@@ -86,22 +86,22 @@ describe('current request readiness', () => {
   it('rejects a missing scenario and an app with no requested dimensions', () => {
     const request = structuredClone(context.request); request.requirements[0].scenarios.push('missing-scenario')
     expect(() => validateRequest(request, apps)).toThrow('unknown missing-scenario')
-    expect(() => validateRequest(context.request, { ...apps, chess: { ...apps.chess, preferredWindow: null } })).toThrow('preferred outer window')
+    expect(() => validateRequest(context.request, { ...apps, minefield: { ...apps.minefield, preferredWindow: null } })).toThrow('preferred outer window')
   })
   it('requires an independent challenge, current contract hash and complete observations', () => {
     const { review } = fixture()
     expect(validateReview(review, context).verdict).toBe('approve')
     expect(() => validateReview({ ...review, challenges: [] }, context)).toThrow()
     expect(() => validateReview({ ...review, contractsSha256: '0'.repeat(64) }, context)).toThrow('stale app/vision')
-    expect(() => validateReview({ ...review, observations: review.observations.slice(1) }, context)).toThrow('missing REF-01')
+    expect(() => validateReview({ ...review, observations: review.observations.slice(1) }, context)).toThrow(`missing ${context.request.requirements[0].id}`)
   })
   it('invalidates review when only normative workflow policy changes', () => {
     const root = temporary()
     cpSync(join(repository, 'experience'), join(root, 'experience'), { recursive: true })
     mkdirSync(join(root, 'docs'), { recursive: true }); cpSync(join(repository, 'docs/experience'), join(root, 'docs/experience'), { recursive: true })
-    const before = loadContext(root, 'experience/requests/desktop-refinement.json'), { review } = fixture()
+    const before = loadContext(root), { review } = fixture()
     writeFileSync(join(root, 'docs/experience/WORKFLOW.md'), 'Changed deployment and promotion policy.\n')
-    const after = loadContext(root, 'experience/requests/desktop-refinement.json')
+    const after = loadContext(root)
     expect(after.requestSha256).toBe(before.requestSha256); expect(after.contractsSha256).not.toBe(before.contractsSha256)
     expect(() => validateReview(review, after)).toThrow('stale app/vision contracts')
   })
@@ -153,9 +153,10 @@ describe('candidate evidence and independent review', () => {
     const g = fixture(); g.review.observations[0].artifactIds = []; expect(g.reviewIt).toThrow('actually inspected artifacts')
   })
   it('requires the independent reviewer to inspect every linked scenario and dynamic proof', () => {
-    const f = fixture(), observation = f.review.observations.find(o => o.requirementId === 'MINE-02')
-    observation.artifactIds = observation.artifactIds.filter(id => !id.startsWith('mine-expert'))
-    expect(f.reviewIt).toThrow('reviewer must inspect mine-expert')
+    const f = fixture(), requirement = context.request.requirements.find(r => r.scenarios.length > 1)
+    const observation = f.review.observations.find(o => o.requirementId === requirement.id), omitted = requirement.scenarios[1]
+    observation.artifactIds = observation.artifactIds.filter(id => !id.startsWith(omitted))
+    expect(f.reviewIt).toThrow(`reviewer must inspect ${omitted}`)
   })
   it('rejects mismatched review report/tree/environment and unresolved major findings', () => {
     const f = fixture(); f.review.reportSha256 = '0'.repeat(64); expect(f.reviewIt).toThrow('frozen evidence report')
@@ -234,6 +235,7 @@ describe('deployment identity and explicit rollout policy', () => {
     const validate = () => validateRollback(rollback, review, context, { root: f.root, failedRun: { finishedAt: ago(200) }, reportSha256: 'f'.repeat(64) })
     expect(validate().candidate.commit).toBe(context.request.rollout.rollbackCommit)
     review.reviewer = 'root'; expect(validate).toThrow('independent approval'); review.reviewer = context.request.rollout.reviewer
-    rollback.checks.pop(); expect(validate).toThrow('rollback primary app smoke coverage')
+    rollback.checks[0].app = 'unrelated'; expect(validate).toThrow('unknown smoke scenario')
+    rollback.checks = []; expect(validate).toThrow('checks')
   })
 })

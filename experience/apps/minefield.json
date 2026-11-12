@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "minefield",
   "vision": "docs/experience/VISION.md",
-  "request": "desktop-refinement",
+  "request": "minefield-elite",
   "route": "/games/minefield",
   "preferredWindow": {
     "width": 480,
@@ -16,15 +16,24 @@
     "expert": {
       "width": 1120,
       "height": 760
+    },
+    "elite": {
+      "width": 720,
+      "height": 760
     }
   },
   "scrollOwners": [
-    "board pan only when24px readable grid cannot fit constrained workspace"
+    "board pan only when readable grid cannot fit constrained workspace:24px classic,32px Elite",
+    "optional bounded proof detail only while its dialog is open"
   ],
   "requiredControls": [
     "Level",
     "New game",
-    "reachable reveal/flag/chord cells"
+    "reachable reveal/flag/chord cells",
+    "Explain move",
+    "Elite Layer1/Layer2",
+    "Elite Scan echo for revealed unscanned cell",
+    "Elite explicit local chord"
   ],
   "states": [
     "ready",
@@ -34,7 +43,13 @@
     "won",
     "failed",
     "narrowExpert",
-    "narrowIntermediate"
+    "narrowIntermediate",
+    "eliteReady",
+    "eliteUnscanned",
+    "eliteEcho",
+    "eliteCrossProof",
+    "eliteWon",
+    "generationTimeout"
   ],
   "forbidden": [
     "Cell size control",
@@ -45,6 +60,8 @@
   ],
   "minimumCellPixels": 24,
   "scrollSelectors": {
-    "constrainedBoard": ".minefield-board-scroll[data-scroll-owner=\"minefield-board\"][data-panning=\"true\"]"
-  }
+    "constrainedBoard": ".minefield-board-scroll[data-scroll-owner=\"minefield-board\"][data-panning=\"true\"]",
+    "proofDetail": "[data-scroll-owner=\"minefield-proof\"]"
+  },
+  "minimumEliteCellPixels": 32
 }

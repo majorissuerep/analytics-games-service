@@ -22,7 +22,7 @@
     "experience:gate": "node scripts/experience/gate.mjs",
     "experience:evidence": "node scripts/experience/evidence.mjs",
     "experience:test": "vitest run tests/experience",
-    "experience:contracts": "node scripts/experience/gate.mjs contracts --request experience/requests/desktop-refinement.json",
+    "experience:contracts": "node scripts/experience/gate.mjs contracts",
     "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run test && npm run typecheck && npm run workspace:check && npm run build",
     "workspace:check": "turbo run check",

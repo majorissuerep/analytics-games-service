@@ -47,3 +47,50 @@ html[data-ui-material='solid'] .minefield-header { background: #e9eef1; box-shad
 .minefield-progress progress::-webkit-progress-bar { background: var(--field-soft); }
 .minefield-progress progress::-webkit-progress-value { background: var(--field-ink); }
 .minefield-progress progress::-moz-progress-bar { background: var(--field-ink); }
+/* Elite uses the same instrument, with one readable layer and a bounded inspector. */
+.minefield-app { position: relative; }
+.minefield-layers { display: flex; gap: 4px; flex: none; padding: 3px; border-radius: 12px; background: #e5ebef; border: 1px solid #c4d0d8; }
+.minefield-layers button { flex: 1; min-height: 40px; display: flex; justify-content: center; align-items: center; gap: 12px; padding: 4px 8px; color: var(--field-ink); border: 1px solid transparent; background: transparent; box-shadow: none; font-weight: 600; }
+.minefield-layers button[aria-selected='true'] { color: #822052; background: #fff3f9; border-color: #bb4c83; box-shadow: inset 0 1px #fff; }
+.minefield-layers span { font-size: 10px; font-weight: 400; color: var(--ui-muted); }
+.minefield-inspector { flex: none; min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 0; }
+.minefield-inspector > div { display: flex; flex-direction: column; min-width: 0; font-size: 11px; line-height: 1.4; color: var(--field-ink); }
+.minefield-inspector strong { font: 600 12px/1.4 var(--ui-mono); }
+.minefield-inspector button { min-height: 40px; flex: none; padding: 4px 10px; font-size: 12px; }
+.minefield-feedback { display: flex; align-items: center; gap: 8px; flex: none; margin-top: 3px; }
+.minefield-feedback .minefield-status { flex: 1; margin: 0; min-width: 0; }
+.minefield-feedback > button { min-height: 36px; flex: none; padding: 4px 9px; font-size: 11px; }
+.minefield-elite .minefield-cell.revealed { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; }
+.minefield-local { font-size: calc(var(--cell-size) * .42); line-height: 1.05; }
+.minefield-echo { font-size: max(10px, calc(var(--cell-size) * .25)); line-height: 1.05; font-weight: 500; color: #415a6b; }
+.minefield-app .minefield-cell.clue-target { border-color: #557b94; }
+.minefield-app .minefield-cell.echo-target { box-shadow: inset 0 0 0 2px #68869a; }
+.minefield-app .minefield-cell.inspected { outline: 2px solid #a12063; outline-offset: -2px; z-index: 1; }
+.minefield-app .minefield-cell.hint-target { outline: 3px dashed #a12063; outline-offset: -3px; z-index: 1; }
+.minefield-proof-backdrop { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; padding: 12px; background: rgb(29 43 53 / 28%); }
+.minefield-proof { width: min(100%, 520px); max-height: 100%; display: flex; flex-direction: column; overflow: hidden; padding: 12px; border: 1px solid #aabcc7; border-radius: 16px; background: rgb(250 252 253 / 97%); box-shadow: 0 8px 24px rgb(35 51 62 / 22%); }
+.minefield-proof > header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex: none; padding-bottom: 8px; }
+.minefield-proof > header button { min-height: 40px; }
+.minefield-proof-body { overflow: auto; min-height: 0; scrollbar-gutter: stable; padding-right: 6px; font-size: 12px; line-height: 1.5; }
+.minefield-proof-body p { margin: 0 0 12px; overflow-wrap: anywhere; }
+.minefield-proof-result { font-weight: 600; color: var(--field-ink); }
+.minefield-proof-body > button { margin-bottom: 12px; min-height: 40px; }
+.minefield-proof-body summary { cursor: pointer; font-weight: 600; padding: 8px 0; }
+@media (max-width: 350px) {
+  .minefield-layers button { gap: 6px; padding-inline: 4px; }
+  .minefield-layers span { font-size: 9px; }
+  .minefield-inspector { min-height: 48px; }
+  .minefield-scoreboard { padding-bottom: 4px; }
+  .minefield-mode-help { margin-top: 4px; }
+  .minefield-feedback > button { padding-inline: 6px; }
+}
+html[data-ui-material='solid'] .minefield-proof { background: #fafcfd; }
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) { .minefield-proof { background: #fafcfd; } }
+@media (forced-colors: active) {
+  .minefield-layers button[aria-selected='true'] { border-color: Highlight; background: Highlight; color: HighlightText; }
+  .minefield-app .minefield-cell.echo-target { outline: 2px dashed Highlight; outline-offset: -3px; box-shadow: none; }
+  .minefield-app .minefield-cell.inspected { outline-color: Highlight; }
+  .minefield-app .minefield-cell.hint-target { outline-color: Highlight; }
+  .minefield-echo { color: CanvasText; }
+  .minefield-proof { background: Canvas; color: CanvasText; }
+}

@@ -58,7 +58,7 @@ jobs:
       - name: Validate current experience contracts and independent request review
         run: |
           npm run experience:contracts
-          npm run experience:gate -- request --request experience/requests/desktop-refinement.json --review experience/reviews/desktop-refinement.request.json
+          npm run experience:gate -- request
 
       - name: Verify native Pinball source and asset provenance
         run: node scripts/vendor-space-cadet.mjs --verify
@@ -67,7 +67,7 @@ jobs:
         run: npx playwright install ffmpeg
 
       - name: Browser regression tests with real chess engines
-        run: npx playwright test tests/e2e/platform.spec.ts tests/e2e/games-reliability.spec.ts tests/e2e/application-design.spec.ts tests/e2e/loading-feedback.spec.ts tests/e2e/catalog-roadmap.spec.ts tests/e2e/space-cadet.spec.ts tests/e2e/app-personalities.spec.ts tests/e2e/experience-contracts.spec.ts tests/e2e/desktop-experience.spec.ts tests/e2e/pinball-experience.spec.ts tests/e2e/pip-clearance.spec.ts tests/e2e/privacy-focus.spec.ts
+        run: npx playwright test tests/e2e/platform.spec.ts tests/e2e/games-reliability.spec.ts tests/e2e/application-design.spec.ts tests/e2e/loading-feedback.spec.ts tests/e2e/catalog-roadmap.spec.ts tests/e2e/space-cadet.spec.ts tests/e2e/app-personalities.spec.ts tests/e2e/experience-contracts.spec.ts tests/e2e/desktop-experience.spec.ts tests/e2e/pinball-experience.spec.ts tests/e2e/pip-clearance.spec.ts tests/e2e/privacy-focus.spec.ts tests/e2e/minefield-elite.spec.ts
 
       # Contract rejection fixtures are included in npm run check's Vitest suite.
       # These artifacts support real independent review; CI never invents visual approval.

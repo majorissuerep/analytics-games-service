@@ -9,7 +9,9 @@ import { collectPlaywright } from '../../scripts/experience/collect-playwright.m
 import { digest, fileRecord, loadContext, readJson, validateCaptureMetadata } from '../../scripts/experience/contracts.mjs'
 import { currentCandidate, git, writeJson } from '../../scripts/experience/runtime.mjs'
 
-const context = loadContext(process.cwd(), 'experience/requests/desktop-refinement.json')
+const context = loadContext(process.cwd())
+const captureScenario = context.request.scenarios.find(s => s.artifacts.includes('sequence')).id
+const otherScenario = context.request.scenarios.find(s => s.id !== captureScenario).id
 const directories = [], ago = seconds => new Date(Date.now() - seconds * 1000).toISOString()
 afterEach(() => { for (const directory of directories.splice(0)) rmSync(directory, { recursive: true, force: true }) })
 function png(shade, width = 2, height = 2) {
@@ -43,7 +45,7 @@ function fixture() {
   writeJson(root, reportPath, report)
   function capture(name, shade, override = {}) {
     const path = `${directory}/${name}.png`; mkdirSync(dirname(join(root, path)), { recursive: true }); writeFileSync(join(root, path), png(shade))
-    const metadata = { scenarioId: 'mine-input', state: name, window: 'clamped', viewport: { width: 2, height: 2 }, capturedAt: ago(60 - shade), url: 'http://localhost:3132/', identity: { ...candidate, nativeAssets: { ...nativeAssets } }, sha256: fileRecord(root, path).sha256, ...override }
+    const metadata = { scenarioId: captureScenario, state: name, window: 'clamped', viewport: { width: 2, height: 2 }, capturedAt: ago(60 - shade), url: 'http://localhost:3132/', identity: { ...candidate, nativeAssets: { ...nativeAssets } }, sha256: fileRecord(root, path).sha256, ...override }
     writeJson(root, path.slice(0, -4) + '.json', metadata)
     return { path, metadataPath: path.slice(0, -4) + '.json', metadata }
   }
@@ -57,7 +59,7 @@ describe('Playwright capture collection', () => {
     writeJson(f.root, `${f.directory}/.last-run.json`, { status: 'passed' })
     const collected = f.collect(), report = readJson(f.root, f.reportPath)
     expect(collected).toMatchObject({ capturesFound: 3, addedCaptures: 3, addedSequences: 1 })
-    expect(collected.missingDynamicScenarios).not.toContain('mine-input')
+    expect(collected.missingDynamicScenarios).not.toContain(captureScenario)
     expect(report.requirements.every(r => r.status === 'pending')).toBe(true); expect(report.scenarios.every(s => s.status === 'pending' && s.observed === '')).toBe(true); expect(report.automation).toEqual([])
     const sequence = readJson(f.root, report.artifacts.find(a => a.kind === 'sequence').path)
     expect(sequence.frames).toHaveLength(2); expect(sequence.frames.map(frame => frame.state)).toEqual(['nested/early', 'nested/late'])
@@ -65,9 +67,9 @@ describe('Playwright capture collection', () => {
     expect(f.collect()).toMatchObject({ addedCaptures: 0, addedSequences: 0 })
   })
   it('does not build fake dynamics by combining different scenarios, viewports or windows', () => {
-    const f = fixture(); f.capture('first', 10); f.capture('other-window', 20, { window: 'maximized' }); f.capture('other-scenario', 30, { scenarioId: 'shell-focus' })
+    const f = fixture(); f.capture('first', 10); f.capture('other-window', 20, { window: 'maximized' }); f.capture('other-scenario', 30, { scenarioId: otherScenario })
     const viewport = f.capture('other-viewport', 40, { viewport: { width: 3, height: 2 } }); writeFileSync(join(f.root, viewport.path), png(40, 3, 2)); viewport.metadata.sha256 = fileRecord(f.root, viewport.path).sha256; writeJson(f.root, viewport.metadataPath, viewport.metadata)
-    const result = f.collect(); expect(result.addedCaptures).toBe(4); expect(result.addedSequences).toBe(0); expect(result.missingDynamicScenarios).toContain('mine-input')
+    const result = f.collect(); expect(result.addedCaptures).toBe(4); expect(result.addedSequences).toBe(0); expect(result.missingDynamicScenarios).toContain(captureScenario)
   })
   it('rejects altered bytes or declared dimensions and keeps the report unchanged', () => {
     const f = fixture(), capture = f.capture('altered', 10); writeFileSync(join(f.root, capture.path), png(20)); expect(f.collect).toThrow('checksum mismatch'); expect(readJson(f.root, f.reportPath)).toEqual(f.report)
@@ -87,7 +89,7 @@ describe('Playwright capture collection', () => {
   })
   it('rejects unknown scenarios, incomplete metadata and missing screenshot pairs', () => {
     const f = fixture(), capture = f.capture('missing', 10, { scenarioId: 'unknown' }); expect(f.collect).toThrow('unknown scenario')
-    capture.metadata.scenarioId = 'mine-input'; delete capture.metadata.identity; writeJson(f.root, capture.metadataPath, capture.metadata); expect(f.collect).toThrow('identity')
+    capture.metadata.scenarioId = captureScenario; delete capture.metadata.identity; writeJson(f.root, capture.metadataPath, capture.metadata); expect(f.collect).toThrow('identity')
     capture.metadata.identity = { ...f.report.candidate, nativeAssets: f.nativeAssets }; writeJson(f.root, capture.metadataPath, capture.metadata); rmSync(join(f.root, capture.path)); expect(f.collect).toThrow()
   })
   it('rejects escaped directories/symlinks and changes to already imported metadata', () => {

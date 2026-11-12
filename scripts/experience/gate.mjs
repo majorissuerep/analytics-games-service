@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { pathToFileURL } from 'node:url'
-import { assert, fileRecord, loadContext, readJson, validateDecision, validateReport, validateReview, validateRollback } from './contracts.mjs'
+import { assert, currentExperience, fileRecord, loadContext, readJson, validateDecision, validateReport, validateReview, validateRollback } from './contracts.mjs'
 import { currentCandidate, options, probeIdentity, required, writeJson } from './runtime.mjs'
 
 export function checkedInput(root, record) {
@@ -23,10 +23,10 @@ export function verifyPromotion(root, context, receipt) {
 
 export async function runGate(argv) {
   const { command, flags, root } = options(argv)
-  const context = loadContext(root, required(flags, 'request'))
+  const context = loadContext(root, flags.request)
   if (command === 'contracts') return { stage: 'contracts', verdict: 'valid', requestId: context.request.id, requestSha256: context.requestSha256, contractsSha256: context.contractsSha256 }
   if (command === 'request') {
-    const review = validateReview(readJson(root, required(flags, 'review')), context)
+    const review = validateReview(readJson(root, flags.review ?? currentExperience(root).review), context)
     return { stage: 'request', verdict: 'ready', requestId: context.request.id, reviewer: review.reviewer }
   }
   if (command === 'promotion') {

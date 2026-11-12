@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "requestId": "minefield-elite",
+  "requestSha256": "8074e59dfd198409e577d4344fd9247339d64661cfbd6a6565b5c73ade78cb81",
+  "contractsSha256": "6bcc1d2de9e163d0915cb4ec1ccccb30aeb7b46e761206ffbd77b0a0f5aec958",
+  "reviewer": "minefield_review",
+  "authors": [
+    "root",
+    "minefield_extreme_owner"
+  ],
+  "reviewedAt": "2026-11-12T10:33:25.870Z",
+  "verdict": "approve",
+  "challenges": [
+    "The cropped board cannot establish impossibility. Independent baseline inspection found sound local/subset/global rules and no hidden-state move selection; an exhaustive bounded probe of1465 legal small placements returned no false deductions. This supports the audit within its sample, not a universal correctness claim.",
+    "Generation and verification previously shared the same solver. The request now requires an independent feasible-world oracle, covered-data noninterference and flag tests, a genuine50/50 fixture and late global-budget evidence. Solver stall is expressly distinguished from mathematical ambiguity.",
+    "Elite opening safety was ambiguous. The final contract excludes the clicked tile and only its same-layer eight-neighborhood; local zero is guaranteed while an unknown echo may be positive.",
+    "A redundant cross clue plus singles-only stall could pass a local-subset-only board. The final contract additionally requires the local-only full-subset certifier to stall, actual cross-clue provenance and singles-only stall. Local-only stall alone remains weak because it cannot initially enter the other layer; these checks establish the supported solver route and do not prove necessity against every possible stronger algorithm.",
+    "Finite information currency could make arbitrary legal scan choices strand a certified board. Scans are instead unlimited, permanent and counted once, making information acquisition strategic without a resource softlock or an optimal-policy claim.",
+    "A narrow layout could pass control reach while leaving an unusable board strip, or grow the document with proof text. The final contract requires at least192px visible board height at320x640, compact inspector and only a named bounded closable proof-detail scroll owner in addition to justified board panning.",
+    "Layer switching could silently replace the inspected source and highlight an unrelated footprint. The final scenario preserves source coordinates across switching and verifies exact center and clipped-edge target footprints.",
+    "Reference adoption and file existence cannot approve unimplemented appearance. Candidate promotion and deployed acceptance still require independent actual viewport and dynamic interaction review bound to the exact source/build."
+  ],
+  "observations": [
+    {
+      "requirementId": "MINE-LOGIC",
+      "note": "Classic dimensions, safe zero opening and fixed mines are preserved. Public-state deduction excludes covered truth and user flags as premises, with independent oracle/noninterference, ambiguous and global-budget scenarios. The bounded local/subset/global method is accurately described as sound but incomplete rather than a complete CSP."
+    },
+    {
+      "requirementId": "MINE-EXPLAIN",
+      "note": "Explain must identify a concrete target, rule, source coordinates and counts, including derivation. Misplaced safe flags require explicit correction; scan suggestions are distinguished from safe-cell deductions and missing echoes remain unknown. Classic and Elite interaction sequences exercise the result."
+    },
+    {
+      "requirementId": "ELITE-RULES",
+      "note": "Two8x8 layers and28 total mines yield100 safe cells. Local8 and aligned opposite-layer3x3/9 are explicit, with same-layer-only safe opening and nullable unscanned echoes. Unlimited scans avoid allocation softlocks. Full solve, local-only stall, singles-only stall and actual cross provenance jointly provide the bounded difficulty threshold; no per-layer hidden count may leak."
+    },
+    {
+      "requirementId": "ELITE-UX",
+      "note": "Requested720x760 Elite window,24px classic and32px Elite minima, opaque playfield, compact controls, persistent selected source and exact cross footprint are explicit. At320x640 the board retains192px visible height; long derivation belongs in a bounded closable named detail pane. Layer, scan, chord, keyboard and touch controls require real hit-testing and dynamic evidence. Visual quality remains pending implementation review."
+    },
+    {
+      "requirementId": "MINE-WAIT",
+      "note": "Worker generation is bounded by an8s deadline plus10s main watchdog and may never admit uncertified fallback. Startup error, silent worker, stale delivery, New game and level-change cancellation, recovery and actual Retry play are included in a dedicated dynamic scenario."
+    },
+    {
+      "requirementId": "ELITE-GATE",
+      "note": "The active request pointer removes duplicated CLI/CI selection. Readiness, frozen candidate promotion and actual deployed acceptance remain distinct and independently reviewed, with negative fixtures, durable evidence and explicit rollback/hotfix ownership. This approval covers request readiness only."
+    }
+  ],
+  "findings": [
+    {
+      "id": "ELITE-R1",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Elite opening safety did not specify whether echo-neighborhood mines were forbidden.",
+      "resolution": "ELITE-RULES now states local-zero opening excludes only clicked tile and same-layer eight neighbors; echo may be positive until scanned."
+    },
+    {
+      "id": "ELITE-R2",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Cross provenance and singles-only stall alone could accept a board whose supported local-subset solver already completes without using the extra dimension.",
+      "resolution": "ELITE-RULES additionally requires full-subset local-only certifier stall, while retaining full completion, actual cross provenance and singles-only stall; the weakness of local-only stall in isolation is explicitly recorded."
+    },
+    {
+      "id": "ELITE-R3",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Constrained layout could make controls pass while collapsing the board, or overflow with long explanation text.",
+      "resolution": "ELITE-UX and elite-layout now require at least192px visible board height at320x640, compact inspector, bounded closable proof detail and a named minefield-proof scroll owner."
+    },
+    {
+      "id": "ELITE-R4",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Layer switching could replace the inspected source, making the cross footprint misleading.",
+      "resolution": "ELITE-UX and elite-play now require persistent source coordinate across layer switching and exact center/edge footprint verification."
+    }
+  ]
+}

@@ -1,0 +1,316 @@
+{
+  "schemaVersion": 1,
+  "id": "minefield-elite",
+  "title": "Explainable no-guess Minefield and Extreme Elite echo layers",
+  "source": {
+    "date": "2026-11-12",
+    "requestor": "user",
+    "summary": "Verify normal no-guess algorithm; explore harder variants and add Extreme Elite with an extra dimension and information strategy; merge. Cropped89% board does not contain enough information to diagnose exact certainty."
+  },
+  "baseline": {
+    "commit": "b63e82a0af6d5648f85c431b178914e90163dbdc",
+    "url": "https://analytics-games-service.vercel.app"
+  },
+  "scope": [
+    "minefield",
+    "process"
+  ],
+  "outOfScope": [
+    "Other apps and XP chrome",
+    "General complete CSP or optimal information policy",
+    "Finite scan currency, lying clues, probabilistic safety claims",
+    "Server persistence or multiplayer"
+  ],
+  "references": [
+    {
+      "url": "https://www.chiark.greenend.org.uk/~sgtatham/puzzles/doc/mines.html",
+      "adopt": "Established no-guess generation certified by elementary deductions; fixed mines during play",
+      "reject": "Claiming identical algorithm: this implementation uses bounded rejection sampling, not pre-play perturbation"
+    },
+    {
+      "url": "https://github.com/JohnnyDeuss/minesweeper-solver",
+      "adopt": "Independent feasible-world checks distinguish certainty from probability and optimal policy",
+      "reject": "Heavy solver dependency or labeling a bounded solver stall as mathematical ambiguity"
+    },
+    {
+      "url": "https://store.steampowered.com/app/1865060/14_Minesweeper_Variants/",
+      "adopt": "Explicit altered clue rules create meaningful new logical interactions",
+      "reject": "Copying art or stacking opaque rule variants"
+    },
+    {
+      "url": "https://github.com/aeramos/4D-Minesweeper",
+      "adopt": "Additional coordinate dimensions can couple deductions",
+      "reject": "Four-axis navigation and large combined neighborhoods impair readability"
+    },
+    {
+      "url": "https://elementary.io/images/screenshots/code.png",
+      "adopt": "Attached compact task controls and a stable main work area",
+      "reject": "Permanent sidebar and editorial headings"
+    },
+    {
+      "url": "https://assets.zorincdn.com/zorin.com/images/home/hero/18.png",
+      "adopt": "Bounded rounded translucent control groups and crisp hierarchy",
+      "reject": "Promotional composition or replacement of XP chrome"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "MINE-LOGIC",
+      "app": "minefield",
+      "title": "Established deductions with independent checks",
+      "expected": "Keep classic9x9/10,16x16/40,30x16/99, safe zero opening and fixed mines. Use local zero/all, global budget and subset subtraction; accepted boards have a certified no-guess route. Visible-state analyzer never reads covered truth or treats user flags as facts; distinguish deduction, contradiction and unsupported stall. Independent oracle, hidden-data tests and genuine50/50 rejection verify soundness.",
+      "proof": "process",
+      "severity": "major",
+      "scenarios": [
+        "logic-oracle",
+        "classic-play"
+      ]
+    },
+    {
+      "id": "MINE-EXPLAIN",
+      "app": "minefield",
+      "title": "Show why a move is certain",
+      "expected": "Explain gives a concrete safe/mine target, source clue coordinates, counts and rule, including derived proof when needed. Correct a provably safe misplaced flag through explicit player action. Unknown echoes remain unknown; a scan suggestion is an information request, not a safe-cell deduction. No screenshot certainty claim.",
+      "proof": "interaction",
+      "severity": "major",
+      "scenarios": [
+        "classic-play",
+        "elite-play"
+      ]
+    },
+    {
+      "id": "ELITE-RULES",
+      "app": "minefield",
+      "title": "Coupled layers and information strategy",
+      "expected": "Extreme Elite has two8x8 layers,28 total mines. Local counts8 same-layer neighbors; echo counts aligned3x3 including center in other layer. Reveal safe tile then optionally scan its echo; unlimited permanent scans count once. Win clears all100 safe cells across both layers; safe opening; fixed layout. Certifier scans available safe tiles, completes using cross-clue provenance and subset reasoning while singles-only stalls. No per-layer hidden mine-count leakage. Opening excludes clicked tile and its same-layer8 neighbors only: local0 guaranteed; unscanned echo may be positive. Full-subset local-only certifier must also stall (weak by itself because it cannot initially enter other layer).",
+      "proof": "dynamic",
+      "severity": "major",
+      "scenarios": [
+        "elite-play",
+        "logic-oracle"
+      ]
+    },
+    {
+      "id": "ELITE-UX",
+      "app": "minefield",
+      "title": "Readable personal glass workspace",
+      "expected": "Compact elementary/Zorin-inspired controls, pink selection plus restrained field identity, opaque board, gloss bounded to controls. Layer tabs, opened counts, selected coordinate/local/echo inspector and highlighted exact cross footprint make the extra dimension legible. Elite revealed click selects; explicit C/Shiftclick local chord, F/rightclick/cancellable touch hold flag, Enter reveal, E scan. No slogans/Cell size/Flag mode. Classic min24px and Elite min32px; no unexplained overflow. At320x640 retain at least192px of visible board height; compact inspector never pushes controls offscreen. Long proof may open an explicitly bounded closable detail dialog; only its detail scrolls. Persistent source coordinate survives layer switching; target footprint is exact, including clipped edges.",
+      "proof": "visual",
+      "severity": "major",
+      "scenarios": [
+        "elite-play",
+        "elite-layout",
+        "classic-play"
+      ]
+    },
+    {
+      "id": "MINE-WAIT",
+      "app": "minefield",
+      "title": "Bounded responsive generation and recovery",
+      "expected": "Progress reports stage/attempts/elapsed with unknown total indeterminate; attempt/time cap8s and main watchdog10s. New game/level change cancels; stale results cannot overwrite. Error Retry reaches genuine play; never fall back to an uncertified board.",
+      "proof": "dynamic",
+      "severity": "major",
+      "scenarios": [
+        "generation-recovery"
+      ]
+    },
+    {
+      "id": "ELITE-GATE",
+      "app": "process",
+      "title": "Repeatable source-bound release",
+      "expected": "Current request is selected once for CLI/CI. Request readiness before implementation, frozen affected checks and required full CI, independent candidate and actual deployed reviews, durable evidence and explicit acceptance decision.",
+      "proof": "process",
+      "severity": "major",
+      "scenarios": [
+        "release-gates"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "logic-oracle",
+      "app": "minefield",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "test fixture",
+      "initialState": "Small legal worlds plus normal and Elite generated boards",
+      "actions": [
+        "Enumerate feasible worlds independently of inference; verify every declared safe/mine result",
+        "Test hidden-data mutation, wrong flags, global-budget endgame, true50/50, layer edges, scan privacy, terminal state and certificate conditions",
+        "Measure generation samples across openings; record sample size,p50,p95,worst and failure rate"
+      ],
+      "expected": [
+        "No false certainty in enumerated domain; unsupported states report stall",
+        "Only certified fixed boards admitted; bounds respected; benchmark claims limited to measured sample"
+      ],
+      "artifacts": [
+        "log"
+      ],
+      "critical": true
+    },
+    {
+      "id": "classic-play",
+      "app": "minefield",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "window": "beginner480x600 then expert1120x760",
+      "initialState": "Fresh classic9x9 then99-mine board",
+      "actions": [
+        "Launch and measure no overflow before auto-scroll; use flags/reveal/explain and misplaced-flag correction fixture",
+        "Play actual99-mine board using public clues past70% through terminal win; inspect dense board",
+        "Reset and preserve classic interaction conventions"
+      ],
+      "expected": [
+        "Concrete proof uses public clues; no unsupported certainty",
+        "Dense frontier readable; game finishes without random click; reset works"
+      ],
+      "artifacts": [
+        "viewport",
+        "sequence"
+      ],
+      "critical": true
+    },
+    {
+      "id": "elite-play",
+      "app": "minefield",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested720x760",
+      "initialState": "Extreme Elite ready",
+      "actions": [
+        "Reveal opening; select revealed tile and scan; inspect local/echo counts and other-layer3x3 lens",
+        "Switch layers and play public-clue deductions, including subset/cross proof; use keyboard, rightclick and touch hold/cancel",
+        "Reach real win across both layers; scans count once; reset",
+        "Verify source coordinate persists across layer switch and exact target footprint at center and edge; inspect proof detail and close"
+      ],
+      "expected": [
+        "Rules and selected source legible; no accidental chord during inspection; hidden clues remain unknown",
+        "Extra dimension actually used;100 safe clears win; scans cannot exhaust"
+      ],
+      "artifacts": [
+        "viewport",
+        "sequence"
+      ],
+      "critical": true
+    },
+    {
+      "id": "elite-layout",
+      "app": "minefield",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "requested then maximized/restored then workspace-clamped",
+      "initialState": "Elite active with inspector/explanation",
+      "actions": [
+        "Inspect1280x900 requested/maximize/restore;320x640 and390x844; short desktop",
+        "Hit-test Level/Newgame/layer/scan/explain/chord when applicable before auto-scroll",
+        "Test glass and solid material, keyboard focus, panning only when32px board cannot fit"
+      ],
+      "expected": [
+        "No document scroll or accidental2px board overflow; all essential controls reachable",
+        "Readable clues/footprint and bounded gloss with restrained palette; truthful discoverable pan fallback",
+        "At320x640 visible board stage at least192px; long proof detail bounded with reachable Close and named scrolling"
+      ],
+      "artifacts": [
+        "viewport",
+        "sequence"
+      ],
+      "critical": true
+    },
+    {
+      "id": "generation-recovery",
+      "app": "minefield",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "workspace-clamped",
+      "initialState": "Real worker generation plus deliberately delayed/failed worker fixtures",
+      "actions": [
+        "Observe scoped progress, cancel by Newgame and by level change; deliver stale result",
+        "Induce startup error and silent worker; observe watchdog then restore worker and Retry",
+        "Play after recovery"
+      ],
+      "expected": [
+        "UI responsive; no stale overwrite or stuck wait; actionable error and successful retry",
+        "Observed bounded timeouts and no uncertified board"
+      ],
+      "artifacts": [
+        "sequence"
+      ],
+      "critical": true
+    },
+    {
+      "id": "release-gates",
+      "app": "process",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "window": "fixture",
+      "initialState": "Current active request and negative gate fixtures",
+      "actions": [
+        "Validate current request/independent review and negative evidence/review fixtures",
+        "Bind candidate/live report to exact tree; retain checks and independent visual review"
+      ],
+      "expected": [
+        "Invalid/missing/stale evidence fails; current request chosen consistently",
+        "Merge only approved candidate; deployed critical journeys verified"
+      ],
+      "artifacts": [
+        "log"
+      ],
+      "critical": true
+    }
+  ],
+  "risks": [
+    {
+      "risk": "Screenshot crop omits clues/global budget and wrong flags can obstruct play",
+      "resolution": "Do not diagnose unseen full board. Analyze actual public revealed clues and global budget; ignore player flags as truth; explain safe flagged-cell correction."
+    },
+    {
+      "risk": "A certifier validating itself can hide soundness errors",
+      "resolution": "Independent small-board feasible-world enumeration and hidden-data noninterference tests; trace correctness and late global-budget/ambiguous fixtures. Bounded evidence is not universal proof."
+    },
+    {
+      "risk": "Cross-layer combined counts can generate symmetric ambiguous fields",
+      "resolution": "Split local8 and cross3x3/9 clues; reject uncertified boards. Full all-echo solver must solve, single-rule-only solver must stall, and a traced deduction must use cross clues."
+    },
+    {
+      "risk": "Information purchases can strand a player",
+      "resolution": "Echo scans are unlimited and permanent, counted only for efficiency, with no optimality claim; certifier may scan all safely revealed tiles. Truthful fixed clues only."
+    },
+    {
+      "risk": "Double clues increase visual and cognitive load",
+      "resolution": "One8x8 layer at a time, local/echo labels and coordinate inspector, minimum32px Elite cells, fixed tabs. No color-only layer identity. Explain is optional; no decorative rainbow."
+    },
+    {
+      "risk": "Generation retry or stale worker could freeze or replace a new game",
+      "resolution": "Attempt/time bound8s in worker plus10s main-thread watchdog, responsive cancel/reset, error/retry and epoch guards. Never return uncertified fallback."
+    }
+  ],
+  "rollout": {
+    "target": "Vercel",
+    "requiredGates": [
+      "request",
+      "promotion",
+      "deployed"
+    ],
+    "rollbackCommit": "b63e82a0af6d5648f85c431b178914e90163dbdc",
+    "rollbackTriggers": [
+      "Classic or Elite cannot play",
+      "False certainty or unverified board admitted",
+      "Essential controls inaccessible or generation cannot recover"
+    ],
+    "hotfixPolicy": "Isolated recoverable defect blocks acceptance; linked hotfix repeats affected scenarios.",
+    "acceptanceOwner": "root",
+    "reviewer": "minefield_review"
+  }
+}

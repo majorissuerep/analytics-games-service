@@ -102,7 +102,7 @@ export function collectPlaywright({ root, context, report, reportPath, directory
 
 export function runCollector(argv) {
   const { flags, root } = options(['collect', ...argv]), reportPath = required(flags, 'report')
-  return collectPlaywright({ root, context: loadContext(root, flags.request ?? 'experience/requests/desktop-refinement.json'), report: readJson(root, reportPath), reportPath, directory: required(flags, 'dir'), sequenceDirectory: flags['sequence-dir'] })
+  return collectPlaywright({ root, context: loadContext(root, flags.request), report: readJson(root, reportPath), reportPath, directory: required(flags, 'dir'), sequenceDirectory: flags['sequence-dir'] })
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try { console.log(JSON.stringify(runCollector(process.argv.slice(2)), null, 2)) }
