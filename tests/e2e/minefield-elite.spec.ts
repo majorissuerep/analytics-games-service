@@ -4,6 +4,8 @@ import { analyzeMinefield, type VisibleMinefield } from '../../games/minefield/s
 import { captureExperience, expectActionReady, overflowIssues } from './helpers/experience'
 
 test.setTimeout(120_000)
+// Touch-sized controls must obey the same geometry contract as mouse layouts.
+test.use({ hasTouch: true })
 test.beforeEach(async ({ context }) => { await context.addInitScript(() => localStorage.setItem('analytics-games.analytics-consent.v1', 'denied')) })
 async function open(page: Page, elite = true) {
   await page.goto('/')
@@ -68,6 +70,9 @@ async function solveElite(frame: FrameLocator, page: Page, info: TestInfo) {
 }
 
 test('Extreme Elite plays through truthful scans and cross-layer deductions to a real win', async ({ page }, info) => {
+  // A full game can expose100echoes through realUI actions; generation itself
+  // retains its separately asserted10-second watchdog.
+  test.setTimeout(240_000)
   await page.setViewportSize({ width: 1280, height: 900 })
   const frame = await open(page)
   await expect.poll(() => overflowIssues(frame.locator('.minefield-app'))).toEqual([])
@@ -81,7 +86,9 @@ test('Extreme Elite plays through truthful scans and cross-layer deductions to a
   await frame.locator('.minefield-cell[data-index="0"]').click()
   expect(await frame.locator('.minefield-cell.revealed').count(), 'selecting a revealed tile does not chord').toBe(before)
   await expectActionReady(frame.getByRole('button', { name: 'Scan echo', exact: true }))
-  await frame.getByRole('button', { name: 'Scan echo', exact: true }).click()
+  await frame.locator('.minefield-cell[data-index="0"]').press('e')
+  await frame.locator('.minefield-cell[data-index="0"]').press('e')
+  await expect(frame.locator('.minefield-dimensions')).toContainText('1 scans')
   await expect(frame.locator('.minefield-cell[data-index="0"]')).toHaveAttribute('data-echo', /^\d$/)
   await captureExperience(page, info, 'elite-play', 'first-echo')
   await layer(frame, 1)

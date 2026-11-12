@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { analyzeMinefield, toVisibleMinefield, type VisibleMinefield } from '../../games/minefield/solver'
+import { analyzeMinefield, solveMinefield, toVisibleMinefield, type VisibleMinefield } from '../../games/minefield/solver'
 import { armMinefield, createMinefield, revealMinefieldCell } from '../../games/minefield/model'
 
 // Independent model-counting oracle. No production neighbor, solver, generation,
@@ -78,6 +78,15 @@ describe('visible Minefield certainty against an independent feasible-world orac
     expect(toVisibleMinefield(guarded)).toEqual(visible)
     expect(visible.cells.every(cell => cell.echo === null)).toBe(true)
     expect(visible.cells.filter(cell => !cell.revealed).every(cell => cell.adjacent === null)).toBe(true)
+  })
+
+  it('rejects a genuine50/50 endgame with exactly two feasible mine layouts', () => {
+    const board = armMinefield(createMinefield(5, 2, 1), 0, [3])
+    const opened = [0, 4, 9].reduce(revealMinefieldCell, board)
+    const view = toVisibleMinefield(opened)
+    expect(feasible(view, placements(10, 1))).toEqual([[3], [8]])
+    expect(analyzeMinefield(view)).toMatchObject({ kind: 'stalled', safe: [], mines: [] })
+    expect(solveMinefield(board, 0).solved).toBe(false)
   })
 
   it('rejects contradictory public clues without interpreting flags as contradictions', () => {

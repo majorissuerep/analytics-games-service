@@ -231,7 +231,14 @@ export function MinefieldGame() {
                     }
                   }}
                   onPointerDown={event => {
-                    if (event.pointerType === 'mouse') return
+                    if (event.pointerType === 'mouse') {
+                      // A real mouse gesture starts a new action. Compatibility
+                      // mouse events after a touch do not emit a mouse pointerdown;
+                      // their click still meets the touch hold's suppression below.
+                      cancelHold()
+                      holdRef.current = null
+                      return
+                    }
                     cancelHold()
                     const hold = { timer: null as ReturnType<typeof setTimeout> | null, x: event.clientX, y: event.clientY, suppress: false }
                     hold.timer = setTimeout(() => { hold.suppress = true; hold.timer = null; if (!generating) { setBoard(current => toggleMinefieldFlag(current, index)); setAnalysis(null) } }, 450)

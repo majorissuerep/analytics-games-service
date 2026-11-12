@@ -330,6 +330,10 @@ test('Minefield input keeps reveal marking cancellation generation reset and Ret
   await expect(scope.locator('.minefield-cell.flagged')).toHaveCount(0)
   await expect(scope.locator('.minefield-cell.revealed')).toHaveCount(0)
   await captureExperience(page, info, 'generation-recovery', 'moved-cancelled-no-mark-no-reveal', 'clamped-request')
+  await expectActionReady(first)
+  await first.click()
+  await expect(first).toHaveClass(/revealed/, { timeout: 15000 })
+  await captureExperience(page, info, 'generation-recovery', 'mouse-after-touch-cancel-opens-once', 'clamped-request')
 })
 
 test('Minefield constrained intermediate and expert pan only their readable board', async ({ page }, info) => {

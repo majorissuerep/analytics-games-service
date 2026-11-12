@@ -77,6 +77,9 @@ html[data-ui-material='solid'] .minefield-header { background: #e9eef1; box-shad
 .minefield-proof-body > button { margin-bottom: 12px; min-height: 40px; }
 .minefield-proof-body summary { cursor: pointer; font-weight: 600; padding: 8px 0; }
 @media (max-width: 350px) {
+  .minefield-elite { gap: 6px; }
+  .minefield-elite .minefield-machine { padding-block: 6px; }
+  .minefield-elite .minefield-inspector { padding-block: 2px; }
   .minefield-layers button { gap: 6px; padding-inline: 4px; }
   .minefield-layers span { font-size: 9px; }
   .minefield-inspector { min-height: 48px; }
