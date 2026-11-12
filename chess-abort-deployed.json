@@ -1,0 +1,1546 @@
+{
+  "schemaVersion": 1,
+  "requestId": "chess-current-position",
+  "requestSha256": "f1d668069e61de816520e9f227200c119a3724dc81b5699a05afc25c9a1e0dec",
+  "contractsSha256": "82ff566aa0d2b7b3d9298f37fa629a64459739135922a54b72e0cb673bdb01de",
+  "candidate": {
+    "commit": "5232dbc66a129522f6a6be4249b86aed4f48b39a",
+    "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a"
+  },
+  "author": "root",
+  "startedAt": "2026-11-12T12:48:47.886Z",
+  "finishedAt": "2026-11-12T12:52:37.749Z",
+  "environment": {
+    "name": "deployed",
+    "url": "https://analytics-games-service.vercel.app",
+    "configuration": {
+      "analytics": "disabled on production; browser consent denied",
+      "browser": "bundled Chromium through session proxy",
+      "material": "existing glass; requested,390x844,320x640 XP windows",
+      "provider": "Vercel production BEzpd41ii9JXT4hymL6WkdXoBK6b; actual merged identity verified; generated private function metadata unavailable"
+    }
+  },
+  "automation": [
+    {
+      "id": "current-position-browser",
+      "command": "[\"env\",\"PLAYWRIGHT_BASE_URL=https://analytics-games-service.vercel.app\",\"npx\",\"playwright\",\"test\",\"--config=experience-evidence/chess-abort-deployed/playwright.config.ts\",\"tests/e2e/chess-current-position.spec.ts\",\"--output=experience-evidence/chess-abort-deployed/browser\"]",
+      "status": "passed",
+      "artifactIds": [
+        "current-position-browser-log"
+      ],
+      "requirementIds": [
+        "CHESS-CURRENT",
+        "CHESS-RECOVERY",
+        "CHESS-TRANSPORT"
+      ],
+      "scenarioIds": [
+        "current-position",
+        "chess-lifecycle",
+        "live-engine"
+      ]
+    },
+    {
+      "id": "live-existing-gameplay",
+      "command": "[\"env\",\"PLAYWRIGHT_BASE_URL=https://analytics-games-service.vercel.app\",\"npx\",\"playwright\",\"test\",\"--config=experience-evidence/chess-abort-deployed/playwright.config.ts\",\"tests/e2e/games-reliability.spec.ts\",\"--grep\",\"plays legal consecutive moves with history|answers a human move|arena .* advances\",\"--output=experience-evidence/chess-abort-deployed/regression-browser\"]",
+      "status": "passed",
+      "artifactIds": [
+        "live-existing-gameplay-log"
+      ],
+      "requirementIds": [
+        "CHESS-RECOVERY",
+        "CHESS-TRANSPORT"
+      ],
+      "scenarioIds": [
+        "chess-lifecycle",
+        "live-engine"
+      ]
+    },
+    {
+      "id": "live-model-streams",
+      "command": "[\"env\",\"PLAYWRIGHT_BASE_URL=https://analytics-games-service.vercel.app\",\"npx\",\"playwright\",\"test\",\"--config=experience-evidence/chess-abort-deployed/playwright.config.ts\",\"tests/e2e/loading-feedback.spec.ts\",\"--grep\",\"real Vercel-compatible engine endpoints\",\"--output=experience-evidence/chess-abort-deployed/streams-browser\"]",
+      "status": "passed",
+      "artifactIds": [
+        "live-model-streams-log"
+      ],
+      "requirementIds": [
+        "CHESS-TRANSPORT",
+        "CHESS-RECOVERY"
+      ],
+      "scenarioIds": [
+        "live-engine"
+      ]
+    },
+    {
+      "id": "cancellation-provider-and-gate-tests",
+      "command": "[\"npx\",\"vitest\",\"run\",\"lib/engine/uci-runtime.test.ts\",\"lib/engine/progress-response.test.ts\",\"lib/engine/client/request-engine.test.ts\",\"app/api/chess/analyse/route.test.ts\",\"app/api/chess-models/[revisionId]/move/route.test.ts\",\"tests/chess\",\"tests/experience\"]",
+      "status": "passed",
+      "artifactIds": [
+        "cancellation-provider-and-gate-tests-log"
+      ],
+      "requirementIds": [
+        "CHESS-CURRENT",
+        "CHESS-QUEUE",
+        "CHESS-TRANSPORT",
+        "CHESS-RECOVERY",
+        "CHESS-GATE"
+      ],
+      "scenarioIds": [
+        "runtime-cancellation",
+        "release-gates"
+      ]
+    },
+    {
+      "id": "merged-deployment-and-ci",
+      "command": "[\"env\",\"NODE_USE_ENV_PROXY=1\",\"node\",\"experience-evidence/chess-abort-deployed/identity-check.mjs\"]",
+      "status": "passed",
+      "artifactIds": [
+        "merged-deployment-and-ci-log"
+      ],
+      "requirementIds": [
+        "CHESS-GATE"
+      ],
+      "scenarioIds": [
+        "release-gates"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "current-position-browser-log",
+      "scenarioId": "live-engine",
+      "kind": "log",
+      "path": "experience-evidence/chess-abort-deployed/current-position-browser.log",
+      "sha256": "204c73bee3523719d319f61384add731df1f37768e2d17ad6a27584ce67cc8a9",
+      "bytes": 3241,
+      "capturedAt": "2026-11-12T12:49:57.855Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "actual production-compatible API and browser",
+      "state": "command exit 0"
+    },
+    {
+      "id": "live-existing-gameplay-log",
+      "scenarioId": "live-engine",
+      "kind": "log",
+      "path": "experience-evidence/chess-abort-deployed/live-existing-gameplay.log",
+      "sha256": "f90fe3ad08f75aade5fc67f15493b66de0ab4370b213360964a344196b781504",
+      "bytes": 1790,
+      "capturedAt": "2026-11-12T12:51:02.060Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "actual production-compatible API and browser",
+      "state": "command exit 0"
+    },
+    {
+      "id": "live-model-streams-log",
+      "scenarioId": "live-engine",
+      "kind": "log",
+      "path": "experience-evidence/chess-abort-deployed/live-model-streams.log",
+      "sha256": "5c0200b9344e42f3cb54bcb55a8e547d571f3b652ed52e763ecd5060443d2b99",
+      "bytes": 690,
+      "capturedAt": "2026-11-12T12:51:09.448Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "actual production-compatible API and browser",
+      "state": "command exit 0"
+    },
+    {
+      "id": "cancellation-provider-and-gate-tests-log",
+      "scenarioId": "runtime-cancellation",
+      "kind": "log",
+      "path": "experience-evidence/chess-abort-deployed/cancellation-provider-and-gate-tests.log",
+      "sha256": "43067948c5a1f69079104be96506297c26648f301ead6ecec1d01676b454c3af",
+      "bytes": 486,
+      "capturedAt": "2026-11-12T12:51:12.560Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "Node transport/runtime fixtures",
+      "state": "command exit 0"
+    },
+    {
+      "id": "merged-deployment-and-ci-log",
+      "scenarioId": "release-gates",
+      "kind": "log",
+      "path": "experience-evidence/chess-abort-deployed/identity-and-ci.log",
+      "sha256": "318a46a1846ab6c4f9e9854ebceae025bd612e033d8790202079bc1f8073a0da",
+      "bytes": 1224,
+      "capturedAt": "2026-11-12T12:51:29.060Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "fixture",
+      "state": "command exit 0"
+    },
+    {
+      "id": "chess-lifecycle-viewport-a0b0f984fd705ab0",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-aut-76e59-complete-into-a-reset-board/chess-lifecycle-late-auto-and-evaluation-ignored.png",
+      "sha256": "cbd4b4d9635083081954db0aa98d8e4fb24d9bed0b6e7331f83782f56cde3126",
+      "bytes": 545687,
+      "capturedAt": "2026-11-12T12:49:30.839Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "late-auto-and-evaluation-ignored",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-aut-76e59-complete-into-a-reset-board/chess-lifecycle-late-auto-and-evaluation-ignored.json",
+        "sha256": "2df1ef256a7d3e00cefe03805de67e78c1e0b6829a0b46d90f7c1ce2d834f3d7",
+        "bytes": 910
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-798ad5f54e7f8d92",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-aut-773e6--requested-and-narrow-sizes/chess-lifecycle-auto-cancel-reachable-1280.png",
+      "sha256": "5a28a204fa83f2226b8ae59aecf05e8a013f2db71d4a6681e74c8b0229985073",
+      "bytes": 562392,
+      "capturedAt": "2026-11-12T12:49:18.319Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "auto-cancel-reachable-1280",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-aut-773e6--requested-and-narrow-sizes/chess-lifecycle-auto-cancel-reachable-1280.json",
+        "sha256": "8ad9219c8e926b3f8e7efdf3290cf3cc1108330ef6b5b60e9fb8da6d47003cf8",
+        "bytes": 904
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-286a2eb97c15c9fe",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-aut-773e6--requested-and-narrow-sizes/chess-lifecycle-auto-cancel-reachable-320.png",
+      "sha256": "cb9821f8c7c1b50321003fd6cb5f5ac5d384b74cde6dac7ff6dc486c6f3b6dae",
+      "bytes": 69692,
+      "capturedAt": "2026-11-12T12:49:20.356Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "clamped",
+      "state": "auto-cancel-reachable-320",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-aut-773e6--requested-and-narrow-sizes/chess-lifecycle-auto-cancel-reachable-320.json",
+        "sha256": "b42502f784b514755e539ada55f22b7244371836b4f005c00aeaf55bf2b16957",
+        "bytes": 900
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-69706731d65dd135",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-aut-773e6--requested-and-narrow-sizes/chess-lifecycle-auto-cancel-reachable-390.png",
+      "sha256": "2030aee65247e7ec5faf2260a1236b9303072dc6594757a4fb67fa1bb8c5b510",
+      "bytes": 89237,
+      "capturedAt": "2026-11-12T12:49:19.197Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "auto-cancel-reachable-390",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-aut-773e6--requested-and-narrow-sizes/chess-lifecycle-auto-cancel-reachable-390.json",
+        "sha256": "ce6a3965273eb9ca87033df4e11afec4a158bc608a8d9128d716dff149541f92",
+        "bytes": 900
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-574c79c670635d56",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-aut-773e6--requested-and-narrow-sizes/chess-lifecycle-auto-retry-reachable-1280.png",
+      "sha256": "8d4c9981971a3d8430127a358cfa97816bcaf72a8605433c6676218c32220e9b",
+      "bytes": 548219,
+      "capturedAt": "2026-11-12T12:49:22.712Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "auto-retry-reachable-1280",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-aut-773e6--requested-and-narrow-sizes/chess-lifecycle-auto-retry-reachable-1280.json",
+        "sha256": "c6fd4747df9b9195aadfaf87cd00f2f0a32fb646cf225eb7d414812d667ea00c",
+        "bytes": 903
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-37d31815348ecbe9",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-aut-773e6--requested-and-narrow-sizes/chess-lifecycle-auto-retry-reachable-320.png",
+      "sha256": "a9dc2f78ac1339724a332fa4a07821f9fde7e8889afdec0e74b0f68964b05baf",
+      "bytes": 67072,
+      "capturedAt": "2026-11-12T12:49:21.355Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "clamped",
+      "state": "auto-retry-reachable-320",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-aut-773e6--requested-and-narrow-sizes/chess-lifecycle-auto-retry-reachable-320.json",
+        "sha256": "bc31689e52016daa88f68045291c588463a6cb920f6410b24c02a0adf750cba8",
+        "bytes": 899
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-507344ed927d1fb2",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-aut-773e6--requested-and-narrow-sizes/chess-lifecycle-auto-retry-reachable-390.png",
+      "sha256": "e75fea0476b7117746b1d698ebbce58c1d689cb4e9fbf96379808568ec6d37fd",
+      "bytes": 86231,
+      "capturedAt": "2026-11-12T12:49:21.964Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "auto-retry-reachable-390",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-aut-773e6--requested-and-narrow-sizes/chess-lifecycle-auto-retry-reachable-390.json",
+        "sha256": "b319bee7d24bbb11482b485ef90c73b607cfee51f78638e5acae706cdae52b40",
+        "bytes": 899
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-0094ac6df99efdaf",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-fre-0ff8e--requested-and-narrow-sizes/chess-lifecycle-free-cancel-reachable-1280.png",
+      "sha256": "e570c537fc300a2666e4e8f0e1fbe326b4ae1f76b400e6147d03022b16f5f896",
+      "bytes": 548486,
+      "capturedAt": "2026-11-12T12:49:08.939Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "free-cancel-reachable-1280",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-fre-0ff8e--requested-and-narrow-sizes/chess-lifecycle-free-cancel-reachable-1280.json",
+        "sha256": "af8bfb8c88d2acddb2742c39160ef1dea8af8604e85408675c188e44fd016eed",
+        "bytes": 904
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-c9bc000f9c3a30f8",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-fre-0ff8e--requested-and-narrow-sizes/chess-lifecycle-free-cancel-reachable-320.png",
+      "sha256": "8e520771e59c58000e35edff41bf822c03e0979ecfee70ef041004b6279c982d",
+      "bytes": 67641,
+      "capturedAt": "2026-11-12T12:49:11.020Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "clamped",
+      "state": "free-cancel-reachable-320",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-fre-0ff8e--requested-and-narrow-sizes/chess-lifecycle-free-cancel-reachable-320.json",
+        "sha256": "4bda4527140bde180d3f7a5b7389e64535b45c9ce606319787b8e89a1d54a12f",
+        "bytes": 900
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-5870d0d476b4c07d",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-fre-0ff8e--requested-and-narrow-sizes/chess-lifecycle-free-cancel-reachable-390.png",
+      "sha256": "6f7452b266acad8db9ffcb16288b50c9515151d062113c2b926b4db96ef49da7",
+      "bytes": 86198,
+      "capturedAt": "2026-11-12T12:49:10.011Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "free-cancel-reachable-390",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-fre-0ff8e--requested-and-narrow-sizes/chess-lifecycle-free-cancel-reachable-390.json",
+        "sha256": "530424bd924b7e7033bf0307f0617c69d2d66feebd65e6796eab4a28d41d1d9b",
+        "bytes": 900
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-00f7105c29690d75",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-fre-0ff8e--requested-and-narrow-sizes/chess-lifecycle-free-retry-reachable-1280.png",
+      "sha256": "47ba9a5883c21c6b97d02c7081dde0e045316699ca94c2ddc8c990aebedf1c51",
+      "bytes": 542957,
+      "capturedAt": "2026-11-12T12:49:13.127Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "free-retry-reachable-1280",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-fre-0ff8e--requested-and-narrow-sizes/chess-lifecycle-free-retry-reachable-1280.json",
+        "sha256": "5cc7ff160ec2f0f3bfba377daf92b987985a2c35af5dee0184cc85016dc0e073",
+        "bytes": 903
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-901f5e27e39c7c10",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-fre-0ff8e--requested-and-narrow-sizes/chess-lifecycle-free-retry-reachable-320.png",
+      "sha256": "b6598bf974b2189cd84c6995747ec85801052037918da98d1f01c428eefc0800",
+      "bytes": 65734,
+      "capturedAt": "2026-11-12T12:49:11.770Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "clamped",
+      "state": "free-retry-reachable-320",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-fre-0ff8e--requested-and-narrow-sizes/chess-lifecycle-free-retry-reachable-320.json",
+        "sha256": "d4d468f9ac87018b3f4bd4a6c1bccdd769f150f6a39f5c3936a3a1e2484cf48a",
+        "bytes": 899
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-b2d99bca4c762ff6",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-fre-0ff8e--requested-and-narrow-sizes/chess-lifecycle-free-retry-reachable-390.png",
+      "sha256": "575ef3fbe1a3e7a16e302871eb5a415c9c70e10bfeafcd8f2d2c4a2c7bcac73a",
+      "bytes": 83672,
+      "capturedAt": "2026-11-12T12:49:12.403Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "free-retry-reachable-390",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-fre-0ff8e--requested-and-narrow-sizes/chess-lifecycle-free-retry-reachable-390.json",
+        "sha256": "faad8677bc0898df7931a4f38366bf66a7f637081e3c551471afcd01cfe452ed",
+        "bytes": 899
+      }
+    },
+    {
+      "id": "current-position-viewport-c1e3cfe6d17093b8",
+      "scenarioId": "current-position",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-onl-26ea4-and-late-buffered-responses/current-position-current-loading-narrow.png",
+      "sha256": "0250835e0c8bdd1982793d5b6005600a043a04db3c8ec80183c1bd1b7b39e6e2",
+      "bytes": 87938,
+      "capturedAt": "2026-11-12T12:48:57.429Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "current-loading-narrow",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-onl-26ea4-and-late-buffered-responses/current-position-current-loading-narrow.json",
+        "sha256": "1c01f44752031d9e8bc9ec7ad937231413f795f09d4218333063fe67fd690809",
+        "bytes": 898
+      }
+    },
+    {
+      "id": "current-position-viewport-f4d18e7f4b1793b1",
+      "scenarioId": "current-position",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-onl-26ea4-and-late-buffered-responses/current-position-initial-current-loading.png",
+      "sha256": "02f7256590d9c3f30322031a4270fd303eb03c50be270099ca5ed810357921ba",
+      "bytes": 546058,
+      "capturedAt": "2026-11-12T12:48:54.141Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "initial-current-loading",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-onl-26ea4-and-late-buffered-responses/current-position-initial-current-loading.json",
+        "sha256": "b7e294c0d5da022134782c74cee08c06c6d722fa5b51e5a31162a4c3d52ce99f",
+        "bytes": 902
+      }
+    },
+    {
+      "id": "current-position-viewport-c238c5f569c74e80",
+      "scenarioId": "current-position",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-onl-26ea4-and-late-buffered-responses/current-position-only-current-hint-and-arrow.png",
+      "sha256": "f3fb675e7a26a7bb87e72dbfe612dce1ec6a542309558ca40cab813bac97628b",
+      "bytes": 574584,
+      "capturedAt": "2026-11-12T12:48:56.584Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "only-current-hint-and-arrow",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-onl-26ea4-and-late-buffered-responses/current-position-only-current-hint-and-arrow.json",
+        "sha256": "933cf11be493988aa27a274d7bdbe8fa3a64f980b1643c3d69d9b79a4136da71",
+        "bytes": 906
+      }
+    },
+    {
+      "id": "current-position-viewport-7b7716324dff4604",
+      "scenarioId": "current-position",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-onl-26ea4-and-late-buffered-responses/current-position-rapid-moves-obsolete-work-aborted.png",
+      "sha256": "35bce53dda22545453738339c90c3baac62937fa1202f73de32db0b5e9f00bc5",
+      "bytes": 551888,
+      "capturedAt": "2026-11-12T12:48:56.065Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "rapid-moves-obsolete-work-aborted",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-onl-26ea4-and-late-buffered-responses/current-position-rapid-moves-obsolete-work-aborted.json",
+        "sha256": "42a92de2e67b5eb0544d308513ff516d50ac35de20a92286c285693549538a39",
+        "bytes": 912
+      }
+    },
+    {
+      "id": "live-engine-viewport-f045f5d5b4e9469b",
+      "scenarioId": "live-engine",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-rea-7fba2--predicts-the-current-board/live-engine-builtin-stockfish-18-current-after-rapid-moves.png",
+      "sha256": "62ad1e73b363481bc1020d63793fecf446403d6a8eb2533e6812a50efa347153",
+      "bytes": 569677,
+      "capturedAt": "2026-11-12T12:49:41.647Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "builtin-stockfish-18-current-after-rapid-moves",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-rea-7fba2--predicts-the-current-board/live-engine-builtin-stockfish-18-current-after-rapid-moves.json",
+        "sha256": "225dc49f0e17041c344dc6cca723b121f5d513f3b77b9c87c32291c383900e98",
+        "bytes": 920
+      }
+    },
+    {
+      "id": "live-engine-viewport-93dd43d770152bab",
+      "scenarioId": "live-engine",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-rea-7fba2--predicts-the-current-board/live-engine-builtin-stockfish-18-current-initial-hints.png",
+      "sha256": "d11a8176d262d7522c1dd03d96105e4cf58d14873f51ef6f4c5be8c8c927f2f0",
+      "bytes": 565698,
+      "capturedAt": "2026-11-12T12:49:38.336Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "builtin-stockfish-18-current-initial-hints",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-rea-7fba2--predicts-the-current-board/live-engine-builtin-stockfish-18-current-initial-hints.json",
+        "sha256": "07870fedfcde986d9dd98e2bcd893b7dcdfcaaf8e06c4c3d35ca6a241d7d5ec2",
+        "bytes": 916
+      }
+    },
+    {
+      "id": "live-engine-viewport-0fd8c0c9b9acf641",
+      "scenarioId": "live-engine",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-rea-b1421--predicts-the-current-board/live-engine-builtin-stockfish-19-current-after-rapid-moves.png",
+      "sha256": "3dc29dcf8f933982edf9bee399a0d4f6e0dbe29abab40a3493d6bd7309ed61f7",
+      "bytes": 570271,
+      "capturedAt": "2026-11-12T12:49:49.659Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "builtin-stockfish-19-current-after-rapid-moves",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-rea-b1421--predicts-the-current-board/live-engine-builtin-stockfish-19-current-after-rapid-moves.json",
+        "sha256": "e3ebee56c4a01f09fe24d885a1cca2aed5fd852b490d422250f95a8470edf140",
+        "bytes": 920
+      }
+    },
+    {
+      "id": "live-engine-viewport-009b1bcbb0ec4391",
+      "scenarioId": "live-engine",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-rea-b1421--predicts-the-current-board/live-engine-builtin-stockfish-19-current-initial-hints.png",
+      "sha256": "aa7c6c5d06618756080eaf4e2a00d6dd73943ab0d2f02e662450732e3d143b3d",
+      "bytes": 566207,
+      "capturedAt": "2026-11-12T12:49:47.838Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "builtin-stockfish-19-current-initial-hints",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-rea-b1421--predicts-the-current-board/live-engine-builtin-stockfish-19-current-initial-hints.json",
+        "sha256": "e5daf5c93b692217870a2d26a41adf921111045c74c4dd47711f1ea00af33fab",
+        "bytes": 916
+      }
+    },
+    {
+      "id": "live-engine-viewport-c42123b3a7a82a8b",
+      "scenarioId": "live-engine",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-rea-bc35b--predicts-the-current-board/live-engine-reckless-local-current-after-rapid-moves.png",
+      "sha256": "b31ed563d9538f942d68784b7be15ef213165c5670adca34d907c0383567cc2f",
+      "bytes": 571332,
+      "capturedAt": "2026-11-12T12:49:57.507Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "reckless-local-current-after-rapid-moves",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-rea-bc35b--predicts-the-current-board/live-engine-reckless-local-current-after-rapid-moves.json",
+        "sha256": "3e4450739897a7c99f1afcf09c6005dd62246f3fa7816642771ac96887a7a307",
+        "bytes": 914
+      }
+    },
+    {
+      "id": "live-engine-viewport-c7e0b001bbc098d9",
+      "scenarioId": "live-engine",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-rea-bc35b--predicts-the-current-board/live-engine-reckless-local-current-initial-hints.png",
+      "sha256": "dcbc20cafde442bbdbe1d7842a12f85adae102cdc98e495290aebb770bfa0b1a",
+      "bytes": 568035,
+      "capturedAt": "2026-11-12T12:49:55.635Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "reckless-local-current-initial-hints",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-rea-bc35b--predicts-the-current-board/live-engine-reckless-local-current-initial-hints.json",
+        "sha256": "287176a005311c75435ce92614648f23c36cee6927bc21717487367f605a0215",
+        "bytes": 910
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-84c125105bbee7c2",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-res-15f39-neration-for-the-same-board/chess-lifecycle-restored-page-current-result.png",
+      "sha256": "d61ee76044b3cfa2fffaa16d63b338ac815beb228028846e7abc2e1a51752126",
+      "bytes": 563308,
+      "capturedAt": "2026-11-12T12:49:26.542Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "restored-page-current-result",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-res-15f39-neration-for-the-same-board/chess-lifecycle-restored-page-current-result.json",
+        "sha256": "92158de4fcc5fa5bb60aea43fc28e5bff942ad773af588f64c0360ccd1e72962",
+        "bytes": 906
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-b788ebba86b8c985",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-res-15f39-neration-for-the-same-board/chess-lifecycle-restored-page-fresh-loading.png",
+      "sha256": "2b23fdd3759568ed4ce30d58f5979689c528106e1e445659c4ac4910fe8291a5",
+      "bytes": 545969,
+      "capturedAt": "2026-11-12T12:49:26.078Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "restored-page-fresh-loading",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-res-15f39-neration-for-the-same-board/chess-lifecycle-restored-page-fresh-loading.json",
+        "sha256": "e29d2ebca4ae0b2125a2f26b1471d45dcac2441ee94478f25f9ce1108177ccf6",
+        "bytes": 905
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-99af976761b67c98",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-und-48056-date-prediction-generations/chess-lifecycle-closing-window-aborts-current-work.png",
+      "sha256": "29e88e9cbbd5a1dcc61a6493cd696dea7a7476f03bb9d1dec3467c5fd92f9ac5",
+      "bytes": 1100132,
+      "capturedAt": "2026-11-12T12:49:04.487Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "closing-window-aborts-current-work",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-und-48056-date-prediction-generations/chess-lifecycle-closing-window-aborts-current-work.json",
+        "sha256": "39ad4700d3e0bc3c230877bd2de8c317dc69869f18957887cb0ec095979aef88",
+        "bytes": 912
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-7cd8126383bce8ef",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-und-48056-date-prediction-generations/chess-lifecycle-explicit-cancel-awaits-retry.png",
+      "sha256": "fb0ec3b24d0078894a5e09bb010775e54f191b718cba74d4582b8fae0f8ef1da",
+      "bytes": 544093,
+      "capturedAt": "2026-11-12T12:49:01.664Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "explicit-cancel-awaits-retry",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-und-48056-date-prediction-generations/chess-lifecycle-explicit-cancel-awaits-retry.json",
+        "sha256": "a4e1b55c8b64bcc2b559b4e9ed2a202ad9352fd72049858c7c91cf9a9a91549f",
+        "bytes": 906
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-ba1e3db5ea4ee9b4",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-und-48056-date-prediction-generations/chess-lifecycle-new-game-current-engine-result.png",
+      "sha256": "61153efc1c30b78e65d0844c606ed88c40694345622ec1c9db552002f0993512",
+      "bytes": 563037,
+      "capturedAt": "2026-11-12T12:49:03.317Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "new-game-current-engine-result",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-und-48056-date-prediction-generations/chess-lifecycle-new-game-current-engine-result.json",
+        "sha256": "6b5e72eeb452cecdaa74ec5bf7a065dcc5aeafe971422c55a8a112c4a156247d",
+        "bytes": 908
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-869f151dc8329ebb",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-und-48056-date-prediction-generations/chess-lifecycle-same-fen-new-generation.png",
+      "sha256": "238f84a7bc564025c9d6c0670608faa6e55e748592443f01fca23ec716b3e961",
+      "bytes": 546065,
+      "capturedAt": "2026-11-12T12:49:00.900Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "same-fen-new-generation",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/browser/chess-current-position-und-48056-date-prediction-generations/chess-lifecycle-same-fen-new-generation.json",
+        "sha256": "2cbe4c8a421596526d28b066b6c1102108fe97bd4fbf47a2ce1096bd8a354351",
+        "bytes": 901
+      }
+    },
+    {
+      "id": "chess-lifecycle-sequence-424d7e6b97ca44c9",
+      "scenarioId": "chess-lifecycle",
+      "kind": "sequence",
+      "path": "experience-evidence/chess-abort-deployed/sequences/chess-lifecycle-sequence-424d7e6b97ca44c9.json",
+      "sha256": "89687befe0a286111b5793fa8850d08f88e30fe0506e853e710a665fad8b17d1",
+      "bytes": 4902,
+      "capturedAt": "2026-11-12T12:52:36.013Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "same-fen-new-generation → explicit-cancel-awaits-retry → new-game-current-engine-result → closing-window-aborts-current-work → free-cancel-reachable-1280 → free-retry-reachable-1280 → auto-cancel-reachable-1280 → auto-retry-reachable-1280 → restored-page-fresh-loading → restored-page-current-result → late-auto-and-evaluation-ignored"
+    },
+    {
+      "id": "chess-lifecycle-sequence-22c8e1045a6d48c9",
+      "scenarioId": "chess-lifecycle",
+      "kind": "sequence",
+      "path": "experience-evidence/chess-abort-deployed/sequences/chess-lifecycle-sequence-22c8e1045a6d48c9.json",
+      "sha256": "3213c1672911e448e415b6f19b6c68fdb5947f44f64983834c77019b6e7b4d96",
+      "bytes": 1906,
+      "capturedAt": "2026-11-12T12:52:36.013Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "clamped",
+      "state": "free-cancel-reachable-320 → free-retry-reachable-320 → auto-cancel-reachable-320 → auto-retry-reachable-320"
+    },
+    {
+      "id": "chess-lifecycle-sequence-a6f5efad83c654e2",
+      "scenarioId": "chess-lifecycle",
+      "kind": "sequence",
+      "path": "experience-evidence/chess-abort-deployed/sequences/chess-lifecycle-sequence-a6f5efad83c654e2.json",
+      "sha256": "c13d2f356642ae780379e14aa2fbf56166ff5b6debd6ce3e619b6453f8d169db",
+      "bytes": 1906,
+      "capturedAt": "2026-11-12T12:52:36.013Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "free-cancel-reachable-390 → free-retry-reachable-390 → auto-cancel-reachable-390 → auto-retry-reachable-390"
+    },
+    {
+      "id": "current-position-sequence-74687ffecde8e6e6",
+      "scenarioId": "current-position",
+      "kind": "sequence",
+      "path": "experience-evidence/chess-abort-deployed/sequences/current-position-sequence-74687ffecde8e6e6.json",
+      "sha256": "c3e3f11f3711ab5267dac6cf6be33a843c13de97f523cf0d3758e4aea09e6d4c",
+      "bytes": 1529,
+      "capturedAt": "2026-11-12T12:52:36.013Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "initial-current-loading → rapid-moves-obsolete-work-aborted → only-current-hint-and-arrow"
+    },
+    {
+      "id": "live-engine-sequence-7482331dc283030c",
+      "scenarioId": "live-engine",
+      "kind": "sequence",
+      "path": "experience-evidence/chess-abort-deployed/sequences/live-engine-sequence-7482331dc283030c.json",
+      "sha256": "cd93d5dcbf38f261927750964a5a7db85c0f4401bf27b317cb04fe10aaaf9a18",
+      "bytes": 3026,
+      "capturedAt": "2026-11-12T12:52:36.013Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "builtin-stockfish-18-current-initial-hints → builtin-stockfish-18-current-after-rapid-moves → builtin-stockfish-19-current-initial-hints → builtin-stockfish-19-current-after-rapid-moves → reckless-local-current-initial-hints → reckless-local-current-after-rapid-moves"
+    },
+    {
+      "id": "chess-lifecycle-viewport-984211c8bc899328",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/manual/01-narrow-real-loading.png",
+      "sha256": "a4a24ac4e1085dfafe2fbd3ef64a039b47a981355c1f5f9e13ba9cc4d012fbd4",
+      "bytes": 84402,
+      "capturedAt": "2026-11-12T12:51:27.005Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "Genuine Stockfish19 loading with visible stage elapsed and pinned Cancel",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/manual/01-narrow-real-loading.json",
+        "sha256": "5ce1579f2362ebc96194848f4ca509fd92b7b0aa5ae828b0ffa3c14f58627345",
+        "bytes": 946
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-a6f1aa0916ea5886",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/manual/02-narrow-stopped.png",
+      "sha256": "32b2dc9f7e72edd4f6b48af30d6778a3bf273297ed4a14a96e88bbbfd78447b9",
+      "bytes": 83270,
+      "capturedAt": "2026-11-12T12:51:27.150Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "Explicit narrow Cancel shows stopped recovery and pinned Retry",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/manual/02-narrow-stopped.json",
+        "sha256": "80880c7e17bee8f4f96cc3b00cf5ea28d20ea7d342284c4def8f84bf57cc07f4",
+        "bytes": 936
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-d7a59bab0f3e1b9f",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/manual/03-short-stopped.png",
+      "sha256": "1774d130d38aa5f53cbd39a92c1ff3123f0a331d939a78466578f32c7e06d0e7",
+      "bytes": 65195,
+      "capturedAt": "2026-11-12T12:51:27.332Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "clamped",
+      "state": "320x640 stopped state readable with reachable Retry",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/manual/03-short-stopped.json",
+        "sha256": "c7bad4dc018b7f256d0f09e5006a80cef6d8570ef78bacf3b1c0db18fa52e2af",
+        "bytes": 925
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-7a2c279ed1214782",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/manual/04-short-real-loading.png",
+      "sha256": "f49ed57bd0f826a21efc57d49f9393ae15b2fe462ddc4ed7aac05bf1b0c55a76",
+      "bytes": 66488,
+      "capturedAt": "2026-11-12T12:51:27.494Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "clamped",
+      "state": "320x640 genuine current search stage elapsed meter and Cancel",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/manual/04-short-real-loading.json",
+        "sha256": "dbc578705735734bab8a138e5d10d543d7d0958dd32cce826a7239fb0e425904",
+        "bytes": 935
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-9706bfa142a14b0e",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/manual/05-short-current.png",
+      "sha256": "e6efe307836644424ff3c9c96d08a5e87b51b38e914357dd958f93df6ab834c1",
+      "bytes": 69210,
+      "capturedAt": "2026-11-12T12:51:31.532Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "clamped",
+      "state": "Current real hints complete at320x640",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/manual/05-short-current.json",
+        "sha256": "5c901cbf5a577dc3cb18bd217d747c4f74e4ae17bfcb76fe9bc192738da37fc0",
+        "bytes": 911
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-9f6d3f5f6e47a278",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/manual/06-rapid-current-loading.png",
+      "sha256": "2d044e45cfdf0b2cea9e962541fa0b7cae388e44beebb2cd9ab4572dd9f0c89f",
+      "bytes": 550482,
+      "capturedAt": "2026-11-12T12:51:32.408Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "Three rapid legal moves clear obsolete hints while latest request runs",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/manual/06-rapid-current-loading.json",
+        "sha256": "5ff5944424792c43d93cfb808b1c14ebfbfba54b0ee551e5a82c4d6ae052b18b",
+        "bytes": 947
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-49c0dbecf1111307",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/manual/07-current-hover.png",
+      "sha256": "f45904ed3ffff9365f0be6aa3be8e8490b4b23ceeba0e2a5fb9a8733530b6bd7",
+      "bytes": 580823,
+      "capturedAt": "2026-11-12T12:51:36.734Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "Only current black-to-move hint and hover after rapid moves",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/manual/07-current-hover.json",
+        "sha256": "b7f500ad2b99cbb96e6cc78b90f016be567c2be9c14ae7b28cde0a7ebdbd21f5",
+        "bytes": 936
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-7e9070e19be324fe",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/manual/08-requested-stopped.png",
+      "sha256": "7d3c893cd686e87d50c81dcf32b3fcd615e716ab7beb36ac06dc531d35c47dc7",
+      "bytes": 549746,
+      "capturedAt": "2026-11-12T12:51:37.206Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "Undo clears hover then explicit Cancel remains stopped",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/manual/08-requested-stopped.json",
+        "sha256": "d1115358eb4509fceb12ce51c33aaa3c30f2ae59ffea5a71fb77fa06b8e0201b",
+        "bytes": 931
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-36e786642c9ad095",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/manual/09-current-retry.png",
+      "sha256": "59c23a4c6bb1a07c3e8b372af959040c315745654390492cf2a914a4c5291e69",
+      "bytes": 568914,
+      "capturedAt": "2026-11-12T12:51:41.974Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "Retry completes current white-to-move hints",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/manual/09-current-retry.json",
+        "sha256": "71675feb483e77028655d807ac0ba8e1cc9c5dd6c8608ed70405f4605cc0d21e",
+        "bytes": 920
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-1152cbbe04d48720",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/manual/10-stable-narrow-current.png",
+      "sha256": "1f7ee2a529e18ebf484786d2c4144baccd87b9d944c44d8e1ee11a19bb5b9f6c",
+      "bytes": 88413,
+      "capturedAt": "2026-11-12T12:51:42.127Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "Stable constrained board and current hints with pinned game actions",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/manual/10-stable-narrow-current.json",
+        "sha256": "ccf894c924b4c7e47c882913b308a45fa6f2be78bbfbb2bc5bd8e7a85b6c9e54",
+        "bytes": 941
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-564dd832d7131843",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/manual/11-narrow-reset.png",
+      "sha256": "86b7ae2a2be87e89d2f442d18ce2966866ff6d8f57cf1e493f7b540818bccd45",
+      "bytes": 92204,
+      "capturedAt": "2026-11-12T12:51:42.283Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "New game returns responsive narrow setup",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/manual/11-narrow-reset.json",
+        "sha256": "80486fa576b1267771512b9a07d1621be0f38ecb7f12353b7837fe4a702dd230",
+        "bytes": 914
+      }
+    },
+    {
+      "id": "chess-lifecycle-viewport-d8cf355013fc526a",
+      "scenarioId": "chess-lifecycle",
+      "kind": "viewport",
+      "path": "experience-evidence/chess-abort-deployed/manual/12-auto-short-real-depth.png",
+      "sha256": "a2de51eb437e26e842bb8238f51655d7822b13f50af206cdf9fa3e0add0789a7",
+      "bytes": 72474,
+      "capturedAt": "2026-11-12T12:51:55.436Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "clamped",
+      "state": "Genuine Reckless3s Auto maximum purposes at320 with actual depth detail and anchored actions",
+      "capture": {
+        "path": "experience-evidence/chess-abort-deployed/manual/12-auto-short-real-depth.json",
+        "sha256": "0bb95ea6b7152ec54c0b2a7303c1ff314c63c1d0044a70893b17bb518aad9c8c",
+        "bytes": 966
+      }
+    },
+    {
+      "id": "chess-lifecycle-sequence-82ae2e621a11580e",
+      "scenarioId": "chess-lifecycle",
+      "kind": "sequence",
+      "path": "experience-evidence/chess-abort-deployed/sequences/chess-lifecycle-sequence-82ae2e621a11580e.json",
+      "sha256": "a7f636c94693e2433eacc1d8691cf0091ca5beb9869658d7108e2aaa8a66641d",
+      "bytes": 6474,
+      "capturedAt": "2026-11-12T12:52:36.536Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested",
+      "state": "same-fen-new-generation → explicit-cancel-awaits-retry → new-game-current-engine-result → closing-window-aborts-current-work → free-cancel-reachable-1280 → free-retry-reachable-1280 → auto-cancel-reachable-1280 → auto-retry-reachable-1280 → restored-page-fresh-loading → restored-page-current-result → late-auto-and-evaluation-ignored → Three rapid legal moves clear obsolete hints while latest request runs → Only current black-to-move hint and hover after rapid moves → Undo clears hover then explicit Cancel remains stopped → Retry completes current white-to-move hints"
+    },
+    {
+      "id": "chess-lifecycle-sequence-656d3129fea79e81",
+      "scenarioId": "chess-lifecycle",
+      "kind": "sequence",
+      "path": "experience-evidence/chess-abort-deployed/sequences/chess-lifecycle-sequence-656d3129fea79e81.json",
+      "sha256": "ac01ec191dba074c3e828c6e1995183c08ef761819bc0039b51c22be432dc168",
+      "bytes": 3505,
+      "capturedAt": "2026-11-12T12:52:36.536Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "window": "clamped",
+      "state": "free-cancel-reachable-320 → free-retry-reachable-320 → auto-cancel-reachable-320 → auto-retry-reachable-320 → 320x640 stopped state readable with reachable Retry → 320x640 genuine current search stage elapsed meter and Cancel → Current real hints complete at320x640 → Genuine Reckless3s Auto maximum purposes at320 with actual depth detail and anchored actions"
+    },
+    {
+      "id": "chess-lifecycle-sequence-23524219f304ab9b",
+      "scenarioId": "chess-lifecycle",
+      "kind": "sequence",
+      "path": "experience-evidence/chess-abort-deployed/sequences/chess-lifecycle-sequence-23524219f304ab9b.json",
+      "sha256": "937113653fa8706bf5a9c4084c0ef5e97727b2b164a27c73ae66b74007cb90f7",
+      "bytes": 3506,
+      "capturedAt": "2026-11-12T12:52:36.536Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "window": "clamped",
+      "state": "free-cancel-reachable-390 → free-retry-reachable-390 → auto-cancel-reachable-390 → auto-retry-reachable-390 → Genuine Stockfish19 loading with visible stage elapsed and pinned Cancel → Explicit narrow Cancel shows stopped recovery and pinned Retry → Stable constrained board and current hints with pinned game actions → New game returns responsive narrow setup"
+    },
+    {
+      "id": "independent-manual-log",
+      "scenarioId": "chess-lifecycle",
+      "kind": "log",
+      "path": "experience-evidence/chess-abort-deployed/manual/review-log.json",
+      "sha256": "cab55d7f28ac4bdd7570e70e5680389002665486affd51dc762d1b08cf345a6f",
+      "bytes": 4265,
+      "capturedAt": "2026-11-12T12:51:42.280Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested then narrow",
+      "state": "Independent genuine Stockfish19 requested and narrow controls, stage and recovery"
+    },
+    {
+      "id": "independent-auto-real-detail-log",
+      "scenarioId": "chess-lifecycle",
+      "kind": "log",
+      "path": "experience-evidence/chess-abort-deployed/manual/auto-real-detail-log.json",
+      "sha256": "37a3fd1500730eda34b7ae6817422da71961b2ad2e93a3bc8adc49b1f492a7b7",
+      "bytes": 2697,
+      "capturedAt": "2026-11-12T12:51:55.432Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested then narrow",
+      "state": "Actual Reckless Auto320 full depth heading and meter with four reachable controls"
+    },
+    {
+      "id": "chess-lifecycle-video-57",
+      "scenarioId": "chess-lifecycle",
+      "kind": "video",
+      "path": "experience-evidence/chess-abort-deployed/manual/page@13aaa06c2f3f312c07533bdb8d4db8ae.webm",
+      "sha256": "59a30ea7d4ec8d9ee6e0efb606eefcf22135fa37f761f4748202f261764e7331",
+      "bytes": 1136047,
+      "capturedAt": "2026-11-12T12:51:42.364Z",
+      "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+      "environment": "deployed",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "window": "requested then narrow",
+      "state": "Independent real-engine current-position cancellation and narrow recovery journey"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "CHESS-CURRENT",
+      "status": "passed",
+      "scenarioIds": [
+        "current-position",
+        "chess-lifecycle"
+      ],
+      "artifactIds": [
+        "chess-lifecycle-viewport-a0b0f984fd705ab0",
+        "chess-lifecycle-viewport-798ad5f54e7f8d92",
+        "chess-lifecycle-viewport-286a2eb97c15c9fe",
+        "chess-lifecycle-viewport-69706731d65dd135",
+        "chess-lifecycle-viewport-574c79c670635d56",
+        "chess-lifecycle-viewport-37d31815348ecbe9",
+        "chess-lifecycle-viewport-507344ed927d1fb2",
+        "chess-lifecycle-viewport-0094ac6df99efdaf",
+        "chess-lifecycle-viewport-c9bc000f9c3a30f8",
+        "chess-lifecycle-viewport-5870d0d476b4c07d",
+        "chess-lifecycle-viewport-00f7105c29690d75",
+        "chess-lifecycle-viewport-901f5e27e39c7c10",
+        "chess-lifecycle-viewport-b2d99bca4c762ff6",
+        "current-position-viewport-c1e3cfe6d17093b8",
+        "current-position-viewport-f4d18e7f4b1793b1",
+        "current-position-viewport-c238c5f569c74e80",
+        "current-position-viewport-7b7716324dff4604",
+        "chess-lifecycle-viewport-84c125105bbee7c2",
+        "chess-lifecycle-viewport-b788ebba86b8c985",
+        "chess-lifecycle-viewport-99af976761b67c98",
+        "chess-lifecycle-viewport-7cd8126383bce8ef",
+        "chess-lifecycle-viewport-ba1e3db5ea4ee9b4",
+        "chess-lifecycle-viewport-869f151dc8329ebb",
+        "chess-lifecycle-sequence-424d7e6b97ca44c9",
+        "chess-lifecycle-sequence-22c8e1045a6d48c9",
+        "chess-lifecycle-sequence-a6f5efad83c654e2",
+        "current-position-sequence-74687ffecde8e6e6",
+        "chess-lifecycle-viewport-984211c8bc899328",
+        "chess-lifecycle-viewport-a6f1aa0916ea5886",
+        "chess-lifecycle-viewport-d7a59bab0f3e1b9f",
+        "chess-lifecycle-viewport-7a2c279ed1214782",
+        "chess-lifecycle-viewport-9706bfa142a14b0e",
+        "chess-lifecycle-viewport-9f6d3f5f6e47a278",
+        "chess-lifecycle-viewport-49c0dbecf1111307",
+        "chess-lifecycle-viewport-7e9070e19be324fe",
+        "chess-lifecycle-viewport-36e786642c9ad095",
+        "chess-lifecycle-viewport-1152cbbe04d48720",
+        "chess-lifecycle-viewport-564dd832d7131843",
+        "chess-lifecycle-viewport-d8cf355013fc526a",
+        "chess-lifecycle-sequence-82ae2e621a11580e",
+        "chess-lifecycle-sequence-656d3129fea79e81",
+        "chess-lifecycle-sequence-23524219f304ab9b",
+        "independent-manual-log",
+        "independent-auto-real-detail-log",
+        "chess-lifecycle-video-57"
+      ]
+    },
+    {
+      "id": "CHESS-QUEUE",
+      "status": "passed",
+      "scenarioIds": [
+        "runtime-cancellation"
+      ],
+      "artifactIds": [
+        "cancellation-provider-and-gate-tests-log"
+      ]
+    },
+    {
+      "id": "CHESS-TRANSPORT",
+      "status": "passed",
+      "scenarioIds": [
+        "runtime-cancellation",
+        "live-engine"
+      ],
+      "artifactIds": [
+        "current-position-browser-log",
+        "live-existing-gameplay-log",
+        "live-model-streams-log",
+        "cancellation-provider-and-gate-tests-log",
+        "live-engine-viewport-f045f5d5b4e9469b",
+        "live-engine-viewport-93dd43d770152bab",
+        "live-engine-viewport-0fd8c0c9b9acf641",
+        "live-engine-viewport-009b1bcbb0ec4391",
+        "live-engine-viewport-c42123b3a7a82a8b",
+        "live-engine-viewport-c7e0b001bbc098d9",
+        "live-engine-sequence-7482331dc283030c"
+      ]
+    },
+    {
+      "id": "CHESS-RECOVERY",
+      "status": "passed",
+      "scenarioIds": [
+        "current-position",
+        "chess-lifecycle",
+        "live-engine"
+      ],
+      "artifactIds": [
+        "current-position-browser-log",
+        "live-existing-gameplay-log",
+        "live-model-streams-log",
+        "chess-lifecycle-viewport-a0b0f984fd705ab0",
+        "chess-lifecycle-viewport-798ad5f54e7f8d92",
+        "chess-lifecycle-viewport-286a2eb97c15c9fe",
+        "chess-lifecycle-viewport-69706731d65dd135",
+        "chess-lifecycle-viewport-574c79c670635d56",
+        "chess-lifecycle-viewport-37d31815348ecbe9",
+        "chess-lifecycle-viewport-507344ed927d1fb2",
+        "chess-lifecycle-viewport-0094ac6df99efdaf",
+        "chess-lifecycle-viewport-c9bc000f9c3a30f8",
+        "chess-lifecycle-viewport-5870d0d476b4c07d",
+        "chess-lifecycle-viewport-00f7105c29690d75",
+        "chess-lifecycle-viewport-901f5e27e39c7c10",
+        "chess-lifecycle-viewport-b2d99bca4c762ff6",
+        "current-position-viewport-c1e3cfe6d17093b8",
+        "current-position-viewport-f4d18e7f4b1793b1",
+        "current-position-viewport-c238c5f569c74e80",
+        "current-position-viewport-7b7716324dff4604",
+        "live-engine-viewport-f045f5d5b4e9469b",
+        "live-engine-viewport-93dd43d770152bab",
+        "live-engine-viewport-0fd8c0c9b9acf641",
+        "live-engine-viewport-009b1bcbb0ec4391",
+        "live-engine-viewport-c42123b3a7a82a8b",
+        "live-engine-viewport-c7e0b001bbc098d9",
+        "chess-lifecycle-viewport-84c125105bbee7c2",
+        "chess-lifecycle-viewport-b788ebba86b8c985",
+        "chess-lifecycle-viewport-99af976761b67c98",
+        "chess-lifecycle-viewport-7cd8126383bce8ef",
+        "chess-lifecycle-viewport-ba1e3db5ea4ee9b4",
+        "chess-lifecycle-viewport-869f151dc8329ebb",
+        "chess-lifecycle-sequence-424d7e6b97ca44c9",
+        "chess-lifecycle-sequence-22c8e1045a6d48c9",
+        "chess-lifecycle-sequence-a6f5efad83c654e2",
+        "current-position-sequence-74687ffecde8e6e6",
+        "live-engine-sequence-7482331dc283030c",
+        "chess-lifecycle-viewport-984211c8bc899328",
+        "chess-lifecycle-viewport-a6f1aa0916ea5886",
+        "chess-lifecycle-viewport-d7a59bab0f3e1b9f",
+        "chess-lifecycle-viewport-7a2c279ed1214782",
+        "chess-lifecycle-viewport-9706bfa142a14b0e",
+        "chess-lifecycle-viewport-9f6d3f5f6e47a278",
+        "chess-lifecycle-viewport-49c0dbecf1111307",
+        "chess-lifecycle-viewport-7e9070e19be324fe",
+        "chess-lifecycle-viewport-36e786642c9ad095",
+        "chess-lifecycle-viewport-1152cbbe04d48720",
+        "chess-lifecycle-viewport-564dd832d7131843",
+        "chess-lifecycle-viewport-d8cf355013fc526a",
+        "chess-lifecycle-sequence-82ae2e621a11580e",
+        "chess-lifecycle-sequence-656d3129fea79e81",
+        "chess-lifecycle-sequence-23524219f304ab9b",
+        "independent-manual-log",
+        "independent-auto-real-detail-log",
+        "chess-lifecycle-video-57"
+      ]
+    },
+    {
+      "id": "CHESS-GATE",
+      "status": "passed",
+      "scenarioIds": [
+        "release-gates"
+      ],
+      "artifactIds": [
+        "merged-deployment-and-ci-log"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "runtime-cancellation",
+      "status": "passed",
+      "artifactIds": [
+        "cancellation-provider-and-gate-tests-log"
+      ],
+      "observed": "82 focused runtime, client, route, provider configuration and gate tests passed. Queued abort settles and releases capacity immediately; unrelated clients remain FIFO. Active stop drains bestmove or1s fallback kills/restarts. Cleanup lifetime persists beyond prompt caller rejection; preregistered Next after and scoped Vercel cancellation retain actual cleanup. Late fetch/JSON/SSE and startup/ready abort fixtures pass."
+    },
+    {
+      "id": "current-position",
+      "status": "passed",
+      "artifactIds": [
+        "current-position-viewport-c1e3cfe6d17093b8",
+        "current-position-viewport-f4d18e7f4b1793b1",
+        "current-position-viewport-c238c5f569c74e80",
+        "current-position-viewport-7b7716324dff4604",
+        "current-position-sequence-74687ffecde8e6e6"
+      ],
+      "observed": "Current-only rapid move test verifies prior work is aborted synchronously when the actual board action returns and before replacement starts. Late progress, JSON/SSE results and errors never render. Only current legal hints and hover remain. Corrected test fails baselinee816; historical invalid measurement retained separately."
+    },
+    {
+      "id": "chess-lifecycle",
+      "status": "passed",
+      "artifactIds": [
+        "chess-lifecycle-viewport-a0b0f984fd705ab0",
+        "chess-lifecycle-viewport-798ad5f54e7f8d92",
+        "chess-lifecycle-viewport-286a2eb97c15c9fe",
+        "chess-lifecycle-viewport-69706731d65dd135",
+        "chess-lifecycle-viewport-574c79c670635d56",
+        "chess-lifecycle-viewport-37d31815348ecbe9",
+        "chess-lifecycle-viewport-507344ed927d1fb2",
+        "chess-lifecycle-viewport-0094ac6df99efdaf",
+        "chess-lifecycle-viewport-c9bc000f9c3a30f8",
+        "chess-lifecycle-viewport-5870d0d476b4c07d",
+        "chess-lifecycle-viewport-00f7105c29690d75",
+        "chess-lifecycle-viewport-901f5e27e39c7c10",
+        "chess-lifecycle-viewport-b2d99bca4c762ff6",
+        "chess-lifecycle-viewport-84c125105bbee7c2",
+        "chess-lifecycle-viewport-b788ebba86b8c985",
+        "chess-lifecycle-viewport-99af976761b67c98",
+        "chess-lifecycle-viewport-7cd8126383bce8ef",
+        "chess-lifecycle-viewport-ba1e3db5ea4ee9b4",
+        "chess-lifecycle-viewport-869f151dc8329ebb",
+        "chess-lifecycle-sequence-424d7e6b97ca44c9",
+        "chess-lifecycle-sequence-22c8e1045a6d48c9",
+        "chess-lifecycle-sequence-a6f5efad83c654e2",
+        "chess-lifecycle-viewport-984211c8bc899328",
+        "chess-lifecycle-viewport-a6f1aa0916ea5886",
+        "chess-lifecycle-viewport-d7a59bab0f3e1b9f",
+        "chess-lifecycle-viewport-7a2c279ed1214782",
+        "chess-lifecycle-viewport-9706bfa142a14b0e",
+        "chess-lifecycle-viewport-9f6d3f5f6e47a278",
+        "chess-lifecycle-viewport-49c0dbecf1111307",
+        "chess-lifecycle-viewport-7e9070e19be324fe",
+        "chess-lifecycle-viewport-36e786642c9ad095",
+        "chess-lifecycle-viewport-1152cbbe04d48720",
+        "chess-lifecycle-viewport-564dd832d7131843",
+        "chess-lifecycle-viewport-d8cf355013fc526a",
+        "chess-lifecycle-sequence-82ae2e621a11580e",
+        "chess-lifecycle-sequence-656d3129fea79e81",
+        "chess-lifecycle-sequence-23524219f304ab9b",
+        "independent-manual-log",
+        "independent-auto-real-detail-log",
+        "chess-lifecycle-video-57"
+      ],
+      "observed": "Nine fresh production browser cases cover same-FEN Undo/reset, Cancel/Retry, cached-page restore, close, stale auto/evaluation and max concurrent recovery actions. Before-autoscroll assertions cover requested1280x900,390x844,320x640, Moves tab, full primary loading heading+meter, and board>=192px. Independent real Stockfish19 manual validates stage/depth/elapsed, narrow Cancel/stoppedRetry/current hints, requested rapid moves/hover/Undo/reset. Prior clipped controls and collapsed feedback candidates rejected and retained."
+    },
+    {
+      "id": "live-engine",
+      "status": "passed",
+      "artifactIds": [
+        "current-position-browser-log",
+        "live-existing-gameplay-log",
+        "live-model-streams-log",
+        "live-engine-viewport-f045f5d5b4e9469b",
+        "live-engine-viewport-93dd43d770152bab",
+        "live-engine-viewport-0fd8c0c9b9acf641",
+        "live-engine-viewport-009b1bcbb0ec4391",
+        "live-engine-viewport-c42123b3a7a82a8b",
+        "live-engine-viewport-c7e0b001bbc098d9",
+        "live-engine-sequence-7482331dc283030c"
+      ],
+      "observed": "All three engines streamed genuine thinking for10s searches, received client abort and produced legal150ms replacement analysis within5s observed. Actual Free both rapid moves produce only legal current hints. Live Vercel HTTP timing is observation; direct runtime fixtures prove same-process removal, while distributed instance routing remains an explicit limitation. Nine additional live gameplay cases preserve all four engines legal-history moves, three human-vs-engine/Free flows, and two arena pause/resume/replay/archive pairs. A further live SSE endpoint case verifies progress and legal moves for all four engines."
+    },
+    {
+      "id": "release-gates",
+      "status": "passed",
+      "artifactIds": [
+        "merged-deployment-and-ci-log"
+      ],
+      "observed": "Production identity5232dbc/treee703527 equals the approved source. CandidateCI43218818618 passed250unit and99browser tests without flaky retries. Nineteen fresh live browser/API cases,82 focused source checks, actual independent live manual and deployment identity verification support exact merged acceptance. Distributed Vercel routing limits HTTP timing claims. Prior candidate receipts remain immutable. Frozen for independent deployed review and explicit acceptance decision."
+    }
+  ],
+  "deployment": {
+    "commit": "5232dbc66a129522f6a6be4249b86aed4f48b39a",
+    "identityUrl": "https://analytics-games-service.vercel.app/api/build-identity",
+    "identityVerifiedAt": "2026-11-12T12:48:47.885Z"
+  }
+}

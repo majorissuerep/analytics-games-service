@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "requestId": "chess-current-position",
+  "requestSha256": "f1d668069e61de816520e9f227200c119a3724dc81b5699a05afc25c9a1e0dec",
+  "contractsSha256": "82ff566aa0d2b7b3d9298f37fa629a64459739135922a54b72e0cb673bdb01de",
+  "reviewer": "chess_cancellation_review",
+  "authors": [
+    "root",
+    "chess_current_position"
+  ],
+  "reviewedAt": "2026-11-12T12:54:00.659323+00:00",
+  "verdict": "approve",
+  "tree": "e7035275741ca466b5b31cb8675ee8684cb7820a",
+  "environment": "deployed",
+  "reportSha256": "6cca301e4a76b3675510214ae481ec708fdf24c35b03b23333b839f873b876f5",
+  "referenceComparison": "Independently repeated actual production XP-window journeys after directly verifying merged5232dbc/treee703527 identity. Genuine Stockfish19 Free both sides at requested1000x760,390x844 and320x640 showed readable selected-engine loading/stage/elapsed, reachable anchored Cancel/Retry, successful current hints, rapid d4/d5/c4 and current hover, Undo and New game. Opened all12 fresh live manual viewport captures and root current-position/all3engine viewport sequence frames. Genuine Reckless3s Auto320 capture12 visibly fits actual Depth1/22positions detail, elapsed and meter with all4actions hit-testable. Deployed material/board/XP shell match approved candidate; no blocker/major found. Analytics is disabled in production as recorded; enabled-state CI evidence remains separate.",
+  "challenges": [
+    "Production endpoint independently returned merged5232dbc and approved treee703527 before interactions; reviewed deployment identity/CI/Vercel success log agrees.",
+    "Live19 browser scenarios pass:9changed critical cases,9legal-history/human-response/Free/arena regressions and1SSE4engine endpoint case. Actual manual replay adds genuine narrow/short recovery and worst-purpose Auto depth detail.",
+    "Direct82 source-bound runtime/provider tests establish same-process removable queue/drain/retention behavior. Live HTTP replacement timings (~602ms SF18,358ms SF19,588ms Reckless) are observations under distributed routing and do not establish instance identity.",
+    "Fresh deployed captures are separate from immutable approved candidate5 and rejected historical candidates. All live report artifact checksums and metadata are validated; production analytics-disabled configuration is explicit."
+  ],
+  "findings": [
+    {
+      "id": "CHESS-PROVIDER-CANDIDATE2",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Earlier candidate omitted Vercel cancellation opt-in and retained actual drain.",
+      "resolution": "Inference-only supportsCancellation source patterns, preregistered Next after retention and controlled true-cleanup lifecycle/route tests are present; preview EisDPbHqDDhwtVaEQZm7C8sQSLj9 succeeds."
+    },
+    {
+      "id": "CHESS-NARROW-CANCEL",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Earlier narrow current loading Cancel was clipped below detail-pane boundary.",
+      "resolution": "Inference/evaluation Cancel and Retry now occupy anchored footer; real390/320 actions pass clip/hit tests before automatic scrolling, including Moves tab and simultaneous purposes."
+    },
+    {
+      "id": "CHESS-SHORT-LOADING",
+      "severity": "major",
+      "status": "resolved",
+      "description": "Earlier320 Auto footer left effectively no space for current loading feedback.",
+      "resolution": "Short viewport reserves276px utility height and at least192px board. Actual genuine Auto320 depth/elapsed/meter fits, with all4actions visible and hit-testable."
+    }
+  ],
+  "observations": [
+    {
+      "requirementId": "CHESS-CURRENT",
+      "note": "Nine live changed scenarios pass synchronous invalidation, late buffered output, same-FEN reset, unmount and cached-page restore. Independent genuine rapid-move/hover/Undo/reset replay displayed current results only; fresh manual and root viewport sequences inspected.",
+      "artifactIds": [
+        "chess-lifecycle-viewport-984211c8bc899328",
+        "chess-lifecycle-viewport-a6f1aa0916ea5886",
+        "chess-lifecycle-viewport-d7a59bab0f3e1b9f",
+        "chess-lifecycle-viewport-7a2c279ed1214782",
+        "chess-lifecycle-viewport-9706bfa142a14b0e",
+        "chess-lifecycle-viewport-9f6d3f5f6e47a278",
+        "chess-lifecycle-viewport-49c0dbecf1111307",
+        "chess-lifecycle-viewport-7e9070e19be324fe",
+        "chess-lifecycle-viewport-36e786642c9ad095",
+        "chess-lifecycle-viewport-1152cbbe04d48720",
+        "chess-lifecycle-viewport-564dd832d7131843",
+        "chess-lifecycle-viewport-d8cf355013fc526a",
+        "current-position-viewport-c1e3cfe6d17093b8",
+        "current-position-viewport-f4d18e7f4b1793b1",
+        "current-position-viewport-c238c5f569c74e80",
+        "current-position-viewport-7b7716324dff4604",
+        "current-position-sequence-74687ffecde8e6e6",
+        "chess-lifecycle-sequence-656d3129fea79e81",
+        "independent-manual-log",
+        "independent-auto-real-detail-log"
+      ]
+    },
+    {
+      "requirementId": "CHESS-QUEUE",
+      "note": "Reran82focused checks on deployed matching source tree; inspected passing log. Controlled runtime cases establish immediate canceled-job settlement/removal/capacity, unrelated FIFO, stop-bestmove/1s fallback, startup/readiness and old-child isolation. Live timing is not substituted for same-process proof.",
+      "artifactIds": [
+        "cancellation-provider-and-gate-tests-log"
+      ]
+    },
+    {
+      "requirementId": "CHESS-TRANSPORT",
+      "note": "Live all3UCI engines stream genuine thinking, abort and produce legal current replacements. All4model endpoints pass real progress/legal SSE case. Source-owned Request/consumer cancellation, late client suppression and preregistered actual-cleanup retention/scoped provider config remain covered by82source-bound tests and verified production deployment. No observed recovery stall; private generated deployment metadata unavailable as documented.",
+      "artifactIds": [
+        "cancellation-provider-and-gate-tests-log",
+        "current-position-browser-log",
+        "live-model-streams-log",
+        "live-engine-viewport-f045f5d5b4e9469b",
+        "live-engine-viewport-93dd43d770152bab",
+        "live-engine-viewport-0fd8c0c9b9acf641",
+        "live-engine-viewport-009b1bcbb0ec4391",
+        "live-engine-viewport-c42123b3a7a82a8b",
+        "live-engine-viewport-c7e0b001bbc098d9",
+        "live-engine-sequence-7482331dc283030c"
+      ]
+    },
+    {
+      "requirementId": "CHESS-RECOVERY",
+      "note": "Independent live narrow390/320 Cancel->stopped Retry->current hints and requested rapid gameplay/hover/Undo/reset pass pre-action hit/clip checks, with no pageerrors. Opened real Auto320 depth/elapsed/meter and all4action capture: board legible, feedback visible, controls reachable. Existing9 live gameplay regressions pass all4engine legal-history,3human-response/Free and2arena pair journeys.",
+      "artifactIds": [
+        "chess-lifecycle-viewport-984211c8bc899328",
+        "chess-lifecycle-viewport-a6f1aa0916ea5886",
+        "chess-lifecycle-viewport-d7a59bab0f3e1b9f",
+        "chess-lifecycle-viewport-7a2c279ed1214782",
+        "chess-lifecycle-viewport-9706bfa142a14b0e",
+        "chess-lifecycle-viewport-9f6d3f5f6e47a278",
+        "chess-lifecycle-viewport-49c0dbecf1111307",
+        "chess-lifecycle-viewport-7e9070e19be324fe",
+        "chess-lifecycle-viewport-36e786642c9ad095",
+        "chess-lifecycle-viewport-1152cbbe04d48720",
+        "chess-lifecycle-viewport-564dd832d7131843",
+        "chess-lifecycle-viewport-d8cf355013fc526a",
+        "current-position-viewport-c1e3cfe6d17093b8",
+        "current-position-viewport-f4d18e7f4b1793b1",
+        "current-position-viewport-c238c5f569c74e80",
+        "current-position-viewport-7b7716324dff4604",
+        "live-engine-viewport-f045f5d5b4e9469b",
+        "live-engine-viewport-93dd43d770152bab",
+        "live-engine-viewport-0fd8c0c9b9acf641",
+        "live-engine-viewport-009b1bcbb0ec4391",
+        "live-engine-viewport-c42123b3a7a82a8b",
+        "live-engine-viewport-c7e0b001bbc098d9",
+        "current-position-sequence-74687ffecde8e6e6",
+        "chess-lifecycle-sequence-656d3129fea79e81",
+        "live-engine-sequence-7482331dc283030c",
+        "current-position-browser-log",
+        "live-existing-gameplay-log",
+        "independent-manual-log",
+        "independent-auto-real-detail-log"
+      ]
+    },
+    {
+      "requirementId": "CHESS-GATE",
+      "note": "Verified merged5232dbc has exact approved treee703527, actual production identity before actions and retained identity/Vercel success evidence. RequiredCI250unit/99browser remains green; all5fresh deployed scenarios pass and report/artifact checksums validate. Independent live verdict approve; coordinator may record accept and run deployed gate.",
+      "artifactIds": [
+        "merged-deployment-and-ci-log"
+      ]
+    }
+  ]
+}
